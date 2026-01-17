@@ -1,0 +1,27 @@
+#include "AST/Noeuds/Operande/Operation.h"
+#include <stdexcept>
+
+Operation::Operation(std::function<double(double, double)> operateur) 
+    : _droite(nullptr), _gauche(nullptr), _operateur(operateur) {}
+
+std::shared_ptr<INoeud> Operation::ajouterExpression(
+    std::shared_ptr<IExpression> gauche, 
+    std::shared_ptr<IExpression> droite) {
+    
+    if (!droite || !gauche) {
+        throw std::invalid_argument("Les noeuds fournis sont nuls");
+    }
+    
+    if (_droite == nullptr && _gauche == nullptr) {
+        _gauche = gauche;
+        _droite = droite;
+    } else {
+        throw std::logic_error("Les noeuds existent déjà pour cette opération");
+    }
+    
+    return std::make_shared<Operation>(*this);
+}
+
+double Operation::resoudre() {
+    return _operateur(_gauche->resoudre(), _droite->resoudre());
+}

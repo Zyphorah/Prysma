@@ -1,0 +1,16 @@
+#pragma once
+
+/**
+ * @interface IExpression
+ * @brief Interface pour toute expression mathématique pouvant être résolue
+ */
+class IExpression {
+public:
+    virtual ~IExpression() = default;
+    
+    /**
+     * @brief Résout l'expression et retourne le résultat
+     * @return La valeur numérique de l'expression
+     */
+    virtual double resoudre() = 0;
+};
