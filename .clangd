@@ -1,0 +1,52 @@
+---
+# Configuration pour clangd
+
+# IntelliSense
+InlayHints:
+  Enabled: true
+  ParameterNames: true
+  DeducedTypes: true
+  TypeHints: true
+
+# Contrôle du compilateur
+CompileFlags:
+  # Drapeaux de compilation supplémentaires
+  Add: 
+    - "-std=c++17"
+    - "-Wall"
+    - "-Wextra"
+    - "-Wpedantic"
+    - "-O0"
+    - "-g"
+  # Chemins d'includes supplémentaires
+  CompilationDatabase: "build"
+
+# Chemins d'include
+Index:
+  # Répertoires à indexer pour la recherche de symboles
+  Background: Build
+  StandardLibraryMapping: 
+    stdlib: gnu++17
+
+# Diagnostics (erreurs/avertissements)
+Diagnostics:
+  # Activer les diagnostics
+  ClangTidy:
+    Add:
+      - "modernize-*"
+      - "readability-*"
+      - "performance-*"
+    Remove:
+      - "modernize-use-trailing-return-type"
+      - "readability-magic-numbers"
+
+# Assistant de code
+Hover:
+  ShowAKA: true
+
+# Completion
+Completion:
+  AllScopes: true
+  BundleOverloads: true
+  FullyQualifiedName: false
+  Limit: 100

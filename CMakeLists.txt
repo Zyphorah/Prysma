@@ -5,6 +5,9 @@ project(Prysma)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Générer compile_commands.json pour clangd
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Par défaut, si aucun type de build n'est fourni, utiliser Debug
 if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "CMAKE_BUILD_TYPE non défini -> configuration par défaut: Debug")

@@ -1,6 +1,23 @@
 {
     "tasks": [
         {
+            "label": "Clangd: Setup & Build",
+            "type": "shell",
+            "command": "${workspaceFolder}/setup-clangd.sh",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "detail": "Configure cmake with clangd support and build"
+        },
+        {
             "label": "CMake: build",
             "type": "shell",
             "command": "cmake",
@@ -34,6 +51,7 @@
                 "${workspaceFolder}/build",
                 "-DCMAKE_BUILD_TYPE=Debug",
                 "-DCMAKE_CXX_FLAGS=-g -O0",
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
                 "${workspaceFolder}"
             ],
             "presentation": {

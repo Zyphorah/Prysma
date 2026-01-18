@@ -1,34 +1,75 @@
 {
+    // ===== Clangd Configuration =====
+    "clangd.arguments": [
+        "--background-index",
+        "--clang-tidy",
+        "--completion-style=bundled",
+        "--header-insertion=iwyu",
+        "--pch-storage=memory",
+        "--function-arg-placeholders=false",
+        "--inlay-hints=true"
+    ],
+    "clangd.checkUpdates": false,
+    "clangd.onConfigChanged": "restart",
+
+    // ===== C++ Configuration =====
     "C_Cpp.default.cppStandard": "c++17",
     "C_Cpp.default.cStandard": "c11",
-    "C_Cpp.default.intelliSenseEngine": "Tag Parser",
+    "C_Cpp.default.intelliSenseEngine": "disabled",
     "C_Cpp.formatting": "disabled",
     "C_Cpp.default.compilerPath": "/usr/bin/g++",
     "C_Cpp.default.includePath": [
         "${workspaceFolder}/include",
-        "${workspaceFolder}/build"
+        "${workspaceFolder}/build",
+        "/usr/include",
+        "/usr/local/include"
     ],
-    "C_Cpp.default.defineSymbols": [
+    "C_Cpp.default.defines": [
         "DEBUG",
         "_DEBUG",
-        "NDEBUG"
+        "NDEBUG",
+        "LLVM_ENABLE_ASSERTIONS"
     ],
     "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.codeAnalysis.runAutomatically": false,
+
+    // ===== Editor Configuration =====
     "[cpp]": {
-        "editor.defaultFormatter": "ms-vscode.cpptools",
-        "editor.formatOnSave": false
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+        "editor.formatOnSave": false,
+        "editor.inlayHints.enabled": "on"
     },
     "[c]": {
-        "editor.defaultFormatter": "ms-vscode.cpptools",
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
         "editor.formatOnSave": false
     },
     "editor.rulers": [80, 120],
     "editor.wordWrap": "off",
     "editor.formatOnPaste": false,
+    "editor.semanticHighlighting.enabled": true,
+
+    // ===== File Exclusions =====
     "files.exclude": {
         "**/*.o": true,
         "**/*.d": true,
-        "build/**": false
-    }
+        "build/**": false,
+        "**/.DS_Store": true
+    },
+
+    // ===== Search Configuration =====
+    "search.exclude": {
+        "build": true,
+        ".git": true,
+        "**/*.o": true,
+        "**/*.a": true
+    },
+
+    // ===== CMake Tools =====
+    "cmake.autoSelectActiveFolder": true,
+    "cmake.configureOnOpen": false,
+
+    // ===== Hover Information =====
+    "editor.hover.enabled": true,
+    "editor.hover.delay": 300
 }

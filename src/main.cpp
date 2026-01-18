@@ -4,7 +4,6 @@
 #include "Parsing/Equation/ServiceParenthese.h"
 #include "Parsing/Equation/GestionnaireOperateur.h"
 #include "AST/Noeuds/Operande/Operation.h"
-#include "AST/Noeuds/Operande/Valeur.h"
 
 // Inclusions LLVM
 #include <llvm/IR/LLVMContext.h>
@@ -16,10 +15,7 @@
 #include <llvm/IR/Constants.h>
 
 #include <iostream>
-#include <memory>
-#include <vector>
-#include <fstream>
-#include <map>
+
 
 
 // Dans le future il faut encapsuler LLVM dans une classe avec que les méthodes nécessaires 
