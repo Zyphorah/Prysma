@@ -54,7 +54,7 @@ endif()
 
 # Options de compilation par configuration (ajout des symboles de debug en Debug)
 target_compile_options(Prysma PRIVATE
-    $<$<CONFIG:Debug>:-g;-O0>
+    $<$<CONFIG:Debug>:-g;-O0;-fno-omit-frame-pointer>
     $<$<NOT:$<CONFIG:Debug>>:-O2>
     -Wall -Wextra -Wpedantic
 )

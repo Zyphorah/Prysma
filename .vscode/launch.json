@@ -13,12 +13,80 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "sourceFileMap": {
-                "/": "${workspaceFolder}"
+                "/home/etudiant/Prysma": "${workspaceFolder}"
             },
             "environment": [],
             "externalConsole": false,
+            "setupCommands": [
+                {
+                    "description": "Enable pretty printing",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set disassembly flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Catch exceptions",
+                    "text": "catch throw",
+                    "ignoreFailures": true
+                }
+            ],
+            "logging": {
+                "engineLogging": false,
+                "trace": false,
+                "traceResponse": false
+            },
             "MIMode": "gdb",
             "miDebuggerPath": "/usr/bin/gdb",
+            "preLaunchTask": "CMake: build"
+        },
+        {
+            "name": "Debug Prysma (Stop at Entry)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/Prysma",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "sourceFileMap": {
+                "/home/etudiant/Prysma": "${workspaceFolder}"
+            },
+            "environment": [],
+            "externalConsole": false,
+            "setupCommands": [
+                {
+                    "description": "Enable pretty printing",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set disassembly flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "logging": {
+                "engineLogging": false
+            },
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "preLaunchTask": "CMake: build"
+        },
+        {
+            "name": "Debug Prysma with Valgrind",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/Prysma",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "miDebuggerArgs": "--args valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes",
             "preLaunchTask": "CMake: build"
         }
     ]
