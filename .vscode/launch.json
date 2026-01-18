@@ -12,6 +12,9 @@
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
+            "sourceFileMap": {
+                "/": "${workspaceFolder}"
+            },
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",

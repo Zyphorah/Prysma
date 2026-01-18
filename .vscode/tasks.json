@@ -11,9 +11,16 @@
                 "Debug",
                 "--",
                 "-j",
-                "${env:NUMBER_OF_PROCESSORS}" 
+                "${env:NUMBER_OF_PROCESSORS}"
             ],
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
             "problemMatcher": []
         },
         {

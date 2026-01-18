@@ -13,7 +13,7 @@ CXXFLAGS = -std=c++17 -Wall -Wextra -Wpedantic -O2 -Iinclude $(LLVM_CXXFLAGS) -f
 SRC_DIR = src
 OBJ_DIR = build/obj
 BIN_DIR = build
-TARGET = $(BIN_DIR)/NexusMathEngine
+TARGET = $(BIN_DIR)/Prysma
 
 # Trouver tous les fichiers .cpp
 SRCS := $(shell find $(SRC_DIR) -name "*.cpp")
