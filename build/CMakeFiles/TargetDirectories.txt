@@ -1,3 +1,0 @@
-/home/etudiant/Prysma/build/CMakeFiles/Prysma.dir
-/home/etudiant/Prysma/build/CMakeFiles/edit_cache.dir
-/home/etudiant/Prysma/build/CMakeFiles/rebuild_cache.dir

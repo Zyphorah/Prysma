@@ -5,8 +5,20 @@ project(Prysma)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Dossiers include
-include_directories(${CMAKE_SOURCE_DIR}/include)
+# --- BLOC LLVM AJOUTÉ ---
+# 1. Localisation du paquet LLVM
+find_package(LLVM REQUIRED CONFIG)
+
+# 2. Définition des macros de préprocesseur LLVM
+add_definitions(${LLVM_DEFINITIONS})
+
+# 3. Sélection des composants (Core et Support sont le minimum)
+# Ajoutez 'native' ou 'executionengine' si vous faites du JIT plus tard
+llvm_map_components_to_libnames(llvm_libs core support irreader bitwriter)
+# ------------------------
+
+# Dossiers include (Ajout de ${LLVM_INCLUDE_DIRS})
+include_directories(${CMAKE_SOURCE_DIR}/include ${LLVM_INCLUDE_DIRS})
 
 # Sources
 set(SOURCES
@@ -22,6 +34,11 @@ set(SOURCES
 
 # Créer l'exécutable
 add_executable(Prysma ${SOURCES})
+
+# --- LIEN LLVM AJOUTÉ ---
+# Lier les bibliothèques LLVM identifiées plus haut
+target_link_libraries(Prysma PRIVATE ${llvm_libs})
+# ------------------------
 
 # Flags de compilation
 if(MSVC)
