@@ -13,7 +13,8 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "sourceFileMap": {
-                "/home/etudiant/Prysma": "${workspaceFolder}"
+                "${workspaceFolder}": "${workspaceFolder}",
+                ".": "${workspaceFolder}"
             },
             "environment": [],
             "externalConsole": false,
@@ -40,7 +41,6 @@
                 "traceResponse": false
             },
             "MIMode": "gdb",
-            "miDebuggerPath": "/usr/bin/gdb",
             "preLaunchTask": "CMake: build"
         },
         {
@@ -52,7 +52,8 @@
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "sourceFileMap": {
-                "/home/etudiant/Prysma": "${workspaceFolder}"
+                "${workspaceFolder}": "${workspaceFolder}",
+                ".": "${workspaceFolder}"
             },
             "environment": [],
             "externalConsole": false,
@@ -72,7 +73,6 @@
                 "engineLogging": false
             },
             "MIMode": "gdb",
-            "miDebuggerPath": "/usr/bin/gdb",
             "preLaunchTask": "CMake: build"
         },
         {
@@ -85,7 +85,6 @@
             "cwd": "${workspaceFolder}",
             "externalConsole": false,
             "MIMode": "gdb",
-            "miDebuggerPath": "/usr/bin/gdb",
             "miDebuggerArgs": "--args valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes",
             "preLaunchTask": "CMake: build"
         }
