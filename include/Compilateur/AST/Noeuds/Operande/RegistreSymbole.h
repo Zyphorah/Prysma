@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AST/Noeuds/Interfaces/IRegistreSymbole.h"
+#include "Compilateur/AST/Noeuds/Interfaces/IRegistreSymbole.h"
 #include <map>
 #include <memory>
 

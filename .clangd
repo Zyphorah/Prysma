@@ -17,14 +17,14 @@ CompileFlags:
     - "-Wpedantic"
     - "-O0"
     - "-g"
-  # Chemins d'includes supplémentaires
+    - "-I${workspaceFolder}/include"
+  # Database de compilation
   CompilationDatabase: "build"
 
 # Chemins d'include
 Index:
   # Répertoires à indexer pour la recherche de symboles
   Background: Build
-  StandardLibrary: gnu++17
 
 # Diagnostics (erreurs/avertissements)
 Diagnostics:

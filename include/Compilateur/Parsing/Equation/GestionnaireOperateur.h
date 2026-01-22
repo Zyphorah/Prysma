@@ -1,8 +1,8 @@
 #ifndef FF112DD1_03F3_41D3_8B8F_5E7E64C5467A
 #define FF112DD1_03F3_41D3_8B8F_5E7E64C5467A
 
-#include "Interfaces/IGestionnaireOperateur.h"
-#include "Interfaces/IGestionnaireParenthese.h"
+#include "Compilateur/Parsing/Equation/Interfaces/IGestionnaireOperateur.h"
+#include "Compilateur/Parsing/Equation/Interfaces/IGestionnaireParenthese.h"
 #include <memory>
 #include <string>
 

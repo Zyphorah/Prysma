@@ -32,15 +32,15 @@ include_directories(${CMAKE_SOURCE_DIR}/include ${LLVM_INCLUDE_DIRS})
 # Sources
 set(SOURCES
     src/main.cpp
-    src/compilateur/AST/ConstructeurArbreEquation.cpp
-    srccompilateur//AST/Noeuds/Operande/Operation.cpp
-    src/compilateur/AST/Noeuds/Operande/RegistreSymbole.cpp
-    src/compilateur/AST/Noeuds/Operande/Valeur.cpp
-    src/compilateur/LLVM/LLVMSerializer.cpp
-    src/compilateur/Parsing/Equation/ChaineResponsabilite.cpp
-    src/compilateur/Parsing/Equation/GestionnaireOperateur.cpp
-    src/compilateur/Parsing/Equation/ServiceParenthese.cpp
-    src/compilateur/Lexer/Lexer.cpp
+    src/Compilateur/AST/ConstructeurArbreEquation.cpp
+    src/Compilateur/AST/Noeuds/Operande/Operation.cpp
+    src/Compilateur/AST/Noeuds/Operande/RegistreSymbole.cpp
+    src/Compilateur/AST/Noeuds/Operande/Valeur.cpp
+    src/Compilateur/LLVM/LLVMSerializer.cpp
+    src/Compilateur/Parsing/Equation/ChaineResponsabilite.cpp
+    src/Compilateur/Parsing/Equation/GestionnaireOperateur.cpp
+    src/Compilateur/Parsing/Equation/ServiceParenthese.cpp
+    src/Compilateur/Lexer/Lexer.cpp
 )
 
 # Créer l'exécutable

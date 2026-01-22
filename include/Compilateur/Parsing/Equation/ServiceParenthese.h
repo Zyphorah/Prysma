@@ -1,8 +1,8 @@
 #ifndef DA3AD58B_D7B7_44D3_AC56_E1DDCD78F54F
 #define DA3AD58B_D7B7_44D3_AC56_E1DDCD78F54F
 
-#include "Interfaces/IGestionnaireParenthese.h"
-#include "AST/Noeuds/Operande/RegistreSymbole.h"
+#include "Compilateur/Parsing/Equation/Interfaces/IGestionnaireParenthese.h"
+#include "Compilateur/AST/Noeuds/Operande/RegistreSymbole.h"
 #include <memory>
 #include <string>
 

@@ -1,4 +1,4 @@
-#include "Lexer/Lexer.h"
+#include "Compilateur/Lexer/Lexer.h"
 #include <cctype>
 
 void Lexer::traiterCommentaires(const string& sourceCode, size_t& pos) {

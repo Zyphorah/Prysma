@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Noeuds/Interfaces/IExpression.h"
-#include "Noeuds/Operande/RegistreSymbole.h"
-#include "Parsing/Equation/ChaineResponsabilite.h"
-#include "Parsing/Equation/Interfaces/IGestionnaireParenthese.h"
+#include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
+#include "Compilateur/AST/Noeuds/Operande/RegistreSymbole.h"
+#include "Compilateur/Parsing/Equation/ChaineResponsabilite.h"
+#include "Compilateur/Parsing/Equation/Interfaces/IGestionnaireParenthese.h"
 #include <llvm/IR/LLVMContext.h>
 #include <memory>
 #include <string>
