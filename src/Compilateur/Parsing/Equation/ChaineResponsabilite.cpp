@@ -4,7 +4,7 @@
 ChaineResponsabilite::ChaineResponsabilite(
     IGestionnaireParenthese* gestionnaireParenthese, 
     std::vector<GestionnaireOperateur*> operateurs)
-    : _debut(nullptr), _gestionnaireParenthese(gestionnaireParenthese), _operateurs(operateurs) {
+    : _debut(nullptr), _gestionnaireParenthese(gestionnaireParenthese), _operateurs(std::move(operateurs)) {
     
     // Chaîner les gestionnaires
     for (size_t i = 0; i < _operateurs.size(); i++) {
@@ -24,6 +24,9 @@ ChaineResponsabilite::~ChaineResponsabilite() {
 }
 
 int ChaineResponsabilite::trouverOperateur(const std::string& equation) const {
-    if (_debut == nullptr) return -1;
+    if (_debut == nullptr)
+    {
+        return -1;
+    }
     return _debut->traiter(equation);
 }
