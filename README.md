@@ -104,13 +104,11 @@ Le temps de travail pour ce projet inclut trois sprints de deux semaines chacun.
 - Comprendre en profondeur les méthodes de LLVM qui permettent de générer le code source intermédiaire. 
 - Écrire le curseur qui orchestre la création des nœuds, les nœuds (while, if, variables (int, float, bool)) serviront pour la génération du code de façon récursive. 
 
-
 ### Que voyez-vous dans l'itération 2 du projet ?
 
 > Listez les fonctionnalités visées à l'intérieur de 2 semaines et les technologies qui seront utilisées
 - Logique d'erreur de syntaxe gérée dans le parsing, le curseur de token utilisera la classe d'erreur pour déterminer si la syntaxe est correcte avant de construire l'arbre syntaxique. 
 - Implémenter un système de débogage contrôlé qui permet à l'éditeur de code VSCode de placer des breakpoints lors de l'exécution. 
-
 
 ### Que voyez-vous dans l'itération 3 du projet ?
 
