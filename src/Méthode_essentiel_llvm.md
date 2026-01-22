@@ -1,7 +1,5 @@
 https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/
 
-Voici la liste essentielle des méthodes de l'API C++ LLVM (fichiers d'en-tête `llvm/IR/`) nécessaires pour construire un compilateur impératif de base.
-
 Cette documentation se base sur **LLVM `IRBuilder**`, qui est la classe principale pour générer du code.
 
 ---
