@@ -1,9 +1,9 @@
-#include "AST/Noeuds/Operande/RegistreSymbole.h"
-#include "AST/ConstructeurArbreEquation.h"
-#include "Parsing/Equation/ChaineResponsabilite.h"
-#include "Parsing/Equation/ServiceParenthese.h"
-#include "Parsing/Equation/GestionnaireOperateur.h"
-#include "AST/Noeuds/Operande/Operation.h"
+#include "Compilateur/AST/Noeuds/Operande/RegistreSymbole.h"
+#include "Compilateur/AST/ConstructeurArbreEquation.h"
+#include "Compilateur/Parsing/Equation/ChaineResponsabilite.h"
+#include "Compilateur/Parsing/Equation/ServiceParenthese.h"
+#include "Compilateur/Parsing/Equation/GestionnaireOperateur.h"
+#include "Compilateur/AST/Noeuds/Operande/Operation.h"
 
 // Inclusions LLVM
 #include <llvm/IR/LLVMContext.h>
@@ -13,7 +13,7 @@
 #include <llvm/IR/NoFolder.h>
 #include <llvm/IR/Type.h>
 #include <llvm/IR/Constants.h>
-#include "LLVM/LLVMSerializer.h"
+#include "Compilateur/LLVM/LLVMSerializer.h"
 
 #include <iostream>
 

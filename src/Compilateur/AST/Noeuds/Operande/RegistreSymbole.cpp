@@ -1,4 +1,4 @@
-#include "AST/Noeuds/Operande/RegistreSymbole.h"
+#include "Compilateur/AST/Noeuds/Operande/RegistreSymbole.h"
 #include <stdexcept>
 
 void RegistreSymbole::enregistrer(

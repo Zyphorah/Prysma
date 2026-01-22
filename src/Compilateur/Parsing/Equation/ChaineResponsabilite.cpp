@@ -1,5 +1,5 @@
-#include "Parsing/Equation/ChaineResponsabilite.h"
-#include "Parsing/Equation/GestionnaireOperateur.h"
+#include "Compilateur/Parsing/Equation/ChaineResponsabilite.h"
+#include "Compilateur/Parsing/Equation/GestionnaireOperateur.h"
 
 ChaineResponsabilite::ChaineResponsabilite(
     IGestionnaireParenthese* gestionnaireParenthese, 

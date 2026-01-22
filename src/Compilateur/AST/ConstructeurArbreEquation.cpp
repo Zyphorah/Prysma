@@ -1,10 +1,10 @@
-#include "AST/ConstructeurArbreEquation.h"
+#include "Compilateur/AST/ConstructeurArbreEquation.h"
 
 #include <utility>
 #include <llvm/IR/Constants.h>
-#include "AST/Noeuds/Interfaces/INoeud.h"
-#include "AST/Noeuds/Operande/Valeur.h"
-#include "AST/Noeuds/Interfaces/IExpression.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/Noeuds/Operande/Valeur.h"
+#include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
 
 ConstructeurArbreEquation::ConstructeurArbreEquation(
     ChaineResponsabilite* chaineResponsabilite,

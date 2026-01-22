@@ -1,4 +1,4 @@
-#include "Parsing/Equation/GestionnaireOperateur.h"
+#include "Compilateur/Parsing/Equation/GestionnaireOperateur.h"
 
 GestionnaireOperateur::GestionnaireOperateur(char symbole)
     : _suivant(nullptr), _gestionnaireParenthese(nullptr), _symbole(symbole) {}
