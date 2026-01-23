@@ -63,7 +63,6 @@ défis technique pour mener à terme la réalisation :
 - Gérer les erreurs de syntaxe et de sémantique de manière efficace.
 - Optimiser le code généré pour de meilleures performances.
 
-
 ## Illustration du projet
 
 C'est la représentation d'un arbre syntaxique abstrait pour le langage Prysma. Pour le code suivant :
@@ -112,7 +111,6 @@ code généré en sortie du compilateur Prysma pour cette équation : 2*3-(20+3)
 - Écrire le curseur qui orchestre la création des nœuds, les nœuds (while, if, variables (int, float, bool)) serviront pour la génération du code de façon récursive. 
 
 ### Itération 2 du projet fonctionnalité à réaliser en 2 semaines ?
-
 
 - Logique d'erreur de syntaxe gérée dans le parsing, le curseur de token utilisera la classe d'erreur pour déterminer si la syntaxe est correcte avant de construire l'arbre syntaxique. 
 - Implémenter un système de débogage contrôlé qui permet à l'éditeur de code VSCode de placer des breakpoints lors de l'exécution. 
