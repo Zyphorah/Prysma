@@ -12,7 +12,7 @@ LLVM résout plusieurs problématiques liées au langage de bas niveau, comme l'
 
 En somme, le LLVM est un outil qui génère du code intermédiaire avec une syntaxe proche de l'assembleur, mais avec des fonctionnalités avancées qui facilitent la création du compilateur. 
 
-Prysma est un langage de programmation qui inclura des fonctionnalités de base comme les variables, les fonctions, les conditions, les boucles, etc. Le compilateur devra être capable de gérer ces fonctionnalités et de générer du code LLVM correspondant. L'objectif est de créer un langage Turing-complet, il y aura donc l'écriture de bibliothèques standard comme la gestion de la mémoire, arbre binaire, liste chaînée, pile, file, graphe, dictionnaire, bibliothèque de manipulation de chaîne de caractères, etc. C'est un projet évolutif, donc les fonctionnalités ne sont pas en manque, nous pouvons toujours ajouter des fonctionnalités supplémentaires au langage et au compilateur, exemple : l'orienté objet, faire un garbage collector, des lambdas, etc.
+Prysma est un langage de programmation qui inclura des fonctionnalités de base comme les variables, les fonctions, les conditions, les boucles, etc. Le compilateur devra être capable de gérer ces fonctionnalités et de générer du code LLVM correspondant. L'objectif est de créer un langage Turing-complet, il y aura donc l'écriture de bibliothèques standard comme la gestion de la mémoire, arbre binaire, liste chaînée, pile, file, graphe, dictionnaire, bibliothèque de manipulation de chaîne de caractères, etc. C'est un projet évolutif, donc les fonctionnalités ne sont pas en manque, nous pouvons toujours ajouter des fonctionnalités supplémentaires au langage et au compilateur, exemple : l'orienté-objet, faire un garbage collector, des lambdas, etc.
 
 
 ## 3 projets similaires au mien qui m'inspirent 
@@ -49,7 +49,7 @@ Cette technologie s'intègre au projet en tant que composant central, c'est le b
 
 ### Les risques technologiques pour la réalisation du projet
 
-endroits de blocage potentiels :
+Endroits de blocage potentiels :
 - Le débogage n'est pas seulement fait dans le langage C++ mais aussi dans le langage généré par le framework LLVM. Ce qui nous donne deux dimensions de débogage où peut se trouver un problème. 
 - La complexité de la génération du code par le framework LLVM peut être importante. 
 - La récursivité peut être un défi, visualiser l'état d'exécution du code n'est pas aussi simple qu'avec un code non récursif. 
@@ -57,7 +57,7 @@ endroits de blocage potentiels :
 - La création du garbage collector peut être un défi technique intéressant à relever. 
 - La création des bibliothèques du langage Prysma.
 
-défis technique pour mener à terme la réalisation :
+défis techniques pour mener à terme la réalisation :
 - Comprendre en profondeur le framework LLVM et son API C++.
 - Concevoir une architecture de compilateur robuste et évolutive.
 - Gérer les erreurs de syntaxe et de sémantique de manière efficace.
@@ -71,11 +71,11 @@ C'est la représentation d'un arbre syntaxique abstrait pour le langage Prysma. 
 def void afficher_nombre_pair(int limite) {
     for (int i = 0; i < limite; i = i + 1) {
         if (i % 2 == 0) {
-            print(i, "paire")
+            print(i, "pair")
         }
         else 
         {
-            print(i, "impaire")
+            print(i, "impair")
         }
     }
 }
@@ -110,13 +110,18 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
 
 - Logique d'erreur de syntaxe gérée dans le parsing, le curseur de token utilisera la classe d'erreur pour déterminer si la syntaxe est correcte avant de construire l'arbre syntaxique. 
 - Implémenter un système d'affichage (dump) de l'AST et du code IR dans la console pour débogage manuel 
-- Coloriage syntaxique dans VSCode pour le langage Prysma. 
-- Implémentation du type string et des tableaux dans le langage Prysma.
+- Coloration syntaxique dans VSCode pour le langage Prysma. 
+
 
 ### Itération 3 du projet fonctionnalité à réaliser en 2 semaines ?
 
 - Écrire une librairie mathématique pour le langage Prysma (factorielle, suite de Fibonacci, puissance, PGCD, vérification de nombre premier, etc.).
-
 - Correction des bugs, d'ailleurs la programmation de cette librairie servira de test pour valider la gestion de la récursivité (stack frames) et des boucles imbriquées sans avoir à gérer l'allocation dynamique complexe.
-
 - Consolider la logique des opérateurs arithmétiques et des conditions pour s'assurer que le code généré est fiable avant d'aller plus loin.
+- refactorisation du code source. 
+
+### bonus 
+
+- Implémentation du type string et des tableaux dans le langage Prysma.
+- Écrire des librairies fonctionnelles pour le langage de programmation (liste chaînée, arbre binaire, pile, file, etc.) 
+- Gestion de mémoire, pointeur allocation 
