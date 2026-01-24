@@ -1,51 +1,42 @@
-cmake_minimum_required(VERSION 3.10)
-project(LLVMMethodeDoc)
+cmake_minimum_required(VERSION 3.14)
+project(LLVM_Labo)
 
-# Configuration du standard C++
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Générer compile_commands.json pour clangd
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# Par défaut, si aucun type de build n'est fourni, utiliser Debug
-if(NOT CMAKE_BUILD_TYPE)
-    message(STATUS "CMAKE_BUILD_TYPE non défini -> configuration par défaut: Debug")
-    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
-endif()
-
-# --- CONFIGURATION LLVM ---
-# Localisation du paquet LLVM
+# 1. Trouver le paquet LLVM
 find_package(LLVM REQUIRED CONFIG)
 
-# Définition des macros de préprocesseur LLVM
+# 2. Configurer les chemins d'inclusion
+include_directories(${LLVM_INCLUDE_DIRS})
+include_directories(${CMAKE_SOURCE_DIR}/../../include)
 add_definitions(${LLVM_DEFINITIONS})
 
-# Sélection des composants LLVM
-llvm_map_components_to_libnames(llvm_libs core support irreader bitwriter)
+# 3. Définir l'exécutable
+add_executable(LLVMMethodeDoc LLVMMethodeDoc.cpp ../../src/Compilateur/LLVM/LLVMSerializer.cpp)
 
-# --- CHEMINS D'INCLUSION ---
-# Ajouter les répertoires include du projet principal
-include_directories(${CMAKE_SOURCE_DIR}/../../include ${LLVM_INCLUDE_DIRS})
-
-# --- SOURCES ---
-set(SOURCES
-    LLVMMethodeDoc.cpp
-    ../../src/Compilateur/LLVM/LLVMSerializer.cpp
+# 4. Utiliser directement les flags de llvm-config sans ALL
+execute_process(
+    COMMAND llvm-config --cxxflags
+    OUTPUT_VARIABLE LLVM_CXX_FLAGS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-# --- CRÉER L'EXÉCUTABLE ---
-add_executable(LLVMMethodeDoc ${SOURCES})
+execute_process(
+    COMMAND llvm-config --ldflags
+    OUTPUT_VARIABLE LLVM_LDFLAGS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 
-# --- LIER LES BIBLIOTHÈQUES ---
-target_link_libraries(LLVMMethodeDoc ${llvm_libs})
+execute_process(
+    COMMAND llvm-config --libs
+    OUTPUT_VARIABLE LLVM_LIBS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 
-# --- FLAGS DE COMPILATION ---
-if(MSVC)
-    target_compile_options(LLVMMethodeDoc PRIVATE /W4)
-else()
-    target_compile_options(LLVMMethodeDoc PRIVATE -Wall -Wextra -Wpedantic -g -O0)
-endif()
+# 5. Appliquer tous les flags et libs
+target_compile_options(LLVMMethodeDoc PRIVATE ${LLVM_CXX_FLAGS})
+target_link_options(LLVMMethodeDoc PRIVATE ${LLVM_LDFLAGS})
+target_link_libraries(LLVMMethodeDoc ${LLVM_LIBS})
 
 # Message de confirmation
 message(STATUS "Projet LLVMMethodeDoc configuré avec succès")

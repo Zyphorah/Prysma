@@ -3,11 +3,17 @@
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/Support/raw_ostream.h>
-#include <llvm/IR/NoFolder.h>
+
 #include <llvm/IR/Type.h>
 #include <llvm/IR/Constants.h>  
 #include <llvm/IR/Instructions.h>
 #include "../../include/Compilateur/LLVM/LLVMSerializer.h"
+
+#include <llvm/TargetParser/Host.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/MC/TargetRegistry.h>
+#include <llvm/Target/TargetMachine.h>
+#include <llvm/Target/TargetOptions.h>
 
 using namespace llvm;
 
@@ -17,7 +23,7 @@ using namespace llvm;
 // ===== Initialisation LLVM =====
 llvm::LLVMContext context;
 llvm::Module module("PrysmaModule", context);
-llvm::IRBuilder<llvm::NoFolder> builder(context);
+llvm::IRBuilder<> builder(context);
 
 AllocaInst* exempleInitialisationVariable()
 {
@@ -41,6 +47,8 @@ void LireUneValeurEtAjouter5(AllocaInst* allocaX)
     Type * typeInt = builder.getInt32Ty();
     const Twine NameTmp = "loadtmp"; 
     
+    // On utilise les instruction comme CreateAdd pour creer une instruction assembleur intermédiaire pour effectuer 
+    // une addition, multiplication, division, soustraction. 
     Value *loaded = builder.CreateLoad(typeInt, allocaX, NameTmp);
     Value *added = builder.CreateAdd(loaded, ConstantInt::get(typeInt, 5), NameTmp);
     builder.CreateStore(added, allocaX);
@@ -54,20 +62,41 @@ void sauvegarderCode()
 
 int main()
 {
+    // Configuration de la cible, évite d'avoir des adresses mémoire aléatoire, ce qui cause des crashs aléatoire. 
+    InitializeAllTargetInfos();
+    InitializeAllTargets();
+    InitializeAllTargetMCs();
+    InitializeAllAsmPrinters();
+
+    std::string targetTriple = sys::getDefaultTargetTriple();
+    module.setTargetTriple(targetTriple);
+
+    std::string error;
+    auto target = TargetRegistry::lookupTarget(targetTriple, error);
+    if (!target) {
+        errs() << error;
+        return 1;
+    }
+
+    TargetOptions opt;
+    auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", opt, Reloc::Model::PIC_);
+    
+    // Définit le layout mémoire correct (alignement standard et espace 0)
+    module.setDataLayout(targetMachine->createDataLayout());
+    // ------------------------------------------------------------------
+
     // Tout dois ce trouver dans une fonction avant l'execution. 
     // 1. Définir le type de la fonction (void func())
     FunctionType *ftype = FunctionType::get(Type::getVoidTy(context), false);
     
     // 2. Créer la fonction "main" dans le module
-    Function *mainFunc = Function::Create(ftype, Function::ExternalLinkage, "main_test", module);
+    Function *mainFunc = Function::Create(ftype, Function::ExternalLinkage, "main", module);
     
     // 3. Créer un BasicBlock nommé "entry" à l'intérieur de cette fonction
     BasicBlock *bb = BasicBlock::Create(context, "entry", mainFunc);
     
     // 4. Positionner le curseur du builder dans ce bloc (CRUCIAL)
     builder.SetInsertPoint(bb);
-    
-    // --- CORRECTIF FIN ---
 
     // Maintenant le builder sait où écrire
     AllocaInst* allocatX = exempleInitialisationVariable();
