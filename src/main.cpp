@@ -34,6 +34,8 @@ int main() {
         std::string equation = "2*3-(20+3)";
         std::shared_ptr<RegistreSymbole> registreSymbole = std::make_shared<RegistreSymbole>();
 
+        // Mettre dans un builder dans le future 
+
         // registre de lamda LLVM contenant une map des opérations mathématiques de base 
         registreSymbole->enregistrer('+', [&]() { 
             return std::make_shared<Operation>(

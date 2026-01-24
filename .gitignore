@@ -46,6 +46,8 @@
 /build-*/ 
 /Documents/LLVMDoc/build-*/ 
 /Documents/LLVMDoc/build/ 
+/Tests/build/ 
+/Tests/build-*/
 
 # Cache clangd 
 
