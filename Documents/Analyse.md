@@ -46,43 +46,6 @@ En résumé : utiliser LLVM IR réduit énormément la charge d'implémentation 
 
 ## 3. Conception du Langage Prysma
 
-### Syntaxe et Sémantique
-
-Prysma utilise une syntaxe claire basée sur l'indentation pour définir les blocs (Off-side rule).
-
-```rust
-// Variables et Types
-int x = 5 
-string message = "Bonjour, Prysma!"
-char caractere = 'A'
-bool estVrai = true
-
-// Contrôle de flux (Indentation définit le bloc)
-if x = 0 
-if x < 0
-if x != 0
-if x > 0
-    print("x est positif")
-else
-    print("x est nul ou négatif")
-
-// Boucle For avec syntaxe d'itérateur
-for i in 0..10
-    print(i)
-
-// Boucle While
-while x < 100
-    x = x * 2
-
-// Fonctions (mot-clé 'def' pour faciliter le parsing)
-def int add_function(int a, int b)
-    int result = a + b
-    return result
-
-// Appel de fonction
-int somme = add_function(10, 20)
-```
-
 ### Conception Orientée Objet (optionnel)
 
 - **Classes et objets :** Définition de la syntaxe et de la sémantique pour la création de classes et l'héritage.

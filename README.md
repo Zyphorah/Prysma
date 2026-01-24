@@ -114,7 +114,6 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
 - Implémenter un système d'affichage (dump) de l'AST et du code IR dans la console pour débogage manuel 
 - Coloration syntaxique dans VSCode pour le langage Prysma. 
 
-
 ### Itération 3 du projet fonctionnalité à réaliser en 2 semaines ?
 
 - Écrire une librairie mathématique pour le langage Prysma (factorielle, suite de Fibonacci, puissance, PGCD, vérification de nombre premier, etc.).
