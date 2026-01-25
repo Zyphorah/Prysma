@@ -63,6 +63,9 @@ class FloatEquationBuilder
         constructeurArbreEquation = new ConstructeurArbreEquation(
             chaineResponsabilite, registreSymboleFloat, serviceParenthese, context
         );
+
+        // ===== Enregistrement des opérateurs =====
+        construireRegistreSymboleFloat();
     }
     ~FloatEquationBuilder()
     {
