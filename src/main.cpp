@@ -1,9 +1,5 @@
+#include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
 #include "Compilateur/AST/Noeuds/Operande/RegistreSymbole.h"
-#include "Compilateur/AST/ConstructeurArbreEquation.h"
-#include "Compilateur/Parsing/Equation/ChaineResponsabilite.h"
-#include "Compilateur/Parsing/Equation/ServiceParenthese.h"
-#include "Compilateur/Parsing/Equation/GestionnaireOperateur.h"
-#include "Compilateur/AST/Noeuds/Operande/Operation.h"
 
 // Inclusions LLVM
 #include <llvm/IR/LLVMContext.h>
@@ -15,8 +11,8 @@
 #include <llvm/IR/Constants.h>
 #include "Compilateur/LLVM/LLVMSerializer.h"
 
-#include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/Lexer/Lexer.h"
+#include "Compilateur/Builder/Equation/FloatEquationBuilder.h"
 
 #include <iostream>
 
@@ -56,65 +52,9 @@ int main() {
 
         vector<Token> tokens = lexer.tokenizer(equation);
 
-
-        std::shared_ptr<RegistreSymbole> registreSymbole = std::make_shared<RegistreSymbole>();
-
-        // Mettre dans un builder dans le future 
-
-        // registre de lamda LLVM contenant une map des opérations mathématiques de base 
-        registreSymbole->enregistrer(TOKEN_PLUS, [&]() { 
-            return std::make_shared<Operation>(
-                std::function<llvm::Value*(llvm::Value*, llvm::Value*)>([&](llvm::Value* lhs, llvm::Value* rhs) { 
-                    return builder.CreateFAdd(lhs, rhs, "addtmp"); 
-                })
-            ); 
-        });
+        FloatEquationBuilder* floatEquationBuilder = new FloatEquationBuilder(context);
         
-        registreSymbole->enregistrer(TOKEN_MOINS, [&]() { 
-            return std::make_shared<Operation>(
-                std::function<llvm::Value*(llvm::Value*, llvm::Value*)>([&](llvm::Value* lhs, llvm::Value* rhs) { 
-                    return builder.CreateFSub(lhs, rhs, "subtmp"); 
-                })
-            ); 
-        });
-        
-        registreSymbole->enregistrer(TOKEN_ETOILE, [&]() { 
-            return std::make_shared<Operation>(
-                std::function<llvm::Value*(llvm::Value*, llvm::Value*)>([&](llvm::Value* lhs, llvm::Value* rhs) { 
-                    return builder.CreateFMul(lhs, rhs, "multmp"); 
-                })
-            ); 
-        });
-        
-        registreSymbole->enregistrer(TOKEN_SLASH, [&]() { 
-            return std::make_shared<Operation>(
-                std::function<llvm::Value*(llvm::Value*, llvm::Value*)>([&](llvm::Value* lhs, llvm::Value* rhs) { 
-                    return builder.CreateFDiv(lhs, rhs, "divtmp"); 
-                })
-            ); 
-        });
-        
-        // ===== Chaîne de responsabilité =====
-        ServiceParenthese* serviceParenthese = new ServiceParenthese(registreSymbole);
-        
-        GestionnaireOperateur* gestionnaireAddition = new GestionnaireOperateur(TOKEN_PLUS);
-        GestionnaireOperateur* gestionnaireSoustraction = new GestionnaireOperateur(TOKEN_MOINS);
-        GestionnaireOperateur* gestionnaireMultiplication = new GestionnaireOperateur(TOKEN_ETOILE);
-        GestionnaireOperateur* gestionnaireDivision = new GestionnaireOperateur(TOKEN_SLASH);
-        
-        std::vector<GestionnaireOperateur*> operateurs = {
-            gestionnaireAddition, gestionnaireSoustraction, 
-            gestionnaireMultiplication, gestionnaireDivision
-        };
-        
-        ChaineResponsabilite* chaineResponsabilite = new ChaineResponsabilite(serviceParenthese, operateurs);
-                        
-        // ===== Construction de l'AST et Résolution =====
-        ConstructeurArbreEquation* constructeurArbreEquation = new ConstructeurArbreEquation(
-            chaineResponsabilite, registreSymbole, serviceParenthese, context
-        );
-
-        std::shared_ptr<IExpression> expression = constructeurArbreEquation->construire(tokens);
+        shared_ptr<IExpression> expression = floatEquationBuilder->builderArbreEquationFloat(tokens);
         
         // Résoudre l'expression (cela appelle aussi les lambdas LLVM) / Parcours en Profondeur Postfixe
         llvm::Value* resultatNumerique = expression->resoudre();
@@ -161,12 +101,7 @@ int main() {
         traitementFichier.SauvegarderCodeLLVM("output.ll");
 
         // Nettoyage
-        delete constructeurArbreEquation;
-        delete chaineResponsabilite;
-        delete gestionnaireAddition; delete gestionnaireSoustraction;
-        delete gestionnaireMultiplication; delete gestionnaireDivision;
-        delete serviceParenthese;
-       
+      
         return 0;
         
     } catch (const std::exception& e) {

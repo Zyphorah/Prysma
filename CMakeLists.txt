@@ -41,6 +41,8 @@ set(SOURCES
     src/Compilateur/Parsing/Equation/GestionnaireOperateur.cpp
     src/Compilateur/Parsing/Equation/ServiceParenthese.cpp
     src/Compilateur/Lexer/Lexer.cpp
+    src/Compilateur/Builder/FloatEquationBuilder.cpp
+    src/Compilateur/Builder/IntEquationBuilder.cpp
 )
 
 # Créer l'exécutable

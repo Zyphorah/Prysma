@@ -5,6 +5,7 @@
 ServiceParenthese::ServiceParenthese(std::shared_ptr<RegistreSymbole> registreSymbole)
     : _registreSymbole(std::move(registreSymbole)) {}
 
+    // TODO: OPTIMISATION utilisation de int debut et int fin pour éviter la copi du vecteur de token et ne rien retourner
 std::vector<Token> ServiceParenthese::enleverParenthesesEnglobantes(const vector<Token>& equation) {
     std::vector<Token> result = equation;
     
