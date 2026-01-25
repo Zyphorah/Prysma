@@ -1,48 +1,66 @@
 #include "Compilateur/Parsing/Equation/ServiceParenthese.h"
-#include <cctype>
+#include "Compilateur/Lexer/TokenType.h"
 #include <utility>
 
 ServiceParenthese::ServiceParenthese(std::shared_ptr<RegistreSymbole> registreSymbole)
     : _registreSymbole(std::move(registreSymbole)) {}
 
-std::string ServiceParenthese::enleverParenthesesEnglobantes(std::string equation) {
-    // Trimmer les espaces
-    equation.erase(0, equation.find_first_not_of(" \t\n\r"));
-    equation.erase(equation.find_last_not_of(" \t\n\r") + 1);
+std::vector<Token> ServiceParenthese::enleverParenthesesEnglobantes(const vector<Token>& equation) {
+    std::vector<Token> result = equation;
     
-    while (equation.length() >= 2 && 
-           equation.front() == '(' && 
-           equation.back() == ')' && 
-           estEnglobante(equation)) {
-        equation = equation.substr(1, equation.length() - 2);
-        equation.erase(0, equation.find_first_not_of(" \t\n\r"));
-        equation.erase(equation.find_last_not_of(" \t\n\r") + 1);
+    // Enlever les tokens EOF au début et à la fin
+    while (!result.empty() && result.front().type == TOKEN_EOF) {
+        result.erase(result.begin());
     }
-    return equation;
+    while (!result.empty() && result.back().type == TOKEN_EOF) {
+        result.erase(result.end() - 1);
+    }
+    
+    while (result.size() >= 2 && 
+           result.front().type == TOKEN_PAREN_OUVERTE && 
+           result.back().type == TOKEN_PAREN_FERMEE && 
+           estEnglobante(result)) {
+        result.erase(result.begin());
+        result.erase(result.end() - 1);
+    }
+    return result;
 }
 
-bool ServiceParenthese::estEnglobante(const std::string& equation)  {
+bool ServiceParenthese::estEnglobante(const vector<Token>& equation) {
+    if (equation.size() < 2) {
+        return false;
+    }
+    
+    if (equation.front().type != TOKEN_PAREN_OUVERTE) {
+        return false;
+    }
+
+    if (equation.back().type != TOKEN_PAREN_FERMEE) {
+        return false;
+    }
+    
+    // Vérifier que la profondeur ne retombe pas à 0 avant le dernier token
     int profondeur = 0;
-    for (size_t i = 0; i < equation.length() - 1; i++) {
-        char caractere = equation[i];
-        profondeur += (caractere == '(' ? 1 : caractere == ')' ? -1 : 0);
-        if (profondeur == 0) 
-        {
+    for (size_t i = 0; i < equation.size(); i++) {
+        Token token = equation[i];
+        profondeur += (token.type == TOKEN_PAREN_OUVERTE ? 1 : token.type == TOKEN_PAREN_FERMEE ? -1 : 0);
+        // Si on atteint profondeur 0 avant le dernier token, ce n'est pas englobant
+        if (profondeur == 0 && i < equation.size() - 1) {
             return false;
         }
     }
-    return true;
+    
+    return profondeur == 0;
 }
 
-int ServiceParenthese::trouverDernierAuNiveauZero(const std::string& equation, char operateur) {
+int ServiceParenthese::trouverDernierAuNiveauZero(const vector<Token>& equation, Token operateur) {
     int profondeur = 0;
-    for (int i = equation.length() - 1; i >= 0; i--) {
-        char caractere = equation[i];
-        profondeur += (caractere == ')' ? 1 : caractere == '(' ? -1 : 0);
+    for (int i = equation.size() - 1; i >= 0; i--) {
+        Token token = equation[i];
+        profondeur += (token.type == TOKEN_PAREN_FERMEE ? 1 : token.type == TOKEN_PAREN_OUVERTE ? -1 : 0);
         
-        if (caractere == operateur && profondeur == 0 && !estSigneUnaire(equation, i)) {
-            // Vérifier pour les opérateurs doubles (comme --)
-            if (i > 0 && operateur == equation[i - 1]) {
+        if (token.type == operateur.type && profondeur == 0 && !estSigneUnaire(equation, i)) {
+            if (i > 0 && operateur.type == equation[i - 1].type) {
                 return i - 1;
             }
             return i;
@@ -51,11 +69,10 @@ int ServiceParenthese::trouverDernierAuNiveauZero(const std::string& equation, c
     return -1;
 }
 
-bool ServiceParenthese::estSigneUnaire(const std::string& equation, int indice) const {
-    if (indice == 0)
-    {
+bool ServiceParenthese::estSigneUnaire(const vector<Token>& equation, int indice) const {
+    if (indice == 0) {
         return true;
     }
-    char precedent = equation[indice - 1];
-    return _registreSymbole->estOperateur(precedent) || precedent == '(';
+    Token precedent = equation[indice - 1];
+    return _registreSymbole->estOperateur(precedent.type) || precedent.type == TOKEN_PAREN_OUVERTE;
 }

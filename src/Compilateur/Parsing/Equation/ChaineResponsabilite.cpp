@@ -23,9 +23,8 @@ ChaineResponsabilite::~ChaineResponsabilite() {
     // Les gestionnaires ne sont pas supprimés ici, c'est au propriétaire de s'en charger
 }
 
-int ChaineResponsabilite::trouverOperateur(const std::string& equation) const {
-    if (_debut == nullptr)
-    {
+int ChaineResponsabilite::trouverOperateur(const std::vector<Token>& equation) const {
+    if (_debut == nullptr) {
         return -1;
     }
     return _debut->traiter(equation);

@@ -106,6 +106,8 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
 
 ### Itération 1 du projet fonctionnalité à réaliser en 2 semaines ?
 
+- Faire la classe qui permet de lire un fichier texte et de l'extraire sous forme de string 
+- Adapter le code de la résolution d'équation pour utiliser des enums au lieu d'une string, utilisation des tokens du lexer
 - Écrire une partie de l'arbre syntaxique abstrait, elle contiendra la logique pour construire le code LLVM qui sera généré ensuite. 
 - Boucle while, if, variables (int, float, bool)
 - Comprendre en profondeur les méthodes de LLVM qui permettent de générer le code source intermédiaire. 

@@ -4,7 +4,6 @@
 #include "Compilateur/Parsing/Equation/Interfaces/IGestionnaireOperateur.h"
 #include "Compilateur/Parsing/Equation/Interfaces/IGestionnaireParenthese.h"
 #include <vector>
-#include <string>
 
 // Forward declaration
 class GestionnaireOperateur;
@@ -41,7 +40,7 @@ public:
      * @param equation L'équation à analyser
      * @return L'index de l'opérateur, ou -1 si aucun trouvé
      */
-    int trouverOperateur(const std::string& equation) const;
+    int trouverOperateur(const std::vector<Token>& equation) const;
 };
 
 

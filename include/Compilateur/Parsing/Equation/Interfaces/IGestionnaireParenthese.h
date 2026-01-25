@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include "Compilateur/Lexer/Lexer.h"
 
 /**
  * @interface IGestionnaireParenthese
@@ -16,7 +16,7 @@ public:
      * @param equation L'équation à traiter
      * @return L'équation sans parenthèses englobantes
      */
-    virtual std::string enleverParenthesesEnglobantes(std::string equation) = 0;
+    virtual std::vector<Token> enleverParenthesesEnglobantes(const std::vector<Token>& equation) = 0;
     
     /**
      * @brief Trouve le dernier opérateur au niveau de parenthèses zéro
@@ -24,5 +24,5 @@ public:
      * @param operateur Le caractère opérateur à chercher
      * @return L'index de l'opérateur, ou -1 si non trouvé
      */
-    virtual int trouverDernierAuNiveauZero(const std::string& equation, char operateur) = 0;
+    virtual int trouverDernierAuNiveauZero(const vector<Token>& equation, Token operateur) = 0;
 };

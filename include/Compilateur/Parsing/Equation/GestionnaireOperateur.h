@@ -3,7 +3,6 @@
 
 #include "Compilateur/Parsing/Equation/Interfaces/IGestionnaireOperateur.h"
 #include "Compilateur/Parsing/Equation/Interfaces/IGestionnaireParenthese.h"
-#include <string>
 
 /**
  * @class GestionnaireOperateur
@@ -14,14 +13,14 @@ class GestionnaireOperateur : public IGestionnaireOperateur {
 protected:
     IGestionnaireOperateur* _suivant;
     IGestionnaireParenthese* _gestionnaireParenthese;
-    char _symbole;
+    TokenType _tokenType;
 
 public:
     /**
      * @brief Constructeur
-     * @param symbole Le caractère représentant cet opérateur
+     * @param tokenType Le type de token représentant cet opérateur
      */
-    explicit GestionnaireOperateur(char symbole);
+    explicit GestionnaireOperateur(TokenType tokenType);
     
     /**
      * @brief Définit le gestionnaire de gestion des parenthèses
@@ -40,14 +39,14 @@ public:
      * @param equation L'équation à analyser
      * @return L'index de l'opérateur, ou -1
      */
-    virtual int chercherOperateur(const std::string& equation) const;
+    virtual int chercherOperateur(const std::vector<Token>& equation) const;
     
     /**
      * @brief Traite la recherche de cet opérateur ou délègue au suivant
      * @param equation L'équation à traiter
      * @return L'index de l'opérateur trouvé, ou -1
      */
-    int traiter(const std::string& equation) override;
+    int traiter(const std::vector<Token>& equation) override;
 };
 
 

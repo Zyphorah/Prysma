@@ -3,6 +3,7 @@
 #include <set>
 #include <functional>
 #include <memory>
+#include "Compilateur/Lexer/TokenType.h"
 
 // Forward declaration
 class INoeud;
@@ -24,7 +25,7 @@ public:
      * @param supplier Fonction créant un nœud d'opération
      */
     virtual void enregistrer(
-        char symbole, 
+        TokenType symbole, 
         std::function<std::shared_ptr<INoeud>()> supplier
     ) = 0;
     
@@ -33,18 +34,18 @@ public:
      * @param symbole Le caractère de l'opérateur
      * @return Un nouveau nœud d'opération
      */
-    virtual std::shared_ptr<INoeud> recupererNoeud(char symbole) = 0;
+    virtual std::shared_ptr<INoeud> recupererNoeud(TokenType symbole) = 0;
     
     /**
      * @brief Vérifie si un caractère est un opérateur connu
      * @param symbole Le caractère à vérifier
      * @return true si c'est un opérateur connu
      */
-    virtual bool estOperateur(char symbole) const = 0;
+    virtual bool estOperateur(TokenType symbole) const = 0;
     
     /**
      * @brief Obtient l'ensemble des symboles enregistrés
      * @return Ensemble des symboles d'opérateurs
      */
-    virtual std::set<char> obtenirSymboles() const = 0;
+    virtual std::set<TokenType> obtenirSymboles() const = 0;
 };

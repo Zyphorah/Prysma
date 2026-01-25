@@ -4,7 +4,6 @@
 #include "Compilateur/Parsing/Equation/Interfaces/IGestionnaireParenthese.h"
 #include "Compilateur/AST/Noeuds/Operande/RegistreSymbole.h"
 #include <memory>
-#include <string>
 
 class ServiceParenthese : public IGestionnaireParenthese {
 private:
@@ -15,7 +14,7 @@ private:
      * @param equation L'équation à vérifier
      * @return true si les parenthèses englobent toute l'expression
      */
-    static bool estEnglobante(const std::string& equation);
+    static bool estEnglobante(const vector<Token>& equation);
     
     /**
      * @brief Vérifie si un opérateur à une position donnée est unaire
@@ -23,7 +22,7 @@ private:
      * @param indice L'indice de l'opérateur
      * @return true si c'est un signe unaire
      */
-    [[nodiscard]] bool estSigneUnaire(const std::string& equation, int indice) const;
+    [[nodiscard]] bool estSigneUnaire(const vector<Token>& equation, int indice) const;
 
 public:
     /**
@@ -37,7 +36,7 @@ public:
      * @param equation L'équation à traiter
      * @return L'équation sans parenthèses englobantes
      */
-    std::string enleverParenthesesEnglobantes(std::string equation) override;
+    std::vector<Token> enleverParenthesesEnglobantes(const std::vector<Token>& equation) override;
     
     /**
      * @brief Trouve le dernier opérateur au niveau de parenthèses zéro
@@ -45,7 +44,7 @@ public:
      * @param operateur Le caractère opérateur à chercher
      * @return L'index de l'opérateur, ou -1 si non trouvé
      */
-    int trouverDernierAuNiveauZero(const std::string& equation, char operateur) override;
+    int trouverDernierAuNiveauZero(const vector<Token>& equation, Token operateur) override;
 };
 
 

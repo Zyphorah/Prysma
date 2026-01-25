@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include "Compilateur/Lexer/Lexer.h"
 
 // Forward declaration
 class IGestionnaireOperateur;
@@ -24,5 +24,5 @@ public:
      * @param equation L'équation à traiter
      * @return L'index de l'opérateur trouvé, ou -1
      */
-    virtual int traiter(const std::string& equation) = 0;
+    virtual int traiter(const std::vector<Token>& equation) = 0;
 };

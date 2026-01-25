@@ -15,10 +15,29 @@
 #include <llvm/IR/Constants.h>
 #include "Compilateur/LLVM/LLVMSerializer.h"
 
+#include "Compilateur/Lexer/TokenType.h"
+#include "Compilateur/Lexer/Lexer.h"
+
 #include <iostream>
 
 int main() {
     try {
+
+        // Instruction
+
+        // Faire un registre de lamda qui contient un dictionnaire mapé construit dynamiquement pour L'AST contenant un dictionnaire de noeud relier à des lamdas
+        // But encapsuler la logique de récursivité similaire pour l'arbre syntaxique abstrait, plus besoins de ce concentrer sur la récursivité car elle est similaire pour tout les cas
+        // Utilisation d'un système Table de Dispatch, rend le code ultra extensible pour toute nouveauté future
+
+        /*
+            INoeud.h
+            class INoeud {
+            public:
+                virtual ~INoeud() = default;
+                // La méthode (Génération de code)
+                virtual llvm::Value* codeGen(Context& ctx) = 0; 
+            };
+        */
         // ===== Initialisation LLVM =====
         llvm::LLVMContext context;
         llvm::Module module("PrysmaModule", context);
@@ -32,12 +51,18 @@ int main() {
 
         // ===== Configuration du registre =====
         std::string equation = "2*3-(20+3)";
+
+        Lexer lexer; 
+
+        vector<Token> tokens = lexer.tokenizer(equation);
+
+
         std::shared_ptr<RegistreSymbole> registreSymbole = std::make_shared<RegistreSymbole>();
 
         // Mettre dans un builder dans le future 
 
         // registre de lamda LLVM contenant une map des opérations mathématiques de base 
-        registreSymbole->enregistrer('+', [&]() { 
+        registreSymbole->enregistrer(TOKEN_PLUS, [&]() { 
             return std::make_shared<Operation>(
                 std::function<llvm::Value*(llvm::Value*, llvm::Value*)>([&](llvm::Value* lhs, llvm::Value* rhs) { 
                     return builder.CreateFAdd(lhs, rhs, "addtmp"); 
@@ -45,7 +70,7 @@ int main() {
             ); 
         });
         
-        registreSymbole->enregistrer('-', [&]() { 
+        registreSymbole->enregistrer(TOKEN_MOINS, [&]() { 
             return std::make_shared<Operation>(
                 std::function<llvm::Value*(llvm::Value*, llvm::Value*)>([&](llvm::Value* lhs, llvm::Value* rhs) { 
                     return builder.CreateFSub(lhs, rhs, "subtmp"); 
@@ -53,7 +78,7 @@ int main() {
             ); 
         });
         
-        registreSymbole->enregistrer('*', [&]() { 
+        registreSymbole->enregistrer(TOKEN_ETOILE, [&]() { 
             return std::make_shared<Operation>(
                 std::function<llvm::Value*(llvm::Value*, llvm::Value*)>([&](llvm::Value* lhs, llvm::Value* rhs) { 
                     return builder.CreateFMul(lhs, rhs, "multmp"); 
@@ -61,7 +86,7 @@ int main() {
             ); 
         });
         
-        registreSymbole->enregistrer('/', [&]() { 
+        registreSymbole->enregistrer(TOKEN_SLASH, [&]() { 
             return std::make_shared<Operation>(
                 std::function<llvm::Value*(llvm::Value*, llvm::Value*)>([&](llvm::Value* lhs, llvm::Value* rhs) { 
                     return builder.CreateFDiv(lhs, rhs, "divtmp"); 
@@ -72,10 +97,10 @@ int main() {
         // ===== Chaîne de responsabilité =====
         ServiceParenthese* serviceParenthese = new ServiceParenthese(registreSymbole);
         
-        GestionnaireOperateur* gestionnaireAddition = new GestionnaireOperateur('+');
-        GestionnaireOperateur* gestionnaireSoustraction = new GestionnaireOperateur('-');
-        GestionnaireOperateur* gestionnaireMultiplication = new GestionnaireOperateur('*');
-        GestionnaireOperateur* gestionnaireDivision = new GestionnaireOperateur('/');
+        GestionnaireOperateur* gestionnaireAddition = new GestionnaireOperateur(TOKEN_PLUS);
+        GestionnaireOperateur* gestionnaireSoustraction = new GestionnaireOperateur(TOKEN_MOINS);
+        GestionnaireOperateur* gestionnaireMultiplication = new GestionnaireOperateur(TOKEN_ETOILE);
+        GestionnaireOperateur* gestionnaireDivision = new GestionnaireOperateur(TOKEN_SLASH);
         
         std::vector<GestionnaireOperateur*> operateurs = {
             gestionnaireAddition, gestionnaireSoustraction, 
@@ -89,7 +114,7 @@ int main() {
             chaineResponsabilite, registreSymbole, serviceParenthese, context
         );
 
-        std::shared_ptr<IExpression> expression = constructeurArbreEquation->construire(equation);
+        std::shared_ptr<IExpression> expression = constructeurArbreEquation->construire(tokens);
         
         // Résoudre l'expression (cela appelle aussi les lambdas LLVM) / Parcours en Profondeur Postfixe
         llvm::Value* resultatNumerique = expression->resoudre();

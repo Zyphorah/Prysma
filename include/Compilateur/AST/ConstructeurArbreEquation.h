@@ -2,11 +2,12 @@
 
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
 #include "Compilateur/AST/Noeuds/Operande/RegistreSymbole.h"
+#include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Parsing/Equation/ChaineResponsabilite.h"
 #include "Compilateur/Parsing/Equation/Interfaces/IGestionnaireParenthese.h"
 #include <llvm/IR/LLVMContext.h>
 #include <memory>
-#include <string>
+#include <vector>
 
 /**
  * @class ConstructeurArbreEquation
@@ -40,5 +41,5 @@ public:
      * @param equation L'équation sous forme de chaîne
      * @return Un shared_ptr vers l'expression racine
      */
-    std::shared_ptr<IExpression> construire(std::string equation);
+    std::shared_ptr<IExpression> construire(std::vector<Token> &equation);
 };
