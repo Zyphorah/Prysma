@@ -67,6 +67,7 @@ class FloatEquationBuilder
         // ===== Enregistrement des opérateurs =====
         construireRegistreSymboleFloat();
     }
+    
     ~FloatEquationBuilder()
     {
         delete constructeurArbreEquation;

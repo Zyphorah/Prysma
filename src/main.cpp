@@ -1,5 +1,4 @@
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
-#include "Compilateur/AST/Noeuds/Operande/RegistreSymbole.h"
 
 // Inclusions LLVM
 #include <llvm/IR/LLVMContext.h>
@@ -19,6 +18,8 @@
 int main() {
     try {
 
+        // Utilisation de shared_ptr 
+
         // Instruction
 
         // Faire un registre de lamda qui contient un dictionnaire mapé construit dynamiquement pour L'AST contenant un dictionnaire de noeud relier à des lamdas
@@ -33,7 +34,25 @@ int main() {
                 // La méthode (Génération de code)
                 virtual llvm::Value* codeGen(Context& ctx) = 0; 
             };
+
+                        // NoeudInstruction.h
+            class NoeudInstruction : public INoeud {
+            private:
+                // La "recette" pour générer le code LLVM de cette instruction spécifique
+                // Elle capture tout ce dont elle a besoin (condition, corps...)
+                std::function<llvm::Value*()> _generateurCode;
+
+            public:
+                NoeudInstruction(std::function<llvm::Value*()> generateur) 
+                    : _generateurCode(generateur) {}
+
+                llvm::Value* genererCode() override {
+                    // On exécute simplement la lambda stockée
+                    return _generateurCode();
+                }
+        };
         */
+        
         // ===== Initialisation LLVM =====
         llvm::LLVMContext context;
         llvm::Module module("PrysmaModule", context);
@@ -46,7 +65,7 @@ int main() {
         builder.SetInsertPoint(entry);
 
         // ===== Configuration du registre =====
-        std::string equation = "2*3-(20+3)";
+        std::string equation = "2.3*3.0-(20.0+3.0)";
 
         Lexer lexer; 
 
