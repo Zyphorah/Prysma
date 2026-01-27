@@ -1,19 +1,22 @@
 #include "Compilateur/TraitementFichier/FichierLecture.h"
 
+FichierLecture::FichierLecture(const std::string& path)
+    : _path(path), _fichier(path, std::ios::in)
+{
+}
+
 std::string FichierLecture :: entrer()
 {
     std::string ligne; 
     std::string document; 
 
-    std::ifstream fichier(_path, std::ios::in); 
-
-    if(fichier.is_open())
+    if(_fichier.is_open())
     {
-        while(std::getline(fichier,ligne))
+        while(std::getline(_fichier,ligne))
         {
             document += ligne; 
         }
-        fichier.close();
+        _fichier.close();
         return document;
     }
     throw std::runtime_error("Impossible d'ouvrir le fichier !");
