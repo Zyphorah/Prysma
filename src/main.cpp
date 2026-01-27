@@ -14,7 +14,7 @@
 #include "Compilateur/Builder/Equation/FloatEquationBuilder.h"
 
 #include <iostream>
-
+#include "Compilateur/Lecture/FichierLecture.h"
 int main() {
     try {
 
@@ -38,7 +38,8 @@ int main() {
                         // NoeudInstruction.h
             class NoeudInstruction : public INoeud {
             private:
-                // La "recette" pour générer le code LLVM de cette instruction spécifique
+                // La "recette" pour générer le code LLVM de cette istd :: cerr << "Impossible d'ouvrir le fichier !";
+    return "";nstruction spécifique
                 // Elle capture tout ce dont elle a besoin (condition, corps...)
                 std::function<llvm::Value*()> _generateurCode;
 
@@ -65,11 +66,21 @@ int main() {
         builder.SetInsertPoint(entry);
 
         // ===== Configuration du registre =====
-        std::string equation = "2.3*3.0-(20.0+3.0)";
+        std::string document;
+        try 
+        {
+          FichierLecture fichierLecture("srcs/PrysmaCodeTests/main.prysma");
+          document = fichierLecture.entrer();
 
+        }catch(const std::exception& e)
+        {
+            std :: cerr << "Impossible d'ouvrir le fichier !";
+            return -1;
+        }
+     
         Lexer lexer; 
-
-        vector<Token> tokens = lexer.tokenizer(equation);
+        
+        vector<Token> tokens = lexer.tokenizer(document);
 
         FloatEquationBuilder* floatEquationBuilder = new FloatEquationBuilder(context);
         
