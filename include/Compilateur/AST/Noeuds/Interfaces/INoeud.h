@@ -10,8 +10,8 @@ public:
     virtual ~INoeud() = default;
     
     /**
-     * @brief Résout l'expression et retourne le résultat
-     * @return La valeur numérique de l'expression
+     * @brief C'est un noeud qui ce charge de la génération du code LLVM 
+     * @return La valeur LLVM 
      */
     virtual llvm::Value* genCode() = 0;
 };

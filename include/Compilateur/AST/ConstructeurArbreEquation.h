@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Compilateur/AST/Interfaces/IConstructeurArbre.h"
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/AST/Noeuds/Operande/RegistreSymbole.h"
 #include "Compilateur/Lexer/Lexer.h"
@@ -14,7 +15,8 @@
  * @brief Constructeur d'arbre d'expression syntaxique
  * Transforme une chaîne en arbre d'expressions récursif
  */
-class ConstructeurArbreEquation {
+class ConstructeurArbreEquation : public IConstructeurArbre
+{
 private:
     ChaineResponsabilite* _chaineResponsabilite;
     std::shared_ptr<RegistreSymbole> _registreSymbole;

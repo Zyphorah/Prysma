@@ -105,7 +105,7 @@ int main() {
         registreVariable->enregistrer(testToken, allocaPtr);
         std::shared_ptr<llvm::AllocaInst> resultTest = registreVariable->recupererVariables(testToken);
 
-        // rechercher dans le dictionnaire 
+        // Rechercher dans le dictionnaire 
         std::shared_ptr<llvm::AllocaInst> allocation = registreVariable->recupererVariables(testToken);
 
         // ===== Configuration du registre =====

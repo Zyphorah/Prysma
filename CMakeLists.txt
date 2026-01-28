@@ -52,6 +52,7 @@ set(SOURCES
     src/Compilateur/TraitementFichier/FichierLecture.cpp
     src/Compilateur/TraitementFichier/FichierEcriture.cpp
     src/Compilateur/Variable/RegistreVariable.cpp
+    /src/Compilateur/AST/ConstructeurArbreInstruction.cpp
 )
 
 # Créer l'exécutable
