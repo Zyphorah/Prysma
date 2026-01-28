@@ -18,15 +18,15 @@ int ConstructeurArbreInstruction::avancerFinInstruction(const std::vector<Token>
 }
 
 
-std::shared_ptr<std::vector<INoeud>> ConstructeurArbreInstruction::obtenirTouteInstructionEnfant(const std::vector<Token>& tokensIntervalle)
+std::shared_ptr<std::vector<std::shared_ptr<INoeud>>> ConstructeurArbreInstruction::obtenirTouteInstructionEnfant(const std::vector<Token>& tokensIntervalle)
 {
-	std::shared_ptr<std::vector<INoeud>> listeEnfants = std::make_shared<std::vector<INoeud>>();
+	std::shared_ptr<std::vector<std::shared_ptr<INoeud>>> listeEnfants = std::make_shared<std::vector<std::shared_ptr<INoeud>>>();
 	std::size_t indexLocal = 0;
 	
 	while (indexLocal < tokensIntervalle.size())
 	{
 		std::shared_ptr<INoeud> enfant = construire(const_cast<std::vector<Token>&>(tokensIntervalle));
-		listeEnfants->push_back(*enfant);
+		listeEnfants->push_back(enfant);
 		indexLocal++;
 	}
 	return listeEnfants;

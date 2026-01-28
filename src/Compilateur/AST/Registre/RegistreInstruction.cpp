@@ -1,4 +1,4 @@
-#include "Compilateur/AST/Noeuds/RegistreInstruction.h"
+#include "Compilateur/AST/Registre/RegistreInstruction.h"
 #include <stdexcept>
 #include <string>
 

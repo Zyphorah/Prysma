@@ -1,4 +1,4 @@
-#include "Compilateur/AST/Noeuds/Operande/RegistreSymbole.h"
+#include "Compilateur/AST/Registre/RegistreSymbole.h"
 #include <stdexcept>
 #include <string>
 

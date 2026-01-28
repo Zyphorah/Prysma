@@ -2,7 +2,7 @@
 #define DA3AD58B_D7B7_44D3_AC56_E1DDCD78F54F
 
 #include "Compilateur/Parsing/Equation/Interfaces/IGestionnaireParenthese.h"
-#include "Compilateur/AST/Noeuds/Operande/RegistreSymbole.h"
+#include "Compilateur/AST/Registre/RegistreSymbole.h"
 #include <memory>
 
 class ServiceParenthese : public IGestionnaireParenthese {

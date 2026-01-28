@@ -40,7 +40,6 @@ set(SOURCES
     src/main.cpp
     src/Compilateur/AST/ConstructeurArbreEquation.cpp
     src/Compilateur/AST/Noeuds/Operande/Operation.cpp
-    src/Compilateur/AST/Noeuds/Operande/RegistreSymbole.cpp
     src/Compilateur/AST/Noeuds/Operande/Valeur.cpp
     src/Compilateur/LLVM/LLVMSerializer.cpp
     src/Compilateur/Parsing/Equation/ChaineResponsabilite.cpp
@@ -51,8 +50,10 @@ set(SOURCES
     src/Compilateur/Builder/Equation/IntEquationBuilder.cpp
     src/Compilateur/TraitementFichier/FichierLecture.cpp
     src/Compilateur/TraitementFichier/FichierEcriture.cpp
-    src/Compilateur/Variable/RegistreVariable.cpp
-    /src/Compilateur/AST/ConstructeurArbreInstruction.cpp
+    src/Compilateur/AST/Registre/RegistreVariable.cpp
+    src/Compilateur/AST/Registre/RegistreSymbole.cpp
+    src/Compilateur/AST/Registre/RegistreInstruction.cpp
+    src/Compilateur/AST/ConstructeurArbreInstruction.cpp
 )
 
 # Créer l'exécutable

@@ -4,7 +4,7 @@
  * @interface INoeud
  * @brief Interface pour toute expression mathématique pouvant être résolue
  */
-#include <llvm-18/llvm/IR/Value.h>
+#include <llvm/IR/Value.h>
 class INoeud {
 public:
     virtual ~INoeud() = default;

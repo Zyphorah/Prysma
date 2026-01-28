@@ -9,7 +9,7 @@ class ConstructeurArbreInstruction : public IConstructeurArbre
 {
 private: 
     int avancerFinInstruction(const std::vector<Token>& tokens, int indexActuel);
-    std::shared_ptr<std::vector<INoeud>> obtenirTouteInstructionEnfant(const std::vector<Token>& tokensIntervalle);
+    std::shared_ptr<std::vector<std::shared_ptr<INoeud>>> obtenirTouteInstructionEnfant(const std::vector<Token>& tokensIntervalle);
     
 public: 
 
