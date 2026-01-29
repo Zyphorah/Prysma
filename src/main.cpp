@@ -2,8 +2,10 @@
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Builder/Equation/FloatEquationBuilder.h"
 #include "Compilateur/TraitementFichier/FichierLecture.h"
-
+#include "Compilateur/AST/Noeuds/Variable/NoeudDeclaration.h"
 #include <iostream>
+#include <llvm-18/llvm/IR/Instructions.h>
+#include <llvm-18/llvm/IR/Value.h>
 #include <memory>
 
 using namespace std;
@@ -27,13 +29,20 @@ int main() {
         backend->creationFonctionMain();
 
         // ===== Résolution de l'expression =====
-        llvm::Value* resultatNumerique = expression->genCode();
+
+        NoeudDeclaration noeudDeclaration(backend,"teste",backend->getBuilder().getFloatTy(), expression->genCode()); 
+        llvm::Value* testePtr =  noeudDeclaration.genCode();
+        
+        // Charger la valeur depuis le pointeur
+        llvm::Value* teste = backend->getBuilder().CreateLoad(backend->getBuilder().getFloatTy(), testePtr, "teste_value");
+        
+       // llvm::Value* resultatNumerique = expression->genCode();
         
         // ===== Affichage du résultat avec printf =====
-        backend->print(resultatNumerique);
+        backend->print(teste);
 
         // ===== Retour du résultat =====
-        llvm::Value* resultInt = backend->getBuilder().CreateFPToSI(resultatNumerique, backend->getBuilder().getInt32Ty(), "resultInt");
+        llvm::Value* resultInt = backend->getBuilder().CreateFPToSI(teste, backend->getBuilder().getInt32Ty(), "resultInt");
         backend->getBuilder().CreateRet(resultInt);
 
         backend->sauvegarderCodeLLVM("output.ll");

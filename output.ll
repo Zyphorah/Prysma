@@ -6,9 +6,11 @@ target triple = "x86_64-pc-linux-gnu"
 
 define i32 @main() {
 entry:
+  %teste = alloca float, align 4
+  store double 1.300000e+01, ptr %teste, align 8
   %formatPtr = getelementptr [14 x i8], ptr @.str, i64 0, i64 0
-  %0 = call i32 (ptr, ...) @printf(ptr %formatPtr, double 1.300000e+01)
-  %resultInt = fptosi double 1.300000e+01 to i32
+  %0 = call i32 (ptr, ...) @printf(ptr %formatPtr, ptr %teste)
+  %resultInt = fptosi ptr %teste to i32
   ret i32 %resultInt
 }
 

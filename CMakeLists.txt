@@ -41,6 +41,8 @@ set(SOURCES
     src/Compilateur/AST/ConstructeurArbreEquation.cpp
     src/Compilateur/AST/Noeuds/Operande/Operation.cpp
     src/Compilateur/AST/Noeuds/Operande/Valeur.cpp
+    src/Compilateur/AST/Noeuds/Variable/NoeudDeclaration.cpp
+    src/Compilateur/AST/Noeuds/Variable/NoeudAffectation.cpp
     src/Compilateur/LLVM/LLVMSerializer.cpp
     src/Compilateur/LLVM/LLVMBackend.cpp
     src/Compilateur/Parsing/Equation/ChaineResponsabilite.cpp
