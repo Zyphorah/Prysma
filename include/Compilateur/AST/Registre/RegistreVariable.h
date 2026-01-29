@@ -4,6 +4,7 @@
 #include "Compilateur/Lexer/Lexer.h"
 #include <map>
 #include <memory>
+#include <stack>
 
 
 namespace llvm { class AllocaInst; }
@@ -11,7 +12,7 @@ namespace llvm { class AllocaInst; }
 class RegistreVariable 
 {
     private: 
-        std::map<std::string, shared_ptr<llvm::AllocaInst>> variables; 
+       std::stack<std::map<std::string, shared_ptr<llvm::AllocaInst>>>  _variables; 
 
     public:
         RegistreVariable();
@@ -24,6 +25,8 @@ class RegistreVariable
             const Token& token,
             shared_ptr<llvm::AllocaInst> instance
         );
+        void piler();
+        void depiler();
 };
 
 #endif /* F7F44FF6_77D4_456C_A897_1A52149FDE53 */
