@@ -19,7 +19,7 @@ public:
     );
 
     std::shared_ptr<IExpression> recupererNoeud(TokenType symbole);
-    bool estOperateur(TokenType symbole);
-    std::set<TokenType> obtenirSymboles();
+    bool estOperateur(TokenType symbole) const;
+    std::set<TokenType> obtenirSymboles() const;
 };
 

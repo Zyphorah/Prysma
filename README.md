@@ -106,28 +106,29 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
 
 ### Itération 1 du projet fonctionnalité à réaliser en 2 semaines ?
 
-- Faire la classe qui permet de lire un fichier texte et de l'extraire sous forme de string 
-- Adapter le code de la résolution d'équation pour utiliser des enums au lieu d'une string, utilisation des tokens du lexer
-- Écrire une partie de l'arbre syntaxique abstrait, elle contiendra la logique pour construire le code LLVM qui sera généré ensuite. 
-- Boucle while, if, variables (int, float, bool)
-- Comprendre en profondeur les méthodes de LLVM qui permettent de générer le code source intermédiaire. 
-- Écrire le curseur qui orchestre la création des nœuds, les nœuds (while, if, variables (int, float, bool)) serviront pour la génération du code de façon récursive. 
+- Lire des fichiers sources Prysma et les traiter comme du texte
+- Supporter les types entiers (int), flottants (float), booléens (bool)
+- Compiler les opérations arithmétiques de base (+, -, *, /) vers du code LLVM
+- Permettre au développeur de déclarer des variables et les utiliser dans des expressions
+- Valider la syntaxe du code et rejeter les structures invalides via la construction de l'AST
+- Supporter les instructions if, while, passer par la pile avec alloca
 
 ### Itération 2 du projet fonctionnalité à réaliser en 2 semaines ?
 
-- Logique d'erreur de syntaxe gérée dans le parsing, le curseur de token utilisera la classe d'erreur pour déterminer si la syntaxe est correcte avant de construire l'arbre syntaxique. 
-- Implémenter un système d'affichage (dump) de l'AST et du code IR dans la console pour débogage manuel 
-- Coloration syntaxique dans VSCode pour le langage Prysma. 
+- Signaler les erreurs de syntaxe précisément (numéro de ligne, type d'erreur) plutôt que planter silencieusement
+- Exporter l'AST en format texte et graphique (Graphviz) pour faciliter le débogage
+- Ajouter la coloration syntaxique du langage Prysma dans Visual Studio Code
+- Supporter les types string, j'utilise la librairie natif du C avec un extern
+- Supporter les fonctions, récursive et un type de retour. 
 
 ### Itération 3 du projet fonctionnalité à réaliser en 2 semaines ?
 
-- Écrire une librairie mathématique pour le langage Prysma (factorielle, suite de Fibonacci, puissance, PGCD, vérification de nombre premier, etc.).
-- Correction des bugs, d'ailleurs la programmation de cette librairie servira de test pour valider la gestion de la récursivité (stack frames) et des boucles imbriquées sans avoir à gérer l'allocation dynamique complexe.
-- Consolider la logique des opérateurs arithmétiques et des conditions pour s'assurer que le code généré est fiable avant d'aller plus loin.
-- refactorisation du code source. 
+- Fournir des fonctions natives pour les calculs avancés (puissance, PGCD, vérification de nombres premiers)
+- supporter la (Factorielle, Fibonacci) avec une gestion appropriée de la pile d'exécution
+- Supporter les tableau programmer en LLVM IR 
+- supporter la boucle for 
 
-### bonus 
+### Fonctionnalités Bonus (Si le temps le permet)
 
-- Implémentation du type string et des tableaux dans le langage Prysma.
-- Écrire des librairies fonctionnelles pour le langage de programmation (liste chaînée, arbre binaire, pile, file, etc.) 
-- Gestion de mémoire, pointeur allocation 
+- Ajouter la gestion manuelle de la mémoire avec les pointeurs pour un contrôle bas niveau
+- Écrire une librairie de structures de données (listes chaînées, arbres binaires, piles, files) 

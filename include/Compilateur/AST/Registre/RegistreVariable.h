@@ -7,7 +7,7 @@
 
 
 namespace llvm { class AllocaInst; }
-
+// Faire une pile de contexte dans le future une pile de dictionnaire pour les contextes différent
 class RegistreVariable 
 {
     private: 
