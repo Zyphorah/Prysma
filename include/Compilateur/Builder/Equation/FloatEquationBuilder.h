@@ -5,6 +5,7 @@
 #include "Compilateur/Parsing/Equation/GestionnaireOperateur.h"
 #include "Compilateur/AST/Noeuds/Operande/Operation.h"
 #include <llvm-18/llvm/IR/IRBuilder.h>
+#include <memory>
 
 class FloatEquationBuilder
 {
@@ -14,16 +15,16 @@ class FloatEquationBuilder
 
     std::shared_ptr<RegistreSymbole> registreSymboleFloat;
 
-    ChaineResponsabilite* chaineResponsabilite;
+    std::unique_ptr<ChaineResponsabilite> chaineResponsabilite;
  
-    GestionnaireOperateur* gestionnaireAddition;
-    GestionnaireOperateur* gestionnaireSoustraction;
-    GestionnaireOperateur* gestionnaireMultiplication;
-    GestionnaireOperateur* gestionnaireDivision;
+    std::unique_ptr<GestionnaireOperateur> gestionnaireAddition;
+    std::unique_ptr<GestionnaireOperateur> gestionnaireSoustraction;
+    std::unique_ptr<GestionnaireOperateur> gestionnaireMultiplication;
+    std::unique_ptr<GestionnaireOperateur> gestionnaireDivision;
 
-    ServiceParenthese* serviceParenthese;
+    std::unique_ptr<ServiceParenthese> serviceParenthese;
         
-    ConstructeurArbreEquation* constructeurArbreEquation;
+    std::unique_ptr<ConstructeurArbreEquation> constructeurArbreEquation;
     
     void construireRegistreSymboleFloat();
   
@@ -31,43 +32,31 @@ class FloatEquationBuilder
 
     FloatEquationBuilder(llvm::LLVMContext &context) : builder(context)
     {
-
-       
         registreSymboleFloat = std::make_shared<RegistreSymbole>();
 
-        serviceParenthese = new ServiceParenthese(registreSymboleFloat);
+        serviceParenthese = std::make_unique<ServiceParenthese>(registreSymboleFloat);
 
-        gestionnaireAddition = new GestionnaireOperateur(TOKEN_PLUS);
-        gestionnaireSoustraction = new GestionnaireOperateur(TOKEN_MOINS);
-        gestionnaireMultiplication = new GestionnaireOperateur(TOKEN_ETOILE);
-        gestionnaireDivision = new GestionnaireOperateur(TOKEN_SLASH);
-
+        gestionnaireAddition = std::make_unique<GestionnaireOperateur>(TOKEN_PLUS);
+        gestionnaireSoustraction = std::make_unique<GestionnaireOperateur>(TOKEN_MOINS);
+        gestionnaireMultiplication = std::make_unique<GestionnaireOperateur>(TOKEN_ETOILE);
+        gestionnaireDivision = std::make_unique<GestionnaireOperateur>(TOKEN_SLASH);
 
         std::vector<GestionnaireOperateur*> operateurs = {
-            gestionnaireAddition, gestionnaireSoustraction, 
-            gestionnaireMultiplication, gestionnaireDivision
+            gestionnaireAddition.get(), gestionnaireSoustraction.get(), 
+            gestionnaireMultiplication.get(), gestionnaireDivision.get()
         };
                 
-        chaineResponsabilite = new ChaineResponsabilite(serviceParenthese, operateurs);
+        chaineResponsabilite = std::make_unique<ChaineResponsabilite>(serviceParenthese.get(), operateurs);
                         
         // ===== Construction de l'AST et Résolution =====
-        constructeurArbreEquation = new ConstructeurArbreEquation(
-            chaineResponsabilite, registreSymboleFloat, serviceParenthese, context
+        constructeurArbreEquation = std::make_unique<ConstructeurArbreEquation>(
+            chaineResponsabilite.get(), registreSymboleFloat, serviceParenthese.get(), context
         );
 
         construireRegistreSymboleFloat();
     }
     
-    ~FloatEquationBuilder()
-    {
-        delete constructeurArbreEquation;
-        delete chaineResponsabilite;
-        delete gestionnaireAddition; 
-        delete gestionnaireSoustraction;
-        delete gestionnaireMultiplication; 
-        delete gestionnaireDivision;
-        delete serviceParenthese;
-    }
+    ~FloatEquationBuilder() = default;
     
     shared_ptr<INoeud> builderArbreEquationFloat(vector<Token> &tokens);
 };

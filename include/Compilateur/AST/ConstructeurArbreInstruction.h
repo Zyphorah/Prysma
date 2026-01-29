@@ -19,7 +19,7 @@ public:
     ConstructeurArbreInstruction(const std::shared_ptr<RegistreInstruction> registreInstructions);
     ~ConstructeurArbreInstruction();
 
-    std::shared_ptr<INoeud> construire(std::vector<Token>& tokens);
+    std::shared_ptr<INoeud> construire(std::vector<Token>& tokens, int index);
 };
 
 #endif /* BDC39C44_6952_4793_8198_C083B106A089 */

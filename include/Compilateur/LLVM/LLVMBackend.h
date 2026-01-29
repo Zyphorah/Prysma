@@ -1,34 +1,38 @@
-#ifndef F0244D90_670B_498F_BCBB_0FCEAB580007
-#define F0244D90_670B_498F_BCBB_0FCEAB580007
+#pragma once
 
 #include <memory>
+#include <string>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
-#include <llvm/Support/raw_ostream.h>
 #include <llvm/IR/NoFolder.h>
 #include <llvm/IR/Type.h>
 #include <llvm/IR/Constants.h>
-#include "Compilateur/LLVM/LLVMSerializer.h"
 
-class LLVMBackend
-{
-    private:
-           // ===== Initialisation LLVM =====
-        llvm::LLVMContext _context;
-        std::unique_ptr<llvm::Module> _module;
-        std::unique_ptr<llvm::IRBuilder<llvm::NoFolder>> _builder;
+class LLVMBackend {
+private:
+    // L'ordre de déclaration est CRUCIAL ici (C++ détruit dans l'ordre inverse)
+    std::unique_ptr<llvm::LLVMContext> context;
 
-    public :
-        LLVMBackend()
-            : _context(),
-              _module(std::make_unique<llvm::Module>("PrysmaModule", _context)),
-              _builder(std::make_unique<llvm::IRBuilder<llvm::NoFolder>>(_context))
-        {
-        }
-        ~LLVMBackend() = default;
-        void creationFonctionLLVM();
+    std::unique_ptr<llvm::Module> module;
+    
+    std::unique_ptr<llvm::IRBuilder<llvm::NoFolder>> builder;
+
+public:
+
+    LLVMBackend();
+
+
+    ~LLVMBackend() = default;
+
+    llvm::LLVMContext& getContext() { return *context; }
+    llvm::Module& getModule() { return *module; }
+    llvm::IRBuilder<llvm::NoFolder>& getBuilder() { return *builder; }
+
+    void sauvegarderCodeLLVM(const std::string& nomFichier);
+    
+    void print(llvm::Value* valeur);
+    
+    void creationFonctionMain();
 };
-
-#endif /* F0244D90_670B_498F_BCBB_0FCEAB580007 */
  

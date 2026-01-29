@@ -31,7 +31,7 @@ std::vector<std::shared_ptr<INoeud>> ConstructeurArbreInstruction::obtenirTouteI
 	
 	while (indexLocal < tokensIntervalle.size())
 	{
-		std::shared_ptr<INoeud> enfant = construire(const_cast<std::vector<Token>&>(tokensIntervalle));
+		std::shared_ptr<INoeud> enfant = construire(const_cast<std::vector<Token>&>(tokensIntervalle), indexLocal);
 		listeEnfants.push_back(enfant);
 		indexLocal++;
 	}
@@ -39,10 +39,10 @@ std::vector<std::shared_ptr<INoeud>> ConstructeurArbreInstruction::obtenirTouteI
 }
 
 
-std::shared_ptr<INoeud> ConstructeurArbreInstruction::construire(std::vector<Token>& tokens)
+std::shared_ptr<INoeud> ConstructeurArbreInstruction::construire(std::vector<Token>& tokens, int index)
 {
 	
-    std::shared_ptr<IInstruction> ParentNoeud = _registreInstructions->recuperer(tokens[1].type);
+    std::shared_ptr<IInstruction> ParentNoeud = _registreInstructions->recuperer(tokens[index].type);
     
     std::vector<std::shared_ptr<INoeud>> enfants = obtenirTouteInstructionEnfant(tokens);
     

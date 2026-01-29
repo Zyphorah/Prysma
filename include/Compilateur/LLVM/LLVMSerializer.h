@@ -1,3 +1,6 @@
+#ifndef LLVMSERIALIZER_H
+#define LLVMSERIALIZER_H
+
 #include <llvm-18/llvm/Support/raw_ostream.h>
 #include "llvm/IR/Module.h"
 #include "llvm/IR/LLVMContext.h"
@@ -16,3 +19,5 @@ class LLVMSerializer {
         LLVMSerializer(LLVMContext& ctx, Module& mod) : _context(ctx), _module(mod) {}
         void SauvegarderCodeLLVM(const string& path);
 };
+
+#endif /* LLVMSERIALIZER_H */
