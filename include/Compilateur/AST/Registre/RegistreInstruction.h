@@ -5,11 +5,10 @@
 #include <map>
 #include <memory>
 #include <set>
-#include <functional>
 
 class RegistreInstruction {
 private:
-    std::map<TokenType, std::function<std::shared_ptr<IParser>()>> _instructions;
+    std::map<TokenType, std::shared_ptr<IParser>> _instructions;
 
 public:
     RegistreInstruction() = default;
@@ -17,7 +16,7 @@ public:
 
     void enregistrer(
         TokenType typeToken,
-        std::function<std::shared_ptr<IParser>()> fournisseur
+       std::shared_ptr<IParser> fournisseur
     );
 
     std::shared_ptr<IParser> recuperer(TokenType typeToken);

@@ -5,7 +5,7 @@
 
 void RegistreInstruction::enregistrer(
     TokenType typeToken,
-    std::function<std::shared_ptr<IParser>()> fournisseur) {
+    std::shared_ptr<IParser> fournisseur) {
     _instructions[typeToken] = std::move(fournisseur);
 }
 
@@ -14,7 +14,7 @@ std::shared_ptr<IParser> RegistreInstruction::recuperer(TokenType typeToken) {
     if (iterator == _instructions.end()) {
         throw std::invalid_argument(std::string("Type de token inconnu: ") + std::to_string(typeToken));
     }
-    return iterator->second();
+    return iterator->second;
 }
 
 bool RegistreInstruction::estInstruction(TokenType typeToken) const {
@@ -28,3 +28,5 @@ std::set<TokenType> RegistreInstruction::obtenirTypesTokens() const {
     }
     return typesTokens;
 }
+
+

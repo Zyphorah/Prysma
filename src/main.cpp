@@ -1,12 +1,15 @@
 #include "Compilateur/LLVM/LLVMBackend.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Builder/Equation/FloatEquationBuilder.h"
+#include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/Parsing/Instruction/Variable/ParseurVariableFloat.h"
 #include "Compilateur/TraitementFichier/FichierLecture.h"
 #include <iostream>
 #include <llvm-18/llvm/IR/Instructions.h>
 #include <llvm-18/llvm/IR/Value.h>
 #include <memory>
+#include "Compilateur/AST/Registre/RegistreInstruction.h"
+#include "Compilateur/Parsing/Instruction/ParserMain.h"
 
 using namespace std;
 
@@ -39,7 +42,14 @@ int main() {
         llvm::Value* teste = backend->getBuilder().CreateLoad(backend->getBuilder().getFloatTy(), valeur, "teste_value");
         
         // llvm::Value* resultatNumerique = expression->genCode();
+
+        // Construction du registre d'instruction 
         
+        std::shared_ptr<RegistreInstruction> registreInstruction = std::make_shared<RegistreInstruction>();
+        
+        registreInstruction->enregistrer(TOKEN_MAIN, std::make_shared<ParserMain>());
+        registreInstruction->enregistrer(TOKEN_VAR, std::make_shared<ParseurVariableFloat>(backend));
+
         // ===== Affichage du résultat avec printf =====
         backend->print(teste);
 
