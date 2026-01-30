@@ -2,6 +2,7 @@
 #include "Compilateur/LLVM/LLVMBackend.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Builder/Equation/FloatEquationBuilder.h"
+#include "Compilateur/Parsing/Instruction/Variable/ParseurVariableFloat.h"
 #include "Compilateur/TraitementFichier/FichierLecture.h"
 #include "Compilateur/AST/Noeuds/Variable/NoeudDeclaration.h"
 #include <iostream>
@@ -22,25 +23,24 @@ int main() {
         Lexer lexer;
         vector<Token> tokens = lexer.tokenizer(document);
 
-        // ===== Construction de l'arbre d'expression =====
-        std::unique_ptr<FloatEquationBuilder> floatEquationBuilder = std::make_unique<FloatEquationBuilder>(backend->getContext());
-        shared_ptr<INoeud> expression = floatEquationBuilder->builderArbreEquationFloat(tokens);
-        
+     
         // ===== Création de la fonction main LLVM =====
         backend->creationFonctionMain();
 
         // ===== Résolution de l'expression =====
 
-        NoeudDeclaration noeudDeclaration(backend,"teste",backend->getBuilder().getFloatTy(), expression->genCode()); 
-        RegistreVariable registreVariable;
+        int index = 0; 
 
+        ParseurVariableFloat parseurVariableFloat(backend);
 
-        llvm::Value* testePtr =  noeudDeclaration.genCode();
+        shared_ptr<INoeud> noeud = parseurVariableFloat.parser(tokens,index);
+
+        llvm::Value* valeur = noeud->genCode();
         
         // Charger la valeur depuis le pointeur
-        llvm::Value* teste = backend->getBuilder().CreateLoad(backend->getBuilder().getFloatTy(), testePtr, "teste_value");
+        llvm::Value* teste = backend->getBuilder().CreateLoad(backend->getBuilder().getFloatTy(), valeur, "teste_value");
         
-       // llvm::Value* resultatNumerique = expression->genCode();
+        // llvm::Value* resultatNumerique = expression->genCode();
         
         // ===== Affichage du résultat avec printf =====
         backend->print(teste);

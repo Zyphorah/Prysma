@@ -49,6 +49,7 @@ enum TokenType {
     TOKEN_PRINT,
 
     // variable 
+    TOKEN_VAR,
     TOKEN_TYPE_INT,
     TOKEN_TYPE_FLOAT,
     TOKEN_TYPE_STRING,

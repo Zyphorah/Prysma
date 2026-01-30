@@ -29,6 +29,7 @@ class Lexer {
         {"true", TOKEN_VRAI},
         {"false", TOKEN_FAUX},
         {"print", TOKEN_PRINT},
+        {"var", TOKEN_VAR},
         {"int", TOKEN_TYPE_INT},
         {"float", TOKEN_TYPE_FLOAT},
         {"string", TOKEN_TYPE_STRING},
