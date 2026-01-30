@@ -19,7 +19,7 @@ ParseurVariableFloat::~ParseurVariableFloat()
 
 
 // Exemple: var float teste = 34+435+4;
-std::shared_ptr<INoeud> ParseurVariableFloat::parser(std::vector<Token>& tokens, int& index)
+std::shared_ptr<INoeud> ParseurVariableFloat::parser(std::vector<Token>& tokens, int& index, std::shared_ptr<ConstructeurArbreInstruction> constructeurArbreInstruction)
 {
     //Vérifie et on consomme le début : "var float nom ="
     index++; // Passe 'var'

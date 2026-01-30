@@ -10,16 +10,13 @@ class ConstructeurArbreInstruction : public IConstructeurArbre
 {
 private: 
     std::shared_ptr<RegistreInstruction> _registreInstructions;
-    int avancerFinInstruction(const std::vector<Token>& tokens, int indexActuel);
-    std::vector<std::shared_ptr<INoeud>> obtenirTouteInstructionEnfant(const std::vector<Token>& tokensIntervalle);
-
     
 public: 
 
-    ConstructeurArbreInstruction(const std::shared_ptr<RegistreInstruction> registreInstructions);
+    ConstructeurArbreInstruction(std::shared_ptr<RegistreInstruction> registreInstructions);
     ~ConstructeurArbreInstruction();
 
-    std::shared_ptr<INoeud> construire(std::vector<Token>& tokens, int index);
+    std::shared_ptr<INoeud> construire(std::vector<Token>& tokens, int& index);
 };
 
 #endif /* BDC39C44_6952_4793_8198_C083B106A089 */
