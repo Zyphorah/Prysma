@@ -68,8 +68,14 @@ void LLVMBackend::print(llvm::Value* valeur) {
         "formatPtr"
     );
     
+    // Conversion float → double pour printf (qui attend un double avec %f)
+    llvm::Value* convertedValue = valeur;
+    if (valeur->getType()->isFloatTy()) {
+        convertedValue = builder->CreateFPExt(valeur, builder->getDoubleTy());
+    }
+    
     // Appel à printf avec le résultat
-    std::vector<llvm::Value*> printfArgs = {formatPtr, valeur};
+    std::vector<llvm::Value*> printfArgs = {formatPtr, convertedValue};
     builder->CreateCall(printfFunc, printfArgs);
 }
 

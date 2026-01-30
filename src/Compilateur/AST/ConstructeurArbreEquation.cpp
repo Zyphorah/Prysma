@@ -31,8 +31,8 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
     
     if (indice == -1) {
         try {
-            double valeurDouble = std::stod(equation[0].value);
-            llvm::Value* valeurLLVM = llvm::ConstantFP::get(_context, llvm::APFloat(valeurDouble));
+            float valeurFloat = std::stof(equation[0].value);
+            llvm::Value* valeurLLVM = llvm::ConstantFP::get(llvm::Type::getFloatTy(_context), valeurFloat);
             return std::make_shared<Valeur>(valeurLLVM);
         } catch (const std::exception& e) {
             throw std::runtime_error("Erreur: impossible de convertir '" + equation[0].value + "' en nombre");
