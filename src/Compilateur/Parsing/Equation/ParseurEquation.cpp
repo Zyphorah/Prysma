@@ -15,7 +15,7 @@ ParseurEquation::~ParseurEquation()
 
 std::shared_ptr<INoeud> ParseurEquation::parser(std::vector<Token>& tokens, int& index, std::shared_ptr<ConstructeurArbreInstruction> constructeurArbreInstruction)
 {
-    int debutEquation = index;
+    size_t debutEquation = index;
     size_t finEquation = index;
     
     while (finEquation < tokens.size() && tokens[finEquation].type != TOKEN_POINT_VIRGULE) {
@@ -30,6 +30,7 @@ std::shared_ptr<INoeud> ParseurEquation::parser(std::vector<Token>& tokens, int&
     
     validerEquation(tokensEquation);
     
+    index = finEquation;
     consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur : ';' attendu");
 
     std::unique_ptr<FloatEquationBuilder> floatEquationBuilder = std::make_unique<FloatEquationBuilder>(_backend->getContext());
