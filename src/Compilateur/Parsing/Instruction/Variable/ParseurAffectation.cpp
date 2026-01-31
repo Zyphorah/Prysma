@@ -31,8 +31,9 @@ std::shared_ptr<INoeud> ParseurAffectation::parser(std::vector<Token>& tokens, i
         try {
             llvm::Value* valeur = _registreVariable->recupererVariables(nomToken);
             variableExistante = llvm::dyn_cast<llvm::AllocaInst>(valeur);
-        } catch (const std::exception&) {
-            // La variable n'existe pas, ce sera une erreur détectée plus tard
+        } catch (const std::exception& e) {
+            // La variable n'existe pas
+            throw std::runtime_error(std::string("Erreur : la variable '") + nomVariable + "' n'existe pas. Vous devez d'abord la déclarer avec 'var type nom = valeur;'");
         }
     }
 

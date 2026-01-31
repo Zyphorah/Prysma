@@ -17,16 +17,21 @@ NoeudDeclaration::~NoeudDeclaration()
 
 llvm::Value* NoeudDeclaration::genCode()
 {
-    llvm::AllocaInst* allocaInst = allocation();
-    initialisation(allocaInst);
-    
-    // Enregistrer la variable dans le registre
-    if (_registreVariable != nullptr) {
-        Token nomToken;
-        nomToken.value = _nom;
-        nomToken.type = TOKEN_IDENTIFIANT;
-        _registreVariable->enregistrer(nomToken, allocaInst);
+    if (_registreVariable == nullptr) {
+        throw std::runtime_error("Erreur : registre de variables non initialisé");
     }
+    Token nomToken;
+    nomToken.value = _nom;
+    nomToken.type = TOKEN_IDENTIFIANT;
+    llvm::Value* val = _registreVariable->recupererVariables(nomToken);
+    llvm::AllocaInst* allocaInst = llvm::dyn_cast<llvm::AllocaInst>(val);
+    
+    if (allocaInst == nullptr) {
+        throw std::runtime_error("Erreur : variable '" + _nom + "' n'est pas une allocation valide");
+    }
+    
+    // Initialiser la variable avec sa valeur
+    initialisation(allocaInst);
     
     return allocaInst;
 }

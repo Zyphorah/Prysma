@@ -18,15 +18,22 @@ ParseurVariable::~ParseurVariable()
 }
 
 // Exemple: var float teste = 34+435+4;
+// Exemple d'assignation: var x = 10;
 std::shared_ptr<INoeud> ParseurVariable::parser(std::vector<Token>& tokens, int& index, std::shared_ptr<ConstructeurArbreInstruction> constructeurArbreInstruction)
 {
     consommer(tokens, index, TOKEN_VAR, "Erreur : 'var' attendu");
     
+    // Vérifier si le prochain token est un type (déclaration) ou un identifiant (assignation)
     if (index < static_cast<int>(tokens.size()) && tokens[index].type == TOKEN_TYPE_FLOAT) {
         ParseurDeclaration parseurDeclaration(_backend, _registreVariable, TOKEN_TYPE_FLOAT);
         return parseurDeclaration.parser(tokens, index, constructeurArbreInstruction);
     }
+    
+    if (index < static_cast<int>(tokens.size()) && tokens[index].type == TOKEN_IDENTIFIANT) {
+        // C'est une assignation à une variable existante: var x = ...
+        ParseurAffectation parseurAffectation(_backend, _registreVariable, TOKEN_TYPE_FLOAT);
+        return parseurAffectation.parser(tokens, index, constructeurArbreInstruction);
+    }
 
-    ParseurAffectation parseurAffectation(_backend, _registreVariable, TOKEN_TYPE_FLOAT);
-    return parseurAffectation.parser(tokens, index, constructeurArbreInstruction);
+    throw std::runtime_error("Erreur : type ou identifiant attendu après 'var'");
 }

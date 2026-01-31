@@ -25,6 +25,13 @@ void NoeudAffectation::assignation(llvm::AllocaInst* allocaInst)
 {
     if (_valeur != nullptr && allocaInst != nullptr)
     {
-        _backend->getBuilder().CreateStore(_valeur, allocaInst);
+        // Si la valeur est une AllocaInst (variable), charger sa valeur
+        if (auto* sourceAlloca = llvm::dyn_cast<llvm::AllocaInst>(_valeur)) {
+            llvm::Value* loadedValue = _backend->getBuilder().CreateLoad(sourceAlloca->getAllocatedType(), sourceAlloca);
+            _backend->getBuilder().CreateStore(loadedValue, allocaInst);
+        } else {
+            // Sinon, assigner directement la valeur
+            _backend->getBuilder().CreateStore(_valeur, allocaInst);
+        }
     }
 }

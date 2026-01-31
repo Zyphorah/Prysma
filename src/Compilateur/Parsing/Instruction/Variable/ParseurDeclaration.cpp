@@ -26,6 +26,12 @@ std::shared_ptr<INoeud> ParseurDeclaration::parser(std::vector<Token>& tokens, i
     ParseurEquation parseurEquation(_backend, _typeVariable);
     std::shared_ptr<INoeud> expression = parseurEquation.parser(tokens, index, constructeurArbreInstruction);
 
+    // Permet aux assignations suivantes de trouver la variable
+    llvm::AllocaInst* allocaInst = _backend->getBuilder().CreateAlloca(_backend->getBuilder().getFloatTy(), nullptr, nomVariable);
+    if (_registreVariable != nullptr) {
+        _registreVariable->enregistrer(nomToken, allocaInst);
+    }
+
     return std::make_shared<NoeudDeclaration>(
         _backend,
         _registreVariable,
