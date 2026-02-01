@@ -20,7 +20,7 @@ public:
     ParseurVariable(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable);
     ~ParseurVariable();
 
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, std::shared_ptr<ConstructeurArbreInstruction> constructeurArbreInstruction) override; 
+    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction) override; 
 };
 
 #endif /* DDD959AA_55F6_46B7_A433_8E073A1EACCE */

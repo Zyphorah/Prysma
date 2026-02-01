@@ -22,7 +22,7 @@ public:
     ParseurEquation(std::shared_ptr<LLVMBackend> backend, TokenType typeVariable);
     ~ParseurEquation();
 
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, std::shared_ptr<ConstructeurArbreInstruction> constructeurArbreInstruction) override;
+    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction) override;
 
 private:
     void validerEquation(const std::vector<Token>& tokensEquation) const;

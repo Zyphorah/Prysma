@@ -43,5 +43,5 @@ public:
      * @param equation L'équation sous forme de chaîne
      * @return Un shared_ptr vers l'expression racine
      */
-    std::shared_ptr<INoeud> construire(std::vector<Token> &equation);
+    std::shared_ptr<INoeud> construire(std::vector<Token> &equation) override;
 };

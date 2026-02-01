@@ -19,7 +19,7 @@ ParseurVariable::~ParseurVariable()
 
 // Exemple: var float teste = 34+435+4;
 // Exemple d'assignation: var x = 10;
-std::shared_ptr<INoeud> ParseurVariable::parser(std::vector<Token>& tokens, int& index, std::shared_ptr<ConstructeurArbreInstruction> constructeurArbreInstruction)
+std::shared_ptr<INoeud> ParseurVariable::parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction)
 {
     consommer(tokens, index, TOKEN_VAR, "Erreur : 'var' attendu");
     

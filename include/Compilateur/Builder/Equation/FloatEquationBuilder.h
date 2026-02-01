@@ -27,7 +27,7 @@ class FloatEquationBuilder
 
     std::unique_ptr<ServiceParenthese> serviceParenthese;
         
-    std::unique_ptr<ConstructeurArbreEquation> constructeurArbreEquation;
+    std::shared_ptr<IConstructeurArbre> constructeurArbreEquation;
     
     void construireRegistreSymboleFloat();
   
@@ -52,7 +52,7 @@ class FloatEquationBuilder
         chaineResponsabilite = std::make_unique<ChaineResponsabilite>(serviceParenthese.get(), operateurs);
                         
         // ===== Construction de l'AST et Résolution =====
-        constructeurArbreEquation = std::make_unique<ConstructeurArbreEquation>(
+        constructeurArbreEquation = std::make_shared<ConstructeurArbreEquation>(
             chaineResponsabilite.get(), registreSymboleFloat, serviceParenthese.get(), context
         );
 
@@ -61,7 +61,7 @@ class FloatEquationBuilder
     
     ~FloatEquationBuilder() = default;
     
-    shared_ptr<INoeud> builderArbreEquationFloat(vector<Token> &tokens);
+    std::shared_ptr<INoeud> builderArbreEquationFloat(std::vector<Token> &tokens);
 };
 
 #endif /* FLOATEQUATIONBUILDER_H */

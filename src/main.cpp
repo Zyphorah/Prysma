@@ -30,8 +30,7 @@ int main() {
 
         // ===== Résolution de l'expression =====
 
-        int index = 0; 
-        
+   
         // llvm::Value* resultatNumerique = expression->genCode();
 
         // Construction du registre d'instruction 
@@ -44,7 +43,7 @@ int main() {
 
         ConstructeurArbreInstruction constructeurArbreInstruction(registreInstruction);
 
-        std::shared_ptr<INoeud> arbre = constructeurArbreInstruction.construire(tokens,index);
+        std::shared_ptr<INoeud> arbre = constructeurArbreInstruction.construire(tokens);
 
         arbre->genCode();
 

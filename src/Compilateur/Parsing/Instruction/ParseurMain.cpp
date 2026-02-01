@@ -3,7 +3,7 @@
 #include "Compilateur/AST/ConstructeurArbreInstruction.h"
 #include "Compilateur/AST/Noeuds/NoeudMain.h"
 
-std::shared_ptr<INoeud> ParserMain::parser(std::vector<Token>& tokens, int& index, std::shared_ptr<ConstructeurArbreInstruction> constructeurArbreInstruction)
+std::shared_ptr<INoeud> ParserMain::parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction)
 {
     std::shared_ptr<NoeudMain> noeudMain = std::make_shared<NoeudMain>();
     consommer(tokens, index, TOKEN_MAIN, "Erreur : 'main' attendu");

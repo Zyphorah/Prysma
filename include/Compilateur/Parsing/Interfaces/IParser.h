@@ -11,7 +11,7 @@ class IParser
 {
 public: 
     virtual ~IParser() = default;
-    virtual std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, std::shared_ptr<ConstructeurArbreInstruction> constructeurArbreInstruction) = 0;
+    virtual std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction) = 0;
 };
 
 #endif /* A32B33F7_0073_416C_873A_6FF7F40419F8 */

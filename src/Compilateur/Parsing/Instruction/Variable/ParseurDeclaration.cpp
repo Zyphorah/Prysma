@@ -14,7 +14,7 @@ ParseurDeclaration::~ParseurDeclaration()
 {
 }
 
-std::shared_ptr<INoeud> ParseurDeclaration::parser(std::vector<Token>& tokens, int& index, std::shared_ptr<ConstructeurArbreInstruction> constructeurArbreInstruction)
+std::shared_ptr<INoeud> ParseurDeclaration::parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction)
 {
     consommer(tokens, index, _typeVariable, "Erreur : type attendu après 'var'");
     

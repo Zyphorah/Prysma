@@ -21,7 +21,7 @@ public:
     ParseurAffectation(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, TokenType typeVariable);
     ~ParseurAffectation();
 
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, std::shared_ptr<ConstructeurArbreInstruction> constructeurArbreInstruction) override;
+    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction) override;
 };
 
 #endif /* E5F6G7H8_I9J0K1L2_M3N4O5P6_Q7R8S9T0 */
