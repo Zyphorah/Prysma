@@ -1,10 +1,11 @@
 #include "Compilateur/AST/Noeuds/Operande/Operation.h"
-#include <llvm-18/llvm/IR/Value.h>
+#include <llvm/IR/Value.h>
 #include <stdexcept>
 #include <functional>
 
 Operation::Operation(const std::function<llvm::Value*(llvm::Value*, llvm::Value*)>& operateur)
-    : _droite(nullptr), _gauche(nullptr), _operateur(operateur) {}
+    : _droite(nullptr), _gauche(nullptr), _operateur(operateur) {
+}
 
 std::shared_ptr<IExpression> Operation::ajouterExpression(
     std::shared_ptr<INoeud> gauche, 
@@ -20,10 +21,19 @@ std::shared_ptr<IExpression> Operation::ajouterExpression(
     } else {
         throw std::logic_error("Les noeuds existent déjà pour cette opération");
     }
-    
-    return std::make_shared<Operation>(*this);
+    return nullptr;
 }
 
 llvm::Value* Operation::genCode() {
-    return _operateur(_gauche->genCode(), _droite->genCode());
+    if (!_gauche || !_droite) {
+        throw std::runtime_error("Erreur: opérande gauche ou droite manquant dans Operation::genCode()");
+    }
+    
+    llvm::Value* valGauche = _gauche->genCode();
+    llvm::Value* valDroite = _droite->genCode();
+    
+    if (valGauche == nullptr || valDroite == nullptr) {
+        throw std::runtime_error("Erreur: l'évaluation d'une opérande a retourné nullptr");
+    }
+    return _operateur(valGauche, valDroite);
 }

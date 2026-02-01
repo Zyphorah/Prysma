@@ -37,5 +37,5 @@ std::shared_ptr<INoeud> ParseurAffectation::parser(std::vector<Token>& tokens, i
         }
     }
 
-    return std::make_shared<NoeudAffectation>(_backend, nomVariable, variableExistante, expression->genCode());
+    return std::make_shared<NoeudAffectation>(_backend, nomVariable, variableExistante, expression);
 }

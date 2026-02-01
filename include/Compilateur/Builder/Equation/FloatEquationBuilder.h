@@ -3,19 +3,23 @@
 
 #include "Compilateur/AST/ConstructeurArbreEquation.h"
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/GestionnaireChargementVariable.h"
 #include "Compilateur/Parsing/Equation/ChaineResponsabilite.h"
 #include "Compilateur/Parsing/Equation/ServiceParenthese.h"
 #include "Compilateur/Parsing/Equation/GestionnaireOperateur.h"
 #include "Compilateur/AST/Noeuds/Operande/Operation.h"
 #include "Compilateur/AST/Registre/RegistreVariable.h"
-#include <llvm-18/llvm/IR/IRBuilder.h>
+#include "Compilateur/LLVM/LLVMBackend.h"
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/NoFolder.h>
 #include <memory>
+#include <utility>
 
 class FloatEquationBuilder
 {
     private:
 
-    llvm::IRBuilder<> builder;
+    std::shared_ptr<LLVMBackend> _backend;
 
     std::shared_ptr<RegistreSymbole> registreSymboleFloat;
     std::shared_ptr<RegistreVariable> registreVariable;
@@ -32,15 +36,18 @@ class FloatEquationBuilder
     std::shared_ptr<IConstructeurArbre> constructeurArbreEquation;
     
     void construireRegistreSymboleFloat();
+    
+    llvm::Value* chargerVariable(llvm::Value* adresseMemoire, llvm::Type* type, const std::string& nomVariable);
   
     public: 
 
-    FloatEquationBuilder(llvm::LLVMContext &context, std::shared_ptr<RegistreVariable> registreVariableExterne) : builder(context)
+    FloatEquationBuilder(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariableExterne) 
+        : _backend(std::move(backend))
     {
         registreSymboleFloat = std::make_shared<RegistreSymbole>();
         
         // Utiliser le registre externe fourni
-        registreVariable = registreVariableExterne;
+        registreVariable = std::move(registreVariableExterne);
 
         serviceParenthese = std::make_unique<ServiceParenthese>(registreSymboleFloat);
 
@@ -57,8 +64,9 @@ class FloatEquationBuilder
         chaineResponsabilite = std::make_unique<ChaineResponsabilite>(serviceParenthese.get(), operateurs);
                         
         // ===== Construction de l'AST et Résolution =====
+        shared_ptr<GestionnaireChargementVariable> gestionnaireChargement = std::make_shared<GestionnaireChargementVariable>(_backend);
         constructeurArbreEquation = std::make_shared<ConstructeurArbreEquation>(
-            chaineResponsabilite.get(), registreSymboleFloat, serviceParenthese.get(), context, registreVariable
+            chaineResponsabilite.get(), registreSymboleFloat, serviceParenthese.get(), _backend->getContext(), registreVariable, gestionnaireChargement
         );
 
         construireRegistreSymboleFloat();

@@ -5,6 +5,7 @@
 #include <vector>
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
 #include "Compilateur/AST/Noeuds/Operande/Valeur.h"
+#include "Compilateur/AST/Noeuds/Operande/NoeudVariable.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenType.h"
 
@@ -13,12 +14,16 @@ ConstructeurArbreEquation::ConstructeurArbreEquation(
     std::shared_ptr<RegistreSymbole> registreSymbole,
     IGestionnaireParenthese* gestionnaireParenthese,
     llvm::LLVMContext& context,
-    std::shared_ptr<RegistreVariable> registreVariable)
+    std::shared_ptr<RegistreVariable> registreVariable,
+    std::shared_ptr<GestionnaireChargementVariable> gestionnaireChargement)
     : _chaineResponsabilite(chaineResponsabilite), 
       _registreSymbole(std::move(registreSymbole)), 
       _gestionnaireParenthese(gestionnaireParenthese),
       _context(context),
-      _registreVariable(std::move(registreVariable)){}
+      _registreVariable(std::move(registreVariable)),
+      _gestionnaireChargement(std::move(gestionnaireChargement))
+{
+}
 
 // "Pile d'Appels" (Call Stack) 
 std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token> &equation) {
@@ -36,9 +41,8 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
         // Déterminer si c'est une variable
         if(equation[0].type == TOKEN_IDENTIFIANT)
         {
-            
-           llvm::Value* valeur =  _registreVariable->recupererVariables(equation[0]);
-           return std::make_shared<Valeur>(valeur);
+            llvm::Value* adresseMemoire = _registreVariable->recupererVariables(equation[0]);
+                        return std::make_shared<NoeudVariable>(adresseMemoire, equation[0].value, _gestionnaireChargement);
         }
         try {
             float valeurFloat = std::stof(equation[0].value);

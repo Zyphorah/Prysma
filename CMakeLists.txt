@@ -39,8 +39,10 @@ include_directories(${CMAKE_SOURCE_DIR}/include ${LLVM_INCLUDE_DIRS})
 set(SOURCES
     src/main.cpp
     src/Compilateur/AST/ConstructeurArbreEquation.cpp
+    src/Compilateur/AST/GestionnaireChargementVariable.cpp
     src/Compilateur/AST/Noeuds/Operande/Operation.cpp
     src/Compilateur/AST/Noeuds/Operande/Valeur.cpp
+    src/Compilateur/AST/Noeuds/Operande/NoeudVariable.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudDeclaration.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudAffectation.cpp
     src/Compilateur/LLVM/LLVMSerializer.cpp

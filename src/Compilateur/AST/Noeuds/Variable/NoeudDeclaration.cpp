@@ -2,12 +2,12 @@
 #include "Compilateur/LLVM/LLVMBackend.h"
 #include "Compilateur/AST/Registre/RegistreVariable.h"
 
-#include <llvm-18/llvm/IR/Instructions.h>
-#include <llvm-18/llvm/IR/Value.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Value.h>
 #include <memory>
 
-NoeudDeclaration::NoeudDeclaration(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, const std::string& nom, llvm::Type* type, llvm::Value* valeur)
-    : _backend(std::move(backend)), _registreVariable(std::move(registreVariable)), _nom(nom), _type(type), _arraySize(nullptr), _valeur(valeur)
+NoeudDeclaration::NoeudDeclaration(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, const std::string& nom, llvm::Type* type, std::shared_ptr<INoeud> expression)
+    : _backend(std::move(backend)), _registreVariable(std::move(registreVariable)), _nom(nom), _type(type), _arraySize(nullptr), _expression(expression)
 {
 }
 
@@ -30,8 +30,14 @@ llvm::Value* NoeudDeclaration::genCode()
         throw std::runtime_error("Erreur : variable '" + _nom + "' n'est pas une allocation valide");
     }
     
-    // Initialiser la variable avec sa valeur
-    initialisation(allocaInst);
+    
+    // Évaluer l'expression ET initialiser la variable immédiatement
+    llvm::Value* valeurCalculee = nullptr;
+    if (_expression != nullptr) {
+        valeurCalculee = _expression->genCode();
+    }
+
+    initialisation(allocaInst, valeurCalculee);
     
     return allocaInst;
 }
@@ -41,11 +47,11 @@ llvm::AllocaInst* NoeudDeclaration::allocation()
     return _backend->getBuilder().CreateAlloca(_type, _arraySize, _nom);
 }
 
-llvm::AllocaInst* NoeudDeclaration::initialisation(llvm::AllocaInst* allocaInst)
+llvm::AllocaInst* NoeudDeclaration::initialisation(llvm::AllocaInst* allocaInst, llvm::Value* valeur)
 {
-    if (_valeur != nullptr && allocaInst != nullptr)
+    if (valeur != nullptr && allocaInst != nullptr)
     {
-        _backend->getBuilder().CreateStore(_valeur, allocaInst);
+        _backend->getBuilder().CreateStore(valeur, allocaInst);
     }
     return allocaInst;
 }

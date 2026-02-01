@@ -12,12 +12,12 @@ private:
     std::shared_ptr<LLVMBackend> _backend;
     std::string _nom;
     llvm::AllocaInst* _variableAssigner;
-    llvm::Value* _valeur;
+    std::shared_ptr<INoeud> _expression;
 
-    void assignation(llvm::AllocaInst* allocaInst);
+    void assignation(llvm::AllocaInst* allocaInst, llvm::Value* valeur);
 
 public:
-    NoeudAffectation(std::shared_ptr<LLVMBackend> backend, const std::string& nom, llvm::AllocaInst* variableAssigner, llvm::Value* valeur);
+    NoeudAffectation(std::shared_ptr<LLVMBackend> backend, const std::string& nom, llvm::AllocaInst* variableAssigner, std::shared_ptr<INoeud> expression);
     ~NoeudAffectation();
 
     llvm::Value* genCode() override;

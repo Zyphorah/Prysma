@@ -4,10 +4,12 @@
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/AST/Registre/RegistreSymbole.h"
 #include "Compilateur/AST/Registre/RegistreVariable.h"
+#include "Compilateur/AST/GestionnaireChargementVariable.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Parsing/Equation/ChaineResponsabilite.h"
 #include "Compilateur/Parsing/Equation/Interfaces/IGestionnaireParenthese.h"
 #include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/IRBuilder.h>
 #include <memory>
 #include <vector>
 
@@ -24,7 +26,8 @@ private:
     IGestionnaireParenthese* _gestionnaireParenthese;
     llvm::LLVMContext& _context;
 
-    shared_ptr<RegistreVariable> _registreVariable; 
+    std::shared_ptr<RegistreVariable> _registreVariable;
+    std::shared_ptr<GestionnaireChargementVariable> _gestionnaireChargement;
 
 public:
     /**
@@ -39,7 +42,8 @@ public:
         std::shared_ptr<RegistreSymbole> registreSymbole,
         IGestionnaireParenthese* gestionnaireParenthese,
         llvm::LLVMContext& context, 
-        shared_ptr<RegistreVariable> registreVariable
+        std::shared_ptr<RegistreVariable> registreVariable,
+        std::shared_ptr<GestionnaireChargementVariable> gestionnaireChargement
     );
     
     /**

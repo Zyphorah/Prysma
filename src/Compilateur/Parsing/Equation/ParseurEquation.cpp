@@ -6,7 +6,7 @@
 ParseurEquation::ParseurEquation(std::shared_ptr<LLVMBackend> backend, TokenType typeVariable, std::shared_ptr<RegistreVariable> registreVariable)
     : _backend(std::move(backend)), 
       _registreVariable(std::move(registreVariable)),
-      _equationBuilder(std::make_unique<FloatEquationBuilder>(_backend->getContext(), _registreVariable)),
+      _equationBuilder(std::make_unique<FloatEquationBuilder>(_backend, _registreVariable)),
       _type(nullptr),
       _typeVariable(typeVariable)
 {

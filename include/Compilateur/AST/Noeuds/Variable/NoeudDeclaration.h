@@ -16,13 +16,13 @@ private:
     std::string _nom;
     llvm::Type* _type;
     llvm::Value* _arraySize;
-    llvm::Value* _valeur;
+    std::shared_ptr<INoeud> _expression;
 
     llvm::AllocaInst* allocation();
-    llvm::AllocaInst* initialisation(llvm::AllocaInst* allocaInst);
+    llvm::AllocaInst* initialisation(llvm::AllocaInst* allocaInst, llvm::Value* valeur);
 
 public:
-    NoeudDeclaration(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, const std::string& nom, llvm::Type* type, llvm::Value* valeur);
+    NoeudDeclaration(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, const std::string& nom, llvm::Type* type, std::shared_ptr<INoeud> expression);
     ~NoeudDeclaration();
 
     llvm::Value* genCode() override;
