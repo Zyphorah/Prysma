@@ -22,3 +22,11 @@ llvm::Value* GestionnaireChargementVariable::chargerVariable(llvm::Value* adress
     llvm::Type* typeVariable = determinerType(adresseMemoire);
     return _backend->getBuilder().CreateLoad(typeVariable, adresseMemoire, nomVariable);
 }
+
+void LLVMBackend::creationFonctionMain() {
+    // ===== Création de la fonction main LLVM =====
+    llvm::FunctionType *funcType = llvm::FunctionType::get(builder->getInt32Ty(), false);
+    llvm::Function *mainFunc = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "main", module.get());
+    llvm::BasicBlock *entry = llvm::BasicBlock::Create(*context, "entry", mainFunc);
+    builder->SetInsertPoint(entry);
+}

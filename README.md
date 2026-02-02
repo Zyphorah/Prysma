@@ -112,6 +112,7 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
 - Permettre au développeur de déclarer des variables et les utiliser dans des expressions
 - Valider la syntaxe du code et rejeter les structures invalides via la construction de l'AST
 - Supporter les instructions if, while, passer par la pile avec alloca
+- Supporter les fonctions, déclaration de fonction, appel de fonction 
 
 ### Itération 2 du projet fonctionnalité à réaliser en 2 semaines ?
 

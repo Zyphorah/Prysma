@@ -56,8 +56,6 @@ set(SOURCES
     src/Compilateur/TraitementFichier/FichierLecture.cpp
     src/Compilateur/TraitementFichier/FichierEcriture.cpp
     src/Compilateur/AST/Registre/RegistreVariable.cpp
-    src/Compilateur/AST/Registre/RegistreSymbole.cpp
-    src/Compilateur/AST/Registre/RegistreInstruction.cpp
     src/Compilateur/AST/ConstructeurArbreInstruction.cpp
     src/Compilateur/Parsing/Instruction/ParseurMain.cpp
     src/Compilateur/Parsing/Instruction/Variable/ParseurDeclaration.cpp

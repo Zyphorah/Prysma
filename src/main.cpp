@@ -29,11 +29,6 @@ int main() {
         // ===== Création de la fonction main LLVM =====
         backend->creationFonctionMain();
 
-        // ===== Résolution de l'expression =====
-
-   
-        // llvm::Value* resultatNumerique = expression->genCode();
-
         std::shared_ptr<RegistreInstruction> registreInstruction = std::make_shared<RegistreInstruction>();
         std::shared_ptr<RegistreVariable> registreVariable = std::make_shared<RegistreVariable>();
         

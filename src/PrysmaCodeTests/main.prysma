@@ -1,4 +1,7 @@
 main 
 {
-    dec float b = (10-4) + 50 * 234 - 40 + 10 + 50;
+    dec float a = 10+40+43+(432+4);
+    dec float b = (10.2-4) + 50 * 234 - a + 10 + 50;
+    aff b = 10;
+    aff b = a; 
 }
