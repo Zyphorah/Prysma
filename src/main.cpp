@@ -2,7 +2,8 @@
 #include "Compilateur/LLVM/LLVMBackend.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenType.h"
-#include "Compilateur/Parsing/Instruction/Variable/ParseurVariable.h"
+#include "Compilateur/Parsing/Instruction/Variable/ParseurAffectation.h"
+#include "Compilateur/Parsing/Instruction/Variable/ParseurDeclaration.h"
 #include "Compilateur/TraitementFichier/FichierLecture.h"
 #include "Compilateur/AST/Registre/RegistreVariable.h"
 #include <iostream>
@@ -37,7 +38,8 @@ int main() {
         std::shared_ptr<RegistreVariable> registreVariable = std::make_shared<RegistreVariable>();
         
         registreInstruction->enregistrer(TOKEN_MAIN, std::make_shared<ParserMain>());
-        registreInstruction->enregistrer(TOKEN_VAR, std::make_shared<ParseurVariable>(backend, registreVariable));
+        registreInstruction->enregistrer(TOKEN_AFF, std::make_shared<ParseurAffectation>(backend, registreVariable,TOKEN_TYPE_FLOAT));
+        registreInstruction->enregistrer(TOKEN_DEC,std::make_shared<ParseurDeclaration>(backend, registreVariable,TOKEN_TYPE_FLOAT));
 
         ConstructeurArbreInstruction constructeurArbreInstruction(registreInstruction);
 

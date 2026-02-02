@@ -16,7 +16,7 @@ namespace TokenCategories {
     inline const std::unordered_set<TokenType> OPERANDES = {
         TOKEN_LIT_INT,
         TOKEN_LIT_FLOAT,
-        TOKEN_IDENTIFIANT
+        TOKEN_IDENTIFIANT,
     };
 
     inline const std::unordered_set<TokenType> OPERATEURS_COMPARAISON = {
@@ -47,7 +47,8 @@ namespace TokenCategories {
         TOKEN_FAUX,
         TOKEN_PRINT,
         TOKEN_MAIN,
-        TOKEN_VAR
+        TOKEN_AFF,
+        TOKEN_DEC
     };
 
     inline const std::unordered_set<TokenType> STRUCTURE = {

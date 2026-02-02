@@ -60,7 +60,6 @@ set(SOURCES
     src/Compilateur/AST/Registre/RegistreInstruction.cpp
     src/Compilateur/AST/ConstructeurArbreInstruction.cpp
     src/Compilateur/Parsing/Instruction/ParseurMain.cpp
-    src/Compilateur/Parsing/Instruction/Variable/ParseurVariable.cpp
     src/Compilateur/Parsing/Instruction/Variable/ParseurDeclaration.cpp
     src/Compilateur/Parsing/Instruction/Variable/ParseurAffectation.cpp
     src/Compilateur/Parsing/Equation/ParseurEquation.cpp

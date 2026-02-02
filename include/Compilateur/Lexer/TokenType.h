@@ -50,7 +50,9 @@ enum TokenType {
     TOKEN_MAIN,
 
     // variable 
-    TOKEN_VAR,
+
+    TOKEN_AFF, 
+    TOKEN_DEC,
     TOKEN_TYPE_INT,
     TOKEN_TYPE_FLOAT,
     TOKEN_TYPE_STRING,

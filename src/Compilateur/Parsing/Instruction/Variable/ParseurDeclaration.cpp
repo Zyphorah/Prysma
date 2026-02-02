@@ -16,7 +16,8 @@ ParseurDeclaration::~ParseurDeclaration()
 
 std::shared_ptr<INoeud> ParseurDeclaration::parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction)
 {
-    consommer(tokens, index, _typeVariable, "Erreur : type attendu après 'var'");
+    consommer(tokens,index,TOKEN_DEC,"Erreur : type attendu 'dec");
+    consommer(tokens, index, _typeVariable, "Erreur : type attendu après 'dec'");
     
     Token nomToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Erreur : nom de variable attendu");
     std::string nomVariable = nomToken.value;

@@ -52,17 +52,20 @@ void ParseurEquation::validerEquation(const std::vector<Token>& tokensEquation) 
 
     for (size_t i = 0; i < tokensEquation.size(); i++) {
         TokenType currentType = tokensEquation[i].type;
-        
-        if (attendOperande) {
-            if (!estOperande(currentType)) {
-                throw std::runtime_error("Erreur : opérande attendu à la position " + std::to_string(i));
+
+        if(currentType != TOKEN_PAREN_OUVERTE && currentType != TOKEN_PAREN_FERMEE)
+        {
+            if (attendOperande) {
+                if (!estOperande(currentType)) {
+                    throw std::runtime_error("Erreur : opérande attendu à la position " + std::to_string(i));
+                }
+                attendOperande = false;
+            } else {
+                if (!estOperateur(currentType)) {
+                    throw std::runtime_error("Erreur : opérateur attendu à la position " + std::to_string(i));
+                }
+                attendOperande = true;
             }
-            attendOperande = false;
-        } else {
-            if (!estOperateur(currentType)) {
-                throw std::runtime_error("Erreur : opérateur attendu à la position " + std::to_string(i));
-            }
-            attendOperande = true;
         }
     }
 

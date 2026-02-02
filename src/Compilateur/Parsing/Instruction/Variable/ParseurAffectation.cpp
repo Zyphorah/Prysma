@@ -17,6 +17,7 @@ ParseurAffectation::~ParseurAffectation()
 
 std::shared_ptr<INoeud> ParseurAffectation::parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction)
 {
+    consommer(tokens, index, TOKEN_AFF, "Erreur : l'affectation est attendu 'aff'");
     Token nomToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Erreur : nom de variable attendu");
     std::string nomVariable = nomToken.value;
     
