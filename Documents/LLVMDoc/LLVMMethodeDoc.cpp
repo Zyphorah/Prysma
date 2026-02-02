@@ -22,7 +22,7 @@ using namespace llvm;
 
 // ===== Initialisation LLVM =====
 llvm::LLVMContext context;
-llvm::Module module("PrysmaModule", context);
+llvm::Module module("output", context);
 llvm::IRBuilder<> builder(context);
 
 AllocaInst* exempleInitialisationVariable()
@@ -58,6 +58,36 @@ void sauvegarderCode()
 {
     LLVMSerializer traitementFichier{context, module};
     traitementFichier.SauvegarderCodeLLVM("output.ll");
+}
+
+void declarationFonction()
+{
+    // 1. Signature : void (i32, float)
+    std::vector<llvm::Type*> args = { builder.getInt32Ty(), builder.getFloatTy() };
+    llvm::FunctionType* ft = llvm::FunctionType::get(builder.getVoidTy(), args, false);
+
+    // 2. Création
+    llvm::Function* fonction = llvm::Function::Create(ft, llvm::Function::ExternalLinkage, "maFonction", module);
+
+    // 3. Création du bloc
+    llvm::BasicBlock* blocEntry = llvm::BasicBlock::Create(context, "entry", fonction);
+    builder.SetInsertPoint(blocEntry);
+
+    // 4. Copie des arguments (Boilerplate)
+    auto argIt = fonction->arg_begin();
+    llvm::Value* valX = argIt++; // Récupère le 1er arg
+    llvm::Value* valY = argIt++; // Récupère le 2ème arg
+
+    // Pour X
+    llvm::Value* ptrX = builder.CreateAlloca(builder.getInt32Ty(), nullptr, "ptr_x");
+    builder.CreateStore(valX, ptrX);
+
+    // Pour Y
+    llvm::Value* ptrY = builder.CreateAlloca(builder.getFloatTy(), nullptr, "ptr_y");
+    builder.CreateStore(valY, ptrY);
+
+    // 5. Fin
+    builder.CreateRetVoid();
 }
 
 int main()

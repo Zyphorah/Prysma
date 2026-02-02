@@ -20,6 +20,7 @@ llvm::Value* NoeudDeclaration::genCode()
     if (_registreVariable == nullptr) {
         throw std::runtime_error("Erreur : registre de variables non initialisé");
     }
+    
     Token nomToken;
     nomToken.value = _nom;
     nomToken.type = TOKEN_IDENTIFIANT;

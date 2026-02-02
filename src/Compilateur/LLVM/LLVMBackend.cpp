@@ -12,7 +12,7 @@ using namespace llvm;
 LLVMBackend::LLVMBackend() {
     // 1. Initialisation des pointeurs dans l'ordre correct
     context = std::make_unique<LLVMContext>();
-    module = std::make_unique<Module>("PrysmaModule", *context);
+    module = std::make_unique<Module>("output", *context);
     builder = std::make_unique<IRBuilder<NoFolder>>(*context);
 
     // 2. Initialisation de la cible (évite d'avoir des adresses mémoire aléatoires)

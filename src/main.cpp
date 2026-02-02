@@ -12,6 +12,7 @@
 #include <memory>
 #include "Compilateur/AST/Registre/RegistreInstruction.h"
 #include "Compilateur/Parsing/Instruction/ParserMain.h"
+#include "Compilateur/Parsing/Instruction/Fonction/ParsingDeclarationFonction.h"
 
 using namespace std;
 
@@ -33,6 +34,7 @@ int main() {
         std::shared_ptr<RegistreVariable> registreVariable = std::make_shared<RegistreVariable>();
         
         registreInstruction->enregistrer(TOKEN_MAIN, std::make_shared<ParserMain>());
+        registreInstruction->enregistrer(TOKEN_FONCTION, std::make_shared<ParsingDeclarationFonction>());
         registreInstruction->enregistrer(TOKEN_AFF, std::make_shared<ParseurAffectation>(backend, registreVariable,TOKEN_TYPE_FLOAT));
         registreInstruction->enregistrer(TOKEN_DEC,std::make_shared<ParseurDeclaration>(backend, registreVariable,TOKEN_TYPE_FLOAT));
 
