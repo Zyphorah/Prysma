@@ -11,7 +11,8 @@ scope
     def float main()
     {
         dec int teste = 10; 
-        dec bool boolean = 0;
+        dec bool boolean = true;
+        aff boolean = false;
         dec float a = 10+234;
         dec int b = 10+234-234*432-(342-42);
         aff a = 10;

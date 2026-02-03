@@ -16,6 +16,7 @@ namespace TokenCategories {
     inline const std::unordered_set<TokenType> OPERANDES = {
         TOKEN_LIT_INT,
         TOKEN_LIT_FLOAT,
+        TOKEN_LIT_BOLEEN,
         TOKEN_IDENTIFIANT,
     };
 
@@ -43,8 +44,6 @@ namespace TokenCategories {
         TOKEN_TANT_QUE,
         TOKEN_POUR,
         TOKEN_RETOUR,
-        TOKEN_VRAI,
-        TOKEN_FAUX,
         TOKEN_PRINT,
         TOKEN_SCOPE,
         TOKEN_AFF,
