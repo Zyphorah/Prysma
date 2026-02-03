@@ -55,8 +55,10 @@ void NoeudAffectation::assignation(llvm::AllocaInst* allocaInst, llvm::Value* va
             llvm::Value* loadedValue = _backend->getBuilder().CreateLoad(sourceAlloca->getAllocatedType(), sourceAlloca);
             _backend->getBuilder().CreateStore(loadedValue, allocaInst);
         } else {
+
+            llvm::Value* valeurCast = _backend->creerAutoCast(valeur,allocaInst->getAllocatedType());
             // Sinon, assigner directement la valeur
-            _backend->getBuilder().CreateStore(valeur, allocaInst);
+            _backend->getBuilder().CreateStore(valeurCast, allocaInst);
         }
     }
 }
