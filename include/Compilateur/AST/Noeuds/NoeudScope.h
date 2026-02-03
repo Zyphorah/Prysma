@@ -4,12 +4,12 @@
 #include "Compilateur/AST/Noeuds/Instruction.h"
 #include <llvm/IR/Value.h>
 
-class NoeudMain : public Instruction
+class NoeudScope : public Instruction
 {
 public: 
 
-    NoeudMain();
-    ~NoeudMain();
+    NoeudScope();
+    ~NoeudScope();
 
     llvm::Value* genCode() override;
 };

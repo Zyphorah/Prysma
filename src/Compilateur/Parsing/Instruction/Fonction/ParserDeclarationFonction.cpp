@@ -2,6 +2,7 @@
 #include "Compilateur/AST/Noeuds/Fonction/NoeudDeclarationFonction.h"
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/Lexer/TokenType.h"
+#include "Compilateur/Lexer/TokenCategories.h"
 #include "Compilateur/Parsing/Instruction/Fonction/ParsingDeclarationFonction.h"
 #include <memory>
 #include <vector>
@@ -26,11 +27,7 @@ std::shared_ptr<INoeud> ParsingDeclarationFonction::parser(std::vector<Token>& t
     Token tokenTypeRetour = tokens[index];
     TokenType typeRetour = tokenTypeRetour.type;
     
-    if (tokenTypeRetour.type == TOKEN_TYPE_INT || 
-        tokenTypeRetour.type == TOKEN_TYPE_FLOAT || 
-        tokenTypeRetour.type == TOKEN_TYPE_BOOL || 
-        tokenTypeRetour.type == TOKEN_TYPE_VOID) {
-        
+    if (TokenCategories::TYPES.find(typeRetour) != TokenCategories::TYPES.end()) {
         index++; 
     } else {
         throw std::runtime_error("Erreur: Type de retour attendu (int, float, void...)");

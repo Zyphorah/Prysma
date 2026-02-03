@@ -1,7 +1,7 @@
 scope 
 {
 
-    def int teste()
+    def float teste()
     {
         dec float a = 10*42;
 
@@ -11,7 +11,7 @@ scope
     def float main()
     {
         dec int teste = 10; 
-        dec bool boolean = 1;
+        dec bool boolean = 0;
         dec float a = 10+234;
         dec float b = 10+234-234*432-(342-42);
         aff a = 10;
@@ -19,5 +19,5 @@ scope
 
         return 10;
     }
-    
+
 }

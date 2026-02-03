@@ -52,7 +52,6 @@ set(SOURCES
     src/Compilateur/Parsing/Equation/ServiceParenthese.cpp
     src/Compilateur/Lexer/Lexer.cpp
     src/Compilateur/Builder/Equation/FloatEquationBuilder.cpp
-    src/Compilateur/Builder/Equation/IntEquationBuilder.cpp
     src/Compilateur/TraitementFichier/FichierLecture.cpp
     src/Compilateur/TraitementFichier/FichierEcriture.cpp
     src/Compilateur/AST/Registre/RegistreVariable.cpp
@@ -64,7 +63,7 @@ set(SOURCES
     src/Compilateur/Parsing/ParserBase.cpp
     src/Compilateur/Parsing/Instruction/Fonction/ParserDeclarationFonction.cpp
     src/Compilateur/Parsing/Instruction/Return/ParsingReturn.cpp
-    src/Compilateur/AST/Noeuds/NoeudMain.cpp
+    src/Compilateur/AST/Noeuds/NoeudScope.cpp
     src/Compilateur/AST/Noeuds/Instruction.cpp
     src/Compilateur/AST/Noeuds/Fonction/NoeudDeclarationFonction.cpp
     src/Compilateur/AST/Noeuds/Return/NoeudReturn.cpp

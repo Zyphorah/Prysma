@@ -4,7 +4,7 @@
 #include "Compilateur/Parsing/Interfaces/IParser.h"
 #include "Compilateur/Parsing/ParserBase.h"
 
-class ParserMain : public IParser, public ParserBase
+class ParserScope : public IParser, public ParserBase
 {
 public:
     std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction) override;

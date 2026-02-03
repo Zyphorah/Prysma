@@ -14,7 +14,7 @@
 #include <llvm-18/llvm/IR/Value.h>
 #include <memory>
 #include "Compilateur/AST/Registre/RegistreInstruction.h"
-#include "Compilateur/Parsing/Instruction/ParserMain.h"
+#include "Compilateur/Parsing/Instruction/ParserScope.h"
 #include "Compilateur/Parsing/Instruction/Fonction/ParsingDeclarationFonction.h"
 #include "Compilateur/Parsing/Instruction/Return/ParsingReturn.h"
 
@@ -43,7 +43,7 @@ int main() {
         registreType->enregistrer(TOKEN_TYPE_BOOL, llvm::Type::getInt1Ty(backend->getContext()));
         registreType->enregistrer(TOKEN_TYPE_VOID, llvm::Type::getVoidTy(backend->getContext()));
         
-        registreInstruction->enregistrer(TOKEN_SCOPE, std::make_shared<ParserMain>());
+        registreInstruction->enregistrer(TOKEN_SCOPE, std::make_shared<ParserScope>());
         registreInstruction->enregistrer(TOKEN_FONCTION, std::make_shared<ParsingDeclarationFonction>(backend, registreFonction, registreVariable, TOKEN_FONCTION));
         registreInstruction->enregistrer(TOKEN_AFF, std::make_shared<ParseurAffectation>(backend, registreVariable,registreType));
         registreInstruction->enregistrer(TOKEN_DEC,std::make_shared<ParseurDeclaration>(backend, registreVariable,registreType));

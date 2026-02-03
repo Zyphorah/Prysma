@@ -1,14 +1,14 @@
-#include "Compilateur/AST/Noeuds/NoeudMain.h"
+#include "Compilateur/AST/Noeuds/NoeudScope.h"
 
-NoeudMain::NoeudMain()
+NoeudScope::NoeudScope()
 {
 }
 
-NoeudMain::~NoeudMain()
+NoeudScope::~NoeudScope()
 {
 }
 
-llvm::Value* NoeudMain::genCode()
+llvm::Value* NoeudScope::genCode()
 {
     llvm::Value* resultat = nullptr;
     for (const auto& enfant : enfants) {

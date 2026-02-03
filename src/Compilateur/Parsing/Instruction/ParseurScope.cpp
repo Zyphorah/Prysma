@@ -1,11 +1,11 @@
 #include "Compilateur/Lexer/TokenType.h"
-#include "Compilateur/Parsing/Instruction/ParserMain.h"
+#include "Compilateur/Parsing/Instruction/ParserScope.h"
 #include "Compilateur/AST/ConstructeurArbreInstruction.h"
-#include "Compilateur/AST/Noeuds/NoeudMain.h"
+#include "Compilateur/AST/Noeuds/NoeudScope.h"
 
-std::shared_ptr<INoeud> ParserMain::parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction)
+std::shared_ptr<INoeud> ParserScope::parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction)
 {
-    std::shared_ptr<NoeudMain> noeudMain = std::make_shared<NoeudMain>();
+    std::shared_ptr<NoeudScope> noeudScope = std::make_shared<NoeudScope>();
     consommer(tokens, index, TOKEN_SCOPE, "Erreur : 'scope' attendu");
     consommer(tokens, index, TOKEN_ACCOLADE_OUVERTE, "Erreur : '{' attendu après 'scope'");
 
@@ -14,8 +14,8 @@ std::shared_ptr<INoeud> ParserMain::parser(std::vector<Token>& tokens, int& inde
     while(index < (int)tokens.size() && tokens[index].type != TOKEN_ACCOLADE_FERMEE)
     {
         std::shared_ptr<INoeud> enfant = constructeurArbreInstruction->construire(tokens, index);
-        noeudMain->ajouterInstruction(enfant);
+        noeudScope->ajouterInstruction(enfant);
     }
      
-    return noeudMain;
+    return noeudScope;
 }
