@@ -8,14 +8,16 @@ scope
         return 1;
     }
 
-    def int main()
+    def float main()
     {
-        
+        dec int teste = 10; 
+        dec bool boolean = 1;
         dec float a = 10+234;
         dec float b = 10+234-234*432-(342-42);
         aff a = 10;
         aff b = 13 +a; 
 
-        return 1;
+        return 10;
     }
+    
 }

@@ -28,11 +28,11 @@ std::shared_ptr<INoeud> ParsingReturn::parser(std::vector<Token>& tokens, int& i
     std::shared_ptr<INoeud> valeurRetour = nullptr;
 
     if (index < (int)tokens.size() && tokens[index].type != TOKEN_POINT_VIRGULE) {
-        ParseurEquation parseurEquation(_backend, TOKEN_TYPE_INT, nullptr);  
+        ParseurEquation parseurEquation(_backend, nullptr);  
         valeurRetour = parseurEquation.parser(tokens, index, constructeurArbreInstruction);
     } else {
         consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur: point-virgule attendu après return");
     }
 
-    return std::make_shared<NoeudReturn>(_backend, valeurRetour, llvm::Type::getInt32Ty(_backend->getContext()));
+    return std::make_shared<NoeudReturn>(_backend, valeurRetour);
 }

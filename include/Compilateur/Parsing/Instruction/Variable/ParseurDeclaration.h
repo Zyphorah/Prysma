@@ -9,16 +9,17 @@
 #include <memory>
 
 class RegistreVariable;
+class RegistreType;
 
 class ParseurDeclaration : public IParser, public ParserBase
 {
 private:
     std::shared_ptr<LLVMBackend> _backend;
     std::shared_ptr<RegistreVariable> _registreVariable;
-    TokenType _typeVariable;
+    std::shared_ptr<RegistreType> _registreType;
 
 public:
-    ParseurDeclaration(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, TokenType typeVariable);
+    ParseurDeclaration(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, std::shared_ptr<RegistreType> registreType);
     ~ParseurDeclaration();
 
     std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction) override;

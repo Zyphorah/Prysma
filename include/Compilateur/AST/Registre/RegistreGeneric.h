@@ -1,35 +1,35 @@
 #ifndef E962F97C_7F79_445E_9F65_097981CC00B4
 #define E962F97C_7F79_445E_9F65_097981CC00B4
 
-#include "Compilateur/Lexer/TokenType.h"
 #include <map>
 #include <memory>
 #include <set>
 #include <stdexcept>
 #include <string>
 #include <functional>
+#include <sstream>
 
-template <typename TValeur>
+template <typename TKey, typename TValeur>
 class RegistreGeneric {
 protected:
-    std::map<TokenType, TValeur> _elements;
-    std::function<std::string(TokenType)> _messageErreurCallback;
+    std::map<TKey, TValeur> _elements;
+    std::function<std::string(TKey)> _messageErreurCallback;
 
 public:
     RegistreGeneric() = default;
     virtual ~RegistreGeneric() = default;
 
    
-    void setMessageErreur(std::function<std::string(TokenType)>&& callback) {
+    void setMessageErreur(std::function<std::string(TKey)>&& callback) {
         _messageErreurCallback = std::move(callback);
     }
 
    
-    void enregistrer(TokenType cle, TValeur valeur) {
+    void enregistrer(TKey cle, TValeur valeur) {
         _elements[cle] = std::move(valeur);
     }
 
-    TValeur recuperer(TokenType cle) {
+    TValeur recuperer(TKey cle) {
         auto iterator = _elements.find(cle);
         if (iterator == _elements.end()) {
             std::string message = genererMessageErreur(cle);
@@ -38,13 +38,13 @@ public:
         return iterator->second;
     }
 
-    bool existe(TokenType cle) const {
+    bool existe(TKey cle) const {
         return _elements.count(cle) > 0;
     }
 
   
-    std::set<TokenType> obtenirCles() const {
-        std::set<TokenType> cles;
+    std::set<TKey> obtenirCles() const {
+        std::set<TKey> cles;
         for (const auto& pair : _elements) {
             cles.insert(pair.first);
         }
@@ -53,11 +53,10 @@ public:
 
 protected:
  
-    virtual std::string genererMessageErreur(TokenType cle) const {
-        if (_messageErreurCallback) {
-            return _messageErreurCallback(cle);
-        }
-        return std::string("Element inconnu: ") + std::to_string(cle);
+   virtual std::string genererMessageErreur(const TKey& cle) const {
+        std::stringstream stringStream;
+        stringStream << "Element inconnu dans le registre : " << cle;
+        return stringStream.str();
     }
 };
 

@@ -5,9 +5,10 @@
 #include "Compilateur/AST/Registre/RegistreVariable.h"
 #include <llvm-18/llvm/IR/Instructions.h>
 #include <memory>
+#include <utility>
 
-ParseurAffectation::ParseurAffectation(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, TokenType typeVariable)
-    : _backend(std::move(backend)), _registreVariable(std::move(registreVariable)), _typeVariable(typeVariable)
+ParseurAffectation::ParseurAffectation(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable,std::shared_ptr<RegistreType> registreType)
+    : _backend(std::move(backend)), _registreVariable(std::move(registreVariable)), _registreType(std::move(registreType))
 {
 }
 
@@ -23,9 +24,8 @@ std::shared_ptr<INoeud> ParseurAffectation::parser(std::vector<Token>& tokens, i
     
     consommer(tokens, index, TOKEN_EGAL, "Erreur : '=' attendu");
     
-    ParseurEquation parseurEquation(_backend, _typeVariable, _registreVariable);
+    ParseurEquation parseurEquation(_backend, _registreVariable);
     std::shared_ptr<INoeud> expression = parseurEquation.parser(tokens, index, constructeurArbreInstruction);
 
- 
     return std::make_shared<NoeudAffectation>(_backend, nomVariable, expression, _registreVariable, nomToken);
 }

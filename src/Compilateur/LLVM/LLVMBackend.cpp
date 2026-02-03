@@ -10,12 +10,12 @@
 using namespace llvm;
 
 LLVMBackend::LLVMBackend() {
-    // 1. Initialisation des pointeurs dans l'ordre correct
+
     context = std::make_unique<LLVMContext>();
     module = std::make_unique<Module>("output", *context);
     builder = std::make_unique<IRBuilder<NoFolder>>(*context);
 
-    // 2. Initialisation de la cible (évite d'avoir des adresses mémoire aléatoires)
+    // Initialisation de la cible (évite d'avoir des adresses mémoire aléatoires)
     InitializeAllTargetInfos();
     InitializeAllTargets();
     InitializeAllTargetMCs();
@@ -34,7 +34,10 @@ LLVMBackend::LLVMBackend() {
     target->createTargetMachine(targetTriple, "generic", "", opt, Reloc::Model::PIC_);
 }
 
-void LLVMBackend::sauvegarderCodeLLVM(const std::string& nomFichier) {
-    LLVMSerializer serializer(*context, *module);
-    serializer.SauvegarderCodeLLVM(nomFichier);
+
+
+llvm::Value* LLVMBackend::creerAutoCast(llvm::Value* valeurSource, llvm::Type* typeCible)
+{
+
+    return nullptr;
 }

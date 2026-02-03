@@ -8,8 +8,8 @@
 #include <stdexcept>
 #include <utility>
 
-NoeudAffectation::NoeudAffectation(std::shared_ptr<LLVMBackend> backend, const std::string& nom, std::shared_ptr<INoeud> expression, std::shared_ptr<RegistreVariable> registreVariable, const Token& token)
-    : _backend(backend), _nom(nom),  _expression(std::move(expression)), _registreVariable(std::move(registreVariable)), _token(token)
+NoeudAffectation::NoeudAffectation(std::shared_ptr<LLVMBackend> backend, const std::string& nom, std::shared_ptr<INoeud> expression, std::shared_ptr<RegistreVariable> registreVariable,Token token)
+    : _backend(std::move(backend)), _nom(nom),  _expression(std::move(expression)), _registreVariable(std::move(registreVariable)), _token(std::move(token))
 {
 }
 

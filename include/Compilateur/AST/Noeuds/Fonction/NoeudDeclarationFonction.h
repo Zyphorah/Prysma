@@ -24,8 +24,8 @@ public:
 
     llvm::Value* genCode() override;
 
-    std::string getNom() const { return _nom; }
-    TokenType getTypeRetourToken() const { return _typeRetourToken; }
+    [[nodiscard]] std::string getNom() const { return _nom; }
+    [[nodiscard]] TokenType getTypeRetourToken() const { return _typeRetourToken; }
 };
 
 #endif /* A2837407_B466_49AE_8A29_4BFC0A5D0461 */

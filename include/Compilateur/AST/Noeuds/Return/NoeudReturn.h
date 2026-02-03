@@ -14,7 +14,7 @@ private:
     llvm::Type* _typeRetour;
 
 public:
-    NoeudReturn(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<INoeud> valeurRetour, llvm::Type* typeRetour);
+    NoeudReturn(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<INoeud> valeurRetour);
     ~NoeudReturn() = default;
 
     llvm::Value* genCode() override;

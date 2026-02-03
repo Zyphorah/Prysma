@@ -20,7 +20,7 @@ private:
     llvm::AllocaInst* recupererVariable();
 
 public:
-    NoeudAffectation(std::shared_ptr<LLVMBackend> backend, const std::string& nom, std::shared_ptr<INoeud> expression, std::shared_ptr<RegistreVariable> registreVariable, const Token& token);
+    NoeudAffectation(std::shared_ptr<LLVMBackend> backend, const std::string& nom, std::shared_ptr<INoeud> expression, std::shared_ptr<RegistreVariable> registreVariable,Token token);
     ~NoeudAffectation();
 
     llvm::Value* genCode() override;

@@ -8,7 +8,7 @@
 
 class IExpression;
 
-class RegistreSymbole : public RegistreGeneric<std::function<std::shared_ptr<IExpression>()>>,
+class RegistreSymbole : public RegistreGeneric<TokenType,std::function<std::shared_ptr<IExpression>()>>,
                         public IRegistreSymbole {
 public:
     RegistreSymbole() = default;
@@ -28,20 +28,17 @@ public:
     }
 
   
-    bool estOperateur(TokenType symbole) const override {
+    [[nodiscard]] bool estOperateur(TokenType symbole) const override {
         return existe(symbole);
     }
 
-    std::set<TokenType> obtenirSymboles() const override {
+    [[nodiscard]] std::set<TokenType> obtenirSymboles() const override {
         return obtenirCles();
     }
 
 protected:
    
-    std::string genererMessageErreur(TokenType cle) const override {
-        if (_messageErreurCallback) {
-            return _messageErreurCallback(cle);
-        }
-        return std::string("Symbole inconnu: ") + std::to_string(cle);
+    [[nodiscard]] std::string genererMessageErreur(TokenType cle) const  {
+        return RegistreGeneric::genererMessageErreur(cle);
     }
 };

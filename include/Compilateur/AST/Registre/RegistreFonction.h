@@ -3,40 +3,25 @@
 
 #include "RegistreGeneric.h"
 #include <llvm-18/llvm/IR/Function.h>
-#include <map>
 #include <string>
 
-class RegistreFonction : public RegistreGeneric<llvm::Function*>
+class RegistreFonction : public RegistreGeneric<std::string, llvm::Function*>
 {
-private:
-    std::map<std::string, llvm::Function*> _fonctions;
 
 public:
     RegistreFonction() = default;
     ~RegistreFonction() = default;
 
     void ajouter(const std::string& nom, llvm::Function* fonction) {
-        _fonctions[nom] = fonction;
+        RegistreGeneric::enregistrer(nom,fonction);
     }
 
-    llvm::Function* obtenir(const std::string& nom) const {
-        auto iter = _fonctions.find(nom);
-        if (iter != _fonctions.end()) {
-            return iter->second;
-        }
-        return nullptr;
+    llvm::Function* obtenir(const std::string& nom){
+        return  RegistreGeneric::recuperer(nom);
     }
 
-    bool existe(const std::string& nom) const {
-        return _fonctions.find(nom) != _fonctions.end();
-    }
-
-    void supprimer(const std::string& nom) {
-        _fonctions.erase(nom);
-    }
-
-    void vider() {
-        _fonctions.clear();
+    [[nodiscard]] bool existe(const std::string& nom) const {
+        return RegistreFonction::existe(nom);
     }
 };
 

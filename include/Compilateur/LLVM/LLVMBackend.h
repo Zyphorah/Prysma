@@ -29,10 +29,6 @@ public:
     llvm::Module& getModule() { return *module; }
     llvm::IRBuilder<llvm::NoFolder>& getBuilder() { return *builder; }
 
-    void sauvegarderCodeLLVM(const std::string& nomFichier);
-    
-    void print(llvm::Value* valeur);
-    
-    void creationFonctionMain();
+    llvm::Value* creerAutoCast(llvm::Value* valeurSource, llvm::Type* typeCible);
 };
  
