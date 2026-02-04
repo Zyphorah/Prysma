@@ -3,7 +3,7 @@
 #include "Compilateur/AST/Interfaces/IConstructeurArbre.h"
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/AST/Registre/RegistreSymbole.h"
-#include "Compilateur/AST/Registre/RegistreVariable.h"
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/AST/GestionnaireChargementVariable.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Parsing/Equation/ChaineResponsabilite.h"

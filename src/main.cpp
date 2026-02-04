@@ -6,7 +6,7 @@
 #include "Compilateur/Parsing/Instruction/Variable/ParseurAffectation.h"
 #include "Compilateur/Parsing/Instruction/Variable/ParseurDeclaration.h"
 #include "Compilateur/TraitementFichier/FichierLecture.h"
-#include "Compilateur/AST/Registre/RegistreVariable.h"
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/AST/Registre/RegistreFonction.h"
 #include "Compilateur/AST/Registre/RegistreType.h"
 #include <iostream>

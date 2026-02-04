@@ -6,8 +6,8 @@
 #include <map>
 #include <stack>
 
-
 namespace llvm { class AllocaInst; }
+
 
 class RegistreVariable 
 {

@@ -6,7 +6,7 @@
 #include "Compilateur/Parsing/ParserBase.h"
 #include "Compilateur/LLVM/LLVMBackend.h"
 #include "Compilateur/Builder/Equation/FloatEquationBuilder.h"
-#include "Compilateur/AST/Registre/RegistreVariable.h"
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include <vector>
 #include <memory>
 

@@ -1,6 +1,6 @@
 #include "Compilateur/AST/Noeuds/Fonction/NoeudDeclarationFonction.h"
 #include "Compilateur/LLVM/LLVMBackend.h"
-#include "Compilateur/AST/Registre/RegistreVariable.h"
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/Lexer/TokenType.h"
 #include <llvm-18/llvm/IR/BasicBlock.h>
 #include <llvm-18/llvm/IR/DerivedTypes.h>

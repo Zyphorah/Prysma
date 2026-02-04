@@ -8,7 +8,7 @@
 #include "Compilateur/Parsing/Equation/ServiceParenthese.h"
 #include "Compilateur/Parsing/Equation/GestionnaireOperateur.h"
 #include "Compilateur/AST/Noeuds/Operande/Operation.h"
-#include "Compilateur/AST/Registre/RegistreVariable.h"
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/LLVM/LLVMBackend.h"
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/NoFolder.h>

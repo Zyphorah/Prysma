@@ -2,7 +2,7 @@
 #define C9126446_60DE_4831_AEE0_655AF47AE40D
 
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
-#include "Compilateur/AST/Registre/RegistreVariable.h" // Important
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h" // Important
 #include "Compilateur/LLVM/LLVMBackend.h"            // Important
 #include <memory>
 #include <string>

@@ -1,5 +1,5 @@
 #include "Compilateur/AST/Noeuds/Variable/NoeudAffectation.h"
-#include "Compilateur/AST/Registre/RegistreVariable.h"
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/LLVM/LLVMBackend.h"
 
 #include <llvm/IR/Instructions.h>

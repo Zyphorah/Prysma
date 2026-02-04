@@ -1,6 +1,6 @@
 #include "Compilateur/AST/Noeuds/Variable/NoeudDeclaration.h"
 #include "Compilateur/LLVM/LLVMBackend.h"
-#include "Compilateur/AST/Registre/RegistreVariable.h"
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/Lexer/TokenType.h"
 
 #include <llvm/IR/Instructions.h>

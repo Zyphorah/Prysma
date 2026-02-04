@@ -2,7 +2,7 @@
 #include "Compilateur/AST/Noeuds/Variable/NoeudDeclaration.h"
 #include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/Parsing/Equation/ParseurEquation.h"
-#include "Compilateur/AST/Registre/RegistreVariable.h"
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/Lexer/TokenCategories.h"
 #include <memory>
 #include <iostream> 
