@@ -7,28 +7,19 @@
 #include <llvm-18/llvm/IR/Function.h>
 #include <utility>
 
-NoeudDeclarationFonction::NoeudDeclarationFonction(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, std::string nom, TokenType typeRetour)
-    : _backend(std::move(backend)), _registreVariable(std::move(registreVariable)), _nom(std::move(nom)), _typeRetourToken(typeRetour)
+NoeudDeclarationFonction::NoeudDeclarationFonction(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, std::string nom, TokenType typeRetour, std::shared_ptr<ReturnContextCompilation> returnContextCompilation)
+    : _backend(std::move(backend)), _registreVariable(std::move(registreVariable)), _nom(std::move(nom)), _typeRetourToken(typeRetour),_returnContextCompilation(std::move(returnContextCompilation))
 {
 }
 
 llvm::Value* NoeudDeclarationFonction::genCode()
 {
+    _returnContextCompilation->piler(_typeRetourToken);
     if (_backend == nullptr) {
         throw std::runtime_error("Erreur : backend LLVM non initialisé dans NoeudDeclarationFonction");
     }
 
-    llvm::Type* retType;
-    if (_typeRetourToken == TOKEN_TYPE_INT) {
-        retType = llvm::Type::getInt32Ty(_backend->getContext());
-    } else if (_typeRetourToken == TOKEN_TYPE_FLOAT) {
-        retType = llvm::Type::getFloatTy(_backend->getContext());
-    } else if (_typeRetourToken == TOKEN_TYPE_VOID) {
-        retType = llvm::Type::getVoidTy(_backend->getContext());
-    } else {
-        throw std::runtime_error("Erreur : Type de token inconnu: " + std::to_string(_typeRetourToken));
-    }
-
+    llvm::Type* retType = llvm::Type::getVoidTy(_backend->getContext());
     llvm::FunctionType* funcType = llvm::FunctionType::get(retType, false);
 
     llvm::Function* function = llvm::Function::Create(
@@ -46,22 +37,14 @@ llvm::Value* NoeudDeclarationFonction::genCode()
         _registreVariable->piler();
     }
 
-    llvm::Value* resultatCorps = executerEnfants();
+    executerEnfants();
 
     // Restaurer la portée précédente
     if (_registreVariable != nullptr) {
         _registreVariable->depiler();
     }
 
-    if (_backend->getBuilder().GetInsertBlock()->getTerminator() == nullptr) {
-        if (retType->isVoidTy()) {
-            _backend->getBuilder().CreateRetVoid();
-        } else if (resultatCorps != nullptr) {
-            _backend->getBuilder().CreateRet(resultatCorps);
-        } else {
-            _backend->getBuilder().CreateRet(llvm::ConstantInt::get(retType, 0));
-        }
-    }
+    _returnContextCompilation->depiler();
 
     return function;
 }

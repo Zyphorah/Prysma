@@ -5,11 +5,12 @@
 #include "Compilateur/Parsing/Instruction/Fonction/ParsingReturn.h"
 #include "Compilateur/Parsing/Equation/ParseurEquation.h"
 #include <memory>
+#include <utility>
 #include <vector>
 #include <llvm-18/llvm/IR/Type.h>
 
-ParsingReturn::ParsingReturn(std::shared_ptr<LLVMBackend> backend)
-    : _backend(std::move(backend))
+ParsingReturn::ParsingReturn(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<ReturnContextCompilation> returnContextCompilation, std::shared_ptr<RegistreType> registreType)
+    : _backend(std::move(backend)), _returnContextCompilation(std::move(returnContextCompilation)), _registreType(std::move(registreType))
 {
 }
 
@@ -34,5 +35,5 @@ std::shared_ptr<INoeud> ParsingReturn::parser(std::vector<Token>& tokens, int& i
         consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur: point-virgule attendu après return");
     }
 
-    return std::make_shared<NoeudReturn>(_backend, valeurRetour);
+    return std::make_shared<NoeudReturn>(_backend, valeurRetour, _returnContextCompilation, _registreType);
 }

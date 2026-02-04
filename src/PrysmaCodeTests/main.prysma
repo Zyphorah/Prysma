@@ -8,7 +8,8 @@ scope
         return 1;
     }
 
-    def float main()
+    
+    def int main()
     {
         dec int teste = 10; 
         dec bool boolean = true;

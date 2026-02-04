@@ -16,7 +16,7 @@ void ReturnContextCompilation::piler(const TokenType& token)
 
 void ReturnContextCompilation::depiler()
 {
-    if(_contexte.size() != 0)
+    if(_contexte.empty())
     {
         throw std::runtime_error("La pile est déjà vide! ");
     }

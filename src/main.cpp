@@ -1,4 +1,5 @@
 #include "Compilateur/AST/ConstructeurArbreInstruction.h"
+#include "Compilateur/AST/Registre/Pile/ReturnContextCompilation.h"
 #include "Compilateur/LLVM/LLVMBackend.h"
 #include "Compilateur/LLVM/LLVMSerializer.h"
 #include "Compilateur/Lexer/Lexer.h"
@@ -36,6 +37,7 @@ int main() {
         std::shared_ptr<RegistreVariable> registreVariable = std::make_shared<RegistreVariable>();
         std::shared_ptr<RegistreFonction> registreFonction = std::make_shared<RegistreFonction>();
         std::shared_ptr<RegistreType> registreType = std::make_shared<RegistreType>();
+        std::shared_ptr<ReturnContextCompilation> returnContextCompilation = std::make_shared<ReturnContextCompilation>();
         
         // Enregistrer les types de base
         registreType->enregistrer(TOKEN_TYPE_INT, llvm::Type::getInt32Ty(backend->getContext()));
@@ -44,10 +46,10 @@ int main() {
         registreType->enregistrer(TOKEN_TYPE_VOID, llvm::Type::getVoidTy(backend->getContext()));
         
         registreInstruction->enregistrer(TOKEN_SCOPE, std::make_shared<ParserScope>());
-        registreInstruction->enregistrer(TOKEN_FONCTION, std::make_shared<ParsingDeclarationFonction>(backend, registreFonction, registreVariable, TOKEN_FONCTION));
+        registreInstruction->enregistrer(TOKEN_FONCTION, std::make_shared<ParsingDeclarationFonction>(backend, registreFonction, registreVariable, TOKEN_FONCTION, returnContextCompilation));
         registreInstruction->enregistrer(TOKEN_AFF, std::make_shared<ParseurAffectation>(backend, registreVariable,registreType));
         registreInstruction->enregistrer(TOKEN_DEC,std::make_shared<ParseurDeclaration>(backend, registreVariable,registreType));
-        registreInstruction->enregistrer(TOKEN_RETOUR, std::make_shared<ParsingReturn>(backend));
+        registreInstruction->enregistrer(TOKEN_RETOUR, std::make_shared<ParsingReturn>(backend, returnContextCompilation, registreType));
 
         ConstructeurArbreInstruction constructeurArbreInstruction(registreInstruction);
 
