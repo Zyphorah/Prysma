@@ -8,8 +8,8 @@
 #include <memory>
 #include <vector>
 
-ParsingDeclarationFonction::ParsingDeclarationFonction(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreFonction> registreFonction, std::shared_ptr<RegistreVariable> registreVariable, TokenType typeFonction, std::shared_ptr<ReturnContextCompilation> returnContextCompilation)
-    : _backend(std::move(backend)), _registreFonction(std::move(registreFonction)), _registreVariable(std::move(registreVariable)), _typeFonction(typeFonction),_returnContextCompilation(std::move(returnContextCompilation))
+ParsingDeclarationFonction::ParsingDeclarationFonction(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreFonction> registreFonction, std::shared_ptr<RegistreVariable> registreVariable, std::shared_ptr<RegistreType> registreType, TokenType typeFonction, std::shared_ptr<ReturnContextCompilation> returnContextCompilation)
+    : _backend(std::move(backend)), _registreFonction(std::move(registreFonction)), _registreVariable(std::move(registreVariable)), _registreType(std::move(registreType)), _typeFonction(typeFonction),_returnContextCompilation(std::move(returnContextCompilation))
 {
 }
 
@@ -38,7 +38,7 @@ std::shared_ptr<INoeud> ParsingDeclarationFonction::parser(std::vector<Token>& t
     std::string nomFonction = tokenNomFonction.value;
     consommer(tokens, index, TOKEN_IDENTIFIANT, "Erreur: identifiant invalide, ce dois être un nom de fonction ");
 
-    std::shared_ptr<IInstruction> parent = std::make_shared<NoeudDeclarationFonction>(_backend, _registreVariable, nomFonction, typeRetour, _returnContextCompilation);
+    std::shared_ptr<IInstruction> parent = std::make_shared<NoeudDeclarationFonction>(_backend, _registreVariable, _registreType, nomFonction, typeRetour, _returnContextCompilation);
 
     // Manger les parenthèses ouvertes
     consommer(tokens, index, TOKEN_PAREN_OUVERTE, "Erreur: ce n'est pas une parenthèse ouverte '('");

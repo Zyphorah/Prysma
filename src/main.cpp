@@ -46,7 +46,7 @@ int main() {
         registreType->enregistrer(TOKEN_TYPE_VOID, llvm::Type::getVoidTy(backend->getContext()));
         
         registreInstruction->enregistrer(TOKEN_SCOPE, std::make_shared<ParserScope>());
-        registreInstruction->enregistrer(TOKEN_FONCTION, std::make_shared<ParsingDeclarationFonction>(backend, registreFonction, registreVariable, TOKEN_FONCTION, returnContextCompilation));
+        registreInstruction->enregistrer(TOKEN_FONCTION, std::make_shared<ParsingDeclarationFonction>(backend, registreFonction, registreVariable, registreType, TOKEN_FONCTION, returnContextCompilation));
         registreInstruction->enregistrer(TOKEN_AFF, std::make_shared<ParseurAffectation>(backend, registreVariable,registreType));
         registreInstruction->enregistrer(TOKEN_DEC,std::make_shared<ParseurDeclaration>(backend, registreVariable,registreType));
         registreInstruction->enregistrer(TOKEN_RETOUR, std::make_shared<ParsingReturn>(backend, returnContextCompilation, registreType));
