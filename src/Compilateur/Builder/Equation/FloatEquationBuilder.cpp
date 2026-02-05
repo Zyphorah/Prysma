@@ -54,8 +54,6 @@ void FloatEquationBuilder::construireRegistreSymboleFloat()
         });
  }      
 
-        
-
 shared_ptr<INoeud> FloatEquationBuilder::builderArbreEquationFloat(vector<Token> &tokens)
 {
     return constructeurArbreEquation->construire(tokens);   
