@@ -111,8 +111,7 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
 - Compiler les opérations arithmétiques de base (+, -, *, /) vers du code LLVM
 - Permettre au développeur de déclarer des variables et les utiliser dans des expressions
 - Valider la syntaxe du code et rejeter les structures invalides via la construction de l'AST
-- Supporter les instructions if, while, passer par la pile avec alloca
-- Supporter les fonctions, déclaration de fonction, appel de fonction 
+- Supporter les fonctions, récursive et un type de retour. 
 
 ### Itération 2 du projet fonctionnalité à réaliser en 2 semaines ?
 
@@ -120,7 +119,7 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
 - Exporter l'AST en format texte et graphique (Graphviz) pour faciliter le débogage
 - Ajouter la coloration syntaxique du langage Prysma dans Visual Studio Code
 - Supporter les types string, j'utilise la librairie natif du C avec un extern
-- Supporter les fonctions, récursive et un type de retour. 
+- Supporter les instructions if, while, passer par la pile avec alloca
 
 ### Itération 3 du projet fonctionnalité à réaliser en 2 semaines ?
 

@@ -1,10 +1,11 @@
 scope 
 {
-  
     def float main()
     {
-        dec float d = 10; 
-        return 10+10+342+4+d;
+        dec float a = 10; 
+        dec int b = 11; 
+        dec float c = a + b; 
+       
+        return c;
     }
-
 }
