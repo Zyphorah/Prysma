@@ -5,7 +5,7 @@
 #include "Compilateur/Parsing/Equation/Interfaces/IGestionnaireParenthese.h"
 #include <vector>
 
-// Forward declaration
+
 class GestionnaireOperateur;
 
 /**

@@ -26,9 +26,8 @@ using namespace std;
 int main() {
     try {
 
-        // Faire la réflexion pour récupérer le type du parent fonction
         shared_ptr<LLVMBackend> backend = std::make_shared<LLVMBackend>();
-        FichierLecture fichierLecture("../src/PrysmaCodeTests/main.pry");
+        FichierLecture fichierLecture("src/PrysmaCodeTests/main.pry");
         std::string document = fichierLecture.entrer();
   
         Lexer lexer;
@@ -52,10 +51,9 @@ int main() {
         registreInstruction->enregistrer(TOKEN_DEC,std::make_shared<ParseurDeclaration>(backend, registreVariable,registreType));
         registreInstruction->enregistrer(TOKEN_RETOUR, std::make_shared<ParsingReturn>(backend, registreVariable, returnContextCompilation, registreType));
         registreInstruction->enregistrer(TOKEN_ARG,std::make_shared<ParserArgFonction>(registreType));
-        registreInstruction->enregistrer(TOKEN_CALL,std::make_shared<ParserAppelFonction>(registreFonction));
+        registreInstruction->enregistrer(TOKEN_CALL,std::make_shared<ParserAppelFonction>(registreFonction, backend));
 
         ConstructeurArbreInstruction constructeurArbreInstruction(registreInstruction);
-
         std::shared_ptr<INoeud> arbre = constructeurArbreInstruction.construire(tokens);
 
         arbre->genCode();
@@ -64,7 +62,6 @@ int main() {
         serializer.SauvegarderCodeLLVM("output.ll");
        
         return 0;
-        
     } catch (const std::exception& e) {
         std::cerr << "Erreur: " << e.what() << std::endl;
         return -1;

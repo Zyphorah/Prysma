@@ -5,7 +5,7 @@
 #include <memory>
 #include "Compilateur/Lexer/TokenType.h"
 
-// Forward declaration
+
 class IExpression;
 
 /**

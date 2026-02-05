@@ -2,7 +2,7 @@
 
 #include "Compilateur/Lexer/Lexer.h"
 
-// Forward declaration
+
 class IGestionnaireOperateur;
 
 /**
