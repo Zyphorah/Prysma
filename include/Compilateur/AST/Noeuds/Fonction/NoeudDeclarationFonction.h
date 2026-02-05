@@ -10,19 +10,21 @@
 
 class LLVMBackend;
 class RegistreVariable;
+class RegistreFonction;
 
 class NoeudDeclarationFonction : public Instruction
 {
 private:
     std::shared_ptr<LLVMBackend> _backend;
     std::shared_ptr<RegistreVariable> _registreVariable;
+    std::shared_ptr<RegistreFonction> _registreFonction;
     std::shared_ptr<RegistreType> _registreType;
     std::string _nom;
     TokenType _typeRetourToken;
     std::shared_ptr<ReturnContextCompilation> _returnContextCompilation; 
 
 public:
-    NoeudDeclarationFonction(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, std::shared_ptr<RegistreType> registreType, std::string nom, TokenType typeRetour, std::shared_ptr<ReturnContextCompilation> returnContextCompilation);
+    NoeudDeclarationFonction(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, std::shared_ptr<RegistreFonction> registreFonction, std::shared_ptr<RegistreType> registreType, std::string nom, TokenType typeRetour, std::shared_ptr<ReturnContextCompilation> returnContextCompilation);
     
     ~NoeudDeclarationFonction() = default;
 

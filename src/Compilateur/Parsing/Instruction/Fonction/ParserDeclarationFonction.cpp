@@ -39,7 +39,7 @@ std::shared_ptr<INoeud> ParsingDeclarationFonction::parser(std::vector<Token>& t
     std::string nomFonction = tokenNomFonction.value;
     consommer(tokens, index, TOKEN_IDENTIFIANT, "Erreur: identifiant invalide, ce dois être un nom de fonction ");
 
-    std::shared_ptr<IInstruction> parent = std::make_shared<NoeudDeclarationFonction>(_backend, _registreVariable, _registreType, nomFonction, typeRetour, _returnContextCompilation);
+    std::shared_ptr<IInstruction> parent = std::make_shared<NoeudDeclarationFonction>(_backend, _registreVariable, _registreFonction, _registreType, nomFonction, typeRetour, _returnContextCompilation);
 
     // Manger les parenthèses ouvertes
     consommer(tokens, index, TOKEN_PAREN_OUVERTE, "Erreur: ce n'est pas une parenthèse ouverte '('");

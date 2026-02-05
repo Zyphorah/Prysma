@@ -27,7 +27,7 @@ int main() {
     try {
 
         shared_ptr<LLVMBackend> backend = std::make_shared<LLVMBackend>();
-        FichierLecture fichierLecture("src/PrysmaCodeTests/main.pry");
+        FichierLecture fichierLecture("../src/PrysmaCodeTests/main.pry");
         std::string document = fichierLecture.entrer();
   
         Lexer lexer;
