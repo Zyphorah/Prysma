@@ -43,8 +43,8 @@ set(SOURCES
     src/Compilateur/AST/Noeuds/Operande/Operation.cpp
     src/Compilateur/AST/Noeuds/Operande/Valeur.cpp
     src/Compilateur/AST/Noeuds/Operande/NoeudVariable.cpp
-    src/Compilateur/AST/Noeuds/Variable/NoeudDeclaration.cpp
-    src/Compilateur/AST/Noeuds/Variable/NoeudAffectation.cpp
+    src/Compilateur/AST/Noeuds/Variable/NoeudDeclarationVariable.cpp
+    src/Compilateur/AST/Noeuds/Variable/NoeudAffectationVariable.cpp
     src/Compilateur/LLVM/LLVMSerializer.cpp
     src/Compilateur/LLVM/LLVMBackend.cpp
     src/Compilateur/Parsing/Equation/ChaineResponsabilite.cpp
@@ -57,8 +57,8 @@ set(SOURCES
     src/Compilateur/AST/Registre/RegistreVariable.cpp
     src/Compilateur/AST/ConstructeurArbreInstruction.cpp
     src/Compilateur/Parsing/Instruction/ParseurScope.cpp
-    src/Compilateur/Parsing/Instruction/Variable/ParseurDeclaration.cpp
-    src/Compilateur/Parsing/Instruction/Variable/ParseurAffectation.cpp
+    src/Compilateur/Parsing/Instruction/Variable/ParseurDeclarationVariable.cpp
+    src/Compilateur/Parsing/Instruction/Variable/ParseurAffectationVariable.cpp
     src/Compilateur/Parsing/Equation/ParseurEquation.cpp
     src/Compilateur/Parsing/ParserBase.cpp
     src/Compilateur/Parsing/Instruction/Fonction/ParserDeclarationFonction.cpp
