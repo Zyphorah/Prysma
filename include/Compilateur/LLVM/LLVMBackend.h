@@ -30,5 +30,6 @@ public:
     llvm::IRBuilder<llvm::NoFolder>& getBuilder() { return *_builder; }
 
     llvm::Value* creerAutoCast(llvm::Value* valeurSource, llvm::Type* typeCible);
+    void declarerExterne(const std::string& nom, llvm::Type* ret, std::vector<llvm::Type*>& args);
 };
  

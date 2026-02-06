@@ -49,3 +49,10 @@ llvm::Value* LLVMBackend::creerAutoCast(llvm::Value* valeurSource, llvm::Type* t
 
     return _builder->CreateCast(opcode, valeurSource, typeCible, "autocast");
 }
+
+
+void LLVMBackend::declarerExterne(const std::string& nom, llvm::Type* ret, std::vector<llvm::Type*>& args)
+{
+    llvm::FunctionType* type = llvm::FunctionType::get(ret, args, false);
+    llvm::Function::Create(type, llvm::Function::ExternalLinkage, nom, *_module);
+}

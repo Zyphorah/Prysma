@@ -12,7 +12,9 @@
 #include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/AST/Registre/RegistreFonction.h"
 #include "Compilateur/AST/Registre/RegistreType.h"
+#include "Compilateur/TraitementFichier/ConstructeurSysteme.h"
 #include <iostream>
+#include <llvm-18/llvm/IR/DerivedTypes.h>
 #include <llvm-18/llvm/IR/Instructions.h>
 #include <llvm-18/llvm/IR/Value.h>
 #include <memory>
@@ -20,14 +22,15 @@
 #include "Compilateur/Parsing/Instruction/ParserScope.h"
 #include "Compilateur/Parsing/Instruction/Fonction/ParsingDeclarationFonction.h"
 #include "Compilateur/Parsing/Instruction/Fonction/ParsingReturn.h"
+#include <filesystem>
 
-using namespace std;
 
-int main() {
+int main(int argc, char* argv[])
+{
     try {
 
         shared_ptr<LLVMBackend> backend = std::make_shared<LLVMBackend>();
-        FichierLecture fichierLecture("../src/PrysmaCodeTests/main.pry");
+        FichierLecture fichierLecture("../src/PrysmaCodeTests/main.p");
         std::string document = fichierLecture.entrer();
   
         Lexer lexer;
@@ -38,6 +41,12 @@ int main() {
         std::shared_ptr<RegistreFonction> registreFonction = std::make_shared<RegistreFonction>();
         std::shared_ptr<RegistreType> registreType = std::make_shared<RegistreType>();
         std::shared_ptr<ReturnContextCompilation> returnContextCompilation = std::make_shared<ReturnContextCompilation>();
+
+        // Enregistrer des fonctions externe
+        IntegerType* intTy = llvm::Type::getInt32Ty(backend->getContext());
+        std::vector<llvm::Type*> printIntArgs = {intTy};
+        backend->declarerExterne("printInt", intTy, printIntArgs);
+        registreFonction->ajouter("printInt", backend->getModule().getFunction("printInt"));
         
         // Enregistrer les types de base
         registreType->enregistrer(TOKEN_TYPE_INT, llvm::Type::getInt32Ty(backend->getContext()));
@@ -49,9 +58,9 @@ int main() {
         registreInstruction->enregistrer(TOKEN_FONCTION, std::make_shared<ParsingDeclarationFonction>(backend, registreFonction, registreVariable, registreType, TOKEN_FONCTION, returnContextCompilation));
         registreInstruction->enregistrer(TOKEN_AFF, std::make_shared<ParseurAffectation>(backend, registreVariable,registreType));
         registreInstruction->enregistrer(TOKEN_DEC,std::make_shared<ParseurDeclaration>(backend, registreVariable,registreType));
+        registreInstruction->enregistrer(TOKEN_CALL, std::make_shared<ParserAppelFonction>(registreFonction, backend));
         registreInstruction->enregistrer(TOKEN_RETOUR, std::make_shared<ParsingReturn>(backend, registreVariable, returnContextCompilation, registreType));
         registreInstruction->enregistrer(TOKEN_ARG,std::make_shared<ParserArgFonction>(registreType));
-        registreInstruction->enregistrer(TOKEN_CALL,std::make_shared<ParserAppelFonction>(registreFonction, backend));
 
         ConstructeurArbreInstruction constructeurArbreInstruction(registreInstruction);
         std::shared_ptr<INoeud> arbre = constructeurArbreInstruction.construire(tokens);
@@ -61,8 +70,11 @@ int main() {
         LLVMSerializer serializer(backend->getContext(), backend->getModule());
         serializer.SauvegarderCodeLLVM("output.ll");
        
-        return 0;
-    } catch (const std::exception& e) {
+        ConstructeurSysteme constructeur("../src/Lib");
+        constructeur.compilerLib();
+        ConstructeurSysteme::lierLibExecutable();
+    }
+    catch (const std::exception& e) {
         std::cerr << "Erreur: " << e.what() << std::endl;
         return -1;
     }
