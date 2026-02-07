@@ -42,7 +42,6 @@ llvm::Value* NoeudVariable::genCode()
         
         typeDonnee = llvm::Type::getFloatTy(_backend->getContext()); 
     }
-
  
     return _backend->getBuilder().CreateLoad(
         typeDonnee, 

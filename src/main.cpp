@@ -54,7 +54,6 @@ int main(int argc, char* argv[])
         registreFonction->ajouter("printInt", backend->getModule().getFunction("printInt"));
 
         //PrintFloat 
-
         IntegerType* floatTy = llvm::Type::getInt32Ty(backend->getContext());
         std::vector<llvm::Type*> printFloatArgs = {floatTy};
         backend->declarerExterne("printFloat", floatTy, printFloatArgs);
@@ -66,6 +65,7 @@ int main(int argc, char* argv[])
         registreType->enregistrer(TOKEN_TYPE_BOOL, llvm::Type::getInt1Ty(backend->getContext()));
         registreType->enregistrer(TOKEN_TYPE_VOID, llvm::Type::getVoidTy(backend->getContext()));
         
+        // Instruction du langage prysma
         registreInstruction->enregistrer(TOKEN_SCOPE, std::make_shared<ParserScope>());
         registreInstruction->enregistrer(TOKEN_FONCTION, std::make_shared<ParsingDeclarationFonction>(backend, registreFonction, registreVariable, registreType, TOKEN_FONCTION, returnContextCompilation));
         registreInstruction->enregistrer(TOKEN_AFF, std::make_shared<ParseurAffectationVariable>(backend, registreVariable,registreType));

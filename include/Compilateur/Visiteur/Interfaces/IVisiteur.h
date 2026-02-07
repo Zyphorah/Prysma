@@ -29,7 +29,6 @@ public:
     virtual void visiter(Valeur* valeur) = 0; 
     virtual void visiter(Instruction* instruction) = 0; 
     virtual void visiter(Operation* operation) = 0; 
-
 };
 
 #endif /* B9A25031_6CA1_409A_879D_68D43CAC9945 */

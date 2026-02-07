@@ -76,6 +76,19 @@ set(SOURCES
     src/Compilateur/AST/Noeuds/Fonction/NoeudArgPassFonction.cpp
     src/Compilateur/AST/Registre/RegistreArgument.cpp
     src/Compilateur/TraitementFichier/ConstructeurSysteme.cpp
+    src/Compilateur/Visiteur/VisiteurGeneralGenCode.cpp
+    src/Compilateur/Visiteur/VisiteurScope.cpp
+    src/Compilateur/Visiteur/VisiteurInstruction.cpp
+    src/Compilateur/Visiteur/Fonction/VisiteurAppelFonction.cpp
+    src/Compilateur/Visiteur/Fonction/VisiteurArgFonction.cpp
+    src/Compilateur/Visiteur/Fonction/VisiteurArgPassFonction.cpp
+    src/Compilateur/Visiteur/Fonction/VisiteurDeclarationFonction.cpp
+    src/Compilateur/Visiteur/Fonction/VisiteurReturn.cpp
+    src/Compilateur/Visiteur/Operande/VisiteurNoeudVariable.cpp
+    src/Compilateur/Visiteur/Operande/VisiteurOperation.cpp
+    src/Compilateur/Visiteur/Operande/VisiteurValeur.cpp
+    src/Compilateur/Visiteur/Variable/VisiteurAffectationVariable.cpp
+    src/Compilateur/Visiteur/Variable/VisiteurDeclarationVariable.cpp
 )
 
 # Créer l'exécutable
