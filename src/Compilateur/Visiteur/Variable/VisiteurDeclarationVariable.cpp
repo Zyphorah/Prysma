@@ -2,6 +2,7 @@
 
 void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationVariable) 
 {
+    /*
      if (_registreVariable == nullptr) {
         throw std::runtime_error("Erreur : registre de variables non initialisé");
     }
@@ -12,7 +13,7 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
     
      // Créer l'allocation au début du bloc d'entrée (mais après les autres allocas) : simple gestionnaire de position il déplace le curseur LLVM
     llvm::BasicBlock* insertBlock = _backend->getBuilder().GetInsertBlock();
-    llvm::Instruction* positionInsertion = nullptr;
+    llvm::NoeudInstruction* positionInsertion = nullptr;
     
     if (insertBlock != nullptr) {
         for (auto& instruction : *insertBlock) {
@@ -22,7 +23,7 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
         }
         
         if (positionInsertion != nullptr) {
-            llvm::Instruction* nextNode = positionInsertion->getNextNode();
+            llvm::NoeudInstruction* nextNode = positionInsertion->getNextNode();
             if (nextNode != nullptr) {
                 _backend->getBuilder().SetInsertPoint(nextNode);
             } else {
@@ -54,9 +55,10 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
     initialisation(allocaInst, valeurCalculee);
     
     return allocaInst;
+    */
 }
 
-
+/*
 llvm::AllocaInst* allocation()
 {
     return _backend->getBuilder().CreateAlloca(_registreType->recuperer(_token), _arraySize, _nom);
@@ -70,3 +72,4 @@ llvm::AllocaInst* initialisation(llvm::AllocaInst* allocaInst, llvm::Value* vale
     }
     return allocaInst;
 }
+*/

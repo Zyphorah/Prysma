@@ -8,7 +8,4 @@ public:
     virtual ~INoeud() = default;
 
     virtual void accept(IVisiteur* visiteur) = 0;
-    
-    //Retirer après la transition
-    virtual llvm::Value* genCode() {return nullptr;}
 };

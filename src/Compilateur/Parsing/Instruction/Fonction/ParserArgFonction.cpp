@@ -4,9 +4,9 @@
 #include <stdexcept>
 #include "Compilateur/AST/Noeuds/Fonction/NoeudArgFonction.h"
 
-ParserArgFonction::ParserArgFonction(std::shared_ptr<RegistreType> registreType)
+ParserArgFonction::ParserArgFonction()
 {
-    _registreType = std::move(registreType);
+
 }
 
 ParserArgFonction::~ParserArgFonction()
@@ -29,5 +29,5 @@ std::shared_ptr<INoeud> ParserArgFonction::parser(std::vector<Token>& tokens, in
     }
     Token nom = consommer(tokens,index,TOKEN_IDENTIFIANT,"Erreur: ce n'est pas un identifiant!");
 
-    return make_shared<NoeudArgFonction>(_registreType,type,type);
+    return make_shared<NoeudArgFonction>(nullptr, nom.type, type);
 }

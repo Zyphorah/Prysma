@@ -1,10 +1,9 @@
+#include "Compilateur/AST/Noeuds/NoeudScope.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 
-void VisiteurGeneralGenCode::visiter(NoeudScope* NoeudScope)
+class NoeudScope;
+
+void VisiteurGeneralGenCode::visiter(NoeudScope* noeudScope)
 {
-     llvm::Value* resultat = nullptr;
-    for (const auto& enfant : enfants) {
-        enfant->accept(this);
-    }
-    this->_valeurTemporaire = resultat;
+    parcourirEnfant(noeudScope);
 }

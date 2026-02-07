@@ -22,5 +22,5 @@ std::shared_ptr<INoeud> ParserArgPassFonction::parser(std::vector<Token>& tokens
     consommer(tokens,index,TOKEN_PASS,"Erreur: ce n'est pas le bon token, 'pass' ");
     Token nomVariable = consommer(tokens,index,TOKEN_IDENTIFIANT,"Erreur: identifiant invalide! ");
 
-    return make_shared<NoeudArgPassFonction>(_registreVariable,nomVariable, _registreArgument);
+    return make_shared<NoeudArgPassFonction>(_registreVariable, nomVariable, _registreArgument);
 }

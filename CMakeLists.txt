@@ -43,6 +43,7 @@ set(SOURCES
     src/Compilateur/AST/Noeuds/Operande/Operation.cpp
     src/Compilateur/AST/Noeuds/Operande/Valeur.cpp
     src/Compilateur/AST/Noeuds/Operande/NoeudVariable.cpp
+    src/Compilateur/AST/Noeuds/Equation/NoeudOperation.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudDeclarationVariable.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudAffectationVariable.cpp
     src/Compilateur/LLVM/LLVMSerializer.cpp
@@ -56,22 +57,22 @@ set(SOURCES
     src/Compilateur/TraitementFichier/FichierEcriture.cpp
     src/Compilateur/AST/Registre/RegistreVariable.cpp
     src/Compilateur/AST/ConstructeurArbreInstruction.cpp
-    src/Compilateur/Parsing/Instruction/ParseurScope.cpp
-    src/Compilateur/Parsing/Instruction/Variable/ParseurDeclarationVariable.cpp
-    src/Compilateur/Parsing/Instruction/Variable/ParseurAffectationVariable.cpp
+    src/Compilateur/Parsing/NoeudInstruction/ParseurScope.cpp
+    src/Compilateur/Parsing/NoeudInstruction/Variable/ParseurDeclarationVariable.cpp
+    src/Compilateur/Parsing/NoeudInstruction/Variable/ParseurAffectationVariable.cpp
     src/Compilateur/Parsing/Equation/ParseurEquation.cpp
     src/Compilateur/Parsing/ParserBase.cpp
-    src/Compilateur/Parsing/Instruction/Fonction/ParserDeclarationFonction.cpp
-    src/Compilateur/Parsing/Instruction/Fonction/ParsingReturn.cpp
-    src/Compilateur/Parsing/Instruction/Fonction/ParserAppelFonction.cpp
-    src/Compilateur/Parsing/Instruction/Fonction/ParserArgPassFonction.cpp
+    src/Compilateur/Parsing/NoeudInstruction/Fonction/ParserDeclarationFonction.cpp
+    src/Compilateur/Parsing/NoeudInstruction/Fonction/ParsingReturn.cpp
+    src/Compilateur/Parsing/NoeudInstruction/Fonction/ParserAppelFonction.cpp
+    src/Compilateur/Parsing/NoeudInstruction/Fonction/ParserArgPassFonction.cpp
     src/Compilateur/AST/Noeuds/NoeudScope.cpp
-    src/Compilateur/AST/Noeuds/Instruction.cpp
+    src/Compilateur/AST/Noeuds/NoeudInstruction.cpp
     src/Compilateur/AST/Noeuds/Fonction/NoeudDeclarationFonction.cpp
     src/Compilateur/AST/Noeuds/Fonction/NoeudReturn.cpp
     src/Compilateur/AST/Registre/ReturnContextCompilation.cpp
     src/Compilateur/AST/Noeuds/Fonction/NoeudArgFonction.cpp
-    src/Compilateur/Parsing/Instruction/Fonction/ParserArgFonction.cpp
+    src/Compilateur/Parsing/NoeudInstruction/Fonction/ParserArgFonction.cpp
     src/Compilateur/AST/Noeuds/Fonction/NoeudAppelFonction.cpp
     src/Compilateur/AST/Noeuds/Fonction/NoeudArgPassFonction.cpp
     src/Compilateur/AST/Registre/RegistreArgument.cpp

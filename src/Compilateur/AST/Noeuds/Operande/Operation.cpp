@@ -29,6 +29,8 @@ void Operation::accept(IVisiteur* visiteur)
     visiteur->visiter(this);
 }
 
+/*
+
 llvm::Value* Operation::genCode() {
     if (!_gauche || !_droite) {
         throw std::runtime_error("Erreur: opérande gauche ou droite manquant dans Operation::genCode()");
@@ -42,3 +44,4 @@ llvm::Value* Operation::genCode() {
     }
     return _operateur(valGauche, valDroite);
 }
+*/

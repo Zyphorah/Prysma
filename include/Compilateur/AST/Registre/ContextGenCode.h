@@ -12,6 +12,7 @@
 
 struct ContextGenCode
 {
+    llvm::Value* valeurTemporaire;
     std::shared_ptr<LLVMBackend> backend;
     std::shared_ptr<RegistreInstruction> registreInstruction;
     std::shared_ptr<RegistreVariable> registreVariable;
@@ -21,21 +22,24 @@ struct ContextGenCode
     std::shared_ptr<RegistreArgument> registreArgument;
 
     ContextGenCode(
-        std::shared_ptr<LLVMBackend> backend_,
-        std::shared_ptr<RegistreInstruction> registreInstruction_,
-        std::shared_ptr<RegistreVariable> registreVariable_,
-        std::shared_ptr<RegistreFonction> registreFonction_,
-        std::shared_ptr<RegistreType> registreType_,
-        std::shared_ptr<ReturnContextCompilation> returnContextCompilation_,
-        std::shared_ptr<RegistreArgument> registreArgument_
+        std::shared_ptr<LLVMBackend> backend,
+        std::shared_ptr<RegistreInstruction> registreInstruction,
+        std::shared_ptr<RegistreVariable> registreVariable,
+        std::shared_ptr<RegistreFonction> registreFonction,
+        std::shared_ptr<RegistreType> registreType,
+        std::shared_ptr<ReturnContextCompilation> returnContextCompilation,
+        std::shared_ptr<RegistreArgument> registreArgument,
+        llvm::Value* valeurTemporaire
     ) 
-        : backend(std::move(backend_)),
-          registreInstruction(std::move(registreInstruction_)),
-          registreVariable(std::move(registreVariable_)),
-          registreFonction(std::move(registreFonction_)),
-          registreType(std::move(registreType_)),
-          returnContextCompilation(std::move(returnContextCompilation_)),
-          registreArgument(std::move(registreArgument_))
+        : valeurTemporaire(valeurTemporaire),
+          backend(std::move(backend)),
+          registreInstruction(std::move(registreInstruction)),
+          registreVariable(std::move(registreVariable)),
+          registreFonction(std::move(registreFonction)),
+          registreType(std::move(registreType)),
+          returnContextCompilation(std::move(returnContextCompilation)),
+          registreArgument(std::move(registreArgument))
+          
     {
     }
 };

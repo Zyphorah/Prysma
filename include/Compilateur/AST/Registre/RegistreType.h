@@ -23,7 +23,7 @@ public:
 
 protected:
     
-    [[nodiscard]] std::string genererMessageErreur(TokenType cle) const  {
+    [[nodiscard]] std::string genererMessageErreur(const TokenType& cle) const override {
         return RegistreGeneric::genererMessageErreur(cle);
     }
 };

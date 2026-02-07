@@ -6,22 +6,20 @@
 #include "Compilateur/Visiteur/AmisVisiteurs.h"
 
 
-class Instruction: public IInstruction
+class NoeudInstruction: public IInstruction
 {
     LISTE_DES_AMIS_VISITEURS
 protected: 
     std::vector<std::shared_ptr<INoeud>> enfants; 
 public: 
 
-    Instruction();
-    virtual ~Instruction() = default;
+    NoeudInstruction();
+    virtual ~NoeudInstruction() = default;
 
     void accept(IVisiteur* visiteur) override;
     void ajouterInstruction(std::shared_ptr<INoeud> enfant) override;
     
-    llvm::Value* executerEnfants();
-    
-    const std::vector<std::shared_ptr<INoeud>>& getEnfants() const;
+    [[nodiscard]] const std::vector<std::shared_ptr<INoeud>>& getEnfants() const { return enfants; }
 };
 
 #endif /* CE440E6B_95E4_4EC8_8C66_1916C9716A77 */

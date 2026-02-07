@@ -1,14 +1,10 @@
 #include "Compilateur/Parsing/Equation/ParseurEquation.h"
-#include "Compilateur/Builder/Equation/FloatEquationBuilder.h"
 #include "Compilateur/Lexer/TokenCategories.h"
 #include "Compilateur/Lexer/TokenType.h"
 #include <stdexcept>
 #include <memory>
 
-ParseurEquation::ParseurEquation(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable)
-    : _backend(std::move(backend)), 
-      _registreVariable(std::move(registreVariable)),
-      _floatEquationBuilder(std::make_unique<FloatEquationBuilder>(_backend, _registreVariable))
+ParseurEquation::ParseurEquation()
 {
   
 }
@@ -17,7 +13,7 @@ ParseurEquation::~ParseurEquation()
 {
 }
 
-std::shared_ptr<INoeud> ParseurEquation::parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction)
+std::shared_ptr<INoeud> ParseurEquation::parser(std::vector<Token>& tokens, int& index,[[maybe_unused]] ConstructeurArbreInstruction* constructeurArbreInstruction)
 {
     size_t debutEquation = index;
     size_t finEquation = index;
@@ -37,7 +33,7 @@ std::shared_ptr<INoeud> ParseurEquation::parser(std::vector<Token>& tokens, int&
     index = finEquation;
     consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur : ';' attendu");
 
-    return _floatEquationBuilder->builderArbreEquationFloat(tokensEquation);
+    return nullptr; // _floatEquationBuilder->builderArbreEquationFloat();
 }
 
 void ParseurEquation::validerEquation(const std::vector<Token>& tokensEquation) const

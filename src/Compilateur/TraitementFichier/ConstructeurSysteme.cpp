@@ -39,7 +39,7 @@ void ConstructeurSysteme::compilerLib()
         const fs::path filePath(fichier);
         std::string objectFile = (fs::path(_libObjDir) / filePath.filename()).replace_extension(".o").string();
         std::string command = "clang++ -c " + fichier + " -o " + objectFile;
-        system(command.c_str());
+        (void)system(command.c_str());
     }
 }
 
@@ -48,5 +48,5 @@ void ConstructeurSysteme::lierLibExecutable()
     std::string objectFiles = ConstructeurSysteme::parcourirEtCollecterFichiers(_libObjDir, ".o");
 
     std::string command = "clang++ " + _outputLL + objectFiles + " -o " + _executable;
-    system(command.c_str());
+    (void)system(command.c_str());
 }

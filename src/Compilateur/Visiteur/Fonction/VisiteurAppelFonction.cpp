@@ -3,6 +3,7 @@
 
 void VisiteurGeneralGenCode::visiter(NoeudAppelFonction* noeudAppelFonction)
 {
+    /*
      _registreArgument->vider();
     executerEnfants();
     llvm::Function* fonction = _registreFonction->recuperer(_nomFonction.value);
@@ -19,4 +20,5 @@ void VisiteurGeneralGenCode::visiter(NoeudAppelFonction* noeudAppelFonction)
     }
 
     return _backend->getBuilder().CreateCall(fonction, argsConvertieLecture, "resultat_appel");
+    */
 }

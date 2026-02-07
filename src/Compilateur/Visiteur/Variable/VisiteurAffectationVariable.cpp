@@ -2,6 +2,7 @@
 
 void VisiteurGeneralGenCode::visiter(NoeudAffectationVariable* noeudAffectationVariable)
 {
+    /*
      // Évaluer l'expression et assigner immédiatement
     llvm::Value* valeur = nullptr;
     if (_expression != nullptr) {
@@ -10,9 +11,10 @@ void VisiteurGeneralGenCode::visiter(NoeudAffectationVariable* noeudAffectationV
     assignation(recupererVariable(), valeur);
     
     return nullptr;
+    */
 }
 
-
+/*
 void assignation(llvm::AllocaInst* allocaInst, llvm::Value* valeur)
 {
     if (valeur != nullptr && allocaInst != nullptr)
@@ -47,3 +49,4 @@ llvm::AllocaInst* recupererVariable()
     return variableExistante;
 }
 
+*/

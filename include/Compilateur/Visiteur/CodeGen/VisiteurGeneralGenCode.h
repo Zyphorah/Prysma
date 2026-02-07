@@ -1,22 +1,9 @@
 #ifndef FDDB5968_6DEF_49B0_AD11_8791D523278A
 #define FDDB5968_6DEF_49B0_AD11_8791D523278A
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
-#include "Compilateur/AST/Noeuds/Instruction.h"
+#include "Compilateur/AST/Noeuds/NoeudInstruction.h"
 #include <llvm-18/llvm/IR/Value.h>
-
-// Importation des noeuds
-class NoeudScope;
-class NoeudAffectationVariable;
-class NoeudDeclarationVariable;
-class NoeudVariable;
-class NoeudAppelFonction;
-class NoeudArgFonction;
-class NoeudArgPassFonction;
-class NoeudReturn;
-class NoeudDeclarationFonction;
-class Valeur;
-class Instruction;
-class Operation;
+#include <memory>
 
 // Importation des classes 
 class GenCodeAppelFonction;
@@ -31,23 +18,21 @@ class GenCodeVariable;
 class GenCodeOperation;
 class GenCodeInstruction;
 class GenCodeScope;
+class NoeudOperation;
 
 //Outils 
 class RegistreVariable;
 class LLVMBackend;
+struct ContextGenCode;
 
-
-class VisiteurGeneralGenCode : public IVisiteur, public Instruction
+class VisiteurGeneralGenCode : public IVisiteur
 {
 private:
-    llvm::Value* _valeurTemporaire = nullptr;
-
-    std::shared_ptr<LLVMBackend> _backend;
-    std::shared_ptr<RegistreVariable> _registre;
+    std::shared_ptr<ContextGenCode> _contextGenCode;
 public:
-    VisiteurGeneralGenCode(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registre);
+    VisiteurGeneralGenCode(std::shared_ptr<ContextGenCode> contextGenCode);
     ~VisiteurGeneralGenCode();
-    llvm::Value* getDerniereValeur() { return _valeurTemporaire; }
+    void parcourirEnfant(NoeudInstruction* noeud);
     
     void visiter(NoeudScope* NoeudScope) override;
     void visiter(NoeudAffectationVariable* noeudAffectationVariable) override;
@@ -58,8 +43,9 @@ public:
     void visiter(NoeudReturn* noeudReturn) override;
     void visiter(NoeudArgFonction* noeudArgFonction) override;
     void visiter(NoeudDeclarationFonction* noeudDeclarationFonction) override;
+    void visiter(NoeudOperation* noeudOperation) override;
     void visiter(Valeur* valeur) override;
-    void visiter(Instruction* instruction) override;
+    void visiter(NoeudInstruction* instruction) override;
     void visiter(Operation* operation) override;
 };
 

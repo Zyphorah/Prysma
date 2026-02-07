@@ -1,12 +1,12 @@
 #ifndef A2837407_B466_49AE_8A29_4BFC0A5D0461
 #define A2837407_B466_49AE_8A29_4BFC0A5D0461
 
-#include "Compilateur/AST/Noeuds/Instruction.h"
+#include "Compilateur/AST/Noeuds/NoeudInstruction.h"
 #include "Compilateur/Lexer/TokenType.h"
 #include <string>
 #include "Compilateur/Visiteur/AmisVisiteurs.h"
 
-class NoeudDeclarationFonction : public Instruction
+class NoeudDeclarationFonction : public NoeudInstruction
 {
     LISTE_DES_AMIS_VISITEURS
 private:

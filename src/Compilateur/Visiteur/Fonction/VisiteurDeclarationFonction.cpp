@@ -3,6 +3,7 @@
 
 void VisiteurGeneralGenCode::visiter(NoeudDeclarationFonction* noeudDeclarationFonction) 
 {
+    /*
      if (_backend == nullptr) {
         throw std::runtime_error("Erreur : backend LLVM non initialisé dans NoeudDeclarationFonction");
     }
@@ -31,4 +32,5 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationFonction* noeudDeclarationF
     _returnContextCompilation->depiler();
 
     return function;
+    */
 }

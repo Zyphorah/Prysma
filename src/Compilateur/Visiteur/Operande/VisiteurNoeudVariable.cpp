@@ -3,6 +3,7 @@
 
 void VisiteurGeneralGenCode::visiter(NoeudVariable* noeudVariable)
 {
+    /*
     if (_registre == nullptr) {
         throw std::runtime_error("ERREUR: NoeudVariable::genCode() - Le registre de variables est NULL ! ""La variable '" + _nomVariable );
     }
@@ -31,4 +32,5 @@ void VisiteurGeneralGenCode::visiter(NoeudVariable* noeudVariable)
         adresseMemoire, 
         _nomVariable 
     );
+    */
 }

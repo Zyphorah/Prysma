@@ -2,15 +2,12 @@
 #include "Compilateur/AST/Noeuds/Variable/NoeudDeclarationVariable.h"
 #include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/Parsing/Equation/ParseurEquation.h"
-#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/Lexer/TokenCategories.h"
 #include <memory>
 #include <iostream> 
 
-ParseurDeclarationVariable::ParseurDeclarationVariable(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, std::shared_ptr<RegistreType> registreType)
-    : _backend(std::move(backend)), _registreVariable(std::move(registreVariable)), _registreType(std::move(registreType))
-{
-}
+ParseurDeclarationVariable::ParseurDeclarationVariable()
+{}
 
 ParseurDeclarationVariable::~ParseurDeclarationVariable()
 {
@@ -32,15 +29,12 @@ std::shared_ptr<INoeud> ParseurDeclarationVariable::parser(std::vector<Token>& t
     
     consommer(tokens, index, TOKEN_EGAL, "Erreur : '=' attendu après le nom de variable");
     
-    ParseurEquation parseurEquation(_backend, _registreVariable);
+    ParseurEquation parseurEquation{};
     std::shared_ptr<INoeud> expression = parseurEquation.parser(tokens, index, constructeurArbreInstruction);
 
     return std::make_shared<NoeudDeclarationVariable>(
-        _backend,
-        _registreVariable,
         nomVariable,
         expression,
-        _registreType,
         typeToken.type
     );
 }

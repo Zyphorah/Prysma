@@ -41,7 +41,7 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
         // Déterminer si c'est une variable
         if(equation[0].type == TOKEN_IDENTIFIANT)
         {
-            return std::make_shared<NoeudVariable>(_backend, _registreVariable, equation[0].value);
+            return std::make_shared<NoeudVariable>(equation[0].value);
         }
         try {
             float valeurFloat = std::stof(equation[0].value);

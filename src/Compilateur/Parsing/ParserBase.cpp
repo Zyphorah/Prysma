@@ -1,6 +1,6 @@
 #include "Compilateur/Parsing/ParserBase.h"
-#include "Compilateur/AST/ConstructeurArbreInstruction.h"
-#include "Compilateur/AST/Noeuds/Interfaces/IInstruction.h"
+#include "Compilateur/AST/Noeuds/NoeudInstruction.h"
+#include "Compilateur/AST/Noeuds/NoeudInstruction.h"
 #include "Compilateur/Lexer/TokenType.h"
 #include <memory>
 #include <stdexcept>

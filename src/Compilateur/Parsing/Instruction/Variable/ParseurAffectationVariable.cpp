@@ -24,8 +24,8 @@ std::shared_ptr<INoeud> ParseurAffectationVariable::parser(std::vector<Token>& t
     
     consommer(tokens, index, TOKEN_EGAL, "Erreur : '=' attendu");
     
-    ParseurEquation parseurEquation(_backend, _registreVariable);
+    ParseurEquation parseurEquation{};
     std::shared_ptr<INoeud> expression = parseurEquation.parser(tokens, index, constructeurArbreInstruction);
 
-    return std::make_shared<NoeudAffectationVariable>(_backend, nomVariable, expression, _registreVariable, nomToken);
+    return std::make_shared<NoeudAffectationVariable>(nomVariable, expression, nomToken);
 }

@@ -1,11 +1,13 @@
 #include "Compilateur/Parsing/Equation/ServiceParenthese.h"
 #include "Compilateur/Lexer/TokenType.h"
+#include "Compilateur/AST/Registre/RegistreSymbole.h"
 #include <utility>
 
 ServiceParenthese::ServiceParenthese(std::shared_ptr<RegistreSymbole> registreSymbole)
-    : _registreSymbole(std::move(registreSymbole)) {}
+    : _registreSymbole(std::move(registreSymbole)) {
+}
 
-    // TODO: OPTIMISATION utilisation de int debut et int fin pour éviter la copie du vecteur de token et ne rien retourner
+// TODO: OPTIMISATION utilisation de int debut et int fin pour éviter la copie du vecteur de token et ne rien retourner
 std::vector<Token> ServiceParenthese::enleverParenthesesEnglobantes(const vector<Token>& equation) {
     std::vector<Token> result = equation;
     

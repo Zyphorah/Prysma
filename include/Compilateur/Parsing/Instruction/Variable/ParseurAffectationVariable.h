@@ -5,16 +5,21 @@
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Parsing/Interfaces/IParser.h"
 #include "Compilateur/Parsing/ParserBase.h"
+#include "Compilateur/LLVM/LLVMBackend.h"
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
+#include "Compilateur/AST/Registre/RegistreType.h"
 #include <memory>
-
-class RegistreVariable;
 
 class ParseurAffectationVariable : public IParser, public ParserBase
 {
+private:
+    std::shared_ptr<LLVMBackend> _backend;
+    std::shared_ptr<RegistreVariable> _registreVariable;
+    std::shared_ptr<RegistreType> _registreType;
 
 public:
 
-    ParseurAffectationVariable();
+    ParseurAffectationVariable(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, std::shared_ptr<RegistreType> registreType);
     ~ParseurAffectationVariable();
 
     std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction) override;

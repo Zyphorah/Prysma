@@ -12,9 +12,12 @@ void Valeur::accept(IVisiteur* visiteur)
    visiteur->visiter(this);
 }
 
+/*
+
 llvm::Value* Valeur::genCode() {
     if (_valeur == nullptr) {
         throw std::runtime_error("Erreur: Valeur::genCode() retournerait nullptr");
     }
     return _valeur;
 }
+*/
