@@ -1,80 +1,44 @@
 #ifndef FLOATEQUATIONBUILDER_H
 #define FLOATEQUATIONBUILDER_H
 
+#include <memory>
+#include <vector>
+
+
 #include "Compilateur/AST/ConstructeurArbreEquation.h"
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
-#include "Compilateur/AST/GestionnaireChargementVariable.h"
 #include "Compilateur/Parsing/Equation/ChaineResponsabilite.h"
 #include "Compilateur/Parsing/Equation/ServiceParenthese.h"
 #include "Compilateur/Parsing/Equation/GestionnaireOperateur.h"
-#include "Compilateur/AST/Noeuds/Operande/Operation.h"
-#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
-#include "Compilateur/LLVM/LLVMBackend.h"
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/NoFolder.h>
-#include <memory>
-#include <utility>
+#include "Compilateur/AST/Registre/RegistreSymbole.h"
+
+struct Token;
 
 class FloatEquationBuilder
 {
-    private:
-
-    std::shared_ptr<LLVMBackend> _backend;
-
-    std::shared_ptr<RegistreSymbole> registreSymboleFloat;
-    std::shared_ptr<RegistreVariable> registreVariable;
-
-    std::unique_ptr<ChaineResponsabilite> chaineResponsabilite;
- 
-    std::unique_ptr<GestionnaireOperateur> gestionnaireAddition;
-    std::unique_ptr<GestionnaireOperateur> gestionnaireSoustraction;
-    std::unique_ptr<GestionnaireOperateur> gestionnaireMultiplication;
-    std::unique_ptr<GestionnaireOperateur> gestionnaireDivision;
-
-    std::unique_ptr<ServiceParenthese> serviceParenthese;
-        
-    std::shared_ptr<IConstructeurArbre> constructeurArbreEquation;
+private:
+      std::shared_ptr<RegistreSymbole> _registreSymbole;
     
-    void construireRegistreSymboleFloat();
-    
-    llvm::Value* chargerVariable(llvm::Value* adresseMemoire, llvm::Type* type, const std::string& nomVariable);
-  
-    public: 
+    std::unique_ptr<GestionnaireOperateur> _gestionnaireAddition;
+    std::unique_ptr<GestionnaireOperateur> _gestionnaireSoustraction;
+    std::unique_ptr<GestionnaireOperateur> _gestionnaireMultiplication;
+    std::unique_ptr<GestionnaireOperateur> _gestionnaireDivision;
 
-    FloatEquationBuilder(std::shared_ptr<LLVMBackend> backend, std::shared_ptr<RegistreVariable> registreVariableExterne) 
-        : _backend(std::move(backend))
-    {
-        registreSymboleFloat = std::make_shared<RegistreSymbole>();
+    std::unique_ptr<ServiceParenthese> _serviceParenthese;
+    std::unique_ptr<ChaineResponsabilite> _chaineResponsabilite;
         
-        // Utiliser le registre externe fourni
-        registreVariable = std::move(registreVariableExterne);
+    std::shared_ptr<IConstructeurArbre> _constructeurArbre;
+    
 
-        serviceParenthese = std::make_unique<ServiceParenthese>(registreSymboleFloat);
+    void initialiserRegistre();
 
-        gestionnaireAddition = std::make_unique<GestionnaireOperateur>(TOKEN_PLUS);
-        gestionnaireSoustraction = std::make_unique<GestionnaireOperateur>(TOKEN_MOINS);
-        gestionnaireMultiplication = std::make_unique<GestionnaireOperateur>(TOKEN_ETOILE);
-        gestionnaireDivision = std::make_unique<GestionnaireOperateur>(TOKEN_SLASH);
+public: 
 
-        std::vector<GestionnaireOperateur*> operateurs = {
-            gestionnaireAddition.get(), gestionnaireSoustraction.get(), 
-            gestionnaireMultiplication.get(), gestionnaireDivision.get()
-        };
-                
-        chaineResponsabilite = std::make_unique<ChaineResponsabilite>(serviceParenthese.get(), operateurs);
-                        
-        // ===== Construction de l'AST et Résolution =====
-        shared_ptr<GestionnaireChargementVariable> gestionnaireChargement = std::make_shared<GestionnaireChargementVariable>(_backend);
-        constructeurArbreEquation = std::make_shared<ConstructeurArbreEquation>(
-            chaineResponsabilite.get(), registreSymboleFloat, serviceParenthese.get(), _backend, registreVariable, gestionnaireChargement
-        );
-
-        construireRegistreSymboleFloat();
-    }
+    FloatEquationBuilder();
     
     ~FloatEquationBuilder() = default;
     
-    std::shared_ptr<INoeud> builderArbreEquationFloat(std::vector<Token> &tokens);
+    std::shared_ptr<INoeud> construire(std::vector<Token> &tokens);
 };
 
 #endif /* FLOATEQUATIONBUILDER_H */

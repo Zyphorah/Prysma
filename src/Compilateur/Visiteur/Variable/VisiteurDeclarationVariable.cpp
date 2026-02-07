@@ -1,19 +1,25 @@
+#include "Compilateur/AST/Registre/ContextGenCode.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
+#include "Compilateur/AST/Noeuds/Variable/NoeudDeclarationVariable.h"
+
+
+llvm::AllocaInst* allocation(ContextGenCode* context, TokenType tokenType, const std::string& nom);
+llvm::AllocaInst* initialisation(ContextGenCode* context, llvm::AllocaInst* allocaInst, llvm::Value* valeur, TokenType tokenType);
 
 void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationVariable) 
 {
-    /*
-     if (_registreVariable == nullptr) {
+    
+    if (_contextGenCode == nullptr || _contextGenCode->registreVariable == nullptr) {
         throw std::runtime_error("Erreur : registre de variables non initialisé");
     }
 
     Token nomToken;
-    nomToken.value = _nom;
+    nomToken.value = noeudDeclarationVariable->_nom;
     nomToken.type = TOKEN_IDENTIFIANT;
     
-     // Créer l'allocation au début du bloc d'entrée (mais après les autres allocas) : simple gestionnaire de position il déplace le curseur LLVM
-    llvm::BasicBlock* insertBlock = _backend->getBuilder().GetInsertBlock();
-    llvm::NoeudInstruction* positionInsertion = nullptr;
+    // Créer l'allocation au début du bloc d'entrée (mais après les autres allocas) : simple gestionnaire de position il déplace le curseur LLVM
+    llvm::BasicBlock* insertBlock = _contextGenCode->backend->getBuilder().GetInsertBlock();
+    llvm::Instruction* positionInsertion = nullptr;
     
     if (insertBlock != nullptr) {
         for (auto& instruction : *insertBlock) {
@@ -23,53 +29,51 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
         }
         
         if (positionInsertion != nullptr) {
-            llvm::NoeudInstruction* nextNode = positionInsertion->getNextNode();
+            llvm::Instruction* nextNode = positionInsertion->getNextNode();
             if (nextNode != nullptr) {
-                _backend->getBuilder().SetInsertPoint(nextNode);
+                _contextGenCode->backend->getBuilder().SetInsertPoint(nextNode);
             } else {
-                _backend->getBuilder().SetInsertPoint(insertBlock);
+                _contextGenCode->backend->getBuilder().SetInsertPoint(insertBlock);
             }
         } else {
             if (insertBlock->empty()) {
-                _backend->getBuilder().SetInsertPoint(insertBlock);
+                _contextGenCode->backend->getBuilder().SetInsertPoint(insertBlock);
             } else {
-                _backend->getBuilder().SetInsertPoint(&insertBlock->front());
+                _contextGenCode->backend->getBuilder().SetInsertPoint(&insertBlock->front());
             }
         }
     }
     
-    llvm::AllocaInst* allocaInst = allocation();
+    llvm::AllocaInst* allocaInst = allocation(_contextGenCode.get(), noeudDeclarationVariable->_token, noeudDeclarationVariable->_nom);
     
     if (insertBlock != nullptr) {
-        _backend->getBuilder().SetInsertPoint(insertBlock);
+        _contextGenCode->backend->getBuilder().SetInsertPoint(insertBlock);
     }
     
-    _registreVariable->enregistrer(nomToken, allocaInst);
+    _contextGenCode->registreVariable->enregistrer(nomToken, allocaInst);
     
     // Évaluer l'expression ET initialiser la variable immédiatement
     llvm::Value* valeurCalculee = nullptr;
-    if (_expression != nullptr) {
-        valeurCalculee = _expression->genCode();
+    if (noeudDeclarationVariable->_expression != nullptr) {
+        noeudDeclarationVariable->_expression->accept(this);
+        valeurCalculee = _contextGenCode->valeurTemporaire;
     }
 
-    initialisation(allocaInst, valeurCalculee);
-    
-    return allocaInst;
-    */
+    initialisation(_contextGenCode.get(), allocaInst, valeurCalculee, noeudDeclarationVariable->_token);
 }
 
-/*
-llvm::AllocaInst* allocation()
+
+
+llvm::AllocaInst* allocation(ContextGenCode* context, TokenType tokenType, const std::string& nom)
 {
-    return _backend->getBuilder().CreateAlloca(_registreType->recuperer(_token), _arraySize, _nom);
+    return context->backend->getBuilder().CreateAlloca(context->registreType->recuperer(tokenType), nullptr, nom);
 }
 
-llvm::AllocaInst* initialisation(llvm::AllocaInst* allocaInst, llvm::Value* valeur)
+llvm::AllocaInst* initialisation(ContextGenCode* context, llvm::AllocaInst* allocaInst, llvm::Value* valeur, TokenType tokenType)
 {
     if (valeur != nullptr && allocaInst != nullptr)
     {
-        _backend->getBuilder().CreateStore(_backend->creerAutoCast(valeur,_registreType->recuperer(_token)), allocaInst);
+        context->backend->getBuilder().CreateStore(context->backend->creerAutoCast(valeur,context->registreType->recuperer(tokenType)), allocaInst);
     }
     return allocaInst;
 }
-*/

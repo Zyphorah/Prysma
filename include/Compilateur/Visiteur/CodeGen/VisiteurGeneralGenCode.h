@@ -45,6 +45,7 @@ public:
     void visiter(NoeudDeclarationFonction* noeudDeclarationFonction) override;
     void visiter(NoeudOperation* noeudOperation) override;
     void visiter(Valeur* valeur) override;
+    void visiter(NoeudLitteral* noeudLitteral) override;
     void visiter(NoeudInstruction* instruction) override;
     void visiter(Operation* operation) override;
 };

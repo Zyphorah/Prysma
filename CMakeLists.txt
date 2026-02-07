@@ -43,6 +43,7 @@ set(SOURCES
     src/Compilateur/AST/GestionnaireChargementVariable.cpp
     src/Compilateur/AST/Noeuds/Operande/Operation.cpp
     src/Compilateur/AST/Noeuds/Operande/Valeur.cpp
+    src/Compilateur/AST/Noeuds/Operande/NoeudLitteral.cpp
     src/Compilateur/AST/Noeuds/Operande/NoeudVariable.cpp
     src/Compilateur/AST/Noeuds/Equation/NoeudOperation.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudDeclarationVariable.cpp
@@ -88,7 +89,6 @@ set(SOURCES
     src/Compilateur/Visiteur/Fonction/VisiteurReturn.cpp
     src/Compilateur/Visiteur/Operande/VisiteurNoeudVariable.cpp
     src/Compilateur/Visiteur/Operande/VisiteurOperation.cpp
-    src/Compilateur/Visiteur/Operande/VisiteurNoeudOperation.cpp
     src/Compilateur/Visiteur/Operande/VisiteurValeur.cpp
     src/Compilateur/Visiteur/Variable/VisiteurAffectationVariable.cpp
     src/Compilateur/Visiteur/Variable/VisiteurDeclarationVariable.cpp

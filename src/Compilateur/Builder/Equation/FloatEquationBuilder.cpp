@@ -2,26 +2,55 @@
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
 #include "Compilateur/AST/Noeuds/Equation/NoeudOperation.h"
 
-void FloatEquationBuilder::construireRegistreSymboleFloat()
-{   
-    registreSymboleFloat->enregistrer(TOKEN_PLUS, []() -> std::shared_ptr<IExpression> { 
+FloatEquationBuilder::FloatEquationBuilder()
+{
+    _registreSymbole = std::make_shared<RegistreSymbole>();
+
+    _serviceParenthese = std::make_unique<ServiceParenthese>(_registreSymbole);
+
+    _gestionnaireAddition = std::make_unique<GestionnaireOperateur>(TOKEN_PLUS);
+    _gestionnaireSoustraction = std::make_unique<GestionnaireOperateur>(TOKEN_MOINS);
+    _gestionnaireMultiplication = std::make_unique<GestionnaireOperateur>(TOKEN_ETOILE);
+    _gestionnaireDivision = std::make_unique<GestionnaireOperateur>(TOKEN_SLASH);
+
+    std::vector<GestionnaireOperateur*> operateurs = {
+        _gestionnaireAddition.get(), 
+        _gestionnaireSoustraction.get(), 
+        _gestionnaireMultiplication.get(), 
+        _gestionnaireDivision.get()
+    };
+            
+    _chaineResponsabilite = std::make_unique<ChaineResponsabilite>(_serviceParenthese.get(), operateurs);
+                    
+    _constructeurArbre = std::make_shared<ConstructeurArbreEquation>(
+        _chaineResponsabilite.get(), 
+        _registreSymbole, 
+        _serviceParenthese.get()
+    );
+
+    initialiserRegistre();
+}
+
+void FloatEquationBuilder::initialiserRegistre()
+{
+    _registreSymbole->enregistrer(TOKEN_PLUS, []() -> std::shared_ptr<IExpression> { 
         return std::make_shared<NoeudOperation>(OP_ADDITION); 
     });
 
-    registreSymboleFloat->enregistrer(TOKEN_MOINS, []() -> std::shared_ptr<IExpression> { 
+    _registreSymbole->enregistrer(TOKEN_MOINS, []() -> std::shared_ptr<IExpression> { 
         return std::make_shared<NoeudOperation>(OP_SOUSTRACTION); 
     });
 
-    registreSymboleFloat->enregistrer(TOKEN_ETOILE, []() -> std::shared_ptr<IExpression> { 
+    _registreSymbole->enregistrer(TOKEN_ETOILE, []() -> std::shared_ptr<IExpression> { 
         return std::make_shared<NoeudOperation>(OP_MULTIPLICATION); 
     });
 
-    registreSymboleFloat->enregistrer(TOKEN_SLASH, []() -> std::shared_ptr<IExpression> { 
+    _registreSymbole->enregistrer(TOKEN_SLASH, []() -> std::shared_ptr<IExpression> { 
         return std::make_shared<NoeudOperation>(OP_DIVISION); 
     });
 }
 
-shared_ptr<INoeud> FloatEquationBuilder::builderArbreEquationFloat(vector<Token> &tokens)
+std::shared_ptr<INoeud> FloatEquationBuilder::construire(std::vector<Token> &tokens)
 {
-    return constructeurArbreEquation->construire(tokens);   
+    return _constructeurArbre->construire(tokens);
 }

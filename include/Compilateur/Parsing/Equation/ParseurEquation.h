@@ -4,12 +4,15 @@
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Parsing/Interfaces/IParser.h"
 #include "Compilateur/Parsing/ParserBase.h"
+#include "Compilateur/Builder/Equation/FloatEquationBuilder.h"
 #include <vector>
 #include <memory>
 
 class ParseurEquation : public IParser, public ParserBase
 {
 private:
+    std::shared_ptr<FloatEquationBuilder> _floatEquationBuilder;
+    
     void validerEquation(const std::vector<Token>& tokensEquation) const;
     bool estOperateur(TokenType tokenType) const;
     bool estOperande(TokenType tokenType) const;

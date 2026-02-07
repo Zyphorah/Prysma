@@ -12,6 +12,7 @@ class NoeudReturn;
 class NoeudDeclarationFonction;
 class NoeudOperation;
 class Valeur;
+class NoeudLitteral;
 class NoeudInstruction;
 class Operation;
 
@@ -28,7 +29,8 @@ public:
     virtual void visiter(NoeudArgFonction* noeudArgFonction) = 0 ;
     virtual void visiter(NoeudDeclarationFonction* noeudDeclarationFonction) = 0;
     virtual void visiter(NoeudOperation* noeudOperation) = 0;
-    virtual void visiter(Valeur* valeur) = 0; 
+    virtual void visiter(Valeur* valeur) = 0;
+    virtual void visiter(NoeudLitteral* noeudLitteral) = 0;
     virtual void visiter(NoeudInstruction* instruction) = 0; 
     virtual void visiter(Operation* operation) = 0; 
 };

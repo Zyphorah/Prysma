@@ -1,10 +1,9 @@
 #include "Compilateur/AST/ConstructeurArbreEquation.h"
 
 #include <utility>
-#include <llvm/IR/Constants.h>
 #include <vector>
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
-#include "Compilateur/AST/Noeuds/Operande/Valeur.h"
+#include "Compilateur/AST/Noeuds/Operande/NoeudLitteral.h"
 #include "Compilateur/AST/Noeuds/Operande/NoeudVariable.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenType.h"
@@ -12,16 +11,10 @@
 ConstructeurArbreEquation::ConstructeurArbreEquation(
     ChaineResponsabilite* chaineResponsabilite,
     std::shared_ptr<RegistreSymbole> registreSymbole,
-    IGestionnaireParenthese* gestionnaireParenthese,
-    std::shared_ptr<LLVMBackend> backend,
-    std::shared_ptr<RegistreVariable> registreVariable,
-    std::shared_ptr<GestionnaireChargementVariable> gestionnaireChargement)
+    IGestionnaireParenthese* gestionnaireParenthese)
     : _chaineResponsabilite(chaineResponsabilite), 
       _registreSymbole(std::move(registreSymbole)), 
-      _gestionnaireParenthese(gestionnaireParenthese),
-      _backend(std::move(backend)),
-      _registreVariable(std::move(registreVariable)),
-      _gestionnaireChargement(std::move(gestionnaireChargement))
+      _gestionnaireParenthese(gestionnaireParenthese)
 {
 }
 
@@ -45,8 +38,7 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
         }
         try {
             float valeurFloat = std::stof(equation[0].value);
-            llvm::Value* valeurLLVM = llvm::ConstantFP::get(llvm::Type::getFloatTy(_backend->getContext()), valeurFloat);
-            return std::make_shared<Valeur>(valeurLLVM);
+            return std::make_shared<NoeudLitteral>(valeurFloat);
         } catch (const std::exception& e) {
             throw std::runtime_error("Erreur: impossible de convertir '" + equation[0].value + "' en nombre");
         }    

@@ -6,7 +6,7 @@
 
 ParseurEquation::ParseurEquation()
 {
-  
+    _floatEquationBuilder = std::make_shared<FloatEquationBuilder>();
 }
 
 ParseurEquation::~ParseurEquation()
@@ -33,7 +33,7 @@ std::shared_ptr<INoeud> ParseurEquation::parser(std::vector<Token>& tokens, int&
     index = finEquation;
     consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur : ';' attendu");
 
-    return nullptr; // _floatEquationBuilder->builderArbreEquationFloat();
+    return _floatEquationBuilder->construire(tokensEquation);
 }
 
 void ParseurEquation::validerEquation(const std::vector<Token>& tokensEquation) const
