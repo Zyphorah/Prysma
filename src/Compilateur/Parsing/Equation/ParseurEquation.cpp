@@ -47,19 +47,29 @@ void ParseurEquation::validerEquation(const std::vector<Token>& tokensEquation) 
     for (size_t i = 0; i < tokensEquation.size(); i++) {
         TokenType currentType = tokensEquation[i].type;
 
-        if(currentType != TOKEN_PAREN_OUVERTE && currentType != TOKEN_PAREN_FERMEE)
-        {
-            if (attendOperande) {
-                if (!estOperande(currentType)) {
-                    throw std::runtime_error("Erreur : opérande attendu à la position " + std::to_string(i));
-                }
-                attendOperande = false;
-            } else {
-                if (!estOperateur(currentType)) {
-                    throw std::runtime_error("Erreur : opérateur attendu à la position " + std::to_string(i));
-                }
-                attendOperande = true;
+        // Ignorer les parenthèses
+        if(currentType == TOKEN_PAREN_OUVERTE || currentType == TOKEN_PAREN_FERMEE) {
+            continue;
+        }
+
+        // Gérer les opérateurs unaires préfixe (unref, ref)
+        if (estOperateurUnaire(currentType)) {
+            if (!attendOperande) {
+                throw std::runtime_error("Erreur : opérateur unaire en mauvaise position à la position " + std::to_string(i));
             }
+            continue;
+        }
+
+        if (attendOperande) {
+            if (!estOperande(currentType)) {
+                throw std::runtime_error("Erreur : opérande attendu à la position " + std::to_string(i));
+            }
+            attendOperande = false;
+        } else {
+            if (!estOperateur(currentType)) {
+                throw std::runtime_error("Erreur : opérateur attendu à la position " + std::to_string(i));
+            }
+            attendOperande = true;
         }
     }
 
@@ -76,4 +86,9 @@ bool ParseurEquation::estOperateur(TokenType tokenType) const
 bool ParseurEquation::estOperande(TokenType tokenType) const
 {
     return TokenCategories::OPERANDES.count(tokenType) > 0;
+}
+
+bool ParseurEquation::estOperateurUnaire(TokenType tokenType) const
+{
+    return tokenType == TOKEN_UNREF || tokenType == TOKEN_REF;
 }

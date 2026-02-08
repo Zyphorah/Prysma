@@ -16,6 +16,7 @@ private:
     void validerEquation(const std::vector<Token>& tokensEquation) const;
     bool estOperateur(TokenType tokenType) const;
     bool estOperande(TokenType tokenType) const;
+    bool estOperateurUnaire(TokenType tokenType) const;
   
 public:
     ParseurEquation();

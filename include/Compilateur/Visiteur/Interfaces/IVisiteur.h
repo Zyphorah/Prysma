@@ -23,7 +23,6 @@ public:
     virtual void visiter(NoeudScope* NoeudScope) = 0;
     virtual void visiter(NoeudAffectationVariable* noeudAffectationVariable) = 0;
     virtual void visiter(NoeudDeclarationVariable* noeudDeclarationVariable) = 0; 
-    virtual void visiter(NoeudVariable* noeudVariable) = 0; 
     virtual void visiter(NoeudAppelFonction* noeudAppelFonction) = 0;
     virtual void visiter(NoeudReturn* noeudReturn) = 0; 
     virtual void visiter(NoeudArgFonction* noeudArgFonction) = 0 ;

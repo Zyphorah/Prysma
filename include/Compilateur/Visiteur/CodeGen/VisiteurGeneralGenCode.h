@@ -37,7 +37,6 @@ public:
     void visiter(NoeudScope* NoeudScope) override;
     void visiter(NoeudAffectationVariable* noeudAffectationVariable) override;
     void visiter(NoeudDeclarationVariable* noeudDeclarationVariable) override; 
-    void visiter(NoeudVariable* noeudVariable) override;
     void visiter(NoeudAppelFonction* noeudAppelFonction) override;
     void visiter(NoeudReturn* noeudReturn) override;
     void visiter(NoeudArgFonction* noeudArgFonction) override;

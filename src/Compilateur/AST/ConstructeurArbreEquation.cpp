@@ -1,12 +1,14 @@
 #include "Compilateur/AST/ConstructeurArbreEquation.h"
 
+#include <exception>
 #include <utility>
 #include <vector>
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
 #include "Compilateur/AST/Noeuds/Operande/NoeudLitteral.h"
-#include "Compilateur/AST/Noeuds/Operande/NoeudVariable.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenType.h"
+#include "Compilateur/AST/Noeuds/Variable/NoeudUnRefVariable.h"
+#include "Compilateur/AST/Noeuds/Variable/NoeudRefVariable.h"
 
 ConstructeurArbreEquation::ConstructeurArbreEquation(
     ChaineResponsabilite* chaineResponsabilite,
@@ -31,11 +33,25 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
     int indice = _chaineResponsabilite->trouverOperateur(equation);
     
     if (indice == -1) {
-        // Déterminer si c'est une variable
-        if(equation[0].type == TOKEN_IDENTIFIANT)
+        // Déterminer si c'est une référence ou déréférence
+        if (equation[0].type == TOKEN_REF)
         {
-            return std::make_shared<NoeudVariable>(equation[0].value);
+            // Créer un noeud ref avec la variable suivante
+            if (equation.size() < 2 || equation[1].type != TOKEN_IDENTIFIANT) {
+                throw std::runtime_error("Erreur: 'ref' doit être suivi d'un identifiant");
+            }
+            return std::make_shared<NoeudRefVariable>(equation[1].value);
         }
+        
+        if (equation[0].type == TOKEN_UNREF)
+        {
+            // Créer un noeud unref avec la variable suivante
+            if (equation.size() < 2 || equation[1].type != TOKEN_IDENTIFIANT) {
+                throw std::runtime_error("Erreur: 'unref' doit être suivi d'un identifiant");
+            }
+            return std::make_shared<NoeudUnRefVariable>(equation[1].value);
+        }
+        
         try {
             float valeurFloat = std::stof(equation[0].value);
             return std::make_shared<NoeudLitteral>(valeurFloat);
