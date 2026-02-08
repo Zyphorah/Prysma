@@ -39,7 +39,9 @@ class Lexer {
         {"bool", TOKEN_TYPE_BOOL},
         {"void", TOKEN_TYPE_VOID},
         {"call", TOKEN_CALL},
-        {"pass", TOKEN_PASS}
+        {"pass", TOKEN_PASS},
+        {"ref", TOKEN_REF},
+        {"unref", TOKEN_UNREF}
         
     };
 

@@ -55,6 +55,8 @@ enum TokenType {
     TOKEN_ARG,
     TOKEN_AFF, 
     TOKEN_DEC,
+    TOKEN_REF,
+    TOKEN_UNREF,
     TOKEN_TYPE_INT,
     TOKEN_TYPE_FLOAT,
     TOKEN_TYPE_STRING,

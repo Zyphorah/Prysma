@@ -3,9 +3,10 @@ scope
    fn int main()
    {
         dec int a = 10 + 10; 
-        dec int b = a + 10;
+        dec int b =  10 + 10;
         aff a = 10;
-        call printInt(pass a);
+        
+        call printInt( unref a ); 
 
         return 1;
    }

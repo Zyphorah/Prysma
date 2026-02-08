@@ -18,6 +18,8 @@ namespace TokenCategories {
         TOKEN_LIT_FLOAT,
         TOKEN_LIT_BOLEEN,
         TOKEN_IDENTIFIANT,
+        TOKEN_UNREF,
+        TOKEN_REF,
     };
 
     inline const std::unordered_set<TokenType> OPERATEURS_COMPARAISON = {

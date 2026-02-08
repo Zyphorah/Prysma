@@ -21,8 +21,9 @@
 #include "Compilateur/Parsing/Instruction/Fonction/ParsingReturn.h"
 #include "Compilateur/Parsing/Instruction/Fonction/ParserAppelFonction.h"
 #include "Compilateur/Parsing/Instruction/Fonction/ParserArgFonction.h"
-#include "Compilateur/Parsing/Instruction/Fonction/ParserArgPassFonction.h"
 #include "Compilateur/Parsing/Instruction/Variable/ParseurAffectationVariable.h"
+#include "Compilateur/Parsing/Instruction/Variable/ParseurUnRefVariable.h"
+#include "Compilateur/Parsing/Instruction/Variable/ParseurRefVariable.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 
 int main(int argc, char* argv[])
@@ -83,6 +84,8 @@ int main(int argc, char* argv[])
         context->registreInstruction->enregistrer(TOKEN_CALL, std::make_shared<ParserAppelFonction>());
         context->registreInstruction->enregistrer(TOKEN_RETOUR, std::make_shared<ParsingReturn>());
         context->registreInstruction->enregistrer(TOKEN_ARG, std::make_shared<ParserArgFonction>());
+        context->registreInstruction->enregistrer(TOKEN_UNREF, std::make_shared<ParseurUnRefVariable>());
+        context->registreInstruction->enregistrer(TOKEN_REF, std::make_shared<ParseurRefVariable>());
 
         ConstructeurArbreInstruction constructeurArbreInstruction(context->registreInstruction);
         std::shared_ptr<INoeud> arbre = constructeurArbreInstruction.construire(tokens);

@@ -46,6 +46,8 @@ set(SOURCES
     src/Compilateur/AST/Noeuds/Equation/NoeudOperation.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudDeclarationVariable.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudAffectationVariable.cpp
+    src/Compilateur/AST/Noeuds/Variable/NoeudUnRefVariable.cpp
+    src/Compilateur/AST/Noeuds/Variable/NoeudRefVariable.cpp
     src/Compilateur/LLVM/LLVMSerializer.cpp
     src/Compilateur/LLVM/LLVMBackend.cpp
     src/Compilateur/Parsing/Equation/ChaineResponsabilite.cpp
@@ -60,6 +62,8 @@ set(SOURCES
     src/Compilateur/Parsing/Instruction/ParseurScope.cpp
     src/Compilateur/Parsing/Instruction/Variable/ParseurDeclarationVariable.cpp
     src/Compilateur/Parsing/Instruction/Variable/ParseurAffectationVariable.cpp
+    src/Compilateur/Parsing/Instruction/Variable/ParseurUnRefVariable.cpp
+    src/Compilateur/Parsing/Instruction/Variable/ParseurRefVariable.cpp
     src/Compilateur/Parsing/Equation/ParseurEquation.cpp
     src/Compilateur/Parsing/ParserBase.cpp
     src/Compilateur/Parsing/Instruction/Fonction/ParserDeclarationFonction.cpp
@@ -87,6 +91,8 @@ set(SOURCES
     src/Compilateur/Visiteur/Operande/VisiteurValeur.cpp
     src/Compilateur/Visiteur/Variable/VisiteurAffectationVariable.cpp
     src/Compilateur/Visiteur/Variable/VisiteurDeclarationVariable.cpp
+    src/Compilateur/Visiteur/Variable/VisiteurUnrefVariable.cpp
+    src/Compilateur/Visiteur/Variable/VisiteurRefVariable.cpp
 )
 
 # Créer l'exécutable
