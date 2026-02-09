@@ -3,6 +3,7 @@
 #include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/Lexer/TokenCategories.h"
 #include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurDeclarationFonction.h"
+#include "Compilateur/GestionnaireErreur.h"
 #include <memory>
 #include <vector>
 
@@ -16,7 +17,7 @@ ParseurDeclarationFonction::~ParseurDeclarationFonction()
 std::shared_ptr<INoeud> ParseurDeclarationFonction::parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction)
 {
     if (constructeurArbreInstruction == nullptr) {
-        throw std::runtime_error("Erreur : ConstructeurArbreInstruction est null dans ParsingDeclarationFonction");
+        throw ErreurCompilation("Erreur : ConstructeurArbreInstruction est null dans ParsingDeclarationFonction", 1, 1);
     }
     
     consommer(tokens, index, TOKEN_FONCTION, "Erreur: ce n'est pas le bon token ! 'fn'");
@@ -27,7 +28,7 @@ std::shared_ptr<INoeud> ParseurDeclarationFonction::parser(std::vector<Token>& t
     if (TokenCategories::TYPES.find(typeRetour) != TokenCategories::TYPES.end()) {
         index++; 
     } else {
-        throw std::runtime_error("Erreur: Type de retour attendu (int, float, void...)");
+        throw ErreurCompilation("Erreur : type de retour attendu (int, float, void...)", tokenTypeRetour.ligne, tokenTypeRetour.colonne);
     }
 
     Token tokenNomFonction = tokens[index];

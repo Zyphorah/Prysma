@@ -73,6 +73,7 @@ set(SOURCES
     src/Compilateur/LLVM/LlvmBackend.cpp
     src/Compilateur/LLVM/LlvmSerializer.cpp
     src/Compilateur/LLVM/GestionFonction.cpp
+    src/Compilateur/LLVM/GestionVariable.cpp
     src/Compilateur/TraitementFichier/ConstructeurSysteme.cpp
     src/Compilateur/TraitementFichier/FichierEcriture.cpp
     src/Compilateur/TraitementFichier/FichierLecture.cpp

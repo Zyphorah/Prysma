@@ -3,6 +3,7 @@
 #include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurRetour.h"
 #include "Compilateur/AnalyseSyntaxique/Equation/ParseurEquation.h"
+#include "Compilateur/GestionnaireErreur.h"
 #include <memory>
 #include <vector>
 #include <llvm-18/llvm/IR/Type.h>
@@ -18,7 +19,7 @@ ParseurRetour::~ParseurRetour()
 std::shared_ptr<INoeud> ParseurRetour::parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction)
 {
     if (constructeurArbreInstruction == nullptr) {
-        throw std::runtime_error("Erreur : ConstructeurArbreInstruction est null dans ParsingReturn");
+        throw ErreurCompilation("Erreur : ConstructeurArbreInstruction est null dans ParsingReturn", 1, 1);
     }
     
     consommer(tokens, index, TOKEN_RETOUR, "Erreur: ce n'est pas le bon token ! 'return'");

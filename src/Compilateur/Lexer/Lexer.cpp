@@ -57,7 +57,7 @@ void Lexer::traiterChaine(const string& sourceCode, size_t& pos, vector<Token>& 
     tokens.push_back({TOKEN_LIT_CHAINE, valeur, ligne, colonneDebut});
 }
 
-void Lexer::traiterNombre(const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int colonne) {
+void Lexer::traiterNombre(const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne) {
     int colonneDebut = colonne;
     string nombre;
     bool estFlottant = false;
@@ -66,21 +66,25 @@ void Lexer::traiterNombre(const string& sourceCode, size_t& pos, vector<Token>& 
         pos + 1 < sourceCode.length() && isdigit(sourceCode[pos + 1]) != 0) {
         nombre += sourceCode[pos];
         pos++;
+        colonne++;
     }
     
     while (pos < sourceCode.length() && isdigit(sourceCode[pos]) != 0) {
         nombre += sourceCode[pos];
         pos++;
+        colonne++;
     }
     
     if (pos < sourceCode.length() && sourceCode[pos] == '.') {
         estFlottant = true;
         nombre += sourceCode[pos];
         pos++;
+        colonne++;
         
         while (pos < sourceCode.length() && isdigit(sourceCode[pos]) != 0) {
             nombre += sourceCode[pos];
             pos++;
+            colonne++;
         }
     }
     
@@ -246,6 +250,7 @@ vector<Token> Lexer::tokenizer(const string& sourceCode) {
             (sourceCode[pos + 1] == '/' || sourceCode[pos + 1] == '*')) {
             ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
             motCourant = "";
+            colonneMotCourant = colonne;
             traiterCommentaires(sourceCode, pos);
             
             // Compter les nouvelles lignes dans le commentaire
@@ -258,6 +263,7 @@ vector<Token> Lexer::tokenizer(const string& sourceCode) {
                 }
                 if (sourceCode[i] == '/' && i > 0 && sourceCode[i-1] == '*') {
                     pos = i + 1;
+                    colonneMotCourant = colonne;
                     break;
                 }
             }
@@ -267,24 +273,30 @@ vector<Token> Lexer::tokenizer(const string& sourceCode) {
         if (current == '"') {
             ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
             motCourant = "";
+            colonneMotCourant = colonne;
             traiterChaine(sourceCode, pos, tokens, ligne, colonne);
+            colonneMotCourant = colonne;
             continue;
         }
 
         if (isdigit(current) != 0) {
             ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
             motCourant = "";
+            colonneMotCourant = colonne;
             traiterNombre(sourceCode, pos, tokens, ligne, colonne);
+            colonneMotCourant = colonne;
             continue;
         }
 
         if (isspace(current) != 0) {
             ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
             motCourant = "";
+            colonneMotCourant = colonne;
             
             if (current == '\n') {
                 ligne++;
                 colonne = 1;
+                colonneMotCourant = 1;
             } else if (current != '\r') {
                 colonne++;
             }
@@ -295,6 +307,7 @@ vector<Token> Lexer::tokenizer(const string& sourceCode) {
         if (!motCourant.empty() && isalnum(current) == 0 && current != '_') {
             ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
             motCourant = "";
+            colonneMotCourant = colonne;
         }
 
         if (isalnum(current) != 0 || current == '_') {

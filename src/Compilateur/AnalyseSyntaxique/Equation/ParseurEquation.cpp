@@ -1,6 +1,7 @@
 #include "Compilateur/AnalyseSyntaxique/Equation/ParseurEquation.h"
 #include "Compilateur/Lexer/TokenCategories.h"
 #include "Compilateur/Lexer/TokenType.h"
+#include "Compilateur/GestionnaireErreur.h"
 #include <stdexcept>
 #include <memory>
 
@@ -23,7 +24,7 @@ std::shared_ptr<INoeud> ParseurEquation::parser(std::vector<Token>& tokens, int&
     }
 
     if (finEquation == tokens.size()) {
-        throw std::runtime_error("Erreur : ';' manquant à la fin de la déclaration");
+        throw ErreurCompilation("Erreur : ';' manquant à la fin de la déclaration", tokens.back().ligne, tokens.back().colonne);
     }
 
     std::vector<Token> tokensEquation(tokens.begin() + debutEquation, tokens.begin() + finEquation);
@@ -39,7 +40,7 @@ std::shared_ptr<INoeud> ParseurEquation::parser(std::vector<Token>& tokens, int&
 void ParseurEquation::validerEquation(const std::vector<Token>& tokensEquation) const
 {
     if (tokensEquation.empty()) {
-        throw std::runtime_error("Erreur : équation vide");
+        throw ErreurCompilation("Erreur : équation vide", 1, 1);
     }
 
     bool attendOperande = true;
@@ -55,26 +56,26 @@ void ParseurEquation::validerEquation(const std::vector<Token>& tokensEquation) 
         // Gérer les opérateurs unaires préfixe (unref, ref)
         if (estOperateurUnaire(currentType)) {
             if (!attendOperande) {
-                throw std::runtime_error("Erreur : opérateur unaire en mauvaise position à la position " + std::to_string(i));
+                throw ErreurCompilation("Erreur : opérateur unaire en mauvaise position à la position " + std::to_string(i), tokensEquation[i].ligne, tokensEquation[i].colonne);
             }
             continue;
         }
 
         if (attendOperande) {
             if (!estOperande(currentType)) {
-                throw std::runtime_error("Erreur : opérande attendu à la position " + std::to_string(i));
+                throw ErreurCompilation("Erreur : opérande attendu à la position " + std::to_string(i), tokensEquation[i].ligne, tokensEquation[i].colonne);
             }
             attendOperande = false;
         } else {
             if (!estOperateur(currentType)) {
-                throw std::runtime_error("Erreur : opérateur attendu à la position " + std::to_string(i));
+                throw ErreurCompilation("Erreur : opérateur attendu à la position " + std::to_string(i), tokensEquation[i].ligne, tokensEquation[i].colonne);
             }
             attendOperande = true;
         }
     }
 
     if (attendOperande) {
-        throw std::runtime_error("Erreur : opérande attendu à la fin de l'équation");
+        throw ErreurCompilation("Erreur : opérande attendu à la fin de l'équation", tokensEquation.back().ligne, tokensEquation.back().colonne);
     }
 }
 

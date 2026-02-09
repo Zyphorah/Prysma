@@ -11,11 +11,13 @@
 #include "Compilateur/AnalyseSyntaxique/Instruction/Variable/ParseurDeclarationVariable.h"
 #include "Compilateur/TraitementFichier/FichierLecture.h"
 #include "Compilateur/TraitementFichier/ConstructeurSysteme.h"
+#include "Compilateur/GestionnaireErreur.h"
 #include <iostream>
 #include <llvm-18/llvm/IR/DerivedTypes.h>
 #include <llvm-18/llvm/IR/Instructions.h>
 #include <llvm-18/llvm/IR/Value.h>
 #include <memory>
+#include <filesystem>
 #include "Compilateur/AnalyseSyntaxique/Instruction/ParseurScope.h"
 #include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurDeclarationFonction.h"
 #include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurRetour.h"
@@ -28,6 +30,10 @@
 
 int main(int argc, char* argv[])
 {
+    // Utiliser le chemin passé en argument, sinon utiliser le chemin par défaut
+    std::string cheminFichier = argv[1];
+    std::string nomFichier = std::filesystem::path(cheminFichier).filename().string();
+    
     try {
 
         std::shared_ptr<LlvmBackend> backend = std::make_shared<LlvmBackend>();
@@ -50,7 +56,7 @@ int main(int argc, char* argv[])
             valeurTemporaire
         );
       
-        FichierLecture fichierLecture("../src/PrysmaCodeTests/testeFonctionnel.p");
+        FichierLecture fichierLecture(cheminFichier);
         std::string document = fichierLecture.entrer();
   
         Lexer lexer;
@@ -100,8 +106,15 @@ int main(int argc, char* argv[])
         constructeur.compilerLib();
         constructeur.lierLibExecutable();
     }
+    catch (const ErreurCompilation& erreur) {
+        std::cerr << nomFichier << ":" 
+                  << erreur.ligne << ":" 
+                  << erreur.colonne << ": Erreur: " 
+                  << erreur.what() << std::endl;
+        return 1;
+    }
     catch (const std::exception& e) {
         std::cerr << "Erreur: " << e.what() << std::endl;
-        return -1;
+        return 1;
     }
 }

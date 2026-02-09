@@ -56,7 +56,7 @@ class Lexer {
     static void traiterLitteraux(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne);
     static void traiterCommentaires(const string& sourceCode, size_t& pos);
     static void traiterChaine(const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne);
-    static void traiterNombre(const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int colonne);
+    static void traiterNombre(const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne);
     
     public: 
         Lexer() {}

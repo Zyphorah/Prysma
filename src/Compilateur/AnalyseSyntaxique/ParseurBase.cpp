@@ -1,12 +1,17 @@
 #include "Compilateur/AnalyseSyntaxique/ParseurBase.h"
 #include "Compilateur/Lexer/TokenType.h"
+#include "Compilateur/GestionnaireErreur.h"
 #include <memory>
 #include <stdexcept>
 
 Token ParseurBase::consommer(std::vector<Token>& tokens, int& index, TokenType typeAttendu, const std::string& messageErreur)
 {
     if (index < 0 || index >= static_cast<int>(tokens.size()) || tokens[index].type != typeAttendu) {
-        throw std::runtime_error(messageErreur);
+        if (index >= 0 && index < static_cast<int>(tokens.size())) {
+            throw ErreurCompilation(messageErreur, tokens[index].ligne, tokens[index].colonne);
+        } else {
+            throw ErreurCompilation(messageErreur, 1, 1);
+        }
     }
     return tokens[index++];
 }

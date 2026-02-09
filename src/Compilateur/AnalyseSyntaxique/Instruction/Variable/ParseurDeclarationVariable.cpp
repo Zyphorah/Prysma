@@ -3,6 +3,7 @@
 #include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/AnalyseSyntaxique/Equation/ParseurEquation.h"
 #include "Compilateur/Lexer/TokenCategories.h"
+#include "Compilateur/GestionnaireErreur.h"
 #include <memory>
 
 ParseurDeclarationVariable::ParseurDeclarationVariable()
@@ -18,7 +19,7 @@ std::shared_ptr<INoeud> ParseurDeclarationVariable::parser(std::vector<Token>& t
     
     // Vérifier que le token courant est un type valide
     if (TokenCategories::TYPES.find(tokens[index].type) == TokenCategories::TYPES.end()) {
-        throw std::runtime_error("Erreur : type attendu après 'dec'");
+        throw ErreurCompilation("Erreur : type attendu après 'dec'", tokens[index].ligne, tokens[index].colonne);
     }
     Token typeToken = tokens[index];
     index++;

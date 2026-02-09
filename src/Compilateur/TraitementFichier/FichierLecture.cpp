@@ -14,7 +14,8 @@ std::string FichierLecture :: entrer()
     {
         while(std::getline(_fichier,ligne))
         {
-            document += ligne; 
+            document += ligne;
+            document += "\n";  
         }
         _fichier.close();
         return document;
