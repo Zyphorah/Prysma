@@ -1,4 +1,5 @@
 #include "Compilateur/LLVM/GenerateurFonction.h"
+#include "Compilateur/AST/Noeuds/Fonction/NoeudAppelFonction.h"
 #include "Compilateur/AST/Registre/ContextGenCode.h"
 #include "Compilateur/AST/Noeuds/Fonction/NoeudDeclarationFonction.h"
 #include "Compilateur/AST/Noeuds/Fonction/NoeudArgFonction.h"
@@ -7,25 +8,33 @@
 #include <utility>
 
 
-GenerateurFonction::GenerateurFonction(shared_ptr<ContextGenCode> contextGenCode, NoeudDeclarationFonction* noeudDeclarationFonction, IVisiteur* visiteurGeneralCodeGen) 
+GestionFonction::GestionFonction(shared_ptr<ContextGenCode> contextGenCode, NoeudDeclarationFonction* noeudDeclarationFonction, IVisiteur* visiteurGeneralCodeGen) 
 :   _contextGenCode(std::move(contextGenCode)),
     _noeudDeclarationFonction(noeudDeclarationFonction),
-    enfants(_noeudDeclarationFonction->getEnfants()),
+    enfants(&noeudDeclarationFonction->getEnfants()),
+    _visiteurGeneralCodeGen(visiteurGeneralCodeGen)
+{
+}
+
+GestionFonction::GestionFonction(shared_ptr<ContextGenCode> contextGenCode, IVisiteur* visiteurGeneralCodeGen)
+:   _contextGenCode(std::move(contextGenCode)),
+    _noeudDeclarationFonction(nullptr),
+    enfants(nullptr),
     _visiteurGeneralCodeGen(visiteurGeneralCodeGen)
 {
 }
 
 
-GenerateurFonction::~GenerateurFonction()
+GestionFonction::~GestionFonction()
 {}
 
-GenerateurFonction::ArgumentsCodeGen GenerateurFonction::chargerArguments() 
+GestionFonction::ArgumentsCodeGen GestionFonction::chargerArguments() 
 {
     std::vector<llvm::Type*> argTypes;
     std::vector<NoeudArgFonction*> arguments;
     
     // Remplir le vecteur argTypes  et arguments
-    for (const std::shared_ptr<INoeud> & index : enfants) {
+    for (const std::shared_ptr<INoeud> & index : *enfants) {
         INoeud* enfant = index.get();
         if (typeid(*enfant) == typeid(NoeudArgFonction)) {
             auto* arg = static_cast<NoeudArgFonction*>(enfant);
@@ -40,7 +49,7 @@ GenerateurFonction::ArgumentsCodeGen GenerateurFonction::chargerArguments()
 
 
 
-llvm::Function* GenerateurFonction::creerFonction(llvm::Type* typeDeRetour, const ArgumentsCodeGen& argumentsCodeGen)
+llvm::Function* GestionFonction::creerFonction(llvm::Type* typeDeRetour, const ArgumentsCodeGen& argumentsCodeGen)
 {
     llvm::FunctionType* funcType = llvm::FunctionType::get(typeDeRetour, argumentsCodeGen.argTypes, false);
 
@@ -58,20 +67,20 @@ llvm::Function* GenerateurFonction::creerFonction(llvm::Type* typeDeRetour, cons
 }
 
 
-void GenerateurFonction::enregistrerFonction(llvm::Function* function)
+void GestionFonction::enregistrerFonction(llvm::Function* function)
 {
     _contextGenCode->registreFonction->enregistrer(_noeudDeclarationFonction->_nom, function);
 }
 
 
-void GenerateurFonction::initialiserContexte()
+void GestionFonction::initialiserContexte()
 {
     _contextGenCode->returnContextCompilation->piler(_noeudDeclarationFonction->_typeRetourToken);
     _contextGenCode->registreVariable->piler();
 }
 
 
-void GenerateurFonction::traiterArguments(llvm::Function* function, const ArgumentsCodeGen& argumentsCodeGen)
+void GestionFonction::traiterArguments(llvm::Function* function, const ArgumentsCodeGen& argumentsCodeGen)
 {
     size_t argIndex = 0;
     for (auto* noeudArg : argumentsCodeGen.arguments) {
@@ -93,9 +102,9 @@ void GenerateurFonction::traiterArguments(llvm::Function* function, const Argume
 }
 
 
-void GenerateurFonction::traiterCorpsFonction()
+void GestionFonction::traiterCorpsFonction()
 {
-    for (const auto & index : enfants) {
+    for (const auto & index : *enfants) {
         INoeud* enfant = index.get();
         if (typeid(*enfant) != typeid(NoeudArgFonction)) {
             index->accept(_visiteurGeneralCodeGen);
@@ -104,18 +113,59 @@ void GenerateurFonction::traiterCorpsFonction()
 }
 
 
-void GenerateurFonction::finaliserContexte()
+void GestionFonction::finaliserContexte()
 {
     _contextGenCode->registreVariable->depiler();
     _contextGenCode->returnContextCompilation->depiler();
 }
 
 
-void GenerateurFonction::declarerFonction()
+void GestionFonction::traiterArguments(NoeudAppelFonction* noeudAppelFonction)
+{
+    _contextGenCode->registreArgument->vider();
+    
+    for (const auto& argumentEnfant : noeudAppelFonction->getEnfants()) 
+    {
+        argumentEnfant->accept(_visiteurGeneralCodeGen);
+        llvm::Value* valeurArgument = _contextGenCode->valeurTemporaire;
+
+        if (valeurArgument == nullptr) {
+            throw std::runtime_error("Erreur : L'argument passé à la fonction " + noeudAppelFonction->_nomFonction.value + " n'a pas généré de valeur.");
+        }
+
+        _contextGenCode->registreArgument->ajouter(valeurArgument);
+    }
+}
+
+
+llvm::Function* GestionFonction::obtenirFonction(const std::string& nomFonction)
+{
+    llvm::Function* fonction = _contextGenCode->registreFonction->recuperer(nomFonction);
+
+    if (fonction == nullptr) {
+        throw std::runtime_error("Fonction introuvable : " + nomFonction);
+    }
+
+    return fonction;
+}
+
+
+void GestionFonction::genererAppelFonction(llvm::Function* fonction)
+{
+    std::vector<llvm::Value*> args = *_contextGenCode->registreArgument->recuperer();
+
+    _contextGenCode->valeurTemporaire = _contextGenCode->backend->getBuilder().CreateCall(
+        fonction, 
+        args, 
+        "resultat_appel"
+    );
+}
+
+void GestionFonction::declarerFonction()
 {
     llvm::Type* typeDeRetour = _contextGenCode->registreType->recuperer(_noeudDeclarationFonction->_typeRetourToken);
     
-    GenerateurFonction::ArgumentsCodeGen argumentsCodeGen = chargerArguments();
+    GestionFonction::ArgumentsCodeGen argumentsCodeGen = chargerArguments();
 
     // Étapes logiques de génération
     llvm::Function* function = creerFonction(typeDeRetour, argumentsCodeGen);
@@ -126,4 +176,11 @@ void GenerateurFonction::declarerFonction()
     finaliserContexte();
 
     _contextGenCode->valeurTemporaire = function;
+}
+
+void GestionFonction::genererAppelFonction(NoeudAppelFonction* noeudAppelFonction)
+{
+    traiterArguments(noeudAppelFonction);
+    llvm::Function* fonction = obtenirFonction(noeudAppelFonction->_nomFonction.value);
+    genererAppelFonction(fonction);
 }

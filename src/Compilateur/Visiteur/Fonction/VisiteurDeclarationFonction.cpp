@@ -6,6 +6,6 @@
 
 void VisiteurGeneralGenCode::visiter(NoeudDeclarationFonction* noeudDeclarationFonction) 
 {
-    GenerateurFonction generateurFonction(_contextGenCode,noeudDeclarationFonction,this);
+    GestionFonction generateurFonction(_contextGenCode,noeudDeclarationFonction,this);
     generateurFonction.declarerFonction();
 }

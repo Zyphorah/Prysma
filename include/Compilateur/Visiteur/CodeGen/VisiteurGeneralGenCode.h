@@ -32,12 +32,13 @@ class VisiteurGeneralGenCode : public IVisiteur
 {
 private:
     std::shared_ptr<ContextGenCode> _contextGenCode;
+    
 public:
     VisiteurGeneralGenCode(std::shared_ptr<ContextGenCode> contextGenCode);
     ~VisiteurGeneralGenCode();
     void parcourirEnfant(NoeudInstruction* noeud);
     
-    llvm::Value* evaluerExpression(std::shared_ptr<INoeud> expression);
+    llvm::Value* evaluerExpression(std::shared_ptr<INoeud>& expression);
     
     void visiter(NoeudScope* NoeudScope) override;
     void visiter(NoeudAffectationVariable* noeudAffectationVariable) override;

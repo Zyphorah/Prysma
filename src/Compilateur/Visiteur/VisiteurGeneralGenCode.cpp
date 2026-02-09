@@ -16,7 +16,7 @@ void VisiteurGeneralGenCode::parcourirEnfant(NoeudInstruction* noeud)
     }
 }
 
-llvm::Value* VisiteurGeneralGenCode::evaluerExpression(std::shared_ptr<INoeud> expression) {
+llvm::Value* VisiteurGeneralGenCode::evaluerExpression(std::shared_ptr<INoeud>& expression) {
     if (expression != nullptr) {
         expression->accept(this);
         return _contextGenCode->valeurTemporaire;
