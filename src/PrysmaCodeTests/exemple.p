@@ -1,24 +1,48 @@
+
+// Teste simple de boucle récursive
 scope 
 {
-   fn int teste(arg int a arg int b)
+   fn int teste(arg int a, arg int b)
    {
-      call printInt(unref a);
-      call printInt(unref b);
+      call printInt(a);
+      call printInt(b);
       return 0;
    }
 
    fn int main()
    {
         dec int a = 10 + 10; 
-        dec int b =  unref a + 10 + unref a ;
+        dec int b = a + 10 + a;
         dec float c = 1;
         dec bool d = 1; 
         dec int teste_var = ref a;
         aff a = 10;
         dec int e = 14;
         dec int f = 15; 
-        call teste(unref e unref f);
+        call teste(e, f);
 
-        return unref a;
+        return a;
+   }
+}
+
+
+// calculer une factoriel sans condition 
+
+scope {
+   fn int fact_accum(arg int produit, arg int n)
+   {
+      aff produit =  produit * n;     
+      call printInt( produit);       
+      dec int suivant = n + 1;
+      call fact_accum( produit, n);
+      return produit;
+   }
+
+   fn int main()
+   {
+      dec int resultat = 1;   
+      dec int nombre = 2;             
+      call fact_accum(resultat, nombre);    
+      return resultat;
    }
 }

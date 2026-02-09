@@ -52,6 +52,11 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
             return std::make_shared<NoeudUnRefVariable>(equation[1].value);
         }
         
+        if (equation[0].type == TOKEN_IDENTIFIANT && equation.size() == 1) {
+     
+            return std::make_shared<NoeudUnRefVariable>(equation[0].value);
+        }
+        
         try {
             float valeurFloat = std::stof(equation[0].value);
             return std::make_shared<NoeudLitteral>(valeurFloat);

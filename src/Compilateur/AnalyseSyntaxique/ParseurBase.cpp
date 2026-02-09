@@ -15,6 +15,13 @@ void ParseurBase::consommerEnfantCorps(std::vector<Token>& tokens, int& index , 
 {
     while(index < (int)tokens.size() && tokens[index].type != fin)
     {
+        // Ignorer les virgules entre les éléments
+        if(tokens[index].type == TOKEN_VIRGULE)
+        {
+            index++;
+            continue;
+        }
+        
         std::shared_ptr<INoeud> enfant = constructeurArbreInstruction->construire(tokens, index);
         parent->ajouterInstruction(enfant);
     }

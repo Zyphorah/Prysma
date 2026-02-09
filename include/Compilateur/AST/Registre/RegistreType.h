@@ -12,15 +12,6 @@ public:
     RegistreType() = default;
     virtual ~RegistreType() = default;
 
-    llvm::Type* getType(TokenType typeToken) {
-        return recuperer(typeToken);
-    }
-
-  
-    [[nodiscard]] bool typeExists(TokenType typeToken) const {
-        return existe(typeToken);
-    }
-
 protected:
     
     [[nodiscard]] std::string genererMessageErreur(const TokenType& cle) const override {

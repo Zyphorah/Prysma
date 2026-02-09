@@ -62,13 +62,13 @@ int main(int argc, char* argv[])
         IntegerType* intTy = llvm::Type::getInt32Ty(context->backend->getContext());
         std::vector<llvm::Type*> printIntArgs = {intTy};
         context->backend->declarerExterne("printInt", intTy, printIntArgs);
-        context->registreFonction->ajouter("printInt", context->backend->getModule().getFunction("printInt"));
+        context->registreFonction->enregistrer("printInt", context->backend->getModule().getFunction("printInt"));
 
         // PrintFloat 
         IntegerType* floatTy = llvm::Type::getInt32Ty(context->backend->getContext());
         std::vector<llvm::Type*> printFloatArgs = {floatTy};
         context->backend->declarerExterne("printFloat", floatTy, printFloatArgs);
-        context->registreFonction->ajouter("printFloat", context->backend->getModule().getFunction("printFloat"));
+        context->registreFonction->enregistrer("printFloat", context->backend->getModule().getFunction("printFloat"));
         
         // Enregistrer les types de base
         context->registreType->enregistrer(TOKEN_TYPE_INT, llvm::Type::getInt32Ty(context->backend->getContext()));

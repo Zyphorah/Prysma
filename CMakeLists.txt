@@ -72,6 +72,7 @@ set(SOURCES
     src/Compilateur/Lexer/Lexer.cpp
     src/Compilateur/LLVM/LlvmBackend.cpp
     src/Compilateur/LLVM/LlvmSerializer.cpp
+    src/Compilateur/LLVM/GenerateurFonction.cpp
     src/Compilateur/TraitementFichier/ConstructeurSysteme.cpp
     src/Compilateur/TraitementFichier/FichierEcriture.cpp
     src/Compilateur/TraitementFichier/FichierLecture.cpp

@@ -6,7 +6,7 @@ void VisiteurGeneralGenCode::visiter(NoeudRetour* noeudReturn)
     noeudReturn->_valeurRetour->accept(this);
 
     TokenType typeRetourToken = _contextGenCode->returnContextCompilation->recupererContext();
-    llvm::Type* typeRetour = _contextGenCode->registreType->getType(typeRetourToken);
+    llvm::Type* typeRetour = _contextGenCode->registreType->recuperer(typeRetourToken);
     
     llvm::Value* valeurRetour = _contextGenCode->backend->getBuilder().CreateFPToSI(_contextGenCode->valeurTemporaire, typeRetour);
     
