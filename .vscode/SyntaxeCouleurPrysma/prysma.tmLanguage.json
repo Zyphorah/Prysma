@@ -1,0 +1,91 @@
+{
+    "scopeName": "source.prysma",
+    "patterns": [
+        { "include": "#comments" },
+        { "include": "#scope" },
+        { "include": "#function-declaration" },
+        { "include": "#keywords" },
+        { "include": "#strings" },
+        { "include": "#constants" },
+        { "include": "#functions" },
+        { "include": "#operators" },
+        { "include": "#variables" }
+    ],
+    "repository": {
+        "comments": {
+            "patterns": [{
+                "name": "comment.line.double-slash.prysma",
+                "match": "//.*$"
+            }]
+        },
+        "scope": {
+            "patterns": [{
+                "name": "keyword.control.scope.prysma",
+                "match": "\\bscope\\b"
+            }]
+        },
+        "function-declaration": {
+            "patterns": [{
+                "match": "\\b(fn)\\s+(int|float|void|double)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+                "captures": {
+                    "1": { "name": "constant.numeric.prysma" },
+                    "2": { "name": "storage.type.prysma" },
+                    "3": { "name": "entity.name.function.prysma" }
+                }
+            }]
+        },
+        "keywords": {
+            "patterns": [{
+                "name": "keyword.control.prysma",
+                "match": "\\b(if|else|for|while|return)\\b"
+            }, {
+                "name": "storage.type.prysma",
+                "match": "\\b(int|float|void|double)\\b"
+            }, {
+                "name": "constant.numeric.prysma",
+                "match": "\\b(fn|arg|dec|aff|call)\\b"
+            }, {
+                "name": "keyword.operator.prysma",
+                "match": "\\b(and|or|not)\\b"
+            }]
+        },
+        "strings": {
+            "name": "string.quoted.double.prysma",
+            "begin": "\"",
+            "end": "\"",
+            "patterns": [{
+                "name": "constant.character.escape.prysma",
+                "match": "\\\\."
+            }]
+        },
+        "constants": {
+            "patterns": [{
+                "name": "constant.numeric.prysma",
+                "match": "\\b\\d+(\\.\\d+)?\\b"
+            }]
+        },
+        "functions": {
+            "patterns": [{
+                "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+                "captures": {
+                    "1": { "name": "entity.name.function.prysma" }
+                }
+            }]
+        },
+        "operators": {
+            "patterns": [{
+                "name": "keyword.operator.prysma",
+                "match": "(\\+|\\-|\\*|\\/|\\=|\\==|\\!=|\\<|\\>|\\<=|\\>=)"
+            }, {
+                "name": "punctuation.separator.prysma",
+                "match": "[{}()\\[\\];,]"
+            }]
+        },
+        "variables": {
+            "patterns": [{
+                "name": "variable.other.prysma",
+                "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+            }]
+        }
+    }
+}

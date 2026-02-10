@@ -1,0 +1,25 @@
+{
+  "name": "prysma-language-support",
+  "displayName": "Prysma Language Support",
+  "description": "Syntax highlighting and color customization for Prysma files.",
+  "version": "0.0.2",
+  "engines": {
+    "vscode": "^1.86.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "prysma",
+      "aliases": ["Prysma", "prysma"],
+      "extensions": [".p"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "prysma",
+      "scopeName": "source.prysma",
+      "path": "./syntaxes/prysma.tmLanguage.json"
+    }]
+  }
+}
