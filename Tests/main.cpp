@@ -1,4 +1,6 @@
-int main()
-{
-    return 1; 
+#include "include/main.h"
+
+int main() {
+    testerTousLesTestsLexer();
+    return 0;
 }

@@ -16,7 +16,7 @@ sudo apt install graphviz
 dot -Tpng mon_graphe.dot -o mon_graphe.png
 
 
-## Fichier tasks.json vous devez inclure cette configuration pour avoir les erreurs surligner lorsque vous faite control shift b 
+## Fichier tasks.json vous devez inclure cette configuration pour avoir les erreurs surligner lorsque vous faite control shift b
 {
 "label": "Compiler Prysma (Check)",
 "type": "shell",
