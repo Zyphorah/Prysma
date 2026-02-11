@@ -16,6 +16,8 @@ class NoeudLitteral;
 class NoeudInstruction;
 class NoeudUnRefVariable;
 class NoeudRefVariable;
+class NoeudIf;
+class NoeudElse;
 
 class IVisiteur
 {
@@ -32,6 +34,8 @@ public:
     virtual void visiter(NoeudInstruction* instruction) = 0; 
     virtual void visiter(NoeudUnRefVariable* noeudUnRefVariable) = 0;
     virtual void visiter(NoeudRefVariable* noeudRefVariable) = 0;
+    virtual void visiter(NoeudIf* noeudIf) = 0;
+    virtual void visiter(NoeudElse* noeudIf) = 0;
 };
 
 #endif /* B9A25031_6CA1_409A_879D_68D43CAC9945 */

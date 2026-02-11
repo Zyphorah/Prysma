@@ -1,32 +1,15 @@
 #ifndef FDDB5968_6DEF_49B0_AD11_8791D523278A
 #define FDDB5968_6DEF_49B0_AD11_8791D523278A
-#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
-#include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
-#include "Compilateur/AST/Noeuds/NoeudInstruction.h"
+
+
 #include <llvm-18/llvm/IR/Value.h>
 #include "Compilateur/AST/Registre/ContextGenCode.h"
 #include "Compilateur/AST/Noeuds/Equation/NoeudOperation.h"
 #include <memory>
 
-// Importation des classes 
-class GenCodeAppelFonction;
-class GenCodeArgFonction;
-class GenCodeArgPassFonction;
-class GenCodeDeclarationFonction;
-class GenCodeReturn;
-class GenCodeAffectationVariable;
-class GenCodeDeclarationVariable;
-class GenCodeValeur;
-class GenCodeVariable;
-class GenCodeOperation;
-class GenCodeInstruction;
-class GenCodeScope;
-class NoeudOperation;
-
 //Outils 
 class RegistreVariable;
 class LlvmBackend;
-
 
 class VisiteurGeneralGenCode : public IVisiteur
 {
@@ -52,6 +35,8 @@ public:
     void visiter(NoeudInstruction* instruction) override;
     void visiter(NoeudUnRefVariable* noeudUnRefVariable) override;
     void visiter(NoeudRefVariable* noeudRefVariable) override;
+    void visiter(NoeudIf* noeudIf) override;
+    void visiter(NoeudElse* noeudIf) override;
 };
 
 #endif /* FDDB5968_6DEF_49B0_AD11_8791D523278A */
