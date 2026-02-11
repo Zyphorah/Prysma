@@ -52,7 +52,7 @@ Cette technologie s'intègre au projet en tant que composant central, c'est le b
 
 ### Les risques technologiques pour la réalisation du projet
 
-Endroits de blocage potentiels :
+Points de blocage potentiels :
 - Le débogage n'est pas seulement fait dans le langage C++ mais aussi dans le langage généré par le framework LLVM. Ce qui nous donne deux dimensions de débogage où peut se trouver un problème. 
 - La complexité de la génération du code par le framework LLVM peut être importante. 
 - La récursivité peut être un défi, visualiser l'état d'exécution du code n'est pas aussi simple qu'avec un code non récursif. 
@@ -60,7 +60,7 @@ Endroits de blocage potentiels :
 - La création du garbage collector peut être un défi technique intéressant à relever. 
 - La création des bibliothèques du langage Prysma.
 
-défis techniques pour mener à terme la réalisation :
+Défis techniques pour mener à terme la réalisation :
 - Comprendre en profondeur le framework LLVM et son API C++.
 - Concevoir une architecture de compilateur robuste et évolutive.
 - Gérer les erreurs de syntaxe et de sémantique de manière efficace.
@@ -104,31 +104,33 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
 
 ## Contenu de vos sprints
 
-### Itération 1 du projet fonctionnalité à réaliser en 2 semaines ?
+### Itération 1 du projet fonctionnalités à réaliser en 2 semaines ?
 
 - Lire des fichiers sources Prysma et les traiter comme du texte
 - Supporter les types entiers (int), flottants (float), booléens (bool)
 - Compiler les opérations arithmétiques de base (+, -, *, /) vers du code LLVM
 - Permettre au développeur de déclarer des variables et les utiliser dans des expressions
 - Valider la syntaxe du code et rejeter les structures invalides via la construction de l'AST
-- Supporter les fonctions, récursive et un type de retour. 
-
-### Itération 2 du projet fonctionnalité à réaliser en 2 semaines ?
-
+- Supporter les fonctions récursives et un type de retour. 
 - Signaler les erreurs de syntaxe précisément (numéro de ligne, type d'erreur) plutôt que planter silencieusement
-- Exporter l'AST en format texte et graphique (Graphviz) pour faciliter le débogage
 - Ajouter la coloration syntaxique du langage Prysma dans Visual Studio Code
-- Supporter les types string, j'utilise la librairie natif du C avec un extern
-- Supporter les instructions if, while, passer par la pile avec alloca
 
-### Itération 3 du projet fonctionnalité à réaliser en 2 semaines ?
+### Itération 2 du projet fonctionnalités à réaliser en 2 semaines ?
 
-- Fournir des fonctions natives pour les calculs avancés (puissance, PGCD, vérification de nombres premiers)
-- supporter la (Factorielle, Fibonacci) avec une gestion appropriée de la pile d'exécution
-- Supporter les tableau programmer en LLVM IR 
-- supporter la boucle for 
+- Exporter l'AST en format texte et graphique (Graphviz) pour faciliter le débogage
+- Supporter l'instruction if, 
+- Supporter l'instruction while, passer par la pile avec alloca
+- Supporter l'approche orientée objet avec des classes, polymorphisme fait avec une vtable. 
+
+### Itération 3 du projet fonctionnalités à réaliser en 2 semaines ?
+
+- Analyse syntaxique abstraite pour la logique du langage Prysma, ce qui évitera les problèmes de logique sémantique exemple : declare int a = "string"; 
+- Supporter les tableaux programmés en LLVM IR 
+- Supporter les types string, j'utilise la bibliothèque native du C avec un extern
+- Écrire une bibliothèque de structures de données (listes chaînées, arbres binaires, piles, files) 
 
 ### Fonctionnalités Bonus (Si le temps le permet)
 
 - Ajouter la gestion manuelle de la mémoire avec les pointeurs pour un contrôle bas niveau
-- Écrire une librairie de structures de données (listes chaînées, arbres binaires, piles, files) 
+- Fournir des fonctions natives pour les calculs avancés (puissance, PGCD, vérification de nombres premiers)
+- Supporter la (Factorielle, Fibonacci) avec une gestion appropriée de la pile d'exécution
