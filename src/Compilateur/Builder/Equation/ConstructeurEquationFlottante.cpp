@@ -2,7 +2,8 @@
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
 #include "Compilateur/AST/Noeuds/Equation/NoeudOperation.h"
 
-ConstructeurEquationFlottante::ConstructeurEquationFlottante()
+ConstructeurEquationFlottante::ConstructeurEquationFlottante(IConstructeurArbre* instructionBuilder)
+    : _instructionBuilder(instructionBuilder)
 {
     _registreSymbole = std::make_shared<RegistreSymbole>();
 
@@ -25,7 +26,8 @@ ConstructeurEquationFlottante::ConstructeurEquationFlottante()
     _constructeurArbre = std::make_shared<ConstructeurArbreEquation>(
         _chaineResponsabilite.get(), 
         _registreSymbole, 
-        _serviceParenthese.get()
+        _serviceParenthese.get(),
+        instructionBuilder
     );
 
     initialiserRegistre();

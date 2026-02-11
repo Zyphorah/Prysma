@@ -4,7 +4,6 @@
 #include <memory>
 #include <vector>
 
-
 #include "Compilateur/AST/ConstructeurArbreEquation.h"
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/AnalyseSyntaxique/Equation/ChaineResponsabilite.h"
@@ -28,13 +27,13 @@ private:
     std::unique_ptr<ChaineResponsabilite> _chaineResponsabilite;
         
     std::shared_ptr<IConstructeurArbre> _constructeurArbre;
-    
+    IConstructeurArbre* _instructionBuilder;
 
     void initialiserRegistre();
 
 public: 
 
-    ConstructeurEquationFlottante();
+    ConstructeurEquationFlottante(IConstructeurArbre* instructionBuilder = nullptr);
     
     ~ConstructeurEquationFlottante() = default;
     

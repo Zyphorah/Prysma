@@ -16,13 +16,15 @@ private:
     ChaineResponsabilite* _chaineResponsabilite;
     std::shared_ptr<RegistreSymbole> _registreSymbole;
     IGestionnaireParenthese* _gestionnaireParenthese;
+    IConstructeurArbre* _instructionBuilder;
 
 public:
   
     ConstructeurArbreEquation(
         ChaineResponsabilite* chaineResponsabilite,
         std::shared_ptr<RegistreSymbole> registreSymbole,
-        IGestionnaireParenthese* gestionnaireParenthese
+        IGestionnaireParenthese* gestionnaireParenthese,
+        IConstructeurArbre* instructionBuilder = nullptr
     );
     
     std::shared_ptr<INoeud> construire(std::vector<Token> &equation) override;

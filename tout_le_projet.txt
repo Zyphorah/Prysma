@@ -1308,10 +1308,12 @@ std::shared_ptr<INoeud> ConstructeurArbreInstruction::construire(std::vector<Tok
 ConstructeurArbreEquation::ConstructeurArbreEquation(
     ChaineResponsabilite* chaineResponsabilite,
     std::shared_ptr<RegistreSymbole> registreSymbole,
-    IGestionnaireParenthese* gestionnaireParenthese)
+    IGestionnaireParenthese* gestionnaireParenthese,
+    IConstructeurArbre* instructionBuilder)
     : _chaineResponsabilite(chaineResponsabilite), 
       _registreSymbole(std::move(registreSymbole)), 
-      _gestionnaireParenthese(gestionnaireParenthese)
+      _gestionnaireParenthese(gestionnaireParenthese),
+      _instructionBuilder(instructionBuilder)
 {
 }
 
@@ -1328,6 +1330,12 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
     int indice = _chaineResponsabilite->trouverOperateur(equation);
 
     if (indice == -1) {
+
+        if (equation[0].type == TOKEN_CALL) {
+            int indexZero = 0;
+            return _instructionBuilder->construire(equation, indexZero);
+        }
+
         // Déterminer si c'est une référence ou déréférence
         if (equation[0].type == TOKEN_REF)
         {
@@ -1602,7 +1610,8 @@ void ConstructeurSysteme::lierLibExecutable()
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
 #include "Compilateur/AST/Noeuds/Equation/NoeudOperation.h"
 
-ConstructeurEquationFlottante::ConstructeurEquationFlottante()
+ConstructeurEquationFlottante::ConstructeurEquationFlottante(IConstructeurArbre* instructionBuilder)
+    : _instructionBuilder(instructionBuilder)
 {
     _registreSymbole = std::make_shared<RegistreSymbole>();
 
@@ -1625,7 +1634,8 @@ ConstructeurEquationFlottante::ConstructeurEquationFlottante()
     _constructeurArbre = std::make_shared<ConstructeurArbreEquation>(
         _chaineResponsabilite.get(), 
         _registreSymbole, 
-        _serviceParenthese.get()
+        _serviceParenthese.get(),
+        instructionBuilder
     );
 
     initialiserRegistre();
@@ -1653,6 +1663,11 @@ void ConstructeurEquationFlottante::initialiserRegistre()
 std::shared_ptr<INoeud> ConstructeurEquationFlottante::construire(std::vector<Token> &tokens)
 {
     return _constructeurArbre->construire(tokens);
+}
+
+IConstructeurArbre* ConstructeurEquationFlottante::recupererConstructeurArbre() const
+{
+    return _constructeurArbre.get();
 }
 #include "Compilateur/AnalyseSyntaxique/Instruction/Variable/ParseurUnRefVariable.h"
 #include "Compilateur/AST/Noeuds/Variable/NoeudUnRefVariable.h"
@@ -1903,7 +1918,8 @@ std::shared_ptr<INoeud> ParseurDeclarationFonction::parser(std::vector<Token>& t
     consommer(tokens, index, TOKEN_ACCOLADE_FERMEE, "Erreur: ce n'est pas une accolade fermée '}'");
 
     return parent; 
-}#include "Compilateur/Lexer/TokenType.h"
+}#include "Compilateur/AST/Interfaces/IConstructeurArbre.h"
+#include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurAppelFonction.h"
 #include "Compilateur/AST/Noeuds/Fonction/NoeudAppelFonction.h"
 #include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
@@ -1920,7 +1936,7 @@ ParseurAppelFonction::~ParseurAppelFonction()
 }
 
 //call nomFonction()
-std::shared_ptr<INoeud> ParseurAppelFonction::parser(std::vector<Token>& tokens, int& index, [[maybe_unused]] IConstructeurArbre* constructeurArbre) 
+std::shared_ptr<INoeud> ParseurAppelFonction::parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) 
 {
 
     consommer(tokens,index,TOKEN_CALL,"Erreur: ce n'est pas le token call, la fonction est invalid! 'call'");
@@ -1928,41 +1944,8 @@ std::shared_ptr<INoeud> ParseurAppelFonction::parser(std::vector<Token>& tokens,
     std::shared_ptr<IInstruction> parent = make_shared<NoeudAppelFonction>(nomFonction);
     consommer(tokens,index,TOKEN_PAREN_OUVERTE, "Erreur: le token est invalide!'('");
     
-    auto builder = std::make_shared<ConstructeurEquationFlottante>();
-    
-    while(index < (int)tokens.size() && tokens[index].type != TOKEN_PAREN_FERMEE)
-    {
-        size_t debutArg = index;
-        size_t finArg = index;
-        
-        int profondeurParentheses = 0;
-        while(finArg < tokens.size())
-        {
-            if(tokens[finArg].type == TOKEN_PAREN_OUVERTE) {
-                profondeurParentheses++;
-            }
-            else if(tokens[finArg].type == TOKEN_PAREN_FERMEE) {
-                if(profondeurParentheses == 0) {
-                    break;
-                }
-                profondeurParentheses--;
-            }
-            else if(tokens[finArg].type == TOKEN_VIRGULE && profondeurParentheses == 0) {
-                break;
-            }
-            finArg++;
-        }
-        
-        std::vector<Token> tokensArg(tokens.begin() + debutArg, tokens.begin() + finArg);
-        std::shared_ptr<INoeud> argument = builder->construire(tokensArg);
-        parent->ajouterInstruction(argument);
-        
-        index = finArg;
-        if(index < (int)tokens.size() && tokens[index].type == TOKEN_VIRGULE)
-        {
-            index++;
-        }
-    }
+    std::shared_ptr<ConstructeurEquationFlottante> constructeurArbreEquation = std::make_shared<ConstructeurEquationFlottante>(constructeurArbre);
+    consommerEnfantCorps(tokens, index, parent, constructeurArbreEquation->recupererConstructeurArbre(), TOKEN_PAREN_FERMEE);
     
     consommer(tokens,index,TOKEN_PAREN_FERMEE, "Erreur: le token est invalide!')'");
     consommer(tokens,index,TOKEN_POINT_VIRGULE, "Erreur: le token est invalide!';'");
@@ -2133,6 +2116,7 @@ bool ServiceParenthese::estSigneUnaire(const vector<Token>& equation, int indice
     return _registreSymbole->estOperateur(precedent.type) || precedent.type == TOKEN_PAREN_OUVERTE;
 }
 #include "Compilateur/AnalyseSyntaxique/Equation/ParseurEquation.h"
+#include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
 #include "Compilateur/Lexer/TokenCategories.h"
 #include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/GestionnaireErreur.h"
@@ -2141,14 +2125,13 @@ bool ServiceParenthese::estSigneUnaire(const vector<Token>& equation, int indice
 
 ParseurEquation::ParseurEquation()
 {
-    _floatEquationBuilder = std::make_shared<ConstructeurEquationFlottante>();
 }
 
 ParseurEquation::~ParseurEquation()
 {
 }
 
-std::shared_ptr<INoeud> ParseurEquation::parser(std::vector<Token>& tokens, int& index,[[maybe_unused]] IConstructeurArbre* constructeurArbre)
+std::shared_ptr<INoeud> ParseurEquation::parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre)
 {
     size_t debutEquation = index;
     size_t finEquation = index;
@@ -2163,12 +2146,17 @@ std::shared_ptr<INoeud> ParseurEquation::parser(std::vector<Token>& tokens, int&
 
     std::vector<Token> tokensEquation(tokens.begin() + debutEquation, tokens.begin() + finEquation);
     
-    validerEquation(tokensEquation);
+    // Ne valider que si ce n'est pas un appel de fonction (instruction)
+    if (tokensEquation.empty() || tokensEquation[0].type != TOKEN_CALL) {
+        validerEquation(tokensEquation);
+    }
     
     index = finEquation;
     consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur : ';' attendu");
 
-    return _floatEquationBuilder->construire(tokensEquation);
+ 
+    std::shared_ptr<ConstructeurEquationFlottante> constructeurFlottant = std::make_shared<ConstructeurEquationFlottante>(constructeurArbre);
+    return constructeurFlottant->construire(tokensEquation);
 }
 
 void ParseurEquation::validerEquation(const std::vector<Token>& tokensEquation) const
@@ -2770,13 +2758,15 @@ private:
     ChaineResponsabilite* _chaineResponsabilite;
     std::shared_ptr<RegistreSymbole> _registreSymbole;
     IGestionnaireParenthese* _gestionnaireParenthese;
+    IConstructeurArbre* _instructionBuilder;
 
 public:
   
     ConstructeurArbreEquation(
         ChaineResponsabilite* chaineResponsabilite,
         std::shared_ptr<RegistreSymbole> registreSymbole,
-        IGestionnaireParenthese* gestionnaireParenthese
+        IGestionnaireParenthese* gestionnaireParenthese,
+        IConstructeurArbre* instructionBuilder = nullptr
     );
     
     std::shared_ptr<INoeud> construire(std::vector<Token> &equation) override;
@@ -3595,7 +3585,6 @@ class IConstructeurArbre
 {
 public:
     virtual ~IConstructeurArbre() = default;
-    // Pour lancer la machine
     virtual std::shared_ptr<INoeud> construire(std::vector<Token>& tokens) = 0;
     // Pour la récursivité entre les parseurs
     virtual std::shared_ptr<INoeud> construire(std::vector<Token>& tokens, int& index) = 0;
@@ -3709,7 +3698,6 @@ public:
 #include <memory>
 #include <vector>
 
-
 #include "Compilateur/AST/ConstructeurArbreEquation.h"
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/AnalyseSyntaxique/Equation/ChaineResponsabilite.h"
@@ -3733,17 +3721,19 @@ private:
     std::unique_ptr<ChaineResponsabilite> _chaineResponsabilite;
         
     std::shared_ptr<IConstructeurArbre> _constructeurArbre;
-    
+    IConstructeurArbre* _instructionBuilder;
 
     void initialiserRegistre();
 
 public: 
 
-    ConstructeurEquationFlottante();
+    ConstructeurEquationFlottante(IConstructeurArbre* instructionBuilder = nullptr);
     
     ~ConstructeurEquationFlottante() = default;
     
     std::shared_ptr<INoeud> construire(std::vector<Token> &tokens);
+
+    IConstructeurArbre* recupererConstructeurArbre() const;
 };
 
 #endif /* FLOATEQUATIONBUILDER_H */#ifndef B863FD2E_67EB_4E4F_BF6B_F5DEBEF317C9
@@ -4109,15 +4099,12 @@ public:
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/AnalyseSyntaxique/Interfaces/IParseur.h"
 #include "Compilateur/AnalyseSyntaxique/ParseurBase.h"
-#include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
 #include <vector>
 #include <memory>
 
 class ParseurEquation : public IParseur, public ParseurBase
 {
 private:
-    std::shared_ptr<ConstructeurEquationFlottante> _floatEquationBuilder;
-    
     void validerEquation(const std::vector<Token>& tokensEquation) const;
     bool estOperateur(TokenType tokenType) const;
     bool estOperande(TokenType tokenType) const;
