@@ -7,8 +7,9 @@ scope {
 
    fn int main()
    {
-      dec int resultat = call test();
+      dec int resultat = 42;
       call printInt(resultat);
       return resultat;
    }
+}
 }
