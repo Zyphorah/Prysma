@@ -1,4 +1,5 @@
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
+#include "Compilateur/AST/Noeuds/NoeudInstruction.h"
 #include "Compilateur/AST/Noeuds/Operande/NoeudLitteral.h"
 #include <llvm/IR/Constants.h>
 

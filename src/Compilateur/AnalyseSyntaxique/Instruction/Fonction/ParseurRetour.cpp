@@ -16,10 +16,10 @@ ParseurRetour::~ParseurRetour()
 {
 }
 
-std::shared_ptr<INoeud> ParseurRetour::parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction)
+std::shared_ptr<INoeud> ParseurRetour::parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre)
 {
-    if (constructeurArbreInstruction == nullptr) {
-        throw ErreurCompilation("Erreur : ConstructeurArbreInstruction est null dans ParsingReturn", 1, 1);
+    if (constructeurArbre == nullptr) {
+        throw ErreurCompilation("Erreur : IConstructeurArbre est null dans ParsingReturn", 1, 1);
     }
     
     consommer(tokens, index, TOKEN_RETOUR, "Erreur: ce n'est pas le bon token ! 'return'");
@@ -28,7 +28,7 @@ std::shared_ptr<INoeud> ParseurRetour::parser(std::vector<Token>& tokens, int& i
 
     if (index < (int)tokens.size() && tokens[index].type != TOKEN_POINT_VIRGULE) {
         ParseurEquation parseurEquation;  
-        valeurRetour = parseurEquation.parser(tokens, index, constructeurArbreInstruction);
+        valeurRetour = parseurEquation.parser(tokens, index, constructeurArbre);
     } else {
         consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur: point-virgule attendu après return");
     }

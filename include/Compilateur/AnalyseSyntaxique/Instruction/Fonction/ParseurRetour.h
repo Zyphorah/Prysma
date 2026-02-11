@@ -14,7 +14,7 @@ public:
     
     ~ParseurRetour();
 
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction) override;
+    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) override;
 };
 
 #endif /* F39730D3_0913_46B1_91E5_676A85D4CABB */

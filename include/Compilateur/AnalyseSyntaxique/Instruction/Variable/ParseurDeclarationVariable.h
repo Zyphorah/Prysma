@@ -18,7 +18,7 @@ public:
     ParseurDeclarationVariable();
     ~ParseurDeclarationVariable();
 
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction) override;
+    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) override;
 };
 
 #endif /* F7H8I9J0_K1L2M3N4_O5P6Q7R8_S9T0U1V2 */

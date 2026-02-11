@@ -75,3 +75,23 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
     noeud->ajouterExpression(exprGauche, exprDroite);
     return noeud;
 }
+
+std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>& tokens, int& index) {
+    // Pour ConstructeurArbreEquation, on crée un vecteur contenant les tokens à partir de l'index
+    // jusqu'au prochain point-virgule ou fin, ou jusqu'à un token qui n'appartient pas à l'équation
+    // Temporaire pour les testes je ne vais pas garder une grosse condition comme ça
+    std::vector<Token> equationTokens;
+    while(index < (int)tokens.size() && 
+          tokens[index].type != TOKEN_POINT_VIRGULE &&
+          tokens[index].type != TOKEN_ACCOLADE_FERMEE &&
+          tokens[index].type != TOKEN_PAREN_FERMEE &&
+          tokens[index].type != TOKEN_VIRGULE) {
+        equationTokens.push_back(tokens[index]);
+        index++;
+    }
+    // Avancer l'index si on est sur un point-virgule
+    if(index < (int)tokens.size() && tokens[index].type == TOKEN_POINT_VIRGULE) {
+        index++;
+    }
+    return construire(equationTokens);
+}

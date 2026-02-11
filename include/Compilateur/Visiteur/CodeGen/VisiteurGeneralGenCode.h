@@ -5,11 +5,25 @@
 #include <llvm-18/llvm/IR/Value.h>
 #include "Compilateur/AST/Registre/ContextGenCode.h"
 #include "Compilateur/AST/Noeuds/Equation/NoeudOperation.h"
+#include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
 #include <memory>
 
 //Outils 
 class RegistreVariable;
 class LlvmBackend;
+class NoeudInstruction;
+class NoeudScope;
+class NoeudAffectationVariable;
+class NoeudDeclarationVariable;
+class NoeudAppelFonction;
+class NoeudRetour;
+class NoeudArgFonction;
+class NoeudDeclarationFonction;
+class NoeudLitteral;
+class NoeudUnRefVariable;
+class NoeudRefVariable;
+class NoeudIf;
+class NoeudElse;
 
 class VisiteurGeneralGenCode : public IVisiteur
 {

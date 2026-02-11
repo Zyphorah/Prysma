@@ -16,7 +16,7 @@ Token ParseurBase::consommer(std::vector<Token>& tokens, int& index, TokenType t
     return tokens[index++];
 }
 
-void ParseurBase::consommerEnfantCorps(std::vector<Token>& tokens, int& index , const std::shared_ptr<IInstruction>& parent, ConstructeurArbreInstruction* constructeurArbreInstruction,TokenType fin)
+void ParseurBase::consommerEnfantCorps(std::vector<Token>& tokens, int& index , const std::shared_ptr<IInstruction>& parent, IConstructeurArbre* constructeurArbre,TokenType fin)
 {
     while(index < (int)tokens.size() && tokens[index].type != fin)
     {
@@ -27,7 +27,7 @@ void ParseurBase::consommerEnfantCorps(std::vector<Token>& tokens, int& index , 
             continue;
         }
         
-        std::shared_ptr<INoeud> enfant = constructeurArbreInstruction->construire(tokens, index);
+        std::shared_ptr<INoeud> enfant = constructeurArbre->construire(tokens, index);
         parent->ajouterInstruction(enfant);
     }
 }

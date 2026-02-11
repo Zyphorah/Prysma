@@ -15,7 +15,7 @@ ParseurAppelFonction::~ParseurAppelFonction()
 }
 
 //call nomFonction()
-std::shared_ptr<INoeud> ParseurAppelFonction::parser(std::vector<Token>& tokens, int& index, [[maybe_unused]] ConstructeurArbreInstruction* constructeurArbreInstruction) 
+std::shared_ptr<INoeud> ParseurAppelFonction::parser(std::vector<Token>& tokens, int& index, [[maybe_unused]] IConstructeurArbre* constructeurArbre) 
 {
 
     consommer(tokens,index,TOKEN_CALL,"Erreur: ce n'est pas le token call, la fonction est invalid! 'call'");

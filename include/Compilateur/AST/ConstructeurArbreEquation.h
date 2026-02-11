@@ -26,4 +26,5 @@ public:
     );
     
     std::shared_ptr<INoeud> construire(std::vector<Token> &equation) override;
+    std::shared_ptr<INoeud> construire(std::vector<Token>& tokens, int& index) override;
 };

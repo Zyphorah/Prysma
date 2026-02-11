@@ -16,7 +16,7 @@ public:
     ~ConstructeurArbreInstruction();
 
     std::shared_ptr<INoeud> construire(std::vector<Token>& tokens) override;  
-    std::shared_ptr<INoeud> construire(std::vector<Token>& tokens, int& index);
+    std::shared_ptr<INoeud> construire(std::vector<Token>& tokens, int& index) override;
 
 };
 

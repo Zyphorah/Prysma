@@ -14,7 +14,7 @@ ParseurEquation::~ParseurEquation()
 {
 }
 
-std::shared_ptr<INoeud> ParseurEquation::parser(std::vector<Token>& tokens, int& index,[[maybe_unused]] ConstructeurArbreInstruction* constructeurArbreInstruction)
+std::shared_ptr<INoeud> ParseurEquation::parser(std::vector<Token>& tokens, int& index,[[maybe_unused]] IConstructeurArbre* constructeurArbre)
 {
     size_t debutEquation = index;
     size_t finEquation = index;

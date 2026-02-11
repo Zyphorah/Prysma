@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
 #include <llvm/IR/Value.h>
+
+class IVisiteur;
 
 class INoeud {
 public:

@@ -11,7 +11,7 @@ public:
 
     ParseurAppelFonction();
     ~ParseurAppelFonction();
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction) override;
+    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) override;
 
 };
 

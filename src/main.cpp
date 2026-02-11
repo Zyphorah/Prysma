@@ -1,5 +1,6 @@
 #include "Compilateur/AST/Noeuds/NoeudInstruction.h"
 #include "Compilateur/AST/Registre/ContextGenCode.h"
+#include "Compilateur/AST/ConstructeurArbreInstruction.h"
 #include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/AST/Registre/Pile/RetourContexteCompilation.h"
 #include "Compilateur/AST/Registre/RegistreArgument.h"

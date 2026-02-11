@@ -9,7 +9,10 @@ class IConstructeurArbre
 {
 public:
     virtual ~IConstructeurArbre() = default;
+    // Pour lancer la machine
     virtual std::shared_ptr<INoeud> construire(std::vector<Token>& tokens) = 0;
+    // Pour la récursivité entre les parseurs
+    virtual std::shared_ptr<INoeud> construire(std::vector<Token>& tokens, int& index) = 0;
 };
 
 #endif /* EEA73704_BBAE_43AD_9799_F1F919E04250 */

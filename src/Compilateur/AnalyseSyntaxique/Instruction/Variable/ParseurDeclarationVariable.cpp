@@ -13,7 +13,7 @@ ParseurDeclarationVariable::~ParseurDeclarationVariable()
 {
 }
 
-std::shared_ptr<INoeud> ParseurDeclarationVariable::parser(std::vector<Token>& tokens, int& index, ConstructeurArbreInstruction* constructeurArbreInstruction)
+std::shared_ptr<INoeud> ParseurDeclarationVariable::parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre)
 {
     consommer(tokens,index,TOKEN_DEC,"Erreur : type attendu 'dec");
     
@@ -30,7 +30,7 @@ std::shared_ptr<INoeud> ParseurDeclarationVariable::parser(std::vector<Token>& t
     consommer(tokens, index, TOKEN_EGAL, "Erreur : '=' attendu après le nom de variable");
     
     ParseurEquation parseurEquation{};
-    std::shared_ptr<INoeud> expression = parseurEquation.parser(tokens, index, constructeurArbreInstruction);
+    std::shared_ptr<INoeud> expression = parseurEquation.parser(tokens, index, constructeurArbre);
 
     return std::make_shared<NoeudDeclarationVariable>(
         nomVariable,
