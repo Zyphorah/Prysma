@@ -1,15 +1,18 @@
 scope {
-  
-   fn int test()
+   fn int fact_accum(arg int produit, arg int n)
    {
-      return 2;
+      aff produit =  produit * n;     
+      call printInt( produit);       
+      dec int suivant = n + 1;
+      call fact_accum( produit, n);
+      return produit;
    }
-   
+
    fn int main()
    {
-      dec int resultat = call test();
-  
-      call printInt(resultat);
+      dec int resultat = 1;   
+      dec int nombre = 2;             
+      call fact_accum(resultat, nombre);    
       return resultat;
    }
 }
