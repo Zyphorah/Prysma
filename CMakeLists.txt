@@ -54,6 +54,7 @@ set(SOURCES
     src/Compilateur/AnalyseSyntaxique/ParseurBase.cpp
     src/Compilateur/AnalyseSyntaxique/Instruction/Condition/ParseurElse.cpp
     src/Compilateur/AnalyseSyntaxique/Instruction/Condition/ParseurElse.cpp
+    src/Compilateur/AnalyseSyntaxique/Instruction/Condition/ParseurIf.cpp
     # ConstructeurArbre
     src/Compilateur/AST/ConstructeurArbreEquation.cpp
     src/Compilateur/AST/ConstructeurArbreInstruction.cpp

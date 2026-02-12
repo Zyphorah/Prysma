@@ -36,19 +36,19 @@ ConstructeurEquationFlottante::ConstructeurEquationFlottante(IConstructeurArbre*
 void ConstructeurEquationFlottante::initialiserRegistre()
 {
     _registreSymbole->enregistrer(TOKEN_PLUS, []() -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(OP_ADDITION); 
+        return std::make_shared<NoeudOperation>(TOKEN_PLUS); 
     });
 
     _registreSymbole->enregistrer(TOKEN_MOINS, []() -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(OP_SOUSTRACTION); 
+        return std::make_shared<NoeudOperation>(TOKEN_MOINS); 
     });
 
     _registreSymbole->enregistrer(TOKEN_ETOILE, []() -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(OP_MULTIPLICATION); 
+        return std::make_shared<NoeudOperation>(TOKEN_ETOILE); 
     });
 
     _registreSymbole->enregistrer(TOKEN_SLASH, []() -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(OP_DIVISION); 
+        return std::make_shared<NoeudOperation>(TOKEN_SLASH); 
     });
 }
 

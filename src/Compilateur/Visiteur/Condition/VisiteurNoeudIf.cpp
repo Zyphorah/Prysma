@@ -2,5 +2,5 @@
 
 void VisiteurGeneralGenCode::visiter(NoeudIf* noeudIf) 
 {
-
+    
 }

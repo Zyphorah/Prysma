@@ -3,23 +3,17 @@
 #pragma once
 
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
+#include "Compilateur/Lexer/TokenType.h"
 #include <memory>
-
-enum TypeOperation {
-    OP_ADDITION,
-    OP_SOUSTRACTION,
-    OP_MULTIPLICATION,
-    OP_DIVISION
-};
 
 class NoeudOperation : public IExpression {
 private:
-    TypeOperation typeOperation;
+    TokenType typeOperation;
     std::shared_ptr<INoeud> gauche;
     std::shared_ptr<INoeud> droite;
 
 public:
-    explicit NoeudOperation(TypeOperation type);
+    explicit NoeudOperation(TokenType type);
 
     void setGauche(std::shared_ptr<INoeud> gauche_node) { gauche = std::move(gauche_node); }
     void setDroite(std::shared_ptr<INoeud> droite_node) { droite = std::move(droite_node); }

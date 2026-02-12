@@ -21,16 +21,16 @@ void VisiteurGeneralGenCode::visiter(NoeudOperation* noeud)
     auto& builder = _contextGenCode->backend->getBuilder();
 
     switch (noeud->typeOperation) {
-        case OP_ADDITION:
+        case TOKEN_PLUS:
             resultat = builder.CreateFAdd(valGauche, valDroite, "addtmp");
             break;
-        case OP_SOUSTRACTION:
+        case TOKEN_MOINS:
             resultat = builder.CreateFSub(valGauche, valDroite, "subtmp");
             break;
-        case OP_MULTIPLICATION:
+        case TOKEN_ETOILE:
             resultat = builder.CreateFMul(valGauche, valDroite, "multmp");
             break;
-        case OP_DIVISION:
+        case TOKEN_SLASH:
             resultat = builder.CreateFDiv(valGauche, valDroite, "divtmp");
             break;
         default:

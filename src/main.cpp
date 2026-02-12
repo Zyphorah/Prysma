@@ -5,6 +5,8 @@
 #include "Compilateur/AST/Registre/Pile/RetourContexteCompilation.h"
 #include "Compilateur/AST/Registre/RegistreArgument.h"
 #include "Compilateur/AST/Registre/RegistreFonction.h"
+#include "Compilateur/AnalyseSyntaxique/Instruction/Condition/ParseurElse.h"
+#include "Compilateur/AnalyseSyntaxique/Instruction/Condition/ParseurIf.h"
 #include "Compilateur/LLVM/LlvmBackend.h"
 #include "Compilateur/LLVM/LlvmSerializer.h"
 #include "Compilateur/Lexer/Lexer.h"
@@ -97,6 +99,8 @@ int main(int argc, char* argv[])
         context->registreInstruction->enregistrer(TOKEN_ARG, std::make_shared<ParseurArgFonction>());
         context->registreInstruction->enregistrer(TOKEN_UNREF, std::make_shared<ParseurUnRefVariable>());
         context->registreInstruction->enregistrer(TOKEN_REF, std::make_shared<ParseurRefVariable>());
+        context->registreInstruction->enregistrer(TOKEN_SI, std::make_shared<ParseurIf>());
+        context->registreInstruction->enregistrer(TOKEN_SINON, std::make_shared<ParseurElse>());
 
         ConstructeurArbreInstruction constructeurArbreInstruction(context->registreInstruction);
         std::shared_ptr<INoeud> arbre = constructeurArbreInstruction.construire(tokens);
