@@ -52,8 +52,6 @@ set(SOURCES
     src/Compilateur/AnalyseSyntaxique/Instruction/Variable/ParseurRefVariable.cpp
     src/Compilateur/AnalyseSyntaxique/Instruction/Variable/ParseurUnRefVariable.cpp
     src/Compilateur/AnalyseSyntaxique/ParseurBase.cpp
-    src/Compilateur/AnalyseSyntaxique/Instruction/Condition/ParseurElse.cpp
-    src/Compilateur/AnalyseSyntaxique/Instruction/Condition/ParseurElse.cpp
     src/Compilateur/AnalyseSyntaxique/Instruction/Condition/ParseurIf.cpp
     # ConstructeurArbre
     src/Compilateur/AST/ConstructeurArbreEquation.cpp
@@ -72,6 +70,9 @@ set(SOURCES
     src/Compilateur/AST/Noeuds/Variable/NoeudRefVariable.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudUnRefVariable.cpp
     src/Compilateur/AST/Noeuds/Condition/NoeudIf.cpp
+    src/Compilateur/AST/Noeuds/Condition/NoeudBlocIf.cpp
+    src/Compilateur/AST/Noeuds/Condition/NoeudBlocElse.cpp
+    src/Compilateur/AST/Noeuds/Condition/NoeudBlocEndif.cpp
     src/Compilateur/AST/Registre/RegistreArgument.cpp
     src/Compilateur/AST/Registre/RegistreVariable.cpp
     src/Compilateur/AST/Registre/ReturnContextCompilation.cpp
@@ -98,8 +99,6 @@ set(SOURCES
     src/Compilateur/Visiteur/VisiteurInstruction.cpp
     src/Compilateur/Visiteur/VisiteurScope.cpp
     src/Compilateur/Visiteur/Condition/VisiteurNoeudIf.cpp
-    src/Compilateur/Visiteur/Condition/VisiteurNoeudElse.cpp
-    src/Compilateur/AST/Noeuds/Condition/NoeudElse.cpp
 
     src/Lib/Print.cpp
     src/main.cpp
