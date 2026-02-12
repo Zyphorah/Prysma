@@ -85,14 +85,41 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
 }
 
 std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>& tokens, int& index) {
+
+    // Système de niveau pour calculer la profondeur, c'est obligatoire pour ne pas avoir de problème au niveau de la séparation 34+4)) sinon le 
+    // Système ne sais pas quoi faire avec les deux parenthèses restante. 
+    
+    if (index < (int)tokens.size() && tokens[index].type == TOKEN_CALL && _instructionBuilder != nullptr) {
+        return _instructionBuilder->construire(tokens, index);
+    }
+
     std::vector<Token> equationTokens;
-    while(index < (int)tokens.size() && 
-          tokens[index].type != TOKEN_POINT_VIRGULE &&
-          tokens[index].type != TOKEN_ACCOLADE_FERMEE &&
-          tokens[index].type != TOKEN_PAREN_FERMEE &&
-          tokens[index].type != TOKEN_VIRGULE) {
+    int parenProfondeur = 0;
+
+    while(index < (int)tokens.size()) {
+        TokenType type = tokens[index].type;
+
+        if (type == TOKEN_PAREN_OUVERTE) {
+            parenProfondeur++;
+        }
+        else if (type == TOKEN_PAREN_FERMEE) {
+            if (parenProfondeur == 0) {
+                break; 
+            }
+            parenProfondeur--;
+        }
+        
+        if (parenProfondeur == 0) {
+            if (type == TOKEN_POINT_VIRGULE || 
+                type == TOKEN_ACCOLADE_FERMEE || 
+                type == TOKEN_VIRGULE) {
+                break;
+            }
+        }
+
         equationTokens.push_back(tokens[index]);
         index++;
     }
+
     return construire(equationTokens);
 }

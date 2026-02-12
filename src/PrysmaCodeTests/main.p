@@ -2,14 +2,14 @@ scope {
   
    fn int test()
    {
-      return 10;
+      return 2;
    }
-
+   
    fn int main()
    {
-      dec int resultat = 42;
+      dec int resultat = call test();
+  
       call printInt(resultat);
       return resultat;
    }
-}
 }
