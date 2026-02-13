@@ -54,6 +54,7 @@ set(SOURCES
     src/Compilateur/AnalyseSyntaxique/Instruction/Variable/ParseurUnRefVariable.cpp
     src/Compilateur/AnalyseSyntaxique/ParseurBase.cpp
     src/Compilateur/AnalyseSyntaxique/Instruction/Condition/ParseurIf.cpp
+    src/Compilateur/AnalyseSyntaxique/Instruction/Boucle/ParseurWhile.cpp
     # ConstructeurArbre
     src/Compilateur/AST/ConstructeurArbreEquation.cpp
     src/Compilateur/AST/ConstructeurArbreInstruction.cpp
@@ -71,6 +72,8 @@ set(SOURCES
     src/Compilateur/AST/Noeuds/Variable/NoeudRefVariable.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudUnRefVariable.cpp
     src/Compilateur/AST/Noeuds/Condition/NoeudIf.cpp
+    src/Compilateur/AST/Noeuds/Boucle/NoeudWhile.cpp
+    # Arbre syntaxique abstrait
     src/Compilateur/AST/Registre/RegistreArgument.cpp
     src/Compilateur/AST/Registre/RegistreVariable.cpp
     src/Compilateur/AST/Registre/ReturnContextCompilation.cpp
@@ -84,6 +87,7 @@ set(SOURCES
     src/Compilateur/TraitementFichier/FichierEcriture.cpp
     src/Compilateur/TraitementFichier/FichierLecture.cpp
     src/Compilateur/Visiteur/Fonction/VisiteurAppelFonction.cpp
+    src/Compilateur/Visiteur/Boucle/VisiteurNoeudWhile.cpp
     # Visiteur 
     src/Compilateur/Visiteur/Fonction/VisiteurArgFonction.cpp
     src/Compilateur/Visiteur/Fonction/VisiteurDeclarationFonction.cpp
@@ -97,8 +101,7 @@ set(SOURCES
     src/Compilateur/Visiteur/VisiteurInstruction.cpp
     src/Compilateur/Visiteur/VisiteurScope.cpp
     src/Compilateur/Visiteur/Condition/VisiteurNoeudIf.cpp
-
-    src/Lib/Print.cpp
+    src/Compilateur/Visiteur/Boucle/VisiteurNoeudWhile.cpp
     src/main.cpp
 )
 

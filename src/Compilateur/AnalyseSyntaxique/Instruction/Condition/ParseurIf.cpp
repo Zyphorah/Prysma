@@ -40,7 +40,6 @@ std::shared_ptr<INoeud> ParseurIf::parser(std::vector<Token>& tokens, int& index
     // Créer le noeud bloc ENDIF
     std::shared_ptr<NoeudInstruction> noeudBlocEndif = std::make_shared<NoeudInstruction>();
 
-    // Créer le noeud if en injectant la condition, le bloc if, le bloc else et le bloc endif dans le constructeur
     std::shared_ptr<NoeudIf> noeudIf = std::make_shared<NoeudIf>(std::move(condition), std::move(noeudBlocIf), std::move(noeudBlocElse), std::move(noeudBlocEndif));
 
     return noeudIf;
