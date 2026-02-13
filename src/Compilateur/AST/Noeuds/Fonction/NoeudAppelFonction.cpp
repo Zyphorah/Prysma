@@ -2,6 +2,7 @@
 
 NoeudAppelFonction::NoeudAppelFonction(Token nomFonction) : _nomFonction(std::move(nomFonction))
 {
+    
 }
 
 NoeudAppelFonction::~NoeudAppelFonction()

@@ -27,12 +27,12 @@ class GestionFonction
         llvm::Function* creerFonction(llvm::Type* typeDeRetour, const ArgumentsCodeGen& argumentsCodeGen);
         void enregistrerFonction(llvm::Function* function);
         void initialiserContexte();
-        void traiterArguments(llvm::Function* function, const ArgumentsCodeGen& argumentsCodeGen);
+        void traiterArgumentsConstruit(llvm::Function* function, const ArgumentsCodeGen& argumentsCodeGen);
         void traiterCorpsFonction();
         void finaliserContexte();
 
         // Appel de fonction
-        void traiterArguments(NoeudAppelFonction* noeudAppelFonction);
+        void passArguments(NoeudAppelFonction* noeudAppelFonction);
         llvm::Function* obtenirFonction(const std::string& nomFonction);
         void genererAppelFonction(llvm::Function* fonction);
       

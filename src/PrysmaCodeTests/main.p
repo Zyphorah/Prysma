@@ -1,20 +1,24 @@
 scope {
+   fn int fib(arg int n) {
+      
+      if (n <= 1) {
+         return n;
+      }
+   
+      dec int un = n-1; 
+      dec int deux = n-2;
+      dec int fib_un = call fib(un);
+      dec int fib_deux = call fib(deux);
+      
+      dec int res = fib_un + fib_deux;
+   
+      return res;
+   }
 
    fn int main() {
-   
-      if (10<=(1+50))
-      {
-         dec int a = 10;
-         call printInt(a);
-      }
-      else
-      {
-         dec int c = 20;
-         call printInt(c);
-      }
-
-      
-      
+      dec int n = 7; 
+      dec int res = call fib(n);
+      call printInt(res);
       return 0;
    }
 }

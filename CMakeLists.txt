@@ -41,6 +41,7 @@ set(SOURCES
     src/Compilateur/AnalyseSyntaxique/Equation/ChaineResponsabilite.cpp
     src/Compilateur/AnalyseSyntaxique/Equation/GestionnaireOperateur.cpp
     src/Compilateur/AnalyseSyntaxique/Equation/ParseurEquation.cpp
+    src/Compilateur/AnalyseSyntaxique/Equation/ParseurInstructionAppel.cpp
     src/Compilateur/AnalyseSyntaxique/Equation/ServiceParenthese.cpp
     src/Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurAppelFonction.cpp
     src/Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurArgFonction.cpp

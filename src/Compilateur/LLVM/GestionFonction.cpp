@@ -1,3 +1,4 @@
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/LLVM/GenerateurFonction.h"
 #include "Compilateur/AST/Noeuds/Fonction/NoeudAppelFonction.h"
 #include "Compilateur/AST/Registre/ContextGenCode.h"
@@ -80,7 +81,7 @@ void GestionFonction::initialiserContexte()
 }
 
 
-void GestionFonction::traiterArguments(llvm::Function* function, const ArgumentsCodeGen& argumentsCodeGen)
+void GestionFonction::traiterArgumentsConstruit(llvm::Function* function, const ArgumentsCodeGen& argumentsCodeGen)
 {
     size_t argIndex = 0;
     for (auto* noeudArg : argumentsCodeGen.arguments) {
@@ -120,20 +121,39 @@ void GestionFonction::finaliserContexte()
 }
 
 
-void GestionFonction::traiterArguments(NoeudAppelFonction* noeudAppelFonction)
+void GestionFonction::passArguments(NoeudAppelFonction* noeudAppelFonction)
 {
     _contextGenCode->registreArgument->vider();
+
+    std::string nomFonction = noeudAppelFonction->_nomFonction.value;
+    llvm::Function* fonctionCible = _contextGenCode->registreFonction->recuperer(nomFonction);
+
+    llvm::FunctionType* typeFonction = fonctionCible->getFunctionType();
     
-    for (const auto& argumentEnfant : noeudAppelFonction->getEnfants()) 
+
+    unsigned int indexParam = 0; 
+
+    for (const std::shared_ptr<INoeud>& argumentEnfant : noeudAppelFonction->getEnfants()) 
     {
+
         argumentEnfant->accept(_visiteurGeneralCodeGen);
         llvm::Value* valeurArgument = _contextGenCode->valeurTemporaire;
 
         if (valeurArgument == nullptr) {
-            throw std::runtime_error("Erreur : L'argument passé à la fonction " + noeudAppelFonction->_nomFonction.value + " n'a pas généré de valeur.");
+            throw std::runtime_error("Erreur : L'argument n'a pas généré de valeur.");
         }
 
-        _contextGenCode->registreArgument->ajouter(valeurArgument);
+        llvm::Value* valeurFinale = valeurArgument;
+
+        if (indexParam < typeFonction->getNumParams()) {
+            
+            llvm::Type* typeAttendu = typeFonction->getParamType(indexParam);
+            valeurFinale = _contextGenCode->backend->creerAutoCast(valeurArgument, typeAttendu);
+        }
+
+        _contextGenCode->registreArgument->ajouter(valeurFinale);
+        
+        indexParam++;
     }
 }
 
@@ -171,7 +191,7 @@ void GestionFonction::declarerFonction()
     llvm::Function* function = creerFonction(typeDeRetour, argumentsCodeGen);
     enregistrerFonction(function);
     initialiserContexte();
-    traiterArguments(function, argumentsCodeGen);
+    traiterArgumentsConstruit(function, argumentsCodeGen);
     traiterCorpsFonction();
     finaliserContexte();
 
@@ -180,7 +200,7 @@ void GestionFonction::declarerFonction()
 
 void GestionFonction::genererAppelFonction(NoeudAppelFonction* noeudAppelFonction)
 {
-    traiterArguments(noeudAppelFonction);
+    passArguments(noeudAppelFonction);
     llvm::Function* fonction = obtenirFonction(noeudAppelFonction->_nomFonction.value);
     genererAppelFonction(fonction);
 }

@@ -5,6 +5,7 @@
 #include "Compilateur/AST/Registre/Pile/RetourContexteCompilation.h"
 #include "Compilateur/AST/Registre/RegistreArgument.h"
 #include "Compilateur/AST/Registre/RegistreFonction.h"
+#include "Compilateur/AnalyseSyntaxique/Equation/ParseurInstructionAppel.h"
 #include "Compilateur/AnalyseSyntaxique/Instruction/Condition/ParseurIf.h"
 #include "Compilateur/LLVM/LlvmBackend.h"
 #include "Compilateur/LLVM/LlvmSerializer.h"
@@ -41,7 +42,6 @@ int main(int argc, char* argv[])
     std::string nomFichier = std::filesystem::path(cheminFichier).string(); 
     
     try {
-
         std::shared_ptr<LlvmBackend> backend = std::make_shared<LlvmBackend>();
         std::shared_ptr<RegistreInstruction> registreInstruction = std::make_shared<RegistreInstruction>();
         std::shared_ptr<RegistreVariable> registreVariable = std::make_shared<RegistreVariable>();
@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
         context->registreInstruction->enregistrer(TOKEN_FONCTION, std::make_shared<ParseurDeclarationFonction>());
         context->registreInstruction->enregistrer(TOKEN_AFF, std::make_shared<ParseurAffectationVariable>(context->backend, context->registreVariable, context->registreType));
         context->registreInstruction->enregistrer(TOKEN_DEC, std::make_shared<ParseurDeclarationVariable>());
-        context->registreInstruction->enregistrer(TOKEN_CALL, std::make_shared<ParseurAppelFonction>());
+        context->registreInstruction->enregistrer(TOKEN_CALL, std::make_shared<ParseurInstructionAppel>());
         context->registreInstruction->enregistrer(TOKEN_RETOUR, std::make_shared<ParseurRetour>());
         context->registreInstruction->enregistrer(TOKEN_ARG, std::make_shared<ParseurArgFonction>());
         context->registreInstruction->enregistrer(TOKEN_UNREF, std::make_shared<ParseurUnRefVariable>());

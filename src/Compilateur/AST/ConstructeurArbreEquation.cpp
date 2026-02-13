@@ -5,6 +5,7 @@
 #include <vector>
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
 #include "Compilateur/AST/Noeuds/Operande/NoeudLitteral.h"
+#include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurAppelFonction.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/AST/Noeuds/Variable/NoeudUnRefVariable.h"
@@ -37,8 +38,11 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
     if (indice == -1) {
 
         if (equation[0].type == TOKEN_CALL) {
+  
+            ParseurAppelFonction parseurAppel;
             int indexZero = 0;
-            return _instructionBuilder->construire(equation, indexZero);
+            std::vector<Token> equationAvecIndex = equation;
+            return parseurAppel.parser(equationAvecIndex, indexZero, _instructionBuilder);
         }
 
         // Déterminer si c'est une référence ou déréférence
@@ -62,7 +66,7 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
         
         if (equation[0].type == TOKEN_IDENTIFIANT && equation.size() == 1) {
      
-            return std::make_shared<NoeudUnRefVariable>(equation[0].value);
+            return std::make_shared<NoeudUnRefVariable>(equation[0].value); 
         }
         
         try {
@@ -74,7 +78,7 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
     }
     
     std::shared_ptr<IExpression> noeud = _registreSymbole->recupererNoeud(equation[indice].type);
-    std::vector<Token> gauche(equation.begin(), equation.begin() + indice);
+    std::vector<Token> gauche(equation.begin(), equation.begin() + indice); 
     std::vector<Token> droite(equation.begin() + indice + 1, equation.end());
     
     std::shared_ptr<INoeud> exprGauche = construire(gauche);
@@ -90,9 +94,11 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
     // Système ne sais pas quoi faire avec les deux parenthèses restante. 
     
     if (index < (int)tokens.size() && tokens[index].type == TOKEN_CALL && _instructionBuilder != nullptr) {
-        return _instructionBuilder->construire(tokens, index);
+        // Déléguer au parseur d'expression directement
+        ParseurAppelFonction parseurAppel;
+        return parseurAppel.parser(tokens, index, _instructionBuilder);
     }
-
+    
     std::vector<Token> equationTokens;
     int parenProfondeur = 0;
 
