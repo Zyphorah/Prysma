@@ -27,7 +27,6 @@ scope
 
 
 // calculer une factoriel sans condition 
-
 scope {
    fn int fact_accum(arg int produit, arg int n)
    {

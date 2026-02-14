@@ -134,3 +134,14 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
 - Ajouter la gestion manuelle de la mémoire avec les pointeurs pour un contrôle bas niveau
 - Fournir des fonctions natives pour les calculs avancés (puissance, PGCD, vérification de nombres premiers)
 - Supporter la (Factorielle, Fibonacci) avec une gestion appropriée de la pile d'exécution
+- Faire une forêt de syntaxe abstraite compilé chaque fichier séparément pour permettre la compilation de gros projets
+- Faire un système de cache pour éviter de recompiler les fichier qui n'on pas été modifié, utiliser un hash du contenu du fichier pour vérifier s'il a été modifié ou pas.
+- L'Assembleur en ligne (asm) pour permettre d'inclure du code assembleur directement dans le code source Prysma, ce qui permettrait de controller directement le cpu. 
+- Faire un enum class pour les types de données. 
+- Ajouter un système de compile time pour permettre d'exécuter du code au moment de la compilation. 
+- Ajouter un système de macro pour permettre de faire du code générique.
+- Système de Modules et Namespaces pour organiser le code en différentes unités de compilation et éviter les conflits de noms.
+- Supporter les fonctions lambda pour permettre de faire des fonctions anonymes et de la programmation fonctionnelle.
+- La Généricité (Templates / Generics) 
+- méta programmation pour permettre d'exécuter du code au moment de la compilation, ce qui permettrait de faire des optimisations au moment de la compilation.
+- Compilation just in-time (JIT) pour permettre d'exécuter du code directement sans passer par la phase de compilation, ce qui permettrait de faire du scripting avec le langage Prysma.
