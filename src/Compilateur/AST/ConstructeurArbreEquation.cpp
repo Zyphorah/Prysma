@@ -5,6 +5,7 @@
 #include <vector>
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
 #include "Compilateur/AST/Noeuds/Operande/NoeudLitteral.h"
+#include "Compilateur/AST/Noeuds/Operande/NoeudNegation.h"
 #include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurAppelFonction.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenType.h"
@@ -62,6 +63,17 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
                 throw std::runtime_error("Erreur: 'unref' doit être suivi d'un identifiant");
             }
             return std::make_shared<NoeudUnRefVariable>(equation[1].value);
+        }
+        
+        if (equation[0].type == TOKEN_NON)
+        {
+            // Créer un noeud de négation avec l'expression suivante
+            if (equation.size() < 2) {
+                throw std::runtime_error("Erreur: '!' doit être suivi d'une expression");
+            }
+            std::vector<Token> operande(equation.begin() + 1, equation.end());
+            std::shared_ptr<INoeud> exprOperande = construire(operande);
+            return std::make_shared<NoeudNegation>(equation[0], exprOperande);
         }
         
         if (equation[0].type == TOKEN_LIT_INT || equation[0].type == TOKEN_LIT_FLOAT || equation[0].type == TOKEN_LIT_BOLEEN) {

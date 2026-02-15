@@ -27,7 +27,8 @@ enum TokenType {
     TOKEN_EGAL_EGAL,
     TOKEN_DIFFERENT,
     TOKEN_ET,          
-    TOKEN_OU,         
+    TOKEN_OU,
+    TOKEN_NON,         
 
     // Structure
     TOKEN_PAREN_OUVERTE,

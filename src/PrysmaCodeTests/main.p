@@ -1,9 +1,15 @@
 // fibonaci
 scope {
+   fn bool test()
+   {
+      return true;
+   }
  
    fn int main() {
-      dec int n1 = -10;
-      call printInt(n1);
+      dec bool a = !false;
+
+      call printBool(a);
+
       return 0;
    }
 }
