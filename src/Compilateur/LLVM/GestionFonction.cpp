@@ -173,6 +173,7 @@ llvm::Function* GestionFonction::obtenirFonction(const std::string& nomFonction)
 void GestionFonction::genererAppelFonction(llvm::Function* fonction)
 {
     std::vector<llvm::Value*> args = *_contextGenCode->registreArgument->recuperer();
+    _contextGenCode->registreArgument->vider();
 
     _contextGenCode->valeurTemporaire = _contextGenCode->backend->getBuilder().CreateCall(
         fonction, 
