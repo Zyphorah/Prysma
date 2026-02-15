@@ -1,21 +1,26 @@
+// fibonaci
 scope {
-
-   fn bool testPassArgFonction(arg int a)
-   {  
-      if (a<= 10) {
-         return true;
-      } else {
-         return false;
+   fn int fib(arg int n) {
+      
+      if (n <= 1) {
+         return n;
       }
-
-      return false;
+      else
+      {
+         dec int un = n-1; 
+         dec int deux = n-2;
+         dec int fib_un = call fib(un);
+         dec int fib_deux = call fib(deux);
+         
+         dec int res = fib_un + fib_deux;
+      }
+      return res;
    }
 
-   fn int main()
-   {
-      dec int a = 10;
-      call printBool(call testPassArgFonction(a));
- 
-      return 1;
+   fn int main() {
+      dec int n = 7; 
+      dec int res = call fib(n);
+      call printInt(res);
+      return 0;
    }
 }

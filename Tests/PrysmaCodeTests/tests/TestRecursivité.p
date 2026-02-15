@@ -1,20 +1,57 @@
-// Simple boucle récursive jusqu'au segmentation fault 
-
 scope {
-   fn int fact_accum(arg int produit, arg int n)
+
+   // Test 1 : Factorielle (5! = 120) - Récursion simple
+   fn int fact(arg int n)
    {
-      aff produit =  produit * n;     
-      call printInt( produit);       
-      dec int suivant = n + 1;
-      call fact_accum( produit, n);
-      return produit;
+      if (n <= 1) {
+         return 1;
+      }
+      dec int m = n - 1;
+      dec int r = call fact(m);
+      return n * r;
    }
+
+   fn bool testFact()
+   {
+      dec int fib = call fact(5);
+      if (fib == 120) {
+         return true;
+      } else {
+         return false;
+      }
+      return false;
+   }
+
+   // Test 2 : fibonaci (fib(7) = 13) - Récursion multiple
+   fn int fib(arg int n) {
+      if (n <= 1) {
+         return n;
+      }
+      dec int un = n - 1;
+      dec int deux = n - 2;
+      dec int fib_un = call fib(un);
+      dec int fib_deux = call fib(deux);
+      return fib_un + fib_deux;
+   }
+
+
+   fn bool testFib()
+   {
+      dec int fib = call fib(7);
+      if (fib == 13) {
+         return true;
+      } else {
+         return false;
+      }
+      return false;
+   }
+
 
    fn int main()
    {
-      dec int resultat = 1;   
-      dec int nombre = 2;             
-      call fact_accum(resultat, nombre);    
-      return resultat;
+      call printBool(call testFact());
+      call printBool(call testFib());
+
+      return 1;
    }
 }
