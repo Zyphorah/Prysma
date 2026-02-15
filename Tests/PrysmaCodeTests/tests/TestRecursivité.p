@@ -1,5 +1,4 @@
 scope {
-
    // Test 1 : Factorielle (5! = 120) - Récursion simple
    fn int fact(arg int n)
    {
@@ -46,12 +45,25 @@ scope {
       return false;
    }
 
+   fn bool testRecursivite()
+   {
+      dec int fact = call fact(5);
+      dec int fib = call fib(7);
+      if ((fact == 120) && (fib == 13)) {
+         return true;
+      } else {
+         return false;
+      }
+      return false;
+   }
 
    fn int main()
    {
       call printBool(call testFact());
       call printBool(call testFib());
+      call printBool(call testRecursivite());
 
       return 1;
    }
 }
+

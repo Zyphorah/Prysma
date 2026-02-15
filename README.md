@@ -121,6 +121,12 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
 - supporter les  opérantes && || == != % #12
 - Supporter l'instruction if, 
 - Supporter l'instruction while, passer par la pile avec alloca
+- Supporter la boucle for
+- Supporter les tableaux programmés en LLVM IR 
+- Supporter le type string
+
+### Itération 3 du projet fonctionnalités à réaliser en 2 semaines ?
+
 - Supporter l'approche orientée objet avec des classes, polymorphisme fait avec une vtable. 
  - Le Layout de Données (La Structure)
  - Les Contrôles d'Accès (Visibilité)
@@ -129,11 +135,7 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
  - L' Héritage (La Hiérarchie de Classes) 
  - Le Polymorphisme (La VTable)
 
-### Itération 3 du projet fonctionnalités à réaliser en 2 semaines ?
-
 - Analyse syntaxique abstraite pour la logique du langage Prysma, ce qui évitera les problèmes de logique sémantique exemple : declare int a = "string"; 
-- Supporter les tableaux programmés en LLVM IR 
-- Supporter les types string, j'utilise la bibliothèque native du C avec un extern
 - Écrire une bibliothèque de structures de données (listes chaînées, arbres binaires, piles, files) 
 
 ### Fonctionnalités Bonus (Si le temps le permet)

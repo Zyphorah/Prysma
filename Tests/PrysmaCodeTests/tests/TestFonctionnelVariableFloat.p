@@ -73,7 +73,6 @@ scope {
    fn bool testProfondeurEquation()
    {
       dec float equation = ((1.0+2.0)*(3.0+4.0))/(5.0-6.0-7.0*(8.0-9.0));
-      call printFloat(equation); // Affiche le résultat pour vérifier manuellement
       if (equation == 3.5) {
          return true;
       } else {
@@ -152,14 +151,13 @@ scope {
       // false test : je dois corriger ça plus tard
       dec float a = 10.0; 
       dec float b = 25.5;
-      call printBool(call testPassArgFonction(a,b)); // false
+      call printBool(call testPassArgFonction(a,b)); 
       
       // Appeler la méthode de nouveau pour voir si le contexte n'a pas changé
       dec float d = 10.0; 
       dec float e = 25.5;
-      call printBool(call testPassArgFonction(d,e)); // false
-      // le nombre est coupé, je ne vois pas la partie décimale donc false
-      call printBool(call testProfondeurEquation()); // false 
+      call printBool(call testPassArgFonction(d,e)); 
+      call printBool(call testProfondeurEquation()); 
 
       call printBool(call testAffectation());
 

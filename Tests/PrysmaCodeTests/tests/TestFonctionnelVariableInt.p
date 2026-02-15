@@ -72,8 +72,7 @@ scope {
    // Test 5 : Vérifier que les parenthèses sont respectées dans une expression complexe
    fn bool testProfondeurEquation()
    {
-      dec float equation = ((1+2)*(3+4))/(5-6-7*(8-9));
-      call printFloat(equation); // Affiche le résultat pour vérifier manuellement
+      dec float equation = ((1.0+2.0)*(3.0+4.0))/(5.0-6.0-7.0*(8.0-9.0));
       if (equation == 3.5) {
          return true;
       } else {
@@ -149,17 +148,12 @@ scope {
       call printBool(call testPrioriteComplexe());
       call printBool(call testMiseAJourEtat());
 
-      // false test : je dois corriger ça plus tard
-      dec int a = 10; 
-      dec float b = 25.5;
-      call printBool(call testPassArgFonction(a,b)); // false
+      call printBool(call testPassArgFonction(10,25.5)); // false
       
       // Appeler la méthode de nouveau pour voir si le contexte n'a pas changé
-      dec int d = 10; 
-      dec float e = 25.5;
-      call printBool(call testPassArgFonction(d,e)); // false
-      // le nombre est coupé, je ne vois pas la partie décimale donc false
-      call printBool(call testProfondeurEquation()); // false 
+      call printBool(call testPassArgFonction(10,25.5)); // false
+
+      call printBool(call testProfondeurEquation()); 
 
       call printBool(call testAffectation());
 
@@ -168,13 +162,6 @@ scope {
 
       call printBool(call testImbrication());
    
-      // call testPassArgFonction(1,1); une erreur ici je dois corriger ça plus tard, il n'y a que les variables qui passe. 
-      // chiffre négatif non pris en compte, je dois corriger ça aussi plus tard
-      // Le lexer ne gère pas les nombres dans un nom de variable ou fonction
-      // !false ne fonctionne pas, je dois corriger ça aussi plus tard 
-      // Je ne peux pas utiliser les comparaison litéral directement en utilisant l'opérante logique true false je dois le stocker dans une variable avant 
-      // Les fonctions ne peuvent pas être appelés dans une condition if bug lorsque je fait call fib(7) == 13; même dans une variable, un problème à investiguer. 
-      
       return 1;
    }
 }
