@@ -235,6 +235,8 @@ void Lexer::traiterOperateursComplexes(char current, const string& sourceCode, s
                 tokens.push_back({TOKEN_DIFFERENT, "!=", ligne, colonne});
                 pos++;
                 colonne++;
+            } else {
+                tokens.push_back({TOKEN_NON, "!", ligne, colonne});
             }
             break;
 
