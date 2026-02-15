@@ -57,6 +57,9 @@ class Lexer {
     static void traiterCommentaires(const string& sourceCode, size_t& pos);
     static void traiterChaine(const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne);
     static void traiterNombre(const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne);
+    static bool estContexteNombreNegatif(const vector<Token>& tokens);
+    bool traiterNombreNegatifOuPositif(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, 
+                                        string& motCourant, int ligne, int& colonne, int& colonneMotCourant);
     
     public: 
         Lexer() {}

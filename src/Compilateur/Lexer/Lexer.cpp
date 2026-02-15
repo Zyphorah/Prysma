@@ -1,5 +1,24 @@
 #include "Compilateur/Lexer/Lexer.h"
 #include <cctype>
+#include <set>
+
+bool Lexer::estContexteNombreNegatif(const vector<Token>& tokens) {
+    if (tokens.empty()) {
+        return true;
+    }
+    
+    TokenType lastType = tokens.back().type;
+    
+    // Les contextes où +/- sont des opérateurs unaires
+    static const set<TokenType> operateurUnaire = {
+        TOKEN_EGAL, TOKEN_PAREN_OUVERTE, TOKEN_VIRGULE, TOKEN_CROCHET_OUVERT,
+        TOKEN_PLUS, TOKEN_MOINS, TOKEN_ETOILE, TOKEN_SLASH, TOKEN_MODULO,
+        TOKEN_EGAL_EGAL, TOKEN_DIFFERENT, TOKEN_PLUS_PETIT, TOKEN_PLUS_GRAND,
+        TOKEN_PLUS_PETIT_EGAL, TOKEN_PLUS_GRAND_EGAL, TOKEN_ET, TOKEN_OU
+    };
+    
+    return operateurUnaire.count(lastType) > 0;
+}
 
 void Lexer::traiterCommentaires(const string& sourceCode, size_t& pos) {
     if (pos + 1 < sourceCode.length() && sourceCode[pos] == '/' && sourceCode[pos + 1] == '/') {
@@ -250,6 +269,23 @@ void Lexer::traiterOperateursEtDelimiteurs(char current, const string& sourceCod
     }
 }
 
+bool Lexer::traiterNombreNegatifOuPositif(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, 
+                                           string& motCourant, int ligne, int& colonne, int& colonneMotCourant) {
+    // Vérifie si c'est un signe (+/-) suivi d'un chiffre en contexte valide
+    if (motCourant.empty() && (current == '-' || current == '+') && 
+        pos + 1 < sourceCode.length() && isdigit(sourceCode[pos + 1]) != 0 &&
+        estContexteNombreNegatif(tokens)) {
+        
+        ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
+        motCourant = "";
+        colonneMotCourant = colonne;
+        traiterNombre(sourceCode, pos, tokens, ligne, colonne);
+        colonneMotCourant = colonne;
+        return true;
+    }
+    return false;
+}
+
 vector<Token> Lexer::tokenizer(const string& sourceCode) {
     vector<Token> tokens;
     string motCourant;
@@ -296,6 +332,18 @@ vector<Token> Lexer::tokenizer(const string& sourceCode) {
         }
 
         if (motCourant.empty() && isdigit(current) != 0) {
+            ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
+            motCourant = "";
+            colonneMotCourant = colonne;
+            traiterNombre(sourceCode, pos, tokens, ligne, colonne);
+            colonneMotCourant = colonne;
+            continue;
+        }
+
+        // Gérer les nombres négatifs ou positifs
+        if (motCourant.empty() && (current == '-' || current == '+') && 
+            pos + 1 < sourceCode.length() && isdigit(sourceCode[pos + 1]) != 0 &&
+            estContexteNombreNegatif(tokens)) {
             ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
             motCourant = "";
             colonneMotCourant = colonne;
