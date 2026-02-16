@@ -6,7 +6,6 @@
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenType.h"
-#include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurAppelFonction.h"
 
 ConstructeurArbreEquation::ConstructeurArbreEquation(
     ChaineResponsabilite* chaineResponsabilite,
@@ -57,12 +56,6 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
 
     // Système de niveau pour calculer la profondeur, c'est obligatoire pour ne pas avoir de problème au niveau de la séparation 34+4)) sinon le 
     // Système ne sais pas quoi faire avec les deux parenthèses restante. 
-    
-    if (index < (int)tokens.size() && tokens[index].type == TOKEN_CALL && _instructionBuilder != nullptr) {
-        // Déléguer au parseur d'expression directement
-        ParseurAppelFonction parseurAppel;
-        return parseurAppel.parser(tokens, index, _instructionBuilder);
-    }
     
     std::vector<Token> equationTokens;
     int parenProfondeur = 0;
