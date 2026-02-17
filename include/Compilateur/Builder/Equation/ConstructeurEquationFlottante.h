@@ -17,7 +17,7 @@ struct Token;
 class ConstructeurEquationFlottante
 {
 private:
-      std::shared_ptr<RegistreSymbole> _registreSymbole;
+    std::shared_ptr<RegistreSymbole> _registreSymbole;
     
     std::unique_ptr<GestionnaireOperateur> _gestionnaireAddition;
     std::unique_ptr<GestionnaireOperateur> _gestionnaireSoustraction;
@@ -45,11 +45,13 @@ private:
 
 public: 
 
-    ConstructeurEquationFlottante(IConstructeurArbre* instructionBuilder = nullptr);
+    ConstructeurEquationFlottante(IConstructeurArbre* instructionBuilder);
     
     ~ConstructeurEquationFlottante() = default;
     
     static void setRegistreStrategieEquation(std::shared_ptr<RegistreStrategieEquation> registre);
+    
+    static std::shared_ptr<RegistreStrategieEquation> getRegistreStrategieEquation();
 
     std::shared_ptr<INoeud> construire(std::vector<Token> &tokens);
 

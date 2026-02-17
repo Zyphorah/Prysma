@@ -7,9 +7,11 @@
 class ParseurAppelFonction : public IParseur, ParseurBase
 {
 
+private:
+    IConstructeurArbre* _constructeurArbre;
 public:
 
-    ParseurAppelFonction();
+    ParseurAppelFonction(IConstructeurArbre* constructeurArbre);
     ~ParseurAppelFonction();
     std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) override;
 

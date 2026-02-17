@@ -16,10 +16,11 @@ private:
     std::shared_ptr<LlvmBackend> _backend;
     std::shared_ptr<RegistreVariable> _registreVariable;
     std::shared_ptr<RegistreType> _registreType;
+    IConstructeurArbre* _constructeurEquation;
 
 public:
 
-    ParseurAffectationVariable(std::shared_ptr<LlvmBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, std::shared_ptr<RegistreType> registreType);
+    ParseurAffectationVariable(std::shared_ptr<LlvmBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, std::shared_ptr<RegistreType> registreType, IConstructeurArbre* constructeurEquation = nullptr);
     ~ParseurAffectationVariable();
 
     std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) override;

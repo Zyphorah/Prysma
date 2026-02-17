@@ -7,7 +7,7 @@ class StrategieLitteral : public IStrategieEquation {
 public:
     StrategieLitteral() = default;
     ~StrategieLitteral() override = default;
-    std::shared_ptr<INoeud> construire(std::vector<Token>& equation, IConstructeurArbre* constructeurEquation, IConstructeurArbre* instructionBuilder) override;
+    std::shared_ptr<INoeud> construire(std::vector<Token>& equation) override;
 };
 
 

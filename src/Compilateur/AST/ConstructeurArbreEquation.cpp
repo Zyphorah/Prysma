@@ -6,6 +6,7 @@
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenType.h"
+#include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
 
 ConstructeurArbreEquation::ConstructeurArbreEquation(
     ChaineResponsabilite* chaineResponsabilite,
@@ -34,8 +35,10 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
     if (indice == -1) {
         TokenType type = equation[0].type;
 
-        if (_registreStrategieEquation->existe(type)) {
-            return _registreStrategieEquation->recuperer(type)->construire(equation, this, _instructionBuilder);
+        // Use the static registre from ConstructeurEquationFlottante, not the instance variable
+        auto strategieEquationRegistry = ConstructeurEquationFlottante::getRegistreStrategieEquation();
+        if (strategieEquationRegistry && strategieEquationRegistry->existe(type)) {
+            return strategieEquationRegistry->recuperer(type)->construire(equation);
         }
 
         throw std::runtime_error("Erreur: token non reconnu dans l'équation");
@@ -59,6 +62,7 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
     
     std::vector<Token> equationTokens;
     int parenProfondeur = 0;
+    int crochetProfondeur = 0;
 
     while(index < (int)tokens.size()) {
         TokenType type = tokens[index].type;
@@ -72,8 +76,14 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
             }
             parenProfondeur--;
         }
+        else if (type == TOKEN_CROCHET_OUVERT) {
+            crochetProfondeur++;
+        }
+        else if (type == TOKEN_CROCHET_FERME) {
+            crochetProfondeur--;
+        }
         
-        if (parenProfondeur == 0) {
+        if (parenProfondeur == 0 && crochetProfondeur == 0) {
             if (type == TOKEN_POINT_VIRGULE || 
                 type == TOKEN_ACCOLADE_FERMEE || 
                 type == TOKEN_VIRGULE) {

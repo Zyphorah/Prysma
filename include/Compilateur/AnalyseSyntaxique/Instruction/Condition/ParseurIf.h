@@ -5,8 +5,10 @@
 #include "Compilateur/AnalyseSyntaxique/ParseurBase.h"
 class ParseurIf: public IParseur, ParseurBase
 {
+private:
+    IConstructeurArbre* _constructeurArbre;
 public:
-    ParseurIf();
+    ParseurIf(IConstructeurArbre* constructeurArbre);
     ~ParseurIf();
     
     std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) override;

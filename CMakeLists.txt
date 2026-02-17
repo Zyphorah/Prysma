@@ -69,6 +69,7 @@ set(SOURCES
     src/Compilateur/AST/Noeuds/Equation/NoeudOperation.cpp
     src/Compilateur/AST/Noeuds/Operande/NoeudLitteral.cpp
     src/Compilateur/AST/Noeuds/Operande/NoeudNegation.cpp
+    src/Compilateur/AST/Noeuds/Operande/NoeudTableauInitialisation.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudAffectationVariable.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudDeclarationVariable.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudRefVariable.cpp
@@ -78,6 +79,7 @@ set(SOURCES
     # StrategieEquation
     src/Compilateur/AST/Noeuds/StrategieEquation/StrategieAppelFonction.cpp
     src/Compilateur/AST/Noeuds/StrategieEquation/StrategieRef.cpp
+    src/Compilateur/AST/Noeuds/StrategieEquation/StrategieTableauInitialisation.cpp
     src/Compilateur/AST/Noeuds/StrategieEquation/StrategieUnRef.cpp
     src/Compilateur/AST/Noeuds/StrategieEquation/StrategieNegation.cpp
     src/Compilateur/AST/Noeuds/StrategieEquation/StrategieLitteral.cpp
@@ -106,6 +108,7 @@ set(SOURCES
     src/Compilateur/Visiteur/CodeGen/Operande/VisiteurOperation.cpp
     src/Compilateur/Visiteur/CodeGen/Operande/VisiteurNoeudLitteral.cpp
     src/Compilateur/Visiteur/CodeGen/Operande/VisiteurNoeudNegation.cpp
+    src/Compilateur/Visiteur/CodeGen/Operande/VisiteurTableauInitialisation.cpp
     src/Compilateur/Visiteur/CodeGen/Variable/VisiteurAffectationVariable.cpp
     src/Compilateur/Visiteur/CodeGen/Variable/VisiteurDeclarationVariable.cpp
     src/Compilateur/Visiteur/CodeGen/Variable/VisiteurRefVariable.cpp
@@ -124,6 +127,7 @@ set(SOURCES
     src/Compilateur/Visiteur/ASTGraphViz/Fonction/VisiteurRetour.cpp
     src/Compilateur/Visiteur/ASTGraphViz/Operande/VisiteurOperation.cpp
     src/Compilateur/Visiteur/ASTGraphViz/Operande/VisiteurNoeudNegation.cpp
+    src/Compilateur/Visiteur/ASTGraphViz/Operande/VisiteurTableauInitialisation.cpp
     src/Compilateur/Visiteur/ASTGraphViz/Variable/VisiteurAffectationVariable.cpp
     src/Compilateur/Visiteur/ASTGraphViz/Variable/VisiteurDeclarationVariable.cpp
     src/Compilateur/Visiteur/ASTGraphViz/Variable/VisiteurRefVariable.cpp

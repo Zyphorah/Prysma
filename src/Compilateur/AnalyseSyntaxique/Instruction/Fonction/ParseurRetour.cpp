@@ -8,7 +8,8 @@
 #include <vector>
 #include <llvm-18/llvm/IR/Type.h>
 
-ParseurRetour::ParseurRetour()
+ParseurRetour::ParseurRetour(IConstructeurArbre* constructeurEquation)
+    : _constructeurEquation(constructeurEquation)
 {
 }
 
@@ -27,11 +28,18 @@ std::shared_ptr<INoeud> ParseurRetour::parser(std::vector<Token>& tokens, int& i
     std::shared_ptr<INoeud> valeurRetour = nullptr;
 
     if (index < (int)tokens.size() && tokens[index].type != TOKEN_POINT_VIRGULE) {
-        ParseurEquation parseurEquation;  
-        valeurRetour = parseurEquation.parser(tokens, index, constructeurArbre);
+        if (_constructeurEquation != nullptr) {
+            valeurRetour = _constructeurEquation->construire(tokens, index);
+        } else {
+            ParseurEquation parseurEquation(constructeurArbre);
+            valeurRetour = parseurEquation.parser(tokens, index, constructeurArbre);
+            return std::make_shared<NoeudRetour>(valeurRetour);
+        }
     } else {
         consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur: point-virgule attendu après return");
     }
+    
+    consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur : ';' attendu à la fin du return");
 
     return std::make_shared<NoeudRetour>(valeurRetour);
 }

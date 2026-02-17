@@ -7,7 +7,7 @@ class StrategieUnRef : public IStrategieEquation {
 public:
     StrategieUnRef() = default;
     ~StrategieUnRef() override = default;
-    std::shared_ptr<INoeud> construire(std::vector<Token>& equation, IConstructeurArbre* constructeurEquation, IConstructeurArbre* instructionBuilder) override;
+    std::shared_ptr<INoeud> construire(std::vector<Token>& equation) override;
 };
 
 

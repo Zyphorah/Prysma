@@ -9,8 +9,9 @@
 
 class ParseurEquation : public IParseur, public ParseurBase
 {
+    IConstructeurArbre* _constructeurArbre;
 public:
-    ParseurEquation();
+    ParseurEquation(IConstructeurArbre* constructeurArbre);
     ~ParseurEquation();
 
     std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) override;

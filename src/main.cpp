@@ -23,6 +23,7 @@
 #include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/AnalyseSyntaxique/Instruction/Variable/ParseurDeclarationVariable.h"
 #include "Compilateur/AnalyseSyntaxique/ParseurType.h"
+#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieTableauInitialisation.h"
 #include "Compilateur/TraitementFichier/FichierLecture.h"
 #include "Compilateur/TraitementFichier/ConstructeurSysteme.h"
 #include "Compilateur/GestionnaireErreur.h"
@@ -110,31 +111,39 @@ int main(int argc, char* argv[])
         // Créer le ParseurType avec le registre
         std::shared_ptr<ParseurType> parseurType = std::make_shared<ParseurType>(context->registreType);
         
-        // NoeudInstruction du langage prysma
-        context->registreInstruction->enregistrer(TOKEN_SCOPE, std::make_shared<ParseurScope>());
-        context->registreInstruction->enregistrer(TOKEN_FONCTION, std::make_shared<ParseurDeclarationFonction>());
-        context->registreInstruction->enregistrer(TOKEN_AFF, std::make_shared<ParseurAffectationVariable>(context->backend, context->registreVariable, context->registreType));
-        context->registreInstruction->enregistrer(TOKEN_DEC, std::make_shared<ParseurDeclarationVariable>(parseurType));
-        context->registreInstruction->enregistrer(TOKEN_CALL, std::make_shared<ParseurInstructionAppel>());
-        context->registreInstruction->enregistrer(TOKEN_RETOUR, std::make_shared<ParseurRetour>());
-        context->registreInstruction->enregistrer(TOKEN_ARG, std::make_shared<ParseurArgFonction>());
-        context->registreInstruction->enregistrer(TOKEN_UNREF, std::make_shared<ParseurUnRefVariable>());
-        context->registreInstruction->enregistrer(TOKEN_REF, std::make_shared<ParseurRefVariable>());
-        context->registreInstruction->enregistrer(TOKEN_SI, std::make_shared<ParseurIf>());
-        context->registreInstruction->enregistrer(TOKEN_TANT_QUE, std::make_shared<ParseurWhile>());
-
+        // Enregistrer les strategies d'équation EN PREMIER, avant de créer ConstructeurEquationFlottante
         std::shared_ptr<RegistreStrategieEquation> registreStrategieEquation = std::make_shared<RegistreStrategieEquation>();
-        registreStrategieEquation->enregistrer(TOKEN_CALL, std::make_shared<StrategieAppelFonction>());
-        registreStrategieEquation->enregistrer(TOKEN_REF, std::make_shared<StrategieRef>());
-        registreStrategieEquation->enregistrer(TOKEN_UNREF, std::make_shared<StrategieUnRef>());
-        registreStrategieEquation->enregistrer(TOKEN_NON, std::make_shared<StrategieNegation>());
         registreStrategieEquation->enregistrer(TOKEN_LIT_INT, std::make_shared<StrategieLitteral>());
         registreStrategieEquation->enregistrer(TOKEN_LIT_FLOAT, std::make_shared<StrategieLitteral>());
         registreStrategieEquation->enregistrer(TOKEN_LIT_BOLEEN, std::make_shared<StrategieLitteral>());
         registreStrategieEquation->enregistrer(TOKEN_IDENTIFIANT, std::make_shared<StrategieIdentifiant>());
+        registreStrategieEquation->enregistrer(TOKEN_REF, std::make_shared<StrategieRef>());
+        registreStrategieEquation->enregistrer(TOKEN_UNREF, std::make_shared<StrategieUnRef>());
+        registreStrategieEquation->enregistrer(TOKEN_NON, std::make_shared<StrategieNegation>());
+        registreStrategieEquation->enregistrer(TOKEN_CROCHET_OUVERT, std::make_shared<StrategieTableauInitialisation>());
         ConstructeurEquationFlottante::setRegistreStrategieEquation(registreStrategieEquation);
-
+        
+        // Constuire les chef d'orchestre de l'arbre syntaxique abstrait
         ConstructeurArbreInstruction constructeurArbreInstruction(context->registreInstruction);
+        std::shared_ptr<ConstructeurEquationFlottante> constructeurEquation = std::make_shared<ConstructeurEquationFlottante>(&constructeurArbreInstruction);
+        
+        // NoeudInstruction du langage prysma
+        context->registreInstruction->enregistrer(TOKEN_SCOPE, std::make_shared<ParseurScope>());
+        context->registreInstruction->enregistrer(TOKEN_FONCTION, std::make_shared<ParseurDeclarationFonction>());
+        context->registreInstruction->enregistrer(TOKEN_AFF, std::make_shared<ParseurAffectationVariable>(context->backend, context->registreVariable, context->registreType, constructeurEquation->recupererConstructeurArbre()));
+        context->registreInstruction->enregistrer(TOKEN_DEC, std::make_shared<ParseurDeclarationVariable>(parseurType, constructeurEquation->recupererConstructeurArbre()));
+        context->registreInstruction->enregistrer(TOKEN_CALL, std::make_shared<ParseurInstructionAppel>());
+        context->registreInstruction->enregistrer(TOKEN_RETOUR, std::make_shared<ParseurRetour>(constructeurEquation->recupererConstructeurArbre()));
+        context->registreInstruction->enregistrer(TOKEN_ARG, std::make_shared<ParseurArgFonction>());
+        context->registreInstruction->enregistrer(TOKEN_UNREF, std::make_shared<ParseurUnRefVariable>());
+        context->registreInstruction->enregistrer(TOKEN_REF, std::make_shared<ParseurRefVariable>());
+        context->registreInstruction->enregistrer(TOKEN_SI, std::make_shared<ParseurIf>(constructeurEquation->recupererConstructeurArbre()));
+        context->registreInstruction->enregistrer(TOKEN_TANT_QUE, std::make_shared<ParseurWhile>(constructeurEquation->recupererConstructeurArbre()));
+
+        // Ajouter la stratégie TOKEN_CALL après avoir créé constructeurEquation (elle en dépend)
+        registreStrategieEquation->enregistrer(TOKEN_CALL, std::make_shared<StrategieAppelFonction>(constructeurEquation->recupererConstructeurArbre()));
+
+        // Construire l'arbre syntaxique APRÈS l'enregistrement de tous les parseurs et stratégies
         std::shared_ptr<INoeud> arbre = constructeurArbreInstruction.construire(tokens);
 
         VisiteurGeneralGenCode visiteur(context);

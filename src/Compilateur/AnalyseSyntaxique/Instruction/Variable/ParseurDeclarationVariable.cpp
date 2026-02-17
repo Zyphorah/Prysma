@@ -5,8 +5,8 @@
 #include <memory>
 #include <utility>
 
-ParseurDeclarationVariable::ParseurDeclarationVariable(std::shared_ptr<ParseurType> parseurType)
-    : _parseurType(std::move(parseurType))
+ParseurDeclarationVariable::ParseurDeclarationVariable(std::shared_ptr<ParseurType> parseurType, IConstructeurArbre* constructeurEquation)
+    : _parseurType(std::move(parseurType)), _constructeurEquation(constructeurEquation)
 {}
 
 ParseurDeclarationVariable::~ParseurDeclarationVariable()
@@ -25,8 +25,17 @@ std::shared_ptr<INoeud> ParseurDeclarationVariable::parser(std::vector<Token>& t
     
     consommer(tokens, index, TOKEN_EGAL, "Erreur : '=' attendu après le nom de variable");
     
-    ParseurEquation parseurEquation{};
-    std::shared_ptr<INoeud> expression = parseurEquation.parser(tokens, index, constructeurArbre);
+    // Use the equation builder if available, otherwise try to extract and parse the equation
+    std::shared_ptr<INoeud> expression;
+    if (_constructeurEquation != nullptr) {
+        expression = _constructeurEquation->construire(tokens, index);
+    } else {
+        ParseurEquation parseurEquation(constructeurArbre);
+        expression = parseurEquation.parser(tokens, index, constructeurArbre);
+        return std::make_shared<NoeudDeclarationVariable>(nomVariable, type, expression);
+    }
+    
+    consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur : ';' attendu à la fin de la déclaration");
 
     return std::make_shared<NoeudDeclarationVariable>(
         nomVariable,

@@ -115,3 +115,8 @@ void ConstructeurEquationFlottante::setRegistreStrategieEquation(std::shared_ptr
 {
     _registreStrategieEquation = std::move(registre);
 }
+
+std::shared_ptr<RegistreStrategieEquation> ConstructeurEquationFlottante::getRegistreStrategieEquation()
+{
+    return _registreStrategieEquation;
+}

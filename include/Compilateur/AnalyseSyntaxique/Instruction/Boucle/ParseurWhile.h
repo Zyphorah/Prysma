@@ -5,9 +5,11 @@
 
 class ParseurWhile : public IParseur, ParseurBase
 {
+private:
+    IConstructeurArbre* _constructeurArbre;
 
 public: 
-    ParseurWhile();
+    ParseurWhile(IConstructeurArbre* _constructeurArbre);
     ~ParseurWhile();
 
     std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) override;

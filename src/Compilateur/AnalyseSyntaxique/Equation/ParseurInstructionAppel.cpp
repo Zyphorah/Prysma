@@ -14,7 +14,7 @@ ParseurInstructionAppel::~ParseurInstructionAppel()
 
 std::shared_ptr<INoeud> ParseurInstructionAppel::parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre)
 {
-    ParseurAppelFonction parseurAppel;
+    ParseurAppelFonction parseurAppel(constructeurArbre);
     std::shared_ptr<INoeud> noeud = parseurAppel.parser(tokens, index, constructeurArbre);
     
     consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur : ';' attendu à la fin de l'appel de fonction");

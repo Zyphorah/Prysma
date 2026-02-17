@@ -4,7 +4,7 @@
 #include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurAppelFonction.h"
 #include <memory>
 
-ParseurAppelFonction::ParseurAppelFonction()
+ParseurAppelFonction::ParseurAppelFonction(IConstructeurArbre* constructeurArbre) : _constructeurArbre(constructeurArbre)
 {
 }
 

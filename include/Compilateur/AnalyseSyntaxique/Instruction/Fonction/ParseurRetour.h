@@ -7,10 +7,12 @@
 
 class ParseurRetour : public IParseur, public ParseurBase
 {
+private:
+    IConstructeurArbre* _constructeurEquation;  // For parsing equations
 
 public:
 
-    explicit ParseurRetour();
+    explicit ParseurRetour(IConstructeurArbre* constructeurEquation = nullptr);
     
     ~ParseurRetour();
 

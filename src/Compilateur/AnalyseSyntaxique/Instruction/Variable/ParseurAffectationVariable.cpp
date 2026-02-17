@@ -7,8 +7,8 @@
 #include <memory>
 #include <utility>
 
-ParseurAffectationVariable::ParseurAffectationVariable(std::shared_ptr<LlvmBackend> backend, std::shared_ptr<RegistreVariable> registreVariable,std::shared_ptr<RegistreType> registreType)
-    : _backend(std::move(backend)), _registreVariable(std::move(registreVariable)), _registreType(std::move(registreType))
+ParseurAffectationVariable::ParseurAffectationVariable(std::shared_ptr<LlvmBackend> backend, std::shared_ptr<RegistreVariable> registreVariable,std::shared_ptr<RegistreType> registreType, IConstructeurArbre* constructeurEquation)
+    : _backend(std::move(backend)), _registreVariable(std::move(registreVariable)), _registreType(std::move(registreType)), _constructeurEquation(constructeurEquation)
 {
 }
 
@@ -24,8 +24,14 @@ std::shared_ptr<INoeud> ParseurAffectationVariable::parser(std::vector<Token>& t
     
     consommer(tokens, index, TOKEN_EGAL, "Erreur : '=' attendu");
     
-    ParseurEquation parseurEquation{};
-    std::shared_ptr<INoeud> expression = parseurEquation.parser(tokens, index, constructeurArbre);
+    std::shared_ptr<INoeud> expression;
+    if (_constructeurEquation != nullptr) {
+        expression = _constructeurEquation->construire(tokens, index);
+        consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur : ';' attendu à la fin de l'affectation");
+    } else {
+        ParseurEquation parseurEquation(constructeurArbre);
+        expression = parseurEquation.parser(tokens, index, constructeurArbre);
+    }
 
     return std::make_shared<NoeudAffectationVariable>(nomVariable, expression, nomToken);
 }

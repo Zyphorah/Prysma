@@ -4,7 +4,7 @@
 #include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
 #include "Compilateur/Lexer/TokenType.h"
 
-ParseurWhile::ParseurWhile()
+ParseurWhile::ParseurWhile(IConstructeurArbre* constructeurArbre) : _constructeurArbre(constructeurArbre)
 {}
 
 ParseurWhile::~ParseurWhile()
@@ -19,8 +19,7 @@ std::shared_ptr<INoeud> ParseurWhile::parser(std::vector<Token>& tokens, int& in
 
     consommer(tokens,index,TOKEN_PAREN_OUVERTE,"Erreur, le token n'est pas '('! ");
     
-    std::shared_ptr<ConstructeurEquationFlottante> constructeurArbreEquation = std::make_shared<ConstructeurEquationFlottante>(constructeurArbre);
-    std::shared_ptr<INoeud> condition = constructeurArbreEquation->recupererConstructeurArbre()->construire(tokens, index);
+    std::shared_ptr<INoeud> condition = _constructeurArbre->construire(tokens, index);
 
     consommer(tokens,index,TOKEN_PAREN_FERMEE,"Erreur, le token n'est pas ')'! ");
 

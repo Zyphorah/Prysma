@@ -17,7 +17,8 @@
     void visiter(NoeudRefVariable* noeudRefVariable) override; \
     void visiter(NoeudIf* noeudIf) override; \
     void visiter(NoeudWhile* noeudWhile) override; \
-    void visiter(NoeudNegation* noeudNegation) override;\
+    void visiter(NoeudNegation* noeudNegation) override; \
+    void visiter(NoeudTableauInitialisation* noeudTableauInit) override;\
 
 #define CLASS_NOEUD \
     class NoeudInstruction; \
@@ -35,6 +36,7 @@
     class NoeudElse; \
     class NoeudWhile; \
     class NoeudOperation; \
-    class NoeudNegation;\
+    class NoeudNegation; \
+    class NoeudTableauInitialisation;\
     
 #endif /* D2023444_D6C2_4302_89E4_57775CF04AD5 */
