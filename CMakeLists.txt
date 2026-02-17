@@ -71,6 +71,7 @@ set(SOURCES
     src/Compilateur/AST/Noeuds/Operande/NoeudNegation.cpp
     src/Compilateur/AST/Noeuds/Operande/NoeudTableauInitialisation.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudAffectationVariable.cpp
+    src/Compilateur/AST/Noeuds/Variable/NoeudAffectationTableau.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudDeclarationVariable.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudRefVariable.cpp
     src/Compilateur/AST/Noeuds/Variable/NoeudUnRefVariable.cpp
@@ -110,6 +111,7 @@ set(SOURCES
     src/Compilateur/Visiteur/CodeGen/Operande/VisiteurNoeudNegation.cpp
     src/Compilateur/Visiteur/CodeGen/Operande/VisiteurTableauInitialisation.cpp
     src/Compilateur/Visiteur/CodeGen/Variable/VisiteurAffectationVariable.cpp
+    src/Compilateur/Visiteur/CodeGen/Variable/VisiteurAffectationTableau.cpp
     src/Compilateur/Visiteur/CodeGen/Variable/VisiteurDeclarationVariable.cpp
     src/Compilateur/Visiteur/CodeGen/Variable/VisiteurRefVariable.cpp
     src/Compilateur/Visiteur/CodeGen/Variable/VisiteurUnRefVariable.cpp
@@ -129,6 +131,7 @@ set(SOURCES
     src/Compilateur/Visiteur/ASTGraphViz/Operande/VisiteurNoeudNegation.cpp
     src/Compilateur/Visiteur/ASTGraphViz/Operande/VisiteurTableauInitialisation.cpp
     src/Compilateur/Visiteur/ASTGraphViz/Variable/VisiteurAffectationVariable.cpp
+    src/Compilateur/Visiteur/ASTGraphViz/Variable/VisiteurAffectationTableau.cpp
     src/Compilateur/Visiteur/ASTGraphViz/Variable/VisiteurDeclarationVariable.cpp
     src/Compilateur/Visiteur/ASTGraphViz/Variable/VisiteurRefVariable.cpp
     src/Compilateur/Visiteur/ASTGraphViz/Variable/VisiteurUnRefVariable.cpp

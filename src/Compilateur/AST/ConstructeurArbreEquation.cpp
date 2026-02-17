@@ -80,13 +80,16 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
             crochetProfondeur++;
         }
         else if (type == TOKEN_CROCHET_FERME) {
+            if (crochetProfondeur == 0) {
+                break;
+            }
             crochetProfondeur--;
         }
         
         if (parenProfondeur == 0 && crochetProfondeur == 0) {
             if (type == TOKEN_POINT_VIRGULE || 
                 type == TOKEN_ACCOLADE_FERMEE || 
-                type == TOKEN_VIRGULE) {
+                type == TOKEN_VIRGULE ) {
                 break;
             }
         }

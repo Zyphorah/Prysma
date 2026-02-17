@@ -1,9 +1,12 @@
 // fibonaci
 scope {
    fn int main() {
-
+   
       dec int a = 0;
+      dec int b = 1;
       dec int[4] tableau = [a, 2, 3, 4];
+      aff tableau[0] = 23;
+ 
       //dec float[3] floats = [1.5, 2.5, 3.5];
       //dec bool[2] booleans = [true, false];
 

@@ -106,4 +106,3 @@ Pour vérifier que la coloration fonctionne :
 1. Ouvrez un fichier `.p` dans VS Code
 2. Les éléments du langage devraient s'afficher avec des couleurs
 3. Si nécessaire, rechargez la fenêtre : `Ctrl+Shift+P` → "Developer: Reload Window"
-

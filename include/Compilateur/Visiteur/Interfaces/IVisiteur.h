@@ -20,6 +20,7 @@ class NoeudIf;
 class NoeudWhile;
 class NoeudNegation;
 class NoeudTableauInitialisation;
+class NoeudAffectationTableau;
 
 class IVisiteur
 {
@@ -40,6 +41,7 @@ public:
     virtual void visiter(NoeudWhile* noeudWhile) = 0;
     virtual void visiter(NoeudNegation* noeudNegation) = 0;
     virtual void visiter(NoeudTableauInitialisation* noeudTableauInit) = 0;
+    virtual void visiter(NoeudAffectationTableau* noeudAffectationTableau) = 0;
 };
 
 #endif /* B9A25031_6CA1_409A_879D_68D43CAC9945 */
