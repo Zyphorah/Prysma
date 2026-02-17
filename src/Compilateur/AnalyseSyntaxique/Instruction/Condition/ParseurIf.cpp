@@ -4,7 +4,8 @@
 #include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
 #include "Compilateur/Lexer/TokenType.h"
 #include <memory>
-ParseurIf::ParseurIf(IConstructeurArbre* constructeurArbre) : _constructeurArbre(constructeurArbre)
+ParseurIf::ParseurIf(IConstructeurArbre* constructeurArbreEquation, IConstructeurArbre* constructeurArbreInstruction) 
+    : _constructeurArbreEquation(constructeurArbreEquation), _constructeurArbreInstruction(constructeurArbreInstruction)
 {
 
 }
@@ -12,21 +13,21 @@ ParseurIf::ParseurIf(IConstructeurArbre* constructeurArbre) : _constructeurArbre
 ParseurIf::~ParseurIf()
 {}
 
-std::shared_ptr<INoeud> ParseurIf::parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) 
+std::shared_ptr<INoeud> ParseurIf::parser(std::vector<Token>& tokens, int& index) 
 {
     consommer(tokens,index,TOKEN_SI,"Erreur, le token n'est pas 'if'! ");
 
     consommer(tokens,index,TOKEN_PAREN_OUVERTE,"Erreur, le token n'est pas '('! ");
     
   
-    std::shared_ptr<INoeud> condition = _constructeurArbre->construire(tokens, index);
+    std::shared_ptr<INoeud> condition = _constructeurArbreEquation->construire(tokens, index);
 
     consommer(tokens,index,TOKEN_PAREN_FERMEE,"Erreur, le token n'est pas ')'! ");
 
     // Créer le noeud bloc IF
     std::shared_ptr<NoeudInstruction> noeudBlocIf = std::make_shared<NoeudInstruction>();
     consommer(tokens,index,TOKEN_ACCOLADE_OUVERTE, "Erreur, le token n'est pas '{'");
-    consommerEnfantCorps(tokens,index,noeudBlocIf,constructeurArbre,TOKEN_ACCOLADE_FERMEE);
+    consommerEnfantCorps(tokens,index,noeudBlocIf,_constructeurArbreInstruction,TOKEN_ACCOLADE_FERMEE);
     consommer(tokens,index,TOKEN_ACCOLADE_FERMEE,"Erreur, le token n'est pas '}'");
 
     // Créer le noeud bloc ELSE s'il existe
@@ -35,7 +36,7 @@ std::shared_ptr<INoeud> ParseurIf::parser(std::vector<Token>& tokens, int& index
         consommer(tokens,index,TOKEN_SINON,"Erreur, le token n'est pas 'else'! ");
         noeudBlocElse = std::make_shared<NoeudInstruction>();
         consommer(tokens,index,TOKEN_ACCOLADE_OUVERTE, "Erreur, le token n'est pas '{'");
-        consommerEnfantCorps(tokens,index,noeudBlocElse,constructeurArbre,TOKEN_ACCOLADE_FERMEE);
+        consommerEnfantCorps(tokens,index,noeudBlocElse,_constructeurArbreInstruction,TOKEN_ACCOLADE_FERMEE);
         consommer(tokens,index,TOKEN_ACCOLADE_FERMEE,"Erreur, le token n'est pas '}'");
     }
 

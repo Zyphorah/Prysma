@@ -12,7 +12,7 @@ ParseurRefVariable::~ParseurRefVariable()
 }
 
 // Exemple ref variable
-std::shared_ptr<INoeud> ParseurRefVariable::parser(std::vector<Token>& tokens, int& index, [[maybe_unused]] IConstructeurArbre* constructeurArbre) 
+std::shared_ptr<INoeud> ParseurRefVariable::parser(std::vector<Token>& tokens, int& index) 
 {
     consommer(tokens, index, TOKEN_REF, "Erreur : 'ref' attendu");
     

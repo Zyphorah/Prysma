@@ -8,15 +8,15 @@
 class ParseurRetour : public IParseur, public ParseurBase
 {
 private:
-    IConstructeurArbre* _constructeurEquation;  // For parsing equations
+    IConstructeurArbre* _constructeurEquation;
 
 public:
 
-    explicit ParseurRetour(IConstructeurArbre* constructeurEquation = nullptr);
+    explicit ParseurRetour(IConstructeurArbre* constructeurEquation);
     
     ~ParseurRetour();
 
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) override;
+    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index) override;
 };
 
 #endif /* F39730D3_0913_46B1_91E5_676A85D4CABB */

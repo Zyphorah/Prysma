@@ -13,5 +13,5 @@ std::shared_ptr<INoeud> StrategieAppelFonction::construire(std::vector<Token>& e
     ParseurAppelFonction parseurAppel(_constructeurEquation);
     int indexZero = 0;
     std::vector<Token> equationAvecIndex = equation;
-    return parseurAppel.parser(equationAvecIndex, indexZero, _constructeurEquation);
+    return parseurAppel.parser(equationAvecIndex, indexZero);
 }

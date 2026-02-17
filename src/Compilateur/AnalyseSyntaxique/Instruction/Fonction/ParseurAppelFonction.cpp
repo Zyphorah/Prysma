@@ -1,10 +1,9 @@
 #include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/AST/Noeuds/Fonction/NoeudAppelFonction.h"
-#include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
 #include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurAppelFonction.h"
 #include <memory>
 
-ParseurAppelFonction::ParseurAppelFonction(IConstructeurArbre* constructeurArbre) : _constructeurArbre(constructeurArbre)
+ParseurAppelFonction::ParseurAppelFonction(IConstructeurArbre* constructeurArbreEquation) : _constructeurArbreEquation(constructeurArbreEquation)
 {
 }
 
@@ -12,7 +11,7 @@ ParseurAppelFonction::~ParseurAppelFonction()
 {
 }
 
-std::shared_ptr<INoeud> ParseurAppelFonction::parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre)
+std::shared_ptr<INoeud> ParseurAppelFonction::parser(std::vector<Token>& tokens, int& index)
 {
 
     consommer(tokens, index, TOKEN_CALL, "Erreur: 'call' attendu");
@@ -21,10 +20,7 @@ std::shared_ptr<INoeud> ParseurAppelFonction::parser(std::vector<Token>& tokens,
     
     std::shared_ptr<IInstruction> noeudAppel = std::make_shared<NoeudAppelFonction>(nomFonction);
     
-
-    std::shared_ptr<ConstructeurEquationFlottante> constructeurEquation = std::make_shared<ConstructeurEquationFlottante>(constructeurArbre);
-    
-    consommerEnfantCorps(tokens, index, noeudAppel, constructeurEquation->recupererConstructeurArbre(), TOKEN_PAREN_FERMEE);
+    consommerEnfantCorps(tokens, index, noeudAppel, _constructeurArbreEquation, TOKEN_PAREN_FERMEE);
 
     consommer(tokens, index, TOKEN_PAREN_FERMEE, "Erreur: ')' attendue");
     

@@ -15,14 +15,14 @@ class ParseurDeclarationVariable : public IParseur, public ParseurBase
 {
 private:
     std::shared_ptr<ParseurType> _parseurType;
-    IConstructeurArbre* _constructeurEquation;  // For parsing equations
+    IConstructeurArbre* _constructeurEquation;
 
 public:
 
-     ParseurDeclarationVariable(std::shared_ptr<ParseurType> parseurType, IConstructeurArbre* constructeurEquation = nullptr);
+     ParseurDeclarationVariable(std::shared_ptr<ParseurType> parseurType, IConstructeurArbre* constructeurEquation);
     ~ParseurDeclarationVariable();
 
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) override;
+    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index) override;
 };
 
 #endif /* F7H8I9J0_K1L2M3N4_O5P6Q7R8_S9T0U1V2 */

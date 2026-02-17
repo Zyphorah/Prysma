@@ -20,10 +20,10 @@ private:
 
 public:
 
-    ParseurAffectationVariable(std::shared_ptr<LlvmBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, std::shared_ptr<RegistreType> registreType, IConstructeurArbre* constructeurEquation = nullptr);
+    ParseurAffectationVariable(std::shared_ptr<LlvmBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, std::shared_ptr<RegistreType> registreType, IConstructeurArbre* constructeurEquation);
     ~ParseurAffectationVariable();
 
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) override;
+    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index) override;
 };
 
 #endif /* E5F6G7H8_I9J0K1L2_M3N4O5P6_Q7R8S9T0 */

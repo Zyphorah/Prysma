@@ -6,8 +6,13 @@
 
 class ParseurScope : public IParseur, public ParseurBase
 {
+private:
+    IConstructeurArbre* _constructeurArbreInstruction;
 public:
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) override;
+    ParseurScope(IConstructeurArbre* constructeurArbreInstruction);
+    ~ParseurScope();
+
+    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index) override;
 
 };
 

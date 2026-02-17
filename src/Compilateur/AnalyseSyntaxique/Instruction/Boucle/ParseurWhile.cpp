@@ -4,7 +4,8 @@
 #include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
 #include "Compilateur/Lexer/TokenType.h"
 
-ParseurWhile::ParseurWhile(IConstructeurArbre* constructeurArbre) : _constructeurArbre(constructeurArbre)
+ParseurWhile::ParseurWhile(IConstructeurArbre* constructeurArbreEquation, IConstructeurArbre* constructeurArbreInstruction) 
+    : _constructeurArbreEquation(constructeurArbreEquation), _constructeurArbreInstruction(constructeurArbreInstruction)
 {}
 
 ParseurWhile::~ParseurWhile()
@@ -13,19 +14,19 @@ ParseurWhile::~ParseurWhile()
 // exemple : while()
 //{}
 
-std::shared_ptr<INoeud> ParseurWhile::parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre)
+std::shared_ptr<INoeud> ParseurWhile::parser(std::vector<Token>& tokens, int& index)
 {
     consommer(tokens,index,TOKEN_TANT_QUE,"Erreur, token attendu 'while' ");
 
     consommer(tokens,index,TOKEN_PAREN_OUVERTE,"Erreur, le token n'est pas '('! ");
     
-    std::shared_ptr<INoeud> condition = _constructeurArbre->construire(tokens, index);
+    std::shared_ptr<INoeud> condition = _constructeurArbreEquation->construire(tokens, index);
 
     consommer(tokens,index,TOKEN_PAREN_FERMEE,"Erreur, le token n'est pas ')'! ");
 
     std::shared_ptr<NoeudInstruction> noeudBlocWhile = std::make_shared<NoeudInstruction>();
     consommer(tokens,index,TOKEN_ACCOLADE_OUVERTE, "Erreur, le token n'est pas '{'");
-    consommerEnfantCorps(tokens,index,noeudBlocWhile,constructeurArbre,TOKEN_ACCOLADE_FERMEE);
+    consommerEnfantCorps(tokens,index,noeudBlocWhile,_constructeurArbreInstruction,TOKEN_ACCOLADE_FERMEE);
     consommer(tokens,index,TOKEN_ACCOLADE_FERMEE,"Erreur, le token n'est pas '}'");
 
 

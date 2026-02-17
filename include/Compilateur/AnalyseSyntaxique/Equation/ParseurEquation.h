@@ -14,7 +14,7 @@ public:
     ParseurEquation(IConstructeurArbre* constructeurArbre);
     ~ParseurEquation();
 
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) override;
+    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index) override;
 };
 
 #endif /* F3A7B8C9_D4E2_4F6A_B1C3_E5G7H9I2J4K6 */

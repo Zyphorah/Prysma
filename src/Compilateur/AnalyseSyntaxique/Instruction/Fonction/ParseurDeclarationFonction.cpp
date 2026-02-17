@@ -7,19 +7,16 @@
 #include <memory>
 #include <vector>
 
-ParseurDeclarationFonction::ParseurDeclarationFonction()
+ParseurDeclarationFonction::ParseurDeclarationFonction(IConstructeurArbre* constructeurArbreInstruction)
+    : _constructeurArbreInstruction(constructeurArbreInstruction)
 {}
 
 ParseurDeclarationFonction::~ParseurDeclarationFonction()
 {
 }
 
-std::shared_ptr<INoeud> ParseurDeclarationFonction::parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre)
+std::shared_ptr<INoeud> ParseurDeclarationFonction::parser(std::vector<Token>& tokens, int& index)
 {
-    if (constructeurArbre == nullptr) {
-        throw ErreurCompilation("Erreur : IConstructeurArbre est null dans ParsingDeclarationFonction", 1, 1);
-    }
-    
     consommer(tokens, index, TOKEN_FONCTION, "Erreur: ce n'est pas le bon token ! 'fn'");
 
     Token tokenTypeRetour = tokens[index];
@@ -41,12 +38,12 @@ std::shared_ptr<INoeud> ParseurDeclarationFonction::parser(std::vector<Token>& t
     consommer(tokens, index, TOKEN_PAREN_OUVERTE, "Erreur: ce n'est pas une parenthèse ouverte '('");
     
     // Manger tout les paramètres
-    consommerEnfantCorps(tokens,index,parent,constructeurArbre,TOKEN_PAREN_FERMEE);
+    consommerEnfantCorps(tokens,index,parent,_constructeurArbreInstruction,TOKEN_PAREN_FERMEE);
 
     consommer(tokens, index, TOKEN_PAREN_FERMEE, "Erreur: ce n'est pas une parenthèse fermée ')'");
     // Manger tout ce qui ce trouve dans les accolades
     consommer(tokens, index, TOKEN_ACCOLADE_OUVERTE, "Erreur: ce n'est pas une accolade ouverte '{' ");
-    consommerEnfantCorps(tokens,index,parent,constructeurArbre,TOKEN_ACCOLADE_FERMEE);
+    consommerEnfantCorps(tokens,index,parent,_constructeurArbreInstruction,TOKEN_ACCOLADE_FERMEE);
     consommer(tokens, index, TOKEN_ACCOLADE_FERMEE, "Erreur: ce n'est pas une accolade fermée '}'");
 
     return parent; 

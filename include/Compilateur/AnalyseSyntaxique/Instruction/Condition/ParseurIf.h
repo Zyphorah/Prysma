@@ -6,12 +6,13 @@
 class ParseurIf: public IParseur, ParseurBase
 {
 private:
-    IConstructeurArbre* _constructeurArbre;
+    IConstructeurArbre* _constructeurArbreEquation;
+    IConstructeurArbre* _constructeurArbreInstruction;
 public:
-    ParseurIf(IConstructeurArbre* constructeurArbre);
+    ParseurIf(IConstructeurArbre* constructeurArbreEquation, IConstructeurArbre* constructeurArbreInstruction);
     ~ParseurIf();
     
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index, IConstructeurArbre* constructeurArbre) override;
+    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index) override;
 };
 
 
