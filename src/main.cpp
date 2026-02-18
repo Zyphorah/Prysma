@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
         registreStrategieEquation->enregistrer(TOKEN_LIT_INT, std::make_shared<StrategieLitteral>());
         registreStrategieEquation->enregistrer(TOKEN_LIT_FLOAT, std::make_shared<StrategieLitteral>());
         registreStrategieEquation->enregistrer(TOKEN_LIT_BOLEEN, std::make_shared<StrategieLitteral>());
-        registreStrategieEquation->enregistrer(TOKEN_IDENTIFIANT, std::make_shared<StrategieIdentifiant>());
+        registreStrategieEquation->enregistrer(TOKEN_IDENTIFIANT, std::make_shared<StrategieIdentifiant>(constructeurEquation));
         registreStrategieEquation->enregistrer(TOKEN_REF, std::make_shared<StrategieRef>());
         registreStrategieEquation->enregistrer(TOKEN_UNREF, std::make_shared<StrategieUnRef>());
         registreStrategieEquation->enregistrer(TOKEN_NON, std::make_shared<StrategieNegation>());

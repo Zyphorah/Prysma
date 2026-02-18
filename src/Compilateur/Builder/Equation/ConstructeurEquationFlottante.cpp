@@ -101,6 +101,8 @@ void ConstructeurEquationFlottante::initialiserRegistre()
     });
 }
 
+
+
 std::shared_ptr<INoeud> ConstructeurEquationFlottante::construire(std::vector<Token> &tokens)
 {
     return _constructeurArbre->construire(tokens);
@@ -109,6 +111,11 @@ std::shared_ptr<INoeud> ConstructeurEquationFlottante::construire(std::vector<To
 IConstructeurArbre* ConstructeurEquationFlottante::recupererConstructeurArbre() const
 {
     return _constructeurArbre.get();
+}
+
+std::shared_ptr<INoeud> ConstructeurEquationFlottante::construire(std::vector<Token>& tokens, int& index)
+{
+    return _constructeurArbre->construire(tokens, index);
 }
 
 void ConstructeurEquationFlottante::setRegistreStrategieEquation(std::shared_ptr<RegistreStrategieEquation> registre)

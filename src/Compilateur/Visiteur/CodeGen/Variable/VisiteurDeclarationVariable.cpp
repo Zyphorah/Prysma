@@ -58,6 +58,9 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
         gestionVariable.enregistrerVariable(noeudDeclarationVariable->getNom(), allocaInst);
         // Cas normal: évaluer l'expression d'initialisation
         llvm::Value* valeurCalculee = evaluerExpression(noeudDeclarationVariable->getExpression());
+        if (valeurCalculee == nullptr) {
+            return;
+        }
 
         // Stocker la valeur
         llvm::Value* valeurCastee = _contextGenCode->backend->creerAutoCast(valeurCalculee, typeVariable);

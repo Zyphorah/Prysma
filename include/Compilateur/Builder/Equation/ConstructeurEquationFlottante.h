@@ -14,7 +14,7 @@
 
 struct Token;
 
-class ConstructeurEquationFlottante
+class ConstructeurEquationFlottante : public IConstructeurArbre
 {
 private:
     std::shared_ptr<RegistreSymbole> _registreSymbole;
@@ -48,12 +48,13 @@ public:
     ConstructeurEquationFlottante(IConstructeurArbre* instructionBuilder);
     
     ~ConstructeurEquationFlottante() = default;
+
+    std::shared_ptr<INoeud> construire(std::vector<Token>& tokens) override;
+    std::shared_ptr<INoeud> construire(std::vector<Token>& tokens, int& index) override;
     
     static void setRegistreStrategieEquation(std::shared_ptr<RegistreStrategieEquation> registre);
     
     static std::shared_ptr<RegistreStrategieEquation> getRegistreStrategieEquation();
-
-    std::shared_ptr<INoeud> construire(std::vector<Token> &tokens);
 
     IConstructeurArbre* recupererConstructeurArbre() const;
 };
