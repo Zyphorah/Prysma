@@ -1,5 +1,5 @@
 #include "Compilateur/Visiteur/ASTGraphViz/VisiteurGeneralGraphViz.h"
-#include "Compilateur/AST/Noeuds/Variable/NoeudAffectationTableau.h"
+#include "Compilateur/AST/Noeuds/Tableau/NoeudAffectationTableau.h"
 
 void VisiteurGeneralGraphViz::visiter(NoeudAffectationTableau* noeudAffectationTableau)
 {

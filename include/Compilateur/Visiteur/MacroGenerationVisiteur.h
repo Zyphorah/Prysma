@@ -1,7 +1,6 @@
 #ifndef D2023444_D6C2_4302_89E4_57775CF04AD5
 #define D2023444_D6C2_4302_89E4_57775CF04AD5
 
-
 #define DECLARER_METHODES_VISITEUR \
     void visiter(NoeudScope* NoeudScope) override; \
     void visiter(NoeudAffectationVariable* noeudAffectationVariable) override; \
@@ -20,6 +19,7 @@
     void visiter(NoeudNegation* noeudNegation) override; \
     void visiter(NoeudTableauInitialisation* noeudTableauInit) override;\
     void visiter(NoeudAffectationTableau* noeudAffectationTableau) override;\
+    void visiter(NoeudLectureTableau* noeudLectureTableau) override;\
 
 #define CLASS_NOEUD \
     class NoeudInstruction; \
@@ -40,5 +40,6 @@
     class NoeudNegation; \
     class NoeudTableauInitialisation;\
     class NoeudAffectationTableau;\
+    class NoeudLectureTableau;\
     
 #endif /* D2023444_D6C2_4302_89E4_57775CF04AD5 */

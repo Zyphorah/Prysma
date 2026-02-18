@@ -1,5 +1,5 @@
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
-#include "Compilateur/AST/Noeuds/Variable/NoeudAffectationTableau.h"
+#include "Compilateur/AST/Noeuds/Tableau/NoeudAffectationTableau.h"
 #include "Compilateur/LLVM/GestionVariable.h"
 
 void VisiteurGeneralGenCode::visiter(NoeudAffectationTableau* noeudAffectationTableau)

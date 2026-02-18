@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
         arbre->accept(&visiteurGraphViz);
         visiteurGraphViz.generer();
 
-        system("dot -Tpng output.dot -o ast_graph.png");
+        (void)system("dot -Tpng output.dot -o ast_graph.png");
 
         LlvmSerializer serializer(context->backend->getContext(), context->backend->getModule());
         serializer.SauvegarderCodeLLVM("output.ll");

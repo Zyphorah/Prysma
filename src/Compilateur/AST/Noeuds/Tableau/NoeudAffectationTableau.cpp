@@ -1,4 +1,4 @@
-#include "Compilateur/AST/Noeuds/Variable/NoeudAffectationTableau.h"
+#include "Compilateur/AST/Noeuds/Tableau/NoeudAffectationTableau.h"
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
 #include "Compilateur/Lexer/Lexer.h"
 
