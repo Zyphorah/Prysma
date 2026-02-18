@@ -125,7 +125,28 @@ scope
 
         return (somme == 6);
     }
-    
+// Ne fonctionne pas, bug dans la gestion de l'équation du tableau dans les braquettes []
+    //fn bool testeEquationScopeTableau()
+    //{
+      //  dec int a = 5; 
+       // dec int[3] tableau = [1+(3*a)-23-2, 3*4*4, 42-23]; 
+
+       // if(tableau[0] != -9)
+        //{
+           // return false;
+       // }
+       // if(tableau[1] != 48)
+        //{
+         //   return false; 
+        //}
+
+       // if(tableau[2] != 19)
+        //{
+         //   return false;
+        //}
+        //return true; 
+    //}
+
     fn int main()
     {
         call printBool(call tableauTestLecture());
@@ -135,6 +156,7 @@ scope
         call printBool(call tableauTestIndexDynamique()); // false 
         call printBool(call tableauTestIntegritePile());
         call printBool(call tableauTestIteration());
+        //call printBool(call testeEquationScopeTableau());
 
         return 0; 
     }
