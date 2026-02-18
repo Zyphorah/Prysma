@@ -36,9 +36,11 @@ std::shared_ptr<INoeud> StrategieTableauInitialisation::construire(std::vector<T
     }
     
     // Retourner un conteneur avec tous les éléments
-    if (!elementsTableau.empty()) {
-        return std::make_shared<NoeudTableauInitialisation>(elementsTableau);
+    if (!sousEquation.empty()) {
+        std::shared_ptr<INoeud> element = _constructeurArbreEquation->construire(sousEquation);
+        if (element) {
+            elementsTableau.push_back(element);
+        }
     }
-    
-    return nullptr;
+    return std::make_shared<NoeudTableauInitialisation>(elementsTableau);
 }

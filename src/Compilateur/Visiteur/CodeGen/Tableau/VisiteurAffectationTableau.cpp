@@ -6,7 +6,7 @@ void VisiteurGeneralGenCode::visiter(NoeudAffectationTableau* noeudAffectationTa
 {
     // Évaluer l'expression de l'index
     llvm::Value* indexValue = evaluerExpression(noeudAffectationTableau->getExpressionIndex());
-
+  
     // Évaluer l'expression à affecter
     llvm::Value* expressionResult = evaluerExpression(noeudAffectationTableau->getExpression());
 
@@ -19,8 +19,13 @@ void VisiteurGeneralGenCode::visiter(NoeudAffectationTableau* noeudAffectationTa
         indexValue 
     };
     
+    // On ne peut pas récupérer la taille du tableau à la compilation si l'index est une variable.
+    // On doit donc récupérer le type du tableau directement depuis l'instruction d'allocation.
+    llvm::AllocaInst* allocaInst = llvm::dyn_cast<llvm::AllocaInst>(valeur);
+    llvm::Type* arrayType = allocaInst->getAllocatedType();
+
     llvm::Value* ptrCase = _contextGenCode->backend->getBuilder().CreateGEP(
-        llvm::ArrayType::get(_contextGenCode->backend->getBuilder().getInt32Ty(), 4), 
+        arrayType, 
         valeur, 
         indices
     );
