@@ -147,6 +147,51 @@ scope
         //return true; 
     //}
 
+    fn float[4] tableauTestRetour()
+    {
+        dec float[4] tableau = [0.0, 1.0, 2.0, 3.0];
+        return tableau;
+    }
+
+    fn bool tableauTestRetourLecture()
+    {
+        dec float[4] tableau = call tableauTestRetour();
+
+         if (tableau[0] != 0.0) {
+             return false;
+         }
+         if (tableau[1] != 1.0) {
+             return false;  
+         }
+        if (tableau[2] != 2.0) {
+            return false;  
+        }
+        if (tableau[3] != 3.0) {
+            return false;  
+        }
+        return true;
+    }
+
+    fn bool tableauInjectionArgument(arg float[3] tableau)
+    {
+        if (tableau[0] != 0.0) {
+             return false;
+         }
+         if (tableau[1] != 1.0) {
+             return false;  
+         }
+        if (tableau[2] != 2.0) {
+            return false;  
+        }
+        return true;
+    }
+
+    fn bool tableauTestArgument()
+    {
+        dec float[3] tableau = [0.0, 1.0, 2.0];
+        return call tableauInjectionArgument(tableau);
+    }
+
     fn int main()
     {
         call printBool(call tableauTestLecture());
@@ -157,8 +202,12 @@ scope
         call printBool(call tableauTestIntegritePile());
         call printBool(call tableauTestIteration()); // false
         //call printBool(call testeEquationScopeTableau());
+        call printBool(call tableauTestRetourLecture());
+        call printBool(call tableauTestArgument());
 
         return 0; 
     }
 
 }
+
+   

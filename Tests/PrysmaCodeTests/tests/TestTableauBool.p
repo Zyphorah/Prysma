@@ -133,6 +133,51 @@ scope
         return true;
     }
 
+    fn bool[4] tableauTestRetour()
+    {
+        dec bool[4] tableau = [true, false, true, false];
+        return tableau;
+    }
+
+    fn bool tableauTestRetourLecture()
+    {
+        dec bool[4] tableau = call tableauTestRetour();
+
+         if (tableau[0] != true) {
+             return false;
+         }
+         if (tableau[1] != false) {
+             return false;  
+         }
+        if (tableau[2] != true) {
+            return false;  
+        }
+        if (tableau[3] != false) {
+            return false;  
+        }
+        return true;
+    }
+
+    fn bool tableauInjectionArgument(arg bool[3] tableau)
+    {
+        if (tableau[0] != true) {
+             return false;
+         }
+         if (tableau[1] != false) {
+             return false;  
+         }
+        if (tableau[2] != true) {
+            return false;  
+        }
+        return true;
+    }
+
+    fn bool tableauTestArgument()
+    {
+        dec bool[3] tableau = [true, false, true];
+        return call tableauInjectionArgument(tableau);
+    }
+
     fn int main()
     {
         call printBool(call tableauTestLecture());
@@ -142,8 +187,12 @@ scope
         //call printBool(call tableauTestIndexDynamique()); // false
         call printBool(call tableauTestIntegritePile());
         call printBool(call tableauTestIteration());
+        call printBool(call tableauTestRetourLecture());
+        call printBool(call tableauTestArgument());
 
         return 0; 
     }
 
 }
+
+  

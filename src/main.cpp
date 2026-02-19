@@ -107,14 +107,15 @@ int main(int argc, char* argv[])
         context->registreType->enregistrer(TOKEN_TYPE_FLOAT, llvm::Type::getFloatTy(context->backend->getContext()));
         context->registreType->enregistrer(TOKEN_TYPE_BOOL, llvm::Type::getInt1Ty(context->backend->getContext()));
         context->registreType->enregistrer(TOKEN_TYPE_VOID, llvm::Type::getVoidTy(context->backend->getContext()));
-        
-        // Créer le ParseurType avec le registre
-        std::shared_ptr<ParseurType> parseurType = std::make_shared<ParseurType>(context->registreType);
-
+       
         // Constuire les chef d'orchestre de l'arbre syntaxique abstrait
         ConstructeurArbreInstruction constructeurArbreInstruction(context->registreInstruction);
         std::shared_ptr<ConstructeurEquationFlottante> constructeurEquation = std::make_shared<ConstructeurEquationFlottante>(&constructeurArbreInstruction);
         
+         
+        // Créer le ParseurType avec le registre
+        std::shared_ptr<ParseurType> parseurType = std::make_shared<ParseurType>(context->registreType,constructeurEquation->recupererConstructeurArbre());
+
         // Enregistrer les strategies d'équation 
         std::shared_ptr<RegistreStrategieEquation> registreStrategieEquation = std::make_shared<RegistreStrategieEquation>();
         registreStrategieEquation->enregistrer(TOKEN_LIT_INT, std::make_shared<StrategieLitteral>());
