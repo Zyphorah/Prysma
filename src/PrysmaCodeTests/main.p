@@ -1,20 +1,27 @@
 // fibonaci
 scope {
 
-  
-
-   fn int teste(arg int[10] tableau)
+   fn int[10] teste(arg int[10] tableau)
    {
-      call printInt(tableau[0]);
-      return 0; 
+      aff tableau[0] = 10; 
+      return tableau; 
    }
 
-   fn int main() {
-
+   fn int main() 
+   {
       dec int[10] tableau = [1,2,3,4];
-      call teste(ref tableau);
-   
 
+      dec int[10] tableauCopier = call teste(tableau);
+
+      dec int i = 0;
+
+      while(i < 10)
+      {
+         call printInt(tableauCopier[i]);
+         aff i = i + 1;
+      }
+     
+      
       return 0;
    }
 }
