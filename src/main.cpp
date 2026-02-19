@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
         context->registreInstruction->enregistrer(TOKEN_DEC, std::make_shared<ParseurDeclarationVariable>(parseurType, constructeurEquation->recupererConstructeurArbre()));
         context->registreInstruction->enregistrer(TOKEN_CALL, std::make_shared<ParseurInstructionAppel>(constructeurEquation->recupererConstructeurArbre()));
         context->registreInstruction->enregistrer(TOKEN_RETOUR, std::make_shared<ParseurRetour>(constructeurEquation->recupererConstructeurArbre()));
-        context->registreInstruction->enregistrer(TOKEN_ARG, std::make_shared<ParseurArgFonction>());
+        context->registreInstruction->enregistrer(TOKEN_ARG, std::make_shared<ParseurArgFonction>(parseurType));
         context->registreInstruction->enregistrer(TOKEN_UNREF, std::make_shared<ParseurUnRefVariable>());
         context->registreInstruction->enregistrer(TOKEN_REF, std::make_shared<ParseurRefVariable>());
         context->registreInstruction->enregistrer(TOKEN_SI, std::make_shared<ParseurIf>(constructeurEquation->recupererConstructeurArbre(), &constructeurArbreInstruction));

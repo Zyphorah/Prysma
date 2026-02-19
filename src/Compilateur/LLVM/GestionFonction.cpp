@@ -8,7 +8,6 @@
 #include <memory>
 #include <utility>
 
-
 GestionFonction::GestionFonction(shared_ptr<ContextGenCode> contextGenCode, NoeudDeclarationFonction* noeudDeclarationFonction, IVisiteur* visiteurGeneralCodeGen) 
 :   _contextGenCode(std::move(contextGenCode)),
     _noeudDeclarationFonction(noeudDeclarationFonction),
@@ -40,15 +39,13 @@ GestionFonction::ArgumentsCodeGen GestionFonction::chargerArguments()
         if (typeid(*enfant) == typeid(NoeudArgFonction)) {
             auto* arg = static_cast<NoeudArgFonction*>(enfant);
             arguments.push_back(arg);
-            llvm::Type* argType = _contextGenCode->registreType->recuperer(arg->getType());
+            llvm::Type* argType = arg->getType()->genererTypeLLVM(_contextGenCode->backend->getContext());
             argTypes.push_back(argType);
         }
     }
     
     return ArgumentsCodeGen{argTypes, arguments};
 }
-
-
 
 llvm::Function* GestionFonction::creerFonction(llvm::Type* typeDeRetour, const ArgumentsCodeGen& argumentsCodeGen)
 {
@@ -66,7 +63,6 @@ llvm::Function* GestionFonction::creerFonction(llvm::Type* typeDeRetour, const A
 
     return function;
 }
-
 
 void GestionFonction::enregistrerFonction(llvm::Function* function)
 {
