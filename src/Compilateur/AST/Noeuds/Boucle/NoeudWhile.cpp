@@ -4,8 +4,8 @@
 NoeudWhile::NoeudWhile()
     = default;
 
-NoeudWhile::NoeudWhile(std::shared_ptr<INoeud>&& condition, std::shared_ptr<INoeud>&& blocWhile, std::shared_ptr<INoeud>&& blocEndWhile)
-    : noeudCondition(std::move(condition)), noeudBlocWhile(std::move(blocWhile)), noeudBlocFinWhile(std::move(blocEndWhile))
+NoeudWhile::NoeudWhile(INoeud* condition, INoeud* blocWhile, INoeud* blocEndWhile)
+    : noeudCondition(condition), noeudBlocWhile(blocWhile), noeudBlocFinWhile(blocEndWhile)
 {
 }
 

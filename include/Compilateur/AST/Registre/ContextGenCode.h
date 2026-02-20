@@ -15,56 +15,56 @@
 struct ContextGenCode
 {
     llvm::Value* valeurTemporaire;
-    std::shared_ptr<LlvmBackend> backend;
-    std::shared_ptr<RegistreInstruction> registreInstruction;
-    std::shared_ptr<RegistreVariable> registreVariable;
-    std::shared_ptr<RegistreFonction> registreFonction;
-    std::shared_ptr<RegistreType> registreType;
-    std::shared_ptr<RetourContexteCompilation> returnContextCompilation;
-    std::shared_ptr<RegistreArgument> registreArgument;
+    LlvmBackend* backend;
+    RegistreInstruction* registreInstruction;
+    RegistreVariable* registreVariable;
+    RegistreFonction* registreFonction;
+    RegistreType* registreType;
+    RetourContexteCompilation* returnContextCompilation;
+    RegistreArgument* registreArgument;
 
     ContextGenCode(
-        std::shared_ptr<LlvmBackend> backend,
-        std::shared_ptr<RegistreInstruction> registreInstruction,
-        std::shared_ptr<RegistreVariable> registreVariable,
-        std::shared_ptr<RegistreFonction> registreFonction,
-        std::shared_ptr<RegistreType> registreType,
-        std::shared_ptr<RetourContexteCompilation> returnContextCompilation,
-        std::shared_ptr<RegistreArgument> registreArgument,
+        LlvmBackend* backend,
+        RegistreInstruction* registreInstruction,
+        RegistreVariable* registreVariable,
+        RegistreFonction* registreFonction,
+        RegistreType* registreType,
+        RetourContexteCompilation* returnContextCompilation,
+        RegistreArgument* registreArgument,
         llvm::Value* valeurTemporaire
     ) 
     {
         try {
-            if (!backend) {
+            if (backend == nullptr) {
                 throw std::invalid_argument("Le backend LLVM ne peut pas être null");
             }
-            if (!registreInstruction) {
+            if (registreInstruction == nullptr) {
                 throw std::invalid_argument("Le registre d'instruction ne peut pas être null");
             }
-            if (!registreVariable) {
+            if (registreVariable == nullptr) {
                 throw std::invalid_argument("Le registre de variable ne peut pas être null");
             }
-            if (!registreFonction) {
+            if (registreFonction == nullptr) {
                 throw std::invalid_argument("Le registre de fonction ne peut pas être null");
             }
-            if (!registreType) {
+            if (registreType == nullptr) {
                 throw std::invalid_argument("Le registre de type ne peut pas être null");
             }
-            if (!returnContextCompilation) {
+            if (returnContextCompilation == nullptr) {
                 throw std::invalid_argument("Le contexte de retour de compilation ne peut pas être null");
             }
-            if (!registreArgument) {
+            if (registreArgument == nullptr) {
                 throw std::invalid_argument("Le registre d'argument ne peut pas être null");
             }
 
             this->valeurTemporaire = valeurTemporaire;
-            this->backend = std::move(backend);
-            this->registreInstruction = std::move(registreInstruction);
-            this->registreVariable = std::move(registreVariable);
-            this->registreFonction = std::move(registreFonction);
-            this->registreType = std::move(registreType);
-            this->returnContextCompilation = std::move(returnContextCompilation);
-            this->registreArgument = std::move(registreArgument);
+            this->backend = backend;
+            this->registreInstruction = registreInstruction;
+            this->registreVariable = registreVariable;
+            this->registreFonction = registreFonction;
+            this->registreType = registreType;
+            this->returnContextCompilation = returnContextCompilation;
+            this->registreArgument = registreArgument;
         }
         catch (const std::invalid_argument& e) {
             std::cerr << "Erreur lors de l'initialisation du contexte de génération de code : " 

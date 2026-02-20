@@ -16,14 +16,14 @@ class LlvmBackend;
 class VisiteurGeneralGenCode : public IVisiteur
 {
 private:
-    std::shared_ptr<ContextGenCode> _contextGenCode;
+    ContextGenCode* _contextGenCode;
     
 public:
-    VisiteurGeneralGenCode(std::shared_ptr<ContextGenCode> contextGenCode);
+    VisiteurGeneralGenCode(ContextGenCode* contextGenCode);
     ~VisiteurGeneralGenCode();
     void parcourirEnfant(NoeudInstruction* noeud);
     
-    llvm::Value* evaluerExpression(std::shared_ptr<INoeud>& expression);
+    llvm::Value* evaluerExpression(INoeud* expression);
     
     DECLARER_METHODES_VISITEUR
 };

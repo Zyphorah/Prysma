@@ -8,16 +8,16 @@
 #include <memory>
 #include <utility>
 
-GestionFonction::GestionFonction(shared_ptr<ContextGenCode> contextGenCode, NoeudDeclarationFonction* noeudDeclarationFonction, IVisiteur* visiteurGeneralCodeGen) 
-:   _contextGenCode(std::move(contextGenCode)),
+GestionFonction::GestionFonction(ContextGenCode* contextGenCode, NoeudDeclarationFonction* noeudDeclarationFonction, IVisiteur* visiteurGeneralCodeGen) 
+:   _contextGenCode(contextGenCode),
     _noeudDeclarationFonction(noeudDeclarationFonction),
     enfants(&noeudDeclarationFonction->getEnfants()),
     _visiteurGeneralCodeGen(visiteurGeneralCodeGen)
 {
 }
 
-GestionFonction::GestionFonction(shared_ptr<ContextGenCode> contextGenCode, IVisiteur* visiteurGeneralCodeGen)
-:   _contextGenCode(std::move(contextGenCode)),
+GestionFonction::GestionFonction(ContextGenCode* contextGenCode, IVisiteur* visiteurGeneralCodeGen)
+:   _contextGenCode(contextGenCode),
     _noeudDeclarationFonction(nullptr),
     enfants(nullptr),
     _visiteurGeneralCodeGen(visiteurGeneralCodeGen)
@@ -34,8 +34,8 @@ GestionFonction::ArgumentsCodeGen GestionFonction::chargerArguments()
     std::vector<NoeudArgFonction*> arguments;
     
     // Remplir le vecteur argTypes  et arguments
-    for (const std::shared_ptr<INoeud> & index : *enfants) {
-        INoeud* enfant = index.get();
+    for (INoeud* index : *enfants) {
+        INoeud* enfant = index;
         if (typeid(*enfant) == typeid(NoeudArgFonction)) {
             auto* arg = static_cast<NoeudArgFonction*>(enfant);
             arguments.push_back(arg);
@@ -102,7 +102,7 @@ void GestionFonction::traiterArgumentsConstruit(llvm::Function* function, const 
 void GestionFonction::traiterCorpsFonction()
 {
     for (const auto & index : *enfants) {
-        INoeud* enfant = index.get();
+        INoeud* enfant = index;
         if (typeid(*enfant) != typeid(NoeudArgFonction)) {
             index->accept(_visiteurGeneralCodeGen);
         }
@@ -129,7 +129,7 @@ void GestionFonction::passArguments(NoeudAppelFonction* noeudAppelFonction)
 
     unsigned int indexParam = 0; 
 
-    for (const std::shared_ptr<INoeud>& argumentEnfant : noeudAppelFonction->getEnfants()) 
+    for (INoeud* argumentEnfant : noeudAppelFonction->getEnfants()) 
     {
 
         argumentEnfant->accept(_visiteurGeneralCodeGen);
@@ -168,7 +168,7 @@ llvm::Function* GestionFonction::obtenirFonction(const std::string& nomFonction)
 
 void GestionFonction::genererAppelFonction(llvm::Function* fonction)
 {
-    std::vector<llvm::Value*> args = *_contextGenCode->registreArgument->recuperer();
+    std::vector<llvm::Value*> args = _contextGenCode->registreArgument->recuperer();
     _contextGenCode->registreArgument->vider();
 
     _contextGenCode->valeurTemporaire = _contextGenCode->backend->getBuilder().CreateCall(

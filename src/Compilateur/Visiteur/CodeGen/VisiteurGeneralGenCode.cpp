@@ -3,7 +3,7 @@
 #include "Compilateur/AST/Noeuds/Operande/NoeudLitteral.h"
 #include <llvm/IR/Constants.h>
 
-VisiteurGeneralGenCode::VisiteurGeneralGenCode(std::shared_ptr<ContextGenCode> contextGenCode) : _contextGenCode(std::move(contextGenCode))
+VisiteurGeneralGenCode::VisiteurGeneralGenCode(ContextGenCode* contextGenCode) : _contextGenCode(contextGenCode)
 {}
 
 VisiteurGeneralGenCode::~VisiteurGeneralGenCode()
@@ -17,7 +17,7 @@ void VisiteurGeneralGenCode::parcourirEnfant(NoeudInstruction* noeud)
     }
 }
 
-llvm::Value* VisiteurGeneralGenCode::evaluerExpression(std::shared_ptr<INoeud>& expression) {
+llvm::Value* VisiteurGeneralGenCode::evaluerExpression(INoeud* expression) {
     if (expression != nullptr) {
         expression->accept(this);
         return _contextGenCode->valeurTemporaire;

@@ -7,12 +7,12 @@
 class RegistreArgument
 {
 private: 
-    std::shared_ptr<std::vector<llvm::Value*>> _vecArg;
+    std::vector<llvm::Value*> _vecArg;
 
 public: 
    RegistreArgument();
    void ajouter(llvm::Value* arg);
-   std::shared_ptr<std::vector<llvm::Value*>> recuperer();
+   std::vector<llvm::Value*>& recuperer();
    void vider();
 };
 

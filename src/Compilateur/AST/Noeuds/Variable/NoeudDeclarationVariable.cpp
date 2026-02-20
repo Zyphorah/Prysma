@@ -6,8 +6,8 @@
 #include <memory>
 #include <utility>
 
-NoeudDeclarationVariable::NoeudDeclarationVariable(const std::string& nom, std::shared_ptr<IType> type, std::shared_ptr<INoeud> expression)
-    : _nom(nom), _type(std::move(type)), _expression(std::move(expression))
+NoeudDeclarationVariable::NoeudDeclarationVariable(const std::string& nom, IType* type, INoeud* expression)
+    : _nom(nom), _type(type), _expression(expression)
 {
 }
 

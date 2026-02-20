@@ -12,10 +12,10 @@ StrategieTableauInitialisation::StrategieTableauInitialisation(IConstructeurArbr
 }
 
 // Calcule d'index pour les éléments du tableau, utilisée la virgule comme séparateur de sous équation à envoyer au constructeur d'arbre d'equation
-std::shared_ptr<INoeud> StrategieTableauInitialisation::construire(std::vector<Token>& equation)
+INoeud* StrategieTableauInitialisation::construire(std::vector<Token>& equation)
 {
     // equation commence avec le '[' - nous devons le sauter
-    std::vector<std::shared_ptr<INoeud>> elementsTableau;
+    std::vector<INoeud*> elementsTableau;
     std::vector<Token> sousEquation;
     
     int index = 1;  // Commencer après le '['
@@ -23,7 +23,7 @@ std::shared_ptr<INoeud> StrategieTableauInitialisation::construire(std::vector<T
     while (index < static_cast<int>(equation.size()) && equation[index].type != TOKEN_CROCHET_FERME) {
         if (equation[index].type == TOKEN_VIRGULE) {
             index++;
-            std::shared_ptr<INoeud> element = _constructeurArbreEquation->construire(sousEquation);
+            INoeud* element = _constructeurArbreEquation->construire(sousEquation);
             if (element) {
                 elementsTableau.push_back(element);
             }
@@ -37,10 +37,10 @@ std::shared_ptr<INoeud> StrategieTableauInitialisation::construire(std::vector<T
     
     // Retourner un conteneur avec tous les éléments
     if (!sousEquation.empty()) {
-        std::shared_ptr<INoeud> element = _constructeurArbreEquation->construire(sousEquation);
+        INoeud* element = _constructeurArbreEquation->construire(sousEquation);
         if (element) {
             elementsTableau.push_back(element);
         }
     }
-    return std::make_shared<NoeudTableauInitialisation>(elementsTableau);
+    return new NoeudTableauInitialisation(elementsTableau);
 }

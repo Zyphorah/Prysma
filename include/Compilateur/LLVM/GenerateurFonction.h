@@ -9,9 +9,9 @@ class VisiteurGeneralGenCode;
 class GestionFonction
 {
     private:
-        std::shared_ptr<ContextGenCode> _contextGenCode;
+        ContextGenCode* _contextGenCode;
         NoeudDeclarationFonction* _noeudDeclarationFonction;
-        const std::vector<shared_ptr<INoeud>>* enfants;
+        const std::vector<INoeud*>* enfants;
 
         IVisiteur* _visiteurGeneralCodeGen;
        
@@ -40,8 +40,8 @@ class GestionFonction
 
         void declarerFonction();
         void genererAppelFonction(NoeudAppelFonction* noeudAppelFonction);
-        GestionFonction(shared_ptr<ContextGenCode> _contextGenCode, NoeudDeclarationFonction* noeudDeclarationFonction, IVisiteur* visiteurGeneralCodeGen);
-        GestionFonction(shared_ptr<ContextGenCode> _contextGenCode, IVisiteur* visiteurGeneralCodeGen);
+        GestionFonction(ContextGenCode* _contextGenCode, NoeudDeclarationFonction* noeudDeclarationFonction, IVisiteur* visiteurGeneralCodeGen);
+        GestionFonction(ContextGenCode* _contextGenCode, IVisiteur* visiteurGeneralCodeGen);
         ~GestionFonction();
 };
 

@@ -6,8 +6,8 @@
 #include <memory>
 #include <utility>
 
-ParseurAffectationVariable::ParseurAffectationVariable(std::shared_ptr<LlvmBackend> backend, std::shared_ptr<RegistreVariable> registreVariable,std::shared_ptr<RegistreType> registreType, IConstructeurArbre* constructeurEquation)
-    : _backend(std::move(backend)), _registreVariable(std::move(registreVariable)), _registreType(std::move(registreType)), _constructeurEquation(constructeurEquation)
+ParseurAffectationVariable::ParseurAffectationVariable(LlvmBackend* backend, RegistreVariable* registreVariable, RegistreType* registreType, IConstructeurArbre* constructeurEquation)
+    : _backend(backend), _registreVariable(registreVariable), _registreType(registreType), _constructeurEquation(constructeurEquation)
 {
 }
 
@@ -15,13 +15,13 @@ ParseurAffectationVariable::~ParseurAffectationVariable()
 {
 }
 
-std::shared_ptr<INoeud> ParseurAffectationVariable::parser(std::vector<Token>& tokens, int& index)
+INoeud* ParseurAffectationVariable::parser(std::vector<Token>& tokens, int& index)
 {
     consommer(tokens, index, TOKEN_AFF, "Erreur : 'aff' attendu");
     Token nomToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Erreur : nom variable attendu");
     std::string nomVariable = nomToken.value;
 
-    std::shared_ptr<INoeud> expressionIndex = nullptr;
+    INoeud* expressionIndex = nullptr;
 
     if (tokens[index].type == TOKEN_CROCHET_OUVERT) {
  
@@ -31,12 +31,12 @@ std::shared_ptr<INoeud> ParseurAffectationVariable::parser(std::vector<Token>& t
     }
 
     consommer(tokens, index, TOKEN_EGAL, "Erreur : '=' attendu");
-    std::shared_ptr<INoeud> expression = _constructeurEquation->construire(tokens, index);
+    INoeud* expression = _constructeurEquation->construire(tokens, index);
     consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur : ';' attendu");
 
     if (expressionIndex != nullptr) {
-        return std::make_shared<NoeudAffectationTableau>(nomVariable, expressionIndex, expression, nomToken);
+        return new NoeudAffectationTableau(nomVariable, expressionIndex, expression, nomToken);
     }
     
-    return std::make_shared<NoeudAffectationVariable>(nomVariable, expression, nomToken);
+    return new NoeudAffectationVariable(nomVariable, expression, nomToken);
 }

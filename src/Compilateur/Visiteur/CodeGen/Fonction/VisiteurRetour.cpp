@@ -6,7 +6,7 @@ void VisiteurGeneralGenCode::visiter(NoeudRetour* noeudReturn)
 {
     noeudReturn->getValeurRetour()->accept(this);
     llvm::Value* valeurEvaluee = _contextGenCode->valeurTemporaire;
-    std::shared_ptr<IType> typeRetourObj = _contextGenCode->returnContextCompilation->recupererContext();
+    IType* typeRetourObj = _contextGenCode->returnContextCompilation->recupererContext();
     llvm::Type* typeRetourLLVM = typeRetourObj->genererTypeLLVM(_contextGenCode->backend->getContext());
     llvm::Value* valeurRetour = _contextGenCode->backend->creerAutoCast(valeurEvaluee, typeRetourLLVM);
     _contextGenCode->backend->getBuilder().CreateRet(valeurRetour);

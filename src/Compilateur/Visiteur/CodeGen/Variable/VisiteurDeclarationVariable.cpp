@@ -16,7 +16,7 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
    
 
     // Vérifier si l'expression est une initialisation de tableau
-    std::shared_ptr<INoeud> expression = noeudDeclarationVariable->getExpression();
+    INoeud* expression = noeudDeclarationVariable->getExpression();
     
     // L'utilisation de dynamic_cast ici est un peu délicate, 
     // pour le moment je n'ai pas trouvé de solution optimal pour retirer ça, sinon je dois dépendre de llvm dans les INoeud, ce qui n'est pas idéal.
@@ -24,7 +24,7 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
     // Je dois trouver une solution pour éviter ce dynamic_cast, sans avoir c'est problème architectural. 
     // Sans doute utiliser un système de stratégie s'il y a plus de 2 types d'initialisation aussi. 
 
-    if (NoeudTableauInitialisation* tableauInit = dynamic_cast<NoeudTableauInitialisation*>(expression.get())) {
+    if (NoeudTableauInitialisation* tableauInit = dynamic_cast<NoeudTableauInitialisation*>(expression)) {
         // typeVariable est le type du tableau complet [n x T], on extrait T
         llvm::ArrayType* typeTableau = llvm::dyn_cast<llvm::ArrayType>(typeVariable);
         
@@ -47,7 +47,7 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
             llvm::Value* ptrCase = _contextGenCode->backend->getBuilder().CreateGEP(typeTableau, allocaInstTableau, indices, "ptr_case");
             
             // Évaluer et stocker la valeur de l'élément
-            std::shared_ptr<INoeud> element = tableauInit->getElements()[i];
+            INoeud* element = tableauInit->getElements()[i];
             llvm::Value* valeurElement = evaluerExpression(element);
             llvm::Value* valeurCastee = _contextGenCode->backend->creerAutoCast(valeurElement, typeElement);
             _contextGenCode->backend->getBuilder().CreateStore(valeurCastee, ptrCase);

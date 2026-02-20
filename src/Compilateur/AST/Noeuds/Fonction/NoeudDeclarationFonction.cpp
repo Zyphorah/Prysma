@@ -6,8 +6,8 @@
 #include <memory>
 #include <utility>
 
-NoeudDeclarationFonction::NoeudDeclarationFonction(std::string nom, std::shared_ptr<IType> typeRetour)
-    : _nom(std::move(nom)), _typeRetour(std::move(typeRetour))
+NoeudDeclarationFonction::NoeudDeclarationFonction(std::string nom, IType* typeRetour)
+    : _nom(std::move(nom)), _typeRetour(typeRetour)
 {
 }
 

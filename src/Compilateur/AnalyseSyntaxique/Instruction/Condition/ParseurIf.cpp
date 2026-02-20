@@ -13,37 +13,37 @@ ParseurIf::ParseurIf(IConstructeurArbre* constructeurArbreEquation, IConstructeu
 ParseurIf::~ParseurIf()
 {}
 
-std::shared_ptr<INoeud> ParseurIf::parser(std::vector<Token>& tokens, int& index) 
+INoeud* ParseurIf::parser(std::vector<Token>& tokens, int& index) 
 {
     consommer(tokens,index,TOKEN_SI,"Erreur, le token n'est pas 'if'! ");
 
     consommer(tokens,index,TOKEN_PAREN_OUVERTE,"Erreur, le token n'est pas '('! ");
     
   
-    std::shared_ptr<INoeud> condition = _constructeurArbreEquation->construire(tokens, index);
+    INoeud* condition = _constructeurArbreEquation->construire(tokens, index);
 
     consommer(tokens,index,TOKEN_PAREN_FERMEE,"Erreur, le token n'est pas ')'! ");
 
     // Créer le noeud bloc IF
-    std::shared_ptr<NoeudInstruction> noeudBlocIf = std::make_shared<NoeudInstruction>();
+    NoeudInstruction* noeudBlocIf = new NoeudInstruction();
     consommer(tokens,index,TOKEN_ACCOLADE_OUVERTE, "Erreur, le token n'est pas '{'");
     consommerEnfantCorps(tokens,index,noeudBlocIf,_constructeurArbreInstruction,TOKEN_ACCOLADE_FERMEE);
     consommer(tokens,index,TOKEN_ACCOLADE_FERMEE,"Erreur, le token n'est pas '}'");
 
     // Créer le noeud bloc ELSE s'il existe
-    std::shared_ptr<NoeudInstruction> noeudBlocElse;
+    NoeudInstruction* noeudBlocElse = nullptr;
     if (index < (int)tokens.size() && tokens[index].type == TOKEN_SINON) {
         consommer(tokens,index,TOKEN_SINON,"Erreur, le token n'est pas 'else'! ");
-        noeudBlocElse = std::make_shared<NoeudInstruction>();
+        noeudBlocElse = new NoeudInstruction();
         consommer(tokens,index,TOKEN_ACCOLADE_OUVERTE, "Erreur, le token n'est pas '{'");
         consommerEnfantCorps(tokens,index,noeudBlocElse,_constructeurArbreInstruction,TOKEN_ACCOLADE_FERMEE);
         consommer(tokens,index,TOKEN_ACCOLADE_FERMEE,"Erreur, le token n'est pas '}'");
     }
 
     // Créer le noeud bloc ENDIF
-    std::shared_ptr<NoeudInstruction> noeudBlocEndif = std::make_shared<NoeudInstruction>();
+    NoeudInstruction* noeudBlocEndif = new NoeudInstruction();
 
-    std::shared_ptr<NoeudIf> noeudIf = std::make_shared<NoeudIf>(std::move(condition), std::move(noeudBlocIf), std::move(noeudBlocElse), std::move(noeudBlocEndif));
+    NoeudIf* noeudIf = new NoeudIf(condition, noeudBlocIf, noeudBlocElse, noeudBlocEndif);
 
     return noeudIf;
 }

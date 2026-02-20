@@ -10,19 +10,19 @@
 
 ConstructeurArbreEquation::ConstructeurArbreEquation(
     ChaineResponsabilite* chaineResponsabilite,
-    std::shared_ptr<RegistreSymbole> registreSymbole,
-    std::shared_ptr<RegistreStrategieEquation> registreStrategieEquation,
+    RegistreSymbole* registreSymbole,
+    RegistreStrategieEquation* registreStrategieEquation,
     IGestionnaireParenthese* gestionnaireParenthese,
     IConstructeurArbre* instructionBuilder)
     : _chaineResponsabilite(chaineResponsabilite), 
-      _registreSymbole(std::move(registreSymbole)), 
-      _registreStrategieEquation(std::move(registreStrategieEquation)),
+      _registreSymbole(registreSymbole), 
+      _registreStrategieEquation(registreStrategieEquation),
       _gestionnaireParenthese(gestionnaireParenthese),
       _instructionBuilder(instructionBuilder)
 {
 }
 
-std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token> &equation) {
+INoeud* ConstructeurArbreEquation::construire(std::vector<Token> &equation) {
     std::vector<Token> equationSansParentheses = _gestionnaireParenthese->enleverParenthesesEnglobantes(equation);
     equation = equationSansParentheses;
     
@@ -44,18 +44,18 @@ std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>
         throw std::runtime_error("Erreur: token non reconnu dans l'équation");
     }
     
-    std::shared_ptr<IExpression> noeud = _registreSymbole->recupererNoeud(equation[indice]);
+    IExpression* noeud = _registreSymbole->recupererNoeud(equation[indice]);
     std::vector<Token> gauche(equation.begin(), equation.begin() + indice); 
     std::vector<Token> droite(equation.begin() + indice + 1, equation.end());
     
-    std::shared_ptr<INoeud> exprGauche = construire(gauche);
-    std::shared_ptr<INoeud> exprDroite = construire(droite);
+    INoeud* exprGauche = construire(gauche);
+    INoeud* exprDroite = construire(droite);
     
     noeud->ajouterExpression(exprGauche, exprDroite);
     return noeud;
 }
 
-std::shared_ptr<INoeud> ConstructeurArbreEquation::construire(std::vector<Token>& tokens, int& index) {
+INoeud* ConstructeurArbreEquation::construire(std::vector<Token>& tokens, int& index) {
 
     // Système de niveau pour calculer la profondeur, c'est obligatoire pour ne pas avoir de problème au niveau de la séparation 34+4)) sinon le 
     // Système ne sais pas quoi faire avec les deux parenthèses restante. 

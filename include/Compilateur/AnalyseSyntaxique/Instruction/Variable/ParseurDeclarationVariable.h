@@ -14,15 +14,15 @@ class RegistreType;
 class ParseurDeclarationVariable : public IParseur, public ParseurBase
 {
 private:
-    std::shared_ptr<ParseurType> _parseurType;
+    ParseurType* _parseurType;
     IConstructeurArbre* _constructeurEquation;
 
 public:
 
-     ParseurDeclarationVariable(std::shared_ptr<ParseurType> parseurType, IConstructeurArbre* constructeurEquation);
+     ParseurDeclarationVariable(ParseurType* parseurType, IConstructeurArbre* constructeurEquation);
     ~ParseurDeclarationVariable();
 
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index) override;
+    INoeud* parser(std::vector<Token>& tokens, int& index) override;
 };
 
 #endif /* F7H8I9J0_K1L2M3N4_O5P6Q7R8_S9T0U1V2 */

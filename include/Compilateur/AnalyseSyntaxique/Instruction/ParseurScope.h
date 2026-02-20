@@ -12,7 +12,7 @@ public:
     ParseurScope(IConstructeurArbre* constructeurArbreInstruction);
     ~ParseurScope();
 
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index) override;
+    INoeud* parser(std::vector<Token>& tokens, int& index) override;
 
 };
 

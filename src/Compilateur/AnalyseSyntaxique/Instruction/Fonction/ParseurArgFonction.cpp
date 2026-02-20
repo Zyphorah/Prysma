@@ -7,7 +7,7 @@
 #include <utility>
 #include "Compilateur/AST/Noeuds/Fonction/NoeudArgFonction.h"
 
-ParseurArgFonction::ParseurArgFonction(std::shared_ptr<ParseurType> constructeurType) : _constructeurType(std::move(constructeurType))
+ParseurArgFonction::ParseurArgFonction(ParseurType* constructeurType) : _constructeurType(constructeurType)
 {
 
 }
@@ -16,15 +16,15 @@ ParseurArgFonction::~ParseurArgFonction()
 {
 }
 
-std::shared_ptr<INoeud> ParseurArgFonction::parser(std::vector<Token>& tokens, int& index) 
+INoeud* ParseurArgFonction::parser(std::vector<Token>& tokens, int& index) 
 {
 
     consommer(tokens,index,TOKEN_ARG,"Erreur: le token n'est pas 'arg' !");
 
     // Refactorisation utilisation du système IType 
-    std::shared_ptr<IType> type = _constructeurType->parser(tokens, index);
+    IType* type = _constructeurType->parser(tokens, index);
 
     Token nom = consommer(tokens,index,TOKEN_IDENTIFIANT,"Erreur: ce n'est pas un identifiant!");
 
-    return make_shared<NoeudArgFonction>(type, nom.value);
+    return new NoeudArgFonction(type, nom.value);
 }

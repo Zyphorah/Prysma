@@ -7,8 +7,8 @@
 #include <memory>
 #include <utility>
 
-NoeudAffectationTableau::NoeudAffectationTableau(const std::string& nom, std::shared_ptr<INoeud> expressionIndex, std::shared_ptr<INoeud> expression, Token token)
-    : _nom(nom), _expressionIndex(std::move(expressionIndex)), _expression(std::move(expression)), _token(std::move(token))
+NoeudAffectationTableau::NoeudAffectationTableau(const std::string& nom, INoeud* expressionIndex, INoeud* expression, Token token)
+    : _nom(nom), _expressionIndex(expressionIndex), _expression(expression), _token(std::move(token))
 {
 }
 

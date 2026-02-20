@@ -8,9 +8,9 @@ ParseurScope::ParseurScope(IConstructeurArbre* constructeurArbreInstruction) : _
 ParseurScope::~ParseurScope()
 {}
 
-std::shared_ptr<INoeud> ParseurScope::parser(std::vector<Token>& tokens, int& index)
+INoeud* ParseurScope::parser(std::vector<Token>& tokens, int& index)
 {
-    std::shared_ptr<IInstruction> noeudScope = std::make_shared<NoeudScope>();
+    IInstruction* noeudScope = new NoeudScope();
     consommer(tokens, index, TOKEN_SCOPE, "Erreur : 'scope' attendu");
     consommer(tokens, index, TOKEN_ACCOLADE_OUVERTE, "Erreur : '{' attendu après 'scope'");
     consommerEnfantCorps(tokens,index,noeudScope,_constructeurArbreInstruction, TOKEN_ACCOLADE_FERMEE);

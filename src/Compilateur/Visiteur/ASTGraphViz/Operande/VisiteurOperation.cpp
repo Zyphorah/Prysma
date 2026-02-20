@@ -9,13 +9,13 @@ void VisiteurGeneralGraphViz::visiter(NoeudOperation* noeud)
 {
     int idNoeud = _sortieGrapheVisuel.ajouterNoeud(noeud->getToken().value);
     
-    const std::shared_ptr<INoeud>& gauche = noeud->getGauche();
+    INoeud* gauche = noeud->getGauche();
     if (gauche) {
         gauche->accept(this);
         _sortieGrapheVisuel.ajouterArete(idNoeud, _dernierId);
     }
 
-    const std::shared_ptr<INoeud>& droite = noeud->getDroite();
+    INoeud* droite = noeud->getDroite();
     if (droite) {
         droite->accept(this);
         _sortieGrapheVisuel.ajouterArete(idNoeud, _dernierId);

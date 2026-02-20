@@ -9,12 +9,12 @@
 class GestionVariable
 {
     private:
-        std::shared_ptr<ContextGenCode> _contextGenCode;
+        ContextGenCode* _contextGenCode;
 
         llvm::Type* extraireTypeDonnee(llvm::Value* adresseMemoire);
 
     public:
-        GestionVariable(std::shared_ptr<ContextGenCode> contextGenCode);
+        GestionVariable(ContextGenCode* contextGenCode);
         ~GestionVariable();
 
         llvm::Value* chargerVariable(const std::string& nomVariable);

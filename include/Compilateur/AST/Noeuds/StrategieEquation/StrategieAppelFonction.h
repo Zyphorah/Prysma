@@ -15,7 +15,7 @@ public:
 
     StrategieAppelFonction(IConstructeurArbre* constructeurEquation);
     ~StrategieAppelFonction() override = default;
-    std::shared_ptr<INoeud> construire(std::vector<Token>& equation) override;
+    INoeud* construire(std::vector<Token>& equation) override;
 };
 
 #endif /* A9AC423F_7A3A_4A2D_9B2F_FE9EA55D9D7A */

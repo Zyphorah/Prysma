@@ -21,8 +21,8 @@ class IRegistreSymbole {
 public:
     virtual ~IRegistreSymbole() = default;
 
-    virtual void enregistrer(TokenType symbole, std::function<std::shared_ptr<IExpression>(Token)> fournisseur) = 0;
-    virtual std::shared_ptr<IExpression> recupererNoeud(Token token) = 0;
+    virtual void enregistrer(TokenType symbole, std::function<IExpression*(Token)> fournisseur) = 0;
+    virtual IExpression* recupererNoeud(Token token) = 0;
     
     /**
      * @brief Vérifie si un caractère est un opérateur connu

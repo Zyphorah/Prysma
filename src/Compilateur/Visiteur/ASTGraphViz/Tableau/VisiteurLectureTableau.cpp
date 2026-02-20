@@ -6,7 +6,7 @@
 void VisiteurGeneralGraphViz::visiter(NoeudLectureTableau* noeudLectureTableau)
 {
     std::string nomTableau = noeudLectureTableau->getNomTableau().value;
-    std::shared_ptr<INoeud> indexEquation = noeudLectureTableau->getIndexEquation();
+    INoeud* indexEquation = noeudLectureTableau->getIndexEquation();
 
     int idNoeud = _sortieGrapheVisuel.ajouterNoeud("Lecture: " + nomTableau);
 

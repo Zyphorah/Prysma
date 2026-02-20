@@ -7,7 +7,7 @@ class StrategieNegation : public IStrategieEquation {
 public:
     StrategieNegation() = default;
     ~StrategieNegation() override = default;
-    std::shared_ptr<INoeud> construire(std::vector<Token>& equation) override;
+    INoeud* construire(std::vector<Token>& equation) override;
 };
 
 

@@ -12,10 +12,10 @@ ParseurEquation::~ParseurEquation()
 {
 }
 
-std::shared_ptr<INoeud> ParseurEquation::parser(std::vector<Token>& tokens, int& index)
+INoeud* ParseurEquation::parser(std::vector<Token>& tokens, int& index)
 {
 
-    std::shared_ptr<INoeud> expression = _constructeurArbre->construire(tokens, index);
+    INoeud* expression = _constructeurArbre->construire(tokens, index);
 
     consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur : ';' attendu à la fin de l'instruction");
     

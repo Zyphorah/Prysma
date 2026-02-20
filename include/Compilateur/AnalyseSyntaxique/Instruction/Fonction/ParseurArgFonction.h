@@ -9,13 +9,13 @@
 class ParseurArgFonction : public IParseur, public ParseurBase
 {
 private:
-    std::shared_ptr<ParseurType> _constructeurType;
+    ParseurType* _constructeurType;
 public: 
 
-    ParseurArgFonction(std::shared_ptr<ParseurType> constructeurType);
+    ParseurArgFonction(ParseurType* constructeurType);
     ~ParseurArgFonction();
     
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index) override;
+    INoeud* parser(std::vector<Token>& tokens, int& index) override;
 
 };
 

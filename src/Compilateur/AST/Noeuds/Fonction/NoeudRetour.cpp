@@ -3,8 +3,8 @@
 #include <llvm-18/llvm/IR/Instructions.h>
 #include <utility>
 
-NoeudRetour::NoeudRetour(std::shared_ptr<INoeud> valeurRetour)
-    : _valeurRetour(std::move(valeurRetour))
+NoeudRetour::NoeudRetour(INoeud* valeurRetour)
+    : _valeurRetour(valeurRetour)
 {
 }
 

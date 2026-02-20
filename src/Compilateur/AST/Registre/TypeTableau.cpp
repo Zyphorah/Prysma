@@ -4,8 +4,8 @@
 #include <stdexcept>
 #include <utility>
 
-TypeTableau::TypeTableau(std::shared_ptr<IType> typeEnfant, std::shared_ptr<INoeud> taille)
-    : _typeEnfant(std::move(typeEnfant)), _taille(std::move(taille))
+TypeTableau::TypeTableau(IType* typeEnfant, INoeud* taille)
+    : _typeEnfant(typeEnfant), _taille(taille)
 {
 }
 
@@ -13,7 +13,7 @@ llvm::Type* TypeTableau::genererTypeLLVM(llvm::LLVMContext& context)
 {
     llvm::Type* typeElement = _typeEnfant->genererTypeLLVM(context);
 
-    auto* litteral = dynamic_cast<NoeudLitteral*>(_taille.get());
+    auto* litteral = dynamic_cast<NoeudLitteral*>(_taille);
     if (litteral == nullptr) {
         throw std::runtime_error("Erreur : la taille du tableau doit être un littéral entier");
     }

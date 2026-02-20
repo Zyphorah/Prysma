@@ -8,16 +8,16 @@
 
 class NoeudNegation : public INoeud {
 private:
-    std::shared_ptr<INoeud> operande;
+    INoeud* operande;
     Token operateur;
 
 public:
-    explicit NoeudNegation(const Token& operateur, std::shared_ptr<INoeud> expr)
-        : operande(std::move(expr)), operateur(operateur) {}
+    explicit NoeudNegation(const Token& operateur, INoeud* expr)
+        : operande(expr), operateur(operateur) {}
 
     void accept(IVisiteur* visiteur) override;
 
-    const std::shared_ptr<INoeud>& getOperande() const { return operande; }
+    INoeud* getOperande() const { return operande; }
     const Token& getOperateur() const { return operateur; }
 };
 

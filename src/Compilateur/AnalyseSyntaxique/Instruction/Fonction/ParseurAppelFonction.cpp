@@ -11,14 +11,14 @@ ParseurAppelFonction::~ParseurAppelFonction()
 {
 }
 
-std::shared_ptr<INoeud> ParseurAppelFonction::parser(std::vector<Token>& tokens, int& index)
+INoeud* ParseurAppelFonction::parser(std::vector<Token>& tokens, int& index)
 {
 
     consommer(tokens, index, TOKEN_CALL, "Erreur: 'call' attendu");
     Token nomFonction = consommer(tokens, index, TOKEN_IDENTIFIANT, "Erreur: identifiant de fonction attendu");
     consommer(tokens, index, TOKEN_PAREN_OUVERTE, "Erreur: '(' attendue");
     
-    std::shared_ptr<IInstruction> noeudAppel = std::make_shared<NoeudAppelFonction>(nomFonction);
+    IInstruction* noeudAppel = new NoeudAppelFonction(nomFonction);
     
     consommerEnfantCorps(tokens, index, noeudAppel, _constructeurArbreEquation, TOKEN_PAREN_FERMEE);
 

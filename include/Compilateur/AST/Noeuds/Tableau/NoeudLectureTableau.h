@@ -10,13 +10,13 @@
 class NoeudLectureTableau : public INoeud
 {
 private:
-     std::shared_ptr<INoeud> _indexEquation;
+     INoeud* _indexEquation;
      Token _nomTableau; 
 public: 
-     NoeudLectureTableau(std::shared_ptr<INoeud> indexEquation, Token nomTableau);
+     NoeudLectureTableau(INoeud* indexEquation, Token nomTableau);
     ~NoeudLectureTableau();
 
-     std::shared_ptr<INoeud>& getIndexEquation(){return _indexEquation;};
+     INoeud* getIndexEquation(){return _indexEquation;};
      Token getNomTableau(){return _nomTableau;};
      void accept(IVisiteur* visiteur) override;
 };

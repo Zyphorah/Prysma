@@ -3,12 +3,12 @@
 #include "Compilateur/AST/Noeuds/Equation/NoeudOperation.h"
 #include "Compilateur/Lexer/TokenType.h"
 
-std::shared_ptr<RegistreStrategieEquation> ConstructeurEquationFlottante::_registreStrategieEquation = nullptr;
+RegistreStrategieEquation* ConstructeurEquationFlottante::_registreStrategieEquation = nullptr;
 
 ConstructeurEquationFlottante::ConstructeurEquationFlottante(IConstructeurArbre* instructionBuilder)
     : _instructionBuilder(instructionBuilder)
 {
-    _registreSymbole = std::make_shared<RegistreSymbole>();
+    _registreSymbole = new RegistreSymbole();
 
     _serviceParenthese = std::make_unique<ServiceParenthese>(_registreSymbole);
 
@@ -44,7 +44,7 @@ ConstructeurEquationFlottante::ConstructeurEquationFlottante(IConstructeurArbre*
             
     _chaineResponsabilite = std::make_unique<ChaineResponsabilite>(_serviceParenthese.get(), operateurs);
                     
-    _constructeurArbre = std::make_shared<ConstructeurArbreEquation>(
+    _constructeurArbre = new ConstructeurArbreEquation(
         _chaineResponsabilite.get(), 
         _registreSymbole, 
         _registreStrategieEquation,
@@ -57,73 +57,73 @@ ConstructeurEquationFlottante::ConstructeurEquationFlottante(IConstructeurArbre*
 
 void ConstructeurEquationFlottante::initialiserRegistre()
 {
-    _registreSymbole->enregistrer(TOKEN_PLUS, [](Token token) -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(token); 
+    _registreSymbole->enregistrer(TOKEN_PLUS, [](Token token) -> IExpression* { 
+        return new NoeudOperation(token); 
     });
 
-    _registreSymbole->enregistrer(TOKEN_MOINS, [](Token token) -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(token); 
+    _registreSymbole->enregistrer(TOKEN_MOINS, [](Token token) -> IExpression* { 
+        return new NoeudOperation(token); 
     });
 
-    _registreSymbole->enregistrer(TOKEN_ETOILE, [](Token token) -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(token); 
+    _registreSymbole->enregistrer(TOKEN_ETOILE, [](Token token) -> IExpression* { 
+        return new NoeudOperation(token); 
     });
 
-    _registreSymbole->enregistrer(TOKEN_SLASH, [](Token token) -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(token); 
+    _registreSymbole->enregistrer(TOKEN_SLASH, [](Token token) -> IExpression* { 
+        return new NoeudOperation(token); 
     });
-    _registreSymbole->enregistrer(TOKEN_PLUS_PETIT, [](Token token) -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(token); 
+    _registreSymbole->enregistrer(TOKEN_PLUS_PETIT, [](Token token) -> IExpression* { 
+        return new NoeudOperation(token); 
     });
-    _registreSymbole->enregistrer(TOKEN_PLUS_GRAND, [](Token token) -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(token); 
+    _registreSymbole->enregistrer(TOKEN_PLUS_GRAND, [](Token token) -> IExpression* { 
+        return new NoeudOperation(token); 
     });
-    _registreSymbole->enregistrer(TOKEN_PLUS_GRAND_EGAL, [](Token token) -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(token); 
+    _registreSymbole->enregistrer(TOKEN_PLUS_GRAND_EGAL, [](Token token) -> IExpression* { 
+        return new NoeudOperation(token); 
     });
-    _registreSymbole->enregistrer(TOKEN_PLUS_PETIT_EGAL, [](Token token) -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(token);
+    _registreSymbole->enregistrer(TOKEN_PLUS_PETIT_EGAL, [](Token token) -> IExpression* { 
+        return new NoeudOperation(token);
      });
-    _registreSymbole->enregistrer(TOKEN_MODULO, [](Token token) -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(token);
+    _registreSymbole->enregistrer(TOKEN_MODULO, [](Token token) -> IExpression* { 
+        return new NoeudOperation(token);
     });
-    _registreSymbole->enregistrer(TOKEN_EGAL_EGAL, [](Token token) -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(token);
+    _registreSymbole->enregistrer(TOKEN_EGAL_EGAL, [](Token token) -> IExpression* { 
+        return new NoeudOperation(token);
     });
-    _registreSymbole->enregistrer(TOKEN_DIFFERENT, [](Token token) -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(token);
+    _registreSymbole->enregistrer(TOKEN_DIFFERENT, [](Token token) -> IExpression* { 
+        return new NoeudOperation(token);
     });
-    _registreSymbole->enregistrer(TOKEN_ET, [](Token token) -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(token);
+    _registreSymbole->enregistrer(TOKEN_ET, [](Token token) -> IExpression* { 
+        return new NoeudOperation(token);
     });
-    _registreSymbole->enregistrer(TOKEN_OU, [](Token token) -> std::shared_ptr<IExpression> { 
-        return std::make_shared<NoeudOperation>(token);
+    _registreSymbole->enregistrer(TOKEN_OU, [](Token token) -> IExpression* { 
+        return new NoeudOperation(token);
     });
 }
 
 
 
-std::shared_ptr<INoeud> ConstructeurEquationFlottante::construire(std::vector<Token> &tokens)
+INoeud* ConstructeurEquationFlottante::construire(std::vector<Token> &tokens)
 {
     return _constructeurArbre->construire(tokens);
 }
 
 IConstructeurArbre* ConstructeurEquationFlottante::recupererConstructeurArbre() const
 {
-    return _constructeurArbre.get();
+    return _constructeurArbre;
 }
 
-std::shared_ptr<INoeud> ConstructeurEquationFlottante::construire(std::vector<Token>& tokens, int& index)
+INoeud* ConstructeurEquationFlottante::construire(std::vector<Token>& tokens, int& index)
 {
     return _constructeurArbre->construire(tokens, index);
 }
 
-void ConstructeurEquationFlottante::setRegistreStrategieEquation(std::shared_ptr<RegistreStrategieEquation> registre)
+void ConstructeurEquationFlottante::setRegistreStrategieEquation(RegistreStrategieEquation* registre)
 {
-    _registreStrategieEquation = std::move(registre);
+    _registreStrategieEquation = registre;
 }
 
-std::shared_ptr<RegistreStrategieEquation> ConstructeurEquationFlottante::getRegistreStrategieEquation()
+RegistreStrategieEquation* ConstructeurEquationFlottante::getRegistreStrategieEquation()
 {
     return _registreStrategieEquation;
 }

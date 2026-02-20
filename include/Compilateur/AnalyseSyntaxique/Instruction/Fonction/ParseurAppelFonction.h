@@ -13,7 +13,7 @@ public:
 
     ParseurAppelFonction(IConstructeurArbre* constructeurArbreEquation);
     ~ParseurAppelFonction();
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index) override;
+    INoeud* parser(std::vector<Token>& tokens, int& index) override;
 
 };
 

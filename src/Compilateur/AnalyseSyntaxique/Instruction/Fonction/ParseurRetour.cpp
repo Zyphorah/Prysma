@@ -14,20 +14,20 @@ ParseurRetour::~ParseurRetour()
 {
 }
 
-std::shared_ptr<INoeud> ParseurRetour::parser(std::vector<Token>& tokens, int& index)
+INoeud* ParseurRetour::parser(std::vector<Token>& tokens, int& index)
 {
     consommer(tokens, index, TOKEN_RETOUR, "Erreur: ce n'est pas le bon token ! 'return'");
 
-    std::shared_ptr<INoeud> valeurRetour = nullptr;
+    INoeud* valeurRetour = nullptr;
 
     if (index < (int)tokens.size() && tokens[index].type != TOKEN_POINT_VIRGULE) {
         valeurRetour = _constructeurEquation->construire(tokens, index);
     } else {
         consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur: point-virgule attendu après return");
-        return std::make_shared<NoeudRetour>(valeurRetour);
+        return new NoeudRetour(valeurRetour);
     }
     
     consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur : ';' attendu à la fin du return");
 
-    return std::make_shared<NoeudRetour>(valeurRetour);
+    return new NoeudRetour(valeurRetour);
 }

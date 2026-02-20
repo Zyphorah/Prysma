@@ -12,14 +12,14 @@ class ParseurDeclarationFonction : public IParseur, public ParseurBase
 {
 private:
     IConstructeurArbre* _constructeurArbreInstruction;
-    std::shared_ptr<ParseurType> _parseurType;
+    ParseurType* _parseurType;
 
 public:
 
-     ParseurDeclarationFonction(IConstructeurArbre* constructeurArbreInstruction, std::shared_ptr<ParseurType> parseurType);
+     ParseurDeclarationFonction(IConstructeurArbre* constructeurArbreInstruction, ParseurType* parseurType);
     ~ParseurDeclarationFonction();
 
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index) override;
+    INoeud* parser(std::vector<Token>& tokens, int& index) override;
 };
 
 #endif /* DD335087_6EDE_4036_872C_8BD586E2625B */

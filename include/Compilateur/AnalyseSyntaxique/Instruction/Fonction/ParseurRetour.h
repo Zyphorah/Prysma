@@ -16,7 +16,7 @@ public:
     
     ~ParseurRetour();
 
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index) override;
+    INoeud* parser(std::vector<Token>& tokens, int& index) override;
 };
 
 #endif /* F39730D3_0913_46B1_91E5_676A85D4CABB */

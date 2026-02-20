@@ -1,8 +1,8 @@
 #include "Compilateur/LLVM/GestionVariable.h"
 #include <stdexcept>
 
-GestionVariable::GestionVariable(std::shared_ptr<ContextGenCode> contextGenCode)
-    : _contextGenCode(std::move(contextGenCode))
+GestionVariable::GestionVariable(ContextGenCode* contextGenCode)
+    : _contextGenCode(contextGenCode)
 {
 }
 

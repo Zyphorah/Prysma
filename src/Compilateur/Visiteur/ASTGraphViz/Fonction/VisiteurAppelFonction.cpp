@@ -8,7 +8,7 @@ void VisiteurGeneralGraphViz::visiter(NoeudAppelFonction* noeudAppelFonction)
 {
     int idNoeud = _sortieGrapheVisuel.ajouterNoeud("Appel Fonction: " + noeudAppelFonction->getNomFonction().value);
 
-    for (const std::shared_ptr<INoeud>& enfant : noeudAppelFonction->getEnfants()) {
+    for (INoeud* enfant : noeudAppelFonction->getEnfants()) {
         enfant->accept(this);
         _sortieGrapheVisuel.ajouterArete(idNoeud, _dernierId);
     }

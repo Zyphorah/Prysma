@@ -9,26 +9,26 @@
 #include <utility>
 #include <vector>
 
-ParseurDeclarationFonction::ParseurDeclarationFonction(IConstructeurArbre* constructeurArbreInstruction, std::shared_ptr<ParseurType> parseurType)
-    : _constructeurArbreInstruction(constructeurArbreInstruction), _parseurType(std::move(parseurType))
+ParseurDeclarationFonction::ParseurDeclarationFonction(IConstructeurArbre* constructeurArbreInstruction, ParseurType* parseurType)
+    : _constructeurArbreInstruction(constructeurArbreInstruction), _parseurType(parseurType)
 {}
 
 ParseurDeclarationFonction::~ParseurDeclarationFonction()
 {
 }
 
-std::shared_ptr<INoeud> ParseurDeclarationFonction::parser(std::vector<Token>& tokens, int& index)
+INoeud* ParseurDeclarationFonction::parser(std::vector<Token>& tokens, int& index)
 {
     consommer(tokens, index, TOKEN_FONCTION, "Erreur: ce n'est pas le bon token ! 'fn'");
 
     Token tokenTypeRetour = tokens[index];
-    std::shared_ptr<IType> typeRetour = _parseurType->parser(tokens, index);
+    IType* typeRetour = _parseurType->parser(tokens, index);
     
     Token tokenNomFonction = tokens[index];
     std::string nomFonction = tokenNomFonction.value;
     consommer(tokens, index, TOKEN_IDENTIFIANT, "Erreur: identifiant invalide, ce dois être un nom de fonction ");
 
-    std::shared_ptr<IInstruction> parent = std::make_shared<NoeudDeclarationFonction>(nomFonction, typeRetour);
+    IInstruction* parent = new NoeudDeclarationFonction(nomFonction, typeRetour);
 
     // Manger les parenthèses ouvertes
     consommer(tokens, index, TOKEN_PAREN_OUVERTE, "Erreur: ce n'est pas une parenthèse ouverte '('");

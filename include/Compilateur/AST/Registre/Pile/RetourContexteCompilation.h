@@ -7,7 +7,7 @@
 class RetourContexteCompilation
 {
 private:
-    std::stack<std::shared_ptr<IType>> _contexte; 
+    std::stack<IType*> _contexte; 
 
 public:
 
@@ -17,9 +17,9 @@ public:
     ~RetourContexteCompilation()
     {}
 
-    std::shared_ptr<IType> recupererContext();
+    IType* recupererContext();
         
-    void piler(std::shared_ptr<IType> token);
+    void piler(IType* token);
     void depiler();
 
 };

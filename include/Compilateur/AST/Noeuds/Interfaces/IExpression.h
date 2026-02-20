@@ -18,8 +18,8 @@ public:
      * @param droite Expression enfant droit
      * @return Référence au nœud courant
      */
-    virtual std::shared_ptr<IExpression> ajouterExpression(
-        std::shared_ptr<INoeud> gauche, 
-        std::shared_ptr<INoeud> droite
+    virtual IExpression* ajouterExpression(
+        INoeud* gauche, 
+        INoeud* droite
     ) = 0;
 };

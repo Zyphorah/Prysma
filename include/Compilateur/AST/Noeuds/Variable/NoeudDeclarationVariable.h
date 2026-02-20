@@ -9,18 +9,18 @@ class NoeudDeclarationVariable : public INoeud
 {
 private:
     std::string _nom;
-    std::shared_ptr<IType> _type;
-    std::shared_ptr<INoeud> _expression;
+    IType* _type;
+    INoeud* _expression;
 
 public:
-    NoeudDeclarationVariable(const std::string& nom, std::shared_ptr<IType> type, std::shared_ptr<INoeud> expression);
+    NoeudDeclarationVariable(const std::string& nom, IType* type, INoeud* expression);
     ~NoeudDeclarationVariable();
 
     void accept(IVisiteur* visiteur) override;
 
     const std::string& getNom() const { return _nom; }
-    std::shared_ptr<IType> getType() const { return _type; }
-    std::shared_ptr<INoeud>& getExpression() { return _expression; }
+    IType* getType() const { return _type; }
+    INoeud* getExpression() { return _expression; }
 };
 
 #endif /* B18E8AB9_A311_4560_9FDD_5E2D3FAC0F14 */

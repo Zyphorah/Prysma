@@ -7,11 +7,11 @@
 
 class StrategieIdentifiant : public IStrategieEquation {
 private:
-   std::shared_ptr<IConstructeurArbre> _constructeurArbre;
+   IConstructeurArbre* _constructeurArbre;
 public:
-    StrategieIdentifiant(std::shared_ptr<IConstructeurArbre> constructeurArbre);
+    StrategieIdentifiant(IConstructeurArbre* constructeurArbre);
     ~StrategieIdentifiant();
-    std::shared_ptr<INoeud> construire(std::vector<Token>& equation) override;
+    INoeud* construire(std::vector<Token>& equation) override;
 };
 
 

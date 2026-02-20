@@ -7,15 +7,15 @@
 class NoeudRetour : public INoeud
 {
 private:
-    std::shared_ptr<INoeud> _valeurRetour;
+    INoeud* _valeurRetour;
 
 public:
-    explicit NoeudRetour(std::shared_ptr<INoeud> valeurRetour);
+    explicit NoeudRetour(INoeud* valeurRetour);
     ~NoeudRetour() = default;
 
     void accept(IVisiteur* visiteur) override;
 
-    const std::shared_ptr<INoeud>& getValeurRetour() const { return _valeurRetour; }
+    INoeud* getValeurRetour() const { return _valeurRetour; }
 };
 
 #endif /* DC6C556F_6309_4430_98EB_911BFF855216 */

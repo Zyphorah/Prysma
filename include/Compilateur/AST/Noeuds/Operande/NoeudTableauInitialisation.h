@@ -7,15 +7,15 @@
 
 class NoeudTableauInitialisation : public INoeud {
 private:
-    std::vector<std::shared_ptr<INoeud>> _elements;
+    std::vector<INoeud*> _elements;
 
 public:
-    explicit NoeudTableauInitialisation(std::vector<std::shared_ptr<INoeud>> elements);
+    explicit NoeudTableauInitialisation(std::vector<INoeud*> elements);
     ~NoeudTableauInitialisation() override = default;
 
     void accept(IVisiteur* visiteur) override;
 
-    const std::vector<std::shared_ptr<INoeud>>& getElements() const { return _elements; }
+    const std::vector<INoeud*>& getElements() const { return _elements; }
     int getTaille() const { return static_cast<int>(_elements.size()); }
 };
 

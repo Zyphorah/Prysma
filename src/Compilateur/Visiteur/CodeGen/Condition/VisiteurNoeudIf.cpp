@@ -5,9 +5,9 @@
 void VisiteurGeneralGenCode::visiter(NoeudIf* noeudIf) 
 {
     // Récupérer la condition et les blocs à partir du noeud if
-    const std::shared_ptr<INoeud>& noeudCondition = noeudIf->getNoeudCondition();
-    const std::shared_ptr<INoeud>& noeudBlocIf = noeudIf->getNoeudBlocIf();
-    const std::shared_ptr<INoeud>& noeudBlocElse = noeudIf->getNoeudBlocElse();
+    INoeud* noeudCondition = noeudIf->getNoeudCondition();
+    INoeud* noeudBlocIf = noeudIf->getNoeudBlocIf();
+    INoeud* noeudBlocElse = noeudIf->getNoeudBlocElse();
 
     // Évaluer la condition
     noeudCondition->accept(this);

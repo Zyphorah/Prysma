@@ -3,12 +3,12 @@
 #include <stdexcept>
 
 
-std::shared_ptr<IType> RetourContexteCompilation::recupererContext()
+IType* RetourContexteCompilation::recupererContext()
 {
     return _contexte.top();
 }
 
-void RetourContexteCompilation::piler(std::shared_ptr<IType> token)
+void RetourContexteCompilation::piler(IType* token)
 {
     _contexte.push(token);
 }

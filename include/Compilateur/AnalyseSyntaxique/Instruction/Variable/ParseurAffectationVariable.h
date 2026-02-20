@@ -13,17 +13,17 @@
 class ParseurAffectationVariable : public IParseur, public ParseurBase
 {
 private:
-    std::shared_ptr<LlvmBackend> _backend;
-    std::shared_ptr<RegistreVariable> _registreVariable;
-    std::shared_ptr<RegistreType> _registreType;
+    LlvmBackend* _backend;
+    RegistreVariable* _registreVariable;
+    RegistreType* _registreType;
     IConstructeurArbre* _constructeurEquation;
 
 public:
 
-    ParseurAffectationVariable(std::shared_ptr<LlvmBackend> backend, std::shared_ptr<RegistreVariable> registreVariable, std::shared_ptr<RegistreType> registreType, IConstructeurArbre* constructeurEquation);
+    ParseurAffectationVariable(LlvmBackend* backend, RegistreVariable* registreVariable, RegistreType* registreType, IConstructeurArbre* constructeurEquation);
     ~ParseurAffectationVariable();
 
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index) override;
+    INoeud* parser(std::vector<Token>& tokens, int& index) override;
 };
 
 #endif /* E5F6G7H8_I9J0K1L2_M3N4O5P6_Q7R8S9T0 */

@@ -4,13 +4,13 @@
 #include "Compilateur/Lexer/TokenType.h"
 #include <vector>
 
-StrategieIdentifiant::StrategieIdentifiant(std::shared_ptr<IConstructeurArbre> constructeurArbre)
-    : _constructeurArbre(std::move(constructeurArbre)) {}
+StrategieIdentifiant::StrategieIdentifiant(IConstructeurArbre* constructeurArbre)
+    : _constructeurArbre(constructeurArbre) {}
 
 StrategieIdentifiant::~StrategieIdentifiant()
 {}
 
-std::shared_ptr<INoeud> StrategieIdentifiant::construire(std::vector<Token>& equation) {
+INoeud* StrategieIdentifiant::construire(std::vector<Token>& equation) {
     bool isTableau = false;
     int indexCrochet = 0;
     std::vector<Token> EquationIndex;
@@ -36,9 +36,9 @@ std::shared_ptr<INoeud> StrategieIdentifiant::construire(std::vector<Token>& equ
             }
         }
 
-        std::shared_ptr<INoeud> indexEquation = _constructeurArbre->construire(EquationIndex);
-        return std::make_shared<NoeudLectureTableau>(indexEquation, equation[0]);
+        INoeud* indexEquation = _constructeurArbre->construire(EquationIndex);
+        return new NoeudLectureTableau(indexEquation, equation[0]);
     }
   
-    return std::make_shared<NoeudUnRefVariable>(equation[0].value);
+    return new NoeudUnRefVariable(equation[0].value);
 }

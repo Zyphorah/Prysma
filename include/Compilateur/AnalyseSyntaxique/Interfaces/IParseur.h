@@ -9,7 +9,7 @@ class IParseur
 {
 public: 
     virtual ~IParseur() = default;
-    virtual std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index) = 0;
+    virtual INoeud* parser(std::vector<Token>& tokens, int& index) = 0;
 };
 
 #endif /* A32B33F7_0073_416C_873A_6FF7F40419F8 */

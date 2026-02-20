@@ -12,17 +12,17 @@ class NoeudAffectationVariable : public INoeud
 {
 private:
     std::string _nom;
-    std::shared_ptr<INoeud> _expression;
+    INoeud* _expression;
     Token _token; 
 
 public:
-    NoeudAffectationVariable(const std::string& nom, std::shared_ptr<INoeud> expression, Token token);
+    NoeudAffectationVariable(const std::string& nom, INoeud* expression, Token token);
     ~NoeudAffectationVariable();
 
     void accept(IVisiteur* visiteur) override;
 
     const std::string& getNom() const { return _nom; }
-    std::shared_ptr<INoeud>& getExpression() { return _expression; }
+    INoeud* getExpression() { return _expression; }
     const Token& getToken() const { return _token; }
 };
 

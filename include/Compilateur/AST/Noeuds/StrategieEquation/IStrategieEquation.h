@@ -9,7 +9,7 @@
 class IStrategieEquation {
 public:
     virtual ~IStrategieEquation() = default;
-    virtual std::shared_ptr<INoeud> construire(std::vector<Token>& equation) = 0;
+    virtual INoeud* construire(std::vector<Token>& equation) = 0;
 };
 
 

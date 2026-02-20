@@ -8,7 +8,7 @@ class RegistreSymbole;
 
 class ServiceParenthese : public IGestionnaireParenthese {
 private:
-    std::shared_ptr<RegistreSymbole> _registreSymbole;  
+    RegistreSymbole* _registreSymbole;  
     /**
      * @brief Vérifie si une paire de parenthèses est englobante
      * @param equation L'équation à vérifier
@@ -29,7 +29,7 @@ public:
      * @brief Constructeur
      * @param registreSymbole Registre des opérateurs
      */
-    explicit ServiceParenthese(std::shared_ptr<RegistreSymbole> registreSymbole);
+    explicit ServiceParenthese(RegistreSymbole* registreSymbole);
     
     /**
      * @brief Enlève les parenthèses qui englobent toute l'expression

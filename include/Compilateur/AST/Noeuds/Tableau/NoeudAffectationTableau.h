@@ -12,19 +12,19 @@ class NoeudAffectationTableau : public INoeud
 {
 private:
     std::string _nom;
-    std::shared_ptr<INoeud> _expressionIndex;
-    std::shared_ptr<INoeud> _expression;
+    INoeud* _expressionIndex;
+    INoeud* _expression;
     Token _token;
 
 public:
-    NoeudAffectationTableau(const std::string& nom, std::shared_ptr<INoeud> expressionIndex, std::shared_ptr<INoeud> expression, Token token);
+    NoeudAffectationTableau(const std::string& nom, INoeud* expressionIndex, INoeud* expression, Token token);
     ~NoeudAffectationTableau();
 
     void accept(IVisiteur* visiteur) override;
 
     const std::string& getNom() const { return _nom; }
-    std::shared_ptr<INoeud>& getExpressionIndex() { return _expressionIndex; }
-    std::shared_ptr<INoeud>& getExpression() { return _expression; }
+    INoeud* getExpressionIndex() { return _expressionIndex; }
+    INoeud* getExpression() { return _expression; }
     const Token& getToken() const { return _token; }
 };
 

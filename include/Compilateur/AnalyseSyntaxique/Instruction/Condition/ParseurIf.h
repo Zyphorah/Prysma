@@ -12,7 +12,7 @@ public:
     ParseurIf(IConstructeurArbre* constructeurArbreEquation, IConstructeurArbre* constructeurArbreInstruction);
     ~ParseurIf();
     
-    std::shared_ptr<INoeud> parser(std::vector<Token>& tokens, int& index) override;
+    INoeud* parser(std::vector<Token>& tokens, int& index) override;
 };
 
 

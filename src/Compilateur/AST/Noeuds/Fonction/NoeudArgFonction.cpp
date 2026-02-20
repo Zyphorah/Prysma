@@ -2,9 +2,9 @@
 #include "Compilateur/AST/Registre/Types/IType.h"
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
 
-NoeudArgFonction::NoeudArgFonction(std::shared_ptr<IType> type, std::string nom)
+NoeudArgFonction::NoeudArgFonction(IType* type, std::string nom)
 {
-    _type = std::move(type);
+    _type = type;
     _nom = std::move(nom);
 }
 

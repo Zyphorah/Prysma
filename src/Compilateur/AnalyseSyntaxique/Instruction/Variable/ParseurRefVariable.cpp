@@ -12,12 +12,12 @@ ParseurRefVariable::~ParseurRefVariable()
 }
 
 // Exemple ref variable
-std::shared_ptr<INoeud> ParseurRefVariable::parser(std::vector<Token>& tokens, int& index) 
+INoeud* ParseurRefVariable::parser(std::vector<Token>& tokens, int& index) 
 {
     consommer(tokens, index, TOKEN_REF, "Erreur : 'ref' attendu");
     
     Token nomToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Erreur : nom de variable attendu après 'ref'");
     std::string nomVariable = nomToken.value;
     
-    return std::make_shared<NoeudRefVariable>(nomVariable);
+    return new NoeudRefVariable(nomVariable);
 }

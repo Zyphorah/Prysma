@@ -31,7 +31,6 @@
 #include <llvm-18/llvm/IR/DerivedTypes.h>
 #include <llvm-18/llvm/IR/Instructions.h>
 #include <llvm-18/llvm/IR/Value.h>
-#include <memory>
 #include <filesystem>
 #include "Compilateur/AnalyseSyntaxique/Instruction/ParseurScope.h"
 #include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurDeclarationFonction.h"
@@ -43,6 +42,7 @@
 #include "Compilateur/AnalyseSyntaxique/Instruction/Variable/ParseurRefVariable.h"
 #include "Compilateur/Visiteur/ASTGraphViz/VisiteurGeneralGraphViz.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
+#include "llvm/Support/Allocator.h"
 #include <cstdlib>
 
 int main(int argc, char* argv[])
@@ -51,21 +51,23 @@ int main(int argc, char* argv[])
         std::cerr << "Erreur: Aucun fichier spécifié" << std::endl;
         return 1;
     }
+    // Arena bump allocator pour optimiser les performances d'allocation mémoire
+    llvm::BumpPtrAllocator arena;
     
     std::string cheminFichier = argv[1];
     std::string nomFichier = std::filesystem::path(cheminFichier).string(); 
     
     try {
-        std::shared_ptr<LlvmBackend> backend = std::make_shared<LlvmBackend>();
-        std::shared_ptr<RegistreInstruction> registreInstruction = std::make_shared<RegistreInstruction>();
-        std::shared_ptr<RegistreVariable> registreVariable = std::make_shared<RegistreVariable>();
-        std::shared_ptr<RegistreFonction> registreFonction = std::make_shared<RegistreFonction>();
-        std::shared_ptr<RegistreType> registreType = std::make_shared<RegistreType>();
-        std::shared_ptr<RetourContexteCompilation> returnContextCompilation = std::make_shared<RetourContexteCompilation>();
-        std::shared_ptr<RegistreArgument> registreArgument = std::make_shared<RegistreArgument>();
+        auto* backend = new (arena.Allocate<LlvmBackend>()) LlvmBackend();
+        auto* registreInstruction = new (arena.Allocate<RegistreInstruction>()) RegistreInstruction();
+        auto* registreVariable = new (arena.Allocate<RegistreVariable>()) RegistreVariable();
+        auto* registreFonction = new (arena.Allocate<RegistreFonction>()) RegistreFonction();
+        auto* registreType = new (arena.Allocate<RegistreType>()) RegistreType();
+        auto* returnContextCompilation = new (arena.Allocate<RetourContexteCompilation>()) RetourContexteCompilation();
+        auto* registreArgument = new (arena.Allocate<RegistreArgument>()) RegistreArgument();
         llvm::Value* valeurTemporaire = nullptr;
 
-        std::shared_ptr<ContextGenCode> context = std::make_shared<ContextGenCode>(
+        auto* context = new (arena.Allocate<ContextGenCode>()) ContextGenCode(
             backend,
             registreInstruction,
             registreVariable,
@@ -109,43 +111,85 @@ int main(int argc, char* argv[])
         context->registreType->enregistrer(TOKEN_TYPE_VOID, llvm::Type::getVoidTy(context->backend->getContext()));
        
         // Constuire les chef d'orchestre de l'arbre syntaxique abstrait
-        ConstructeurArbreInstruction constructeurArbreInstruction(context->registreInstruction);
-        std::shared_ptr<ConstructeurEquationFlottante> constructeurEquation = std::make_shared<ConstructeurEquationFlottante>(&constructeurArbreInstruction);
+        auto* rawConstructeurArbreInstruction = new (arena.Allocate<ConstructeurArbreInstruction>()) 
+            ConstructeurArbreInstruction(context->registreInstruction);
+        
+        auto* constructeurEquation = new (arena.Allocate<ConstructeurEquationFlottante>()) 
+            ConstructeurEquationFlottante(rawConstructeurArbreInstruction);
         
          
         // Créer le ParseurType avec le registre
-        std::shared_ptr<ParseurType> parseurType = std::make_shared<ParseurType>(context->registreType,constructeurEquation->recupererConstructeurArbre());
-
+        auto* parseurType = new (arena.Allocate<ParseurType>()) 
+            ParseurType(context->registreType, constructeurEquation->recupererConstructeurArbre());
         // Enregistrer les strategies d'équation 
-        std::shared_ptr<RegistreStrategieEquation> registreStrategieEquation = std::make_shared<RegistreStrategieEquation>();
-        registreStrategieEquation->enregistrer(TOKEN_LIT_INT, std::make_shared<StrategieLitteral>());
-        registreStrategieEquation->enregistrer(TOKEN_LIT_FLOAT, std::make_shared<StrategieLitteral>());
-        registreStrategieEquation->enregistrer(TOKEN_LIT_BOLEEN, std::make_shared<StrategieLitteral>());
-        registreStrategieEquation->enregistrer(TOKEN_IDENTIFIANT, std::make_shared<StrategieIdentifiant>(constructeurEquation));
-        registreStrategieEquation->enregistrer(TOKEN_REF, std::make_shared<StrategieRef>());
-        registreStrategieEquation->enregistrer(TOKEN_UNREF, std::make_shared<StrategieUnRef>());
-        registreStrategieEquation->enregistrer(TOKEN_NON, std::make_shared<StrategieNegation>());
-        registreStrategieEquation->enregistrer(TOKEN_CROCHET_OUVERT, std::make_shared<StrategieTableauInitialisation>(constructeurEquation->recupererConstructeurArbre()));
+        auto* registreStrategieEquation = new (arena.Allocate<RegistreStrategieEquation>()) RegistreStrategieEquation();
+        
+        auto* stratLitInt = new (arena.Allocate<StrategieLitteral>()) StrategieLitteral();
+        registreStrategieEquation->enregistrer(TOKEN_LIT_INT, stratLitInt);
+        
+        auto* stratLitFloat = new (arena.Allocate<StrategieLitteral>()) StrategieLitteral();
+        registreStrategieEquation->enregistrer(TOKEN_LIT_FLOAT, stratLitFloat);
+        
+        auto* stratLitBool = new (arena.Allocate<StrategieLitteral>()) StrategieLitteral();
+        registreStrategieEquation->enregistrer(TOKEN_LIT_BOLEEN, stratLitBool);
+        
+        auto* stratIdent = new (arena.Allocate<StrategieIdentifiant>()) StrategieIdentifiant(constructeurEquation);
+        registreStrategieEquation->enregistrer(TOKEN_IDENTIFIANT, stratIdent);
+        
+        auto* stratRef = new (arena.Allocate<StrategieRef>()) StrategieRef();
+        registreStrategieEquation->enregistrer(TOKEN_REF, stratRef);
+        
+        auto* stratUnRef = new (arena.Allocate<StrategieUnRef>()) StrategieUnRef();
+        registreStrategieEquation->enregistrer(TOKEN_UNREF, stratUnRef);
+        
+        auto* stratNeg = new (arena.Allocate<StrategieNegation>()) StrategieNegation();
+        registreStrategieEquation->enregistrer(TOKEN_NON, stratNeg);
+        
+        auto* stratTab = new (arena.Allocate<StrategieTableauInitialisation>()) StrategieTableauInitialisation(constructeurEquation->recupererConstructeurArbre());
+        registreStrategieEquation->enregistrer(TOKEN_CROCHET_OUVERT, stratTab);
+        
         ConstructeurEquationFlottante::setRegistreStrategieEquation(registreStrategieEquation);
     
         // NoeudInstruction du langage prysma
-        context->registreInstruction->enregistrer(TOKEN_SCOPE, std::make_shared<ParseurScope>(&constructeurArbreInstruction));
-        context->registreInstruction->enregistrer(TOKEN_FONCTION, std::make_shared<ParseurDeclarationFonction>(&constructeurArbreInstruction,parseurType));
-        context->registreInstruction->enregistrer(TOKEN_AFF, std::make_shared<ParseurAffectationVariable>(context->backend, context->registreVariable, context->registreType, constructeurEquation->recupererConstructeurArbre()));
-        context->registreInstruction->enregistrer(TOKEN_DEC, std::make_shared<ParseurDeclarationVariable>(parseurType, constructeurEquation->recupererConstructeurArbre()));
-        context->registreInstruction->enregistrer(TOKEN_CALL, std::make_shared<ParseurInstructionAppel>(constructeurEquation->recupererConstructeurArbre()));
-        context->registreInstruction->enregistrer(TOKEN_RETOUR, std::make_shared<ParseurRetour>(constructeurEquation->recupererConstructeurArbre()));
-        context->registreInstruction->enregistrer(TOKEN_ARG, std::make_shared<ParseurArgFonction>(parseurType));
-        context->registreInstruction->enregistrer(TOKEN_UNREF, std::make_shared<ParseurUnRefVariable>());
-        context->registreInstruction->enregistrer(TOKEN_REF, std::make_shared<ParseurRefVariable>());
-        context->registreInstruction->enregistrer(TOKEN_SI, std::make_shared<ParseurIf>(constructeurEquation->recupererConstructeurArbre(), &constructeurArbreInstruction));
-        context->registreInstruction->enregistrer(TOKEN_TANT_QUE, std::make_shared<ParseurWhile>(constructeurEquation->recupererConstructeurArbre(), &constructeurArbreInstruction));
+        auto* parsScope = new (arena.Allocate<ParseurScope>()) ParseurScope(rawConstructeurArbreInstruction);
+        context->registreInstruction->enregistrer(TOKEN_SCOPE, parsScope);
+        
+        auto* parsFonc = new (arena.Allocate<ParseurDeclarationFonction>()) ParseurDeclarationFonction(rawConstructeurArbreInstruction, parseurType);
+        context->registreInstruction->enregistrer(TOKEN_FONCTION, parsFonc);
+        
+        auto* parsAff = new (arena.Allocate<ParseurAffectationVariable>()) ParseurAffectationVariable(context->backend, context->registreVariable, context->registreType, constructeurEquation->recupererConstructeurArbre());
+        context->registreInstruction->enregistrer(TOKEN_AFF, parsAff);
+        
+        auto* parsDec = new (arena.Allocate<ParseurDeclarationVariable>()) ParseurDeclarationVariable(parseurType, constructeurEquation->recupererConstructeurArbre());
+        context->registreInstruction->enregistrer(TOKEN_DEC, parsDec);
+        
+        auto* parsCall = new (arena.Allocate<ParseurInstructionAppel>()) ParseurInstructionAppel(constructeurEquation->recupererConstructeurArbre());
+        context->registreInstruction->enregistrer(TOKEN_CALL, parsCall);
+        
+        auto* parsRet = new (arena.Allocate<ParseurRetour>()) ParseurRetour(constructeurEquation->recupererConstructeurArbre());
+        context->registreInstruction->enregistrer(TOKEN_RETOUR, parsRet);
+        
+        auto* parsArg = new (arena.Allocate<ParseurArgFonction>()) ParseurArgFonction(parseurType);
+        context->registreInstruction->enregistrer(TOKEN_ARG, parsArg);
+        
+        auto* parsUnRef = new (arena.Allocate<ParseurUnRefVariable>()) ParseurUnRefVariable();
+        context->registreInstruction->enregistrer(TOKEN_UNREF, parsUnRef);
+        
+        auto* parsRefVar = new (arena.Allocate<ParseurRefVariable>()) ParseurRefVariable();
+        context->registreInstruction->enregistrer(TOKEN_REF, parsRefVar);
+        
+        auto* parsIf = new (arena.Allocate<ParseurIf>()) ParseurIf(constructeurEquation->recupererConstructeurArbre(), rawConstructeurArbreInstruction);
+        context->registreInstruction->enregistrer(TOKEN_SI, parsIf);
+        
+        auto* parsWhile = new (arena.Allocate<ParseurWhile>()) ParseurWhile(constructeurEquation->recupererConstructeurArbre(), rawConstructeurArbreInstruction);
+        context->registreInstruction->enregistrer(TOKEN_TANT_QUE, parsWhile);
 
         // Ajouter la stratégie TOKEN_CALL 
-        registreStrategieEquation->enregistrer(TOKEN_CALL, std::make_shared<StrategieAppelFonction>(constructeurEquation->recupererConstructeurArbre()));
+        auto* stratCall = new (arena.Allocate<StrategieAppelFonction>()) StrategieAppelFonction(constructeurEquation->recupererConstructeurArbre());
+        registreStrategieEquation->enregistrer(TOKEN_CALL, stratCall);
 
         // Construire l'arbre syntaxique 
-        std::shared_ptr<INoeud> arbre = constructeurArbreInstruction.construire(tokens);
+        INoeud* arbre = rawConstructeurArbreInstruction->construire(tokens);
 
         VisiteurGeneralGenCode visiteur(context);
         arbre->accept(&visiteur);

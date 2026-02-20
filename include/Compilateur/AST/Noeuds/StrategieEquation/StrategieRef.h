@@ -10,7 +10,7 @@ class StrategieRef : public IStrategieEquation {
 public:
     StrategieRef() = default;
     ~StrategieRef() override = default;
-    std::shared_ptr<INoeud> construire(std::vector<Token>& equation) override;
+    INoeud* construire(std::vector<Token>& equation) override;
 };
 
 

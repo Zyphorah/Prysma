@@ -6,7 +6,7 @@ void VisiteurGeneralGraphViz::visiter(NoeudInstruction* instruction)
 {
     int idNoeud = _sortieGrapheVisuel.ajouterNoeud("Instruction");
 
-    for (const std::shared_ptr<INoeud>& enfant : instruction->getEnfants()) {
+    for (INoeud* enfant : instruction->getEnfants()) {
         enfant->accept(this);
         _sortieGrapheVisuel.ajouterArete(idNoeud, _dernierId);
     }

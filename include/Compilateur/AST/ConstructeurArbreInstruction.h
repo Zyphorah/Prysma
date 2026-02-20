@@ -9,14 +9,14 @@
 class ConstructeurArbreInstruction : public IConstructeurArbre
 {
 private: 
-    std::shared_ptr<RegistreInstruction> _registreInstructions;
+    RegistreInstruction* _registreInstructions;
 public: 
 
-    ConstructeurArbreInstruction(std::shared_ptr<RegistreInstruction> registreInstructions);
+    ConstructeurArbreInstruction(RegistreInstruction* registreInstructions);
     ~ConstructeurArbreInstruction();
 
-    std::shared_ptr<INoeud> construire(std::vector<Token>& tokens) override;  
-    std::shared_ptr<INoeud> construire(std::vector<Token>& tokens, int& index) override;
+    INoeud* construire(std::vector<Token>& tokens) override;  
+    INoeud* construire(std::vector<Token>& tokens, int& index) override;
 
 };
 

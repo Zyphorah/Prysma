@@ -17,7 +17,7 @@ struct Token;
 class ConstructeurEquationFlottante : public IConstructeurArbre
 {
 private:
-    std::shared_ptr<RegistreSymbole> _registreSymbole;
+    RegistreSymbole* _registreSymbole;
     
     std::unique_ptr<GestionnaireOperateur> _gestionnaireAddition;
     std::unique_ptr<GestionnaireOperateur> _gestionnaireSoustraction;
@@ -36,10 +36,10 @@ private:
     std::unique_ptr<ServiceParenthese> _serviceParenthese;
     std::unique_ptr<ChaineResponsabilite> _chaineResponsabilite;
         
-    std::shared_ptr<IConstructeurArbre> _constructeurArbre;
+    IConstructeurArbre* _constructeurArbre;
     IConstructeurArbre* _instructionBuilder;
 
-    static std::shared_ptr<RegistreStrategieEquation> _registreStrategieEquation;
+    static RegistreStrategieEquation* _registreStrategieEquation;
 
     void initialiserRegistre();
 
@@ -49,12 +49,12 @@ public:
     
     ~ConstructeurEquationFlottante() = default;
 
-    std::shared_ptr<INoeud> construire(std::vector<Token>& tokens) override;
-    std::shared_ptr<INoeud> construire(std::vector<Token>& tokens, int& index) override;
+    INoeud* construire(std::vector<Token>& tokens) override;
+    INoeud* construire(std::vector<Token>& tokens, int& index) override;
     
-    static void setRegistreStrategieEquation(std::shared_ptr<RegistreStrategieEquation> registre);
+    static void setRegistreStrategieEquation(RegistreStrategieEquation* registre);
     
-    static std::shared_ptr<RegistreStrategieEquation> getRegistreStrategieEquation();
+    static RegistreStrategieEquation* getRegistreStrategieEquation();
 
     IConstructeurArbre* recupererConstructeurArbre() const;
 };

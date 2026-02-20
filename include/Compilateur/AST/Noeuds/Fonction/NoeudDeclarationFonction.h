@@ -8,17 +8,17 @@ class NoeudDeclarationFonction : public NoeudInstruction
 {
 private:
     std::string _nom;
-    std::shared_ptr<IType> _typeRetour;
+    IType* _typeRetour;
 
 public:
-    NoeudDeclarationFonction(std::string nom, std::shared_ptr<IType> typeRetour);
+    NoeudDeclarationFonction(std::string nom, IType* typeRetour);
     
     ~NoeudDeclarationFonction() = default;
 
     void accept(IVisiteur* visiteur) override;
 
     const std::string& getNom() const { return _nom; }
-    std::shared_ptr<IType> getTypeRetour() const { return _typeRetour; }
+    IType* getTypeRetour() const { return _typeRetour; }
 };
 
 #endif /* A2837407_B466_49AE_8A29_4BFC0A5D0461 */

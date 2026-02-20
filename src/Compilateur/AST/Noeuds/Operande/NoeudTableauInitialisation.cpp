@@ -2,7 +2,7 @@
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
 #include <utility>
 
-NoeudTableauInitialisation::NoeudTableauInitialisation(std::vector<std::shared_ptr<INoeud>> elements)
+NoeudTableauInitialisation::NoeudTableauInitialisation(std::vector<INoeud*> elements)
     : _elements(std::move(elements))
 {
 }

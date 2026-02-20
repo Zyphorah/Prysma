@@ -3,8 +3,8 @@
 #include "Compilateur/AST/Registre/RegistreSymbole.h"
 #include <utility>
 
-ServiceParenthese::ServiceParenthese(std::shared_ptr<RegistreSymbole> registreSymbole)
-    : _registreSymbole(std::move(registreSymbole)) {
+ServiceParenthese::ServiceParenthese(RegistreSymbole* registreSymbole)
+    : _registreSymbole(registreSymbole) {
 }
 
 // TODO: OPTIMISATION utilisation de int debut et int fin pour éviter la copie du vecteur de token et ne rien retourner

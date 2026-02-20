@@ -15,8 +15,8 @@ class ConstructeurArbreEquation : public IConstructeurArbre
 {
 private:
     ChaineResponsabilite* _chaineResponsabilite;
-    std::shared_ptr<RegistreSymbole> _registreSymbole;
-    std::shared_ptr<RegistreStrategieEquation> _registreStrategieEquation;
+    RegistreSymbole* _registreSymbole;
+    RegistreStrategieEquation* _registreStrategieEquation;
     IGestionnaireParenthese* _gestionnaireParenthese;
     IConstructeurArbre* _instructionBuilder;
 
@@ -24,12 +24,12 @@ public:
   
     ConstructeurArbreEquation(
         ChaineResponsabilite* chaineResponsabilite,
-        std::shared_ptr<RegistreSymbole> registreSymbole,
-        std::shared_ptr<RegistreStrategieEquation> registreStrategieEquation,
+        RegistreSymbole* registreSymbole,
+        RegistreStrategieEquation* registreStrategieEquation,
         IGestionnaireParenthese* gestionnaireParenthese,
         IConstructeurArbre* instructionBuilder = nullptr
     );
     
-    std::shared_ptr<INoeud> construire(std::vector<Token> &equation) override;
-    std::shared_ptr<INoeud> construire(std::vector<Token>& tokens, int& index) override;
+    INoeud* construire(std::vector<Token> &equation) override;
+    INoeud* construire(std::vector<Token>& tokens, int& index) override;
 };
