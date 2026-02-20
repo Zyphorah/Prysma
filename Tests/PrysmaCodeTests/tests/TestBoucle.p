@@ -2,7 +2,7 @@ scope {
 
     fn bool testBoucleConditionExtern()
     {
-        dec int i = 0; 
+        dec int32 i = 0; 
 
         dec bool condition = i < 5;
 
@@ -20,7 +20,7 @@ scope {
 
    fn bool testBoucleNesPasEgale()
    {
-        dec int i = 0; 
+        dec int32 i = 0; 
         while(i != 5)
         {
             aff i = i +1; 
@@ -34,7 +34,7 @@ scope {
 
    fn bool testBoucle()
     {
-        dec int i = 0;
+        dec int32 i = 0;
 
         while (i < 5) {
             aff i = i + 1;
@@ -48,9 +48,9 @@ scope {
    
    fn bool testBoucleImbrique()
    {
-        dec int i = 0;
-        dec int j = 0;
-        dec int total = 0;
+        dec int32 i = 0;
+        dec int32 j = 0;
+        dec int32 total = 0;
         while(i < 5)
         {
             aff j = 0;
@@ -70,8 +70,8 @@ scope {
 
    fn bool testBoucleConditionComplexe()
    {
-        dec int i = 0;
-        dec int j = 10;
+        dec int32 i = 0;
+        dec int32 j = 10;
         while(i < 5 && j > 5)
         {
             aff i = i + 1;
@@ -86,7 +86,7 @@ scope {
 
    fn bool testBoucleNonExecute()
    {
-       dec int i = 5;
+       dec int32 i = 5;
        while(i < 5)
        {
            aff i = i + 1;
@@ -98,7 +98,7 @@ scope {
        return false;
    }
 
-   fn int main()
+   fn int32 main()
    {
         call printBool(call testBoucle());
         call printBool(call testBoucleNesPasEgale());

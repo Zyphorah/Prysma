@@ -32,11 +32,13 @@ namespace TokenCategories {
     };
 
     inline const std::unordered_set<TokenType> TYPES = {
-        TOKEN_TYPE_INT,
         TOKEN_TYPE_FLOAT,
         TOKEN_TYPE_STRING,
         TOKEN_TYPE_BOOL,
-        TOKEN_TYPE_VOID
+        TOKEN_TYPE_VOID,
+        TOKEN_TYPE_CHAR,
+         TOKEN_TYPE_INT64,
+        TOKEN_TYPE_INT32
     };
 
     inline const std::unordered_set<TokenType> MOTS_CLES = {

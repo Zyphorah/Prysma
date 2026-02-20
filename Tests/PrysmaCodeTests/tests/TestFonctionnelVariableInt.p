@@ -5,10 +5,10 @@ scope {
    // Si la priorité est fausse (gauche vers droite) : (10 + 2) * 5 = 60
    fn bool testPrioriteSimple()
    {
-      dec int a = 10;
-      dec int b = 2;
-      dec int c = 5;
-      dec int d = a + b * c; 
+      dec int32 a = 10;
+      dec int32 b = 2;
+      dec int32 c = 5;
+      dec int32 d = a + b * c; 
       if (d == 20) {
          return true;
       } else {
@@ -22,11 +22,11 @@ scope {
    // Si faux : 2 * 3 + 4 = 10, puis 10 * 5 = 50
    fn bool testPrioriteComplexe()
    {
-      dec int a = 2;
-      dec int b = 3;
-      dec int c = 4;
-      dec int d = 5;
-      dec int resultat = a * b + c * d;
+      dec int32 a = 2;
+      dec int32 b = 3;
+      dec int32 c = 4;
+      dec int32 d = 5;
+      dec int32 resultat = a * b + c * d;
 
 
       if (resultat == 26) {
@@ -42,12 +42,12 @@ scope {
    // Calcul : 10 + 5 = 15
    fn bool testMiseAJourEtat()
    {
-      dec int a = 1;
-      dec int b = 5;
+      dec int32 a = 1;
+      dec int32 b = 5;
       
       aff a = 10; 
       
-      dec int c = a + b;
+      dec int32 c = a + b;
       if (c == 15) {
          return true;
       } else {
@@ -58,7 +58,7 @@ scope {
    }
 
    // Test 4 : Vérifier que les arguments peuvent passer dans une fonction 
-   fn bool testPassArgFonction(arg int a, arg float b)
+   fn bool testPassArgFonction(arg int32 a, arg float b)
    {  
       if ((a == 10) && (b == 25.5)) {
          return true;
@@ -83,7 +83,7 @@ scope {
 
    fn bool testAffectation()
    {
-      dec int a = 5;
+      dec int32 a = 5;
       aff a = 10; 
       if (a == 10) {
          return true;
@@ -97,7 +97,7 @@ scope {
    // Vérifie que le compilateur charge 'a' avant d'écraser 'a'
    fn bool testAutoIncrement()
    {
-      dec int a = 10;
+      dec int32 a = 10;
       aff a = a + 1; // Si le load/store est mal ordonné, ça plante ou donne 1
 
       if (a == 11) {
@@ -112,8 +112,8 @@ scope {
    // Vérifie que la valeur est bien copiée, pas juste liée
    fn bool testCopieVariable()
    {
-      dec int a = 50;
-      dec int b = a; // Doit copier 50 dans b
+      dec int32 a = 50;
+      dec int32 b = a; // Doit copier 50 dans b
       
       aff a = 0; // On modifie a, b ne doit pas changer
 
@@ -127,8 +127,8 @@ scope {
 
    fn bool testImbrication()
    {
-      dec int a = 1;
-      dec int b = 2;
+      dec int32 a = 1;
+      dec int32 b = 2;
 
       if (a == 1) {
          if (b == 2) {
@@ -142,7 +142,7 @@ scope {
       return false;
    }
 
-   fn int main()
+   fn int32 main()
    {
       call printBool(call testPrioriteSimple());
       call printBool(call testPrioriteComplexe());

@@ -22,6 +22,7 @@ class Lexer {
     // Dictionnaire pour les mots réservés du langage de programmation prysma
     // Permet de différencier les identifiants des mots-clés
     map<string, TokenType> motsCles = {
+        {"char", TOKEN_TYPE_CHAR},
         {"arg", TOKEN_ARG},
         {"fn", TOKEN_FONCTION},
         {"if", TOKEN_SI},
@@ -35,7 +36,8 @@ class Lexer {
         {"scope", TOKEN_SCOPE},
         {"aff", TOKEN_AFF},
         {"dec", TOKEN_DEC},
-        {"int", TOKEN_TYPE_INT},
+        {"int64", TOKEN_TYPE_INT64},
+        {"int32", TOKEN_TYPE_INT32},
         {"float", TOKEN_TYPE_FLOAT},
         {"string", TOKEN_TYPE_STRING},
         {"bool", TOKEN_TYPE_BOOL},

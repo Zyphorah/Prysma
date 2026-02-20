@@ -1,18 +1,13 @@
 scope {
 
-   fn int test(arg int[10] tableau)
+   fn int64 main() 
    {
-       call printInt(tableau[2]);
-       return 0;
-   }
 
-   fn int main() 
-   {
-      dec int i = 10; 
-      dec int[10] tableau = [1,2,4,5]; 
+      dec int64 a = 10; 
+      dec char[10] tableau = [65, 66, 67, 68, 69, 70, 71, 72, 73, 74];
 
-      call test(tableau);
-     
+      call printString(ref tableau);
+    
       return 0;
    }
 

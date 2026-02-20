@@ -42,10 +42,17 @@ llvm::Value* LlvmBackend::creerAutoCast(llvm::Value* valeurSource, llvm::Type* t
         return valeurSource;
     }
     // Vérifier que c'est un array 
-
     if(typeCible->isArrayTy() && valeurSource->getType()->isPointerTy())
     {
-        return _builder->CreateLoad(typeCible->getArrayElementType(), valeurSource, "autocast_array");
+        llvm::Value* zero = _builder->getInt32(0);
+        std::vector<llvm::Value*> indices = { zero, zero };
+
+        return _builder->CreateInBoundsGEP(
+            typeCible,      
+            valeurSource, 
+            indices,       
+            "autocast_array_to_ptr"
+        );
     }
 
     llvm::Instruction::CastOps opcode = llvm::CastInst::getCastOpcode(

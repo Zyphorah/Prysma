@@ -6,7 +6,7 @@ void VisiteurGeneralGraphViz::visiter(NoeudDeclarationVariable* noeudDeclaration
 {
     int idNoeud = _sortieGrapheVisuel.ajouterNoeud("Declaration: " + noeudDeclarationVariable->getNom());
 
-    if (noeudDeclarationVariable->getExpression()) {
+    if (noeudDeclarationVariable->getExpression() != nullptr) {
         noeudDeclarationVariable->getExpression()->accept(this);
         _sortieGrapheVisuel.ajouterArete(idNoeud, _dernierId);
     }

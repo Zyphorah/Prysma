@@ -1,6 +1,7 @@
 #include <cstdio>
 
 extern "C" {
+
     void printInt(int value) {
         printf("%d\n", value);
     }
@@ -16,4 +17,9 @@ extern "C" {
             printf("false\n");
         }
     }
+    void printString(char* value)
+    {
+        printf("%s\n", value);
+    }
+
 }

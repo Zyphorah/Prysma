@@ -101,7 +101,7 @@ scope {
       return false;
    }
 
-   fn int main()
+   fn int32 main()
    {
       // Tester les bool 
       call printBool(call testEtLogique()); 

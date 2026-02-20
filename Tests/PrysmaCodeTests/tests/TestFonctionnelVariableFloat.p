@@ -142,7 +142,7 @@ scope {
       return false;
    }
 
-   fn int main()
+   fn int32 main()
    {
       call printBool(call testPrioriteSimple());
       call printBool(call testPrioriteComplexe());

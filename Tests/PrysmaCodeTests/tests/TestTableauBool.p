@@ -83,7 +83,7 @@ scope
     //fn bool tableauTestIndexDynamique()
     //{
     //    dec bool[4] t = [true, false, true, false];
-    //    dec int i = 2;
+    //    dec int32 i = 2;
     //    
     //    // Test variable
     //    if (t[i] != true) { return false; }
@@ -112,7 +112,7 @@ scope
     fn bool tableauTestIteration()
     {
         dec bool[3] t = [false, false, false];
-        dec int i = 0;
+        dec int32 i = 0;
 
         // Remplissage dynamique
         while (i < 3) {
@@ -178,7 +178,7 @@ scope
         return call tableauInjectionArgument(tableau);
     }
 
-    fn int main()
+    fn int32 main()
     {
         call printBool(call tableauTestLecture());
         call printBool(call tableauTestAffectation());

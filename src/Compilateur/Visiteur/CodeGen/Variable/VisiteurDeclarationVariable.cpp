@@ -26,7 +26,7 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
 
     if (NoeudTableauInitialisation* tableauInit = dynamic_cast<NoeudTableauInitialisation*>(expression)) {
         // typeVariable est le type du tableau complet [n x T], on extrait T
-        llvm::ArrayType* typeTableau = llvm::dyn_cast<llvm::ArrayType>(typeVariable);
+        auto* typeTableau = llvm::dyn_cast<llvm::ArrayType>(typeVariable);
         
         if (typeTableau == nullptr) {
             throw std::runtime_error("Erreur : le type de la variable n'est pas un tableau pour une initialisation de tableau");
@@ -38,7 +38,7 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
         llvm::AllocaInst* allocaInstTableau = gestionVariable.allouerVariable(typeVariable, noeudDeclarationVariable->getNom());
         gestionVariable.enregistrerVariable(noeudDeclarationVariable->getNom(), allocaInstTableau);
         
-        // Boucle d'initialisation GEP et store
+        // Boucle d'initialisation GEP et store, index gep 
         for (size_t i = 0; i < tableauInit->getElements().size(); ++i) {
             std::vector<llvm::Value*> indices = {
                 _contextGenCode->backend->getBuilder().getInt32(0), // Toujours à zéro c'est l'index d'offset pour les tableaux alloués 
