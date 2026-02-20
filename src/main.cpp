@@ -96,6 +96,10 @@ int main(int argc, char* argv[])
 
         // Enregistrer des fonctions externes
 
+        // backSlashN
+        context->backend->declarerExterne("backSlashN", llvm::Type::getVoidTy(context->backend->getContext()), {});
+        context->registreFonction->enregistrer("backSlashN", context->backend->getModule().getFunction("backSlashN"));      
+
         // PrintInt
         IntegerType* intTy = llvm::Type::getInt64Ty(context->backend->getContext());
         std::vector<llvm::Type*> printIntArgs = {intTy};

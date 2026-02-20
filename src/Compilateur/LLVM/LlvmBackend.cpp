@@ -66,7 +66,7 @@ llvm::Value* LlvmBackend::creerAutoCast(llvm::Value* valeurSource, llvm::Type* t
 }
 
 
-void LlvmBackend::declarerExterne(const std::string& nom, llvm::Type* ret, std::vector<llvm::Type*>& args)
+void LlvmBackend::declarerExterne(const std::string& nom, llvm::Type* ret, const std::vector<llvm::Type*>& args)
 {
     llvm::FunctionType* type = llvm::FunctionType::get(ret, args, false);
     llvm::Function::Create(type, llvm::Function::ExternalLinkage, nom, *_module);

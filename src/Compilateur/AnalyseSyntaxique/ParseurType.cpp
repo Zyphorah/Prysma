@@ -5,7 +5,6 @@
 #include "Compilateur/Lexer/TokenCategories.h"
 #include "Compilateur/GestionnaireErreur.h"
 #include "Compilateur/Lexer/TokenType.h"
-#include <cstddef>
 
 ParseurType::ParseurType(RegistreType* registreType, IConstructeurArbre* constructeurArbre)
     : _registreType(registreType), _constructeurArbre(constructeurArbre)

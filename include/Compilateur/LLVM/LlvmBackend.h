@@ -30,7 +30,7 @@ public:
     llvm::IRBuilder<llvm::NoFolder>& getBuilder() { return *_builder; }
 
     llvm::Value* creerAutoCast(llvm::Value* valeurSource, llvm::Type* typeCible);
-    void declarerExterne(const std::string& nom, llvm::Type* ret, std::vector<llvm::Type*>& args);
+    void declarerExterne(const std::string& nom, llvm::Type* ret, const std::vector<llvm::Type*>& args);
     llvm::Value* chargerValeur(llvm::Value* adresseMemoire, const std::string& nomVariable);
     void definirPointInsertionApresAllocation();
 };
