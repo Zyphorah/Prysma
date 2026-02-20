@@ -3,8 +3,6 @@
 #include "Compilateur/AST/Noeuds/Tableau/NoeudAffectationTableau.h"
 #include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
-#include <memory>
-#include <utility>
 
 ParseurAffectationVariable::ParseurAffectationVariable(LlvmBackend* backend, RegistreVariable* registreVariable, RegistreType* registreType, IConstructeurArbre* constructeurEquation)
     : _backend(backend), _registreVariable(registreVariable), _registreType(registreType), _constructeurEquation(constructeurEquation)

@@ -4,7 +4,8 @@
 #include "Compilateur/AST/Registre/Types/TypeTableau.h"
 #include "Compilateur/Lexer/TokenCategories.h"
 #include "Compilateur/GestionnaireErreur.h"
-#include <memory>
+#include "Compilateur/Lexer/TokenType.h"
+#include <cstddef>
 
 ParseurType::ParseurType(RegistreType* registreType, IConstructeurArbre* constructeurArbre)
     : _registreType(registreType), _constructeurArbre(constructeurArbre)
@@ -23,10 +24,16 @@ IType* ParseurType::parser(std::vector<Token>& tokens, int& index)
     IType* type = _constructeurArbre->allouer<TypeSimple>(typeLLVM);
     index++;
 
-    while (index < static_cast<int>(tokens.size()) && tokens[index].type == TOKEN_CROCHET_OUVERT) {
+    if (tokens[index].type == TOKEN_CROCHET_OUVERT) {
+    
         index++; // Consommer le crochet ouvert
 
-        INoeud* tailleEquation = _constructeurArbre->construire(tokens, index);
+        INoeud* tailleEquation = nullptr;
+        
+        // Vérifier si la taille est spécifiée ou si les crochets sont vides
+        if (tokens[index].type != TOKEN_CROCHET_FERME) {
+            tailleEquation = _constructeurArbre->construire(tokens, index);
+        }
 
         if (index >= static_cast<int>(tokens.size()) || tokens[index].type != TOKEN_CROCHET_FERME) {
             throw ErreurCompilation("Erreur : ']' attendu après la taille du tableau", tokens[index].ligne, tokens[index].colonne);
@@ -35,6 +42,5 @@ IType* ParseurType::parser(std::vector<Token>& tokens, int& index)
 
         type = _constructeurArbre->allouer<TypeTableau>(type, tailleEquation);
     }
-
     return type;
 }

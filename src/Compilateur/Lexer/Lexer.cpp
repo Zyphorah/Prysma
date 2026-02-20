@@ -41,41 +41,6 @@ void Lexer::traiterCommentaires(const string& sourceCode, size_t& pos) {
     }
 }
 
-void Lexer::traiterChaine(const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne) {
-    if (sourceCode[pos] != '"') {
-        return;
-    }
-    
-    int colonneDebut = colonne;
-    string valeur;
-    valeur += sourceCode[pos];
-    pos++;
-    colonne++;
-    
-    while (pos < sourceCode.length() && sourceCode[pos] != '"') {
-        if (sourceCode[pos] == '\\' && pos + 1 < sourceCode.length()) {
-            valeur += sourceCode[pos];
-            pos++;
-            colonne++;
-            valeur += sourceCode[pos];
-            pos++;
-            colonne++;
-        } else {
-            valeur += sourceCode[pos];
-            pos++;
-            colonne++;
-        }
-    }
-    
-    if (pos < sourceCode.length()) {
-        valeur += sourceCode[pos];
-        pos++;
-        colonne++;
-    }
-    
-    tokens.push_back({TOKEN_LIT_CHAINE, valeur, ligne, colonneDebut});
-}
-
 void Lexer::traiterNombre(const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne) {
     int colonneDebut = colonne;
     string nombre;
@@ -115,9 +80,7 @@ void Lexer::traiterNombre(const string& sourceCode, size_t& pos, vector<Token>& 
 }
 
 void Lexer::traiterLitteraux(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne) {
-    if (current == '"') {
-        traiterChaine(sourceCode, pos, tokens, ligne, colonne);
-    } else if (isdigit(current) != 0) {
+    if (isdigit(current) != 0) {
         traiterNombre(sourceCode, pos, tokens, ligne, colonne);
     }
 }
@@ -328,7 +291,33 @@ vector<Token> Lexer::tokenizer(const string& sourceCode) {
             ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
             motCourant = "";
             colonneMotCourant = colonne;
-            traiterChaine(sourceCode, pos, tokens, ligne, colonne);
+            
+            tokens.push_back({TOKEN_GUILLEMET, "\"", ligne, colonne});
+            pos++;
+            colonne++;
+
+            string stringContent;
+            int colonneDebutChaine = colonne;
+            while (pos < sourceCode.length() && sourceCode[pos] != '"') {
+                if (sourceCode[pos] == '\\' && pos + 1 < sourceCode.length()) {
+                    stringContent += sourceCode[pos];
+                    pos++;
+                    colonne++;
+                }
+                stringContent += sourceCode[pos];
+                pos++;
+                colonne++;
+            }
+
+            if (!stringContent.empty()) {
+                tokens.push_back({TOKEN_IDENTIFIANT, stringContent, ligne, colonneDebutChaine});
+            }
+
+            if (pos < sourceCode.length() && sourceCode[pos] == '"') {
+                tokens.push_back({TOKEN_GUILLEMET, "\"", ligne, colonne});
+                pos++;
+                colonne++;
+            }
             colonneMotCourant = colonne;
             continue;
         }

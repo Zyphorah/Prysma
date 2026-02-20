@@ -1,7 +1,4 @@
 #include "Compilateur/AST/ConstructeurArbreEquation.h"
-
-#include <exception>
-#include <utility>
 #include <vector>
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
 #include "Compilateur/Lexer/Lexer.h"
@@ -38,8 +35,8 @@ INoeud* ConstructeurArbreEquation::construire(std::vector<Token> &equation) {
         TokenType type = equation[0].type;
 
         // Use the static registre from ConstructeurEquationFlottante, not the instance variable
-        auto strategieEquationRegistry = ConstructeurEquationFlottante::getRegistreStrategieEquation();
-        if (strategieEquationRegistry && strategieEquationRegistry->existe(type)) {
+        auto *strategieEquationRegistry = ConstructeurEquationFlottante::getRegistreStrategieEquation();
+        if ((strategieEquationRegistry != nullptr) && strategieEquationRegistry->existe(type)) {
             return strategieEquationRegistry->recuperer(type)->construire(equation);
         }
 

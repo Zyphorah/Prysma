@@ -1,4 +1,5 @@
 #include "Compilateur/AST/Noeuds/Boucle/NoeudWhile.h"
+#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieString.h"
 #include "Compilateur/AST/Registre/ContextGenCode.h"
 #include "Compilateur/AST/ConstructeurArbreInstruction.h"
 #include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
@@ -119,6 +120,7 @@ int main(int argc, char* argv[])
         context->backend->declarerExterne("printString", llvm::Type::getVoidTy(context->backend->getContext()), printStringArgs);
         context->registreFonction->enregistrer("printString", context->backend->getModule().getFunction("printString"));
         // Enregistrer les types de base
+        context->registreType->enregistrer(TOKEN_TYPE_STRING,llvm::Type::getInt8Ty(context->backend->getContext()));
         context->registreType->enregistrer(TOKEN_TYPE_CHAR, llvm::Type::getInt8Ty(context->backend->getContext()));
         context->registreType->enregistrer(TOKEN_TYPE_INT64, llvm::Type::getInt64Ty(context->backend->getContext()));
         context->registreType->enregistrer(TOKEN_TYPE_INT32, llvm::Type::getInt32Ty(context->backend->getContext()));
@@ -133,7 +135,6 @@ int main(int argc, char* argv[])
         auto* constructeurEquation = new (arena) 
             ConstructeurEquationFlottante(rawConstructeurArbreInstruction, arena);
         
-         
         // Créer le ParseurType avec le registre
         auto* parseurType = new (arena.Allocate<ParseurType>()) 
             ParseurType(context->registreType, constructeurEquation->recupererConstructeurArbre());
@@ -163,6 +164,9 @@ int main(int argc, char* argv[])
         
         auto* stratTab = new (arena.Allocate<StrategieTableauInitialisation>()) StrategieTableauInitialisation(constructeurEquation->recupererConstructeurArbre());
         registreStrategieEquation->enregistrer(TOKEN_CROCHET_OUVERT, stratTab);
+
+        auto* stratString = new (arena.Allocate<StrategieString>()) StrategieString(arena);
+        registreStrategieEquation->enregistrer(TOKEN_GUILLEMET, stratString);
         
         ConstructeurEquationFlottante::setRegistreStrategieEquation(registreStrategieEquation);
     

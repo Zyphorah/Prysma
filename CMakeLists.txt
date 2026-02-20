@@ -87,6 +87,7 @@ set(SOURCES
     src/Compilateur/AST/Noeuds/StrategieEquation/StrategieNegation.cpp
     src/Compilateur/AST/Noeuds/StrategieEquation/StrategieLitteral.cpp
     src/Compilateur/AST/Noeuds/StrategieEquation/StrategieIdentifiant.cpp
+    src/Compilateur/AST/Noeuds/StrategieEquation/StrategieString.cpp
     # Arbre syntaxique abstrait
     src/Compilateur/AST/Registre/RegistreArgument.cpp
     src/Compilateur/AST/Registre/RegistreVariable.cpp

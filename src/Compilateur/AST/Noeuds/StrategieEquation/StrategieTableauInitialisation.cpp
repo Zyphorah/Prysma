@@ -1,9 +1,7 @@
 #include "Compilateur/AST/Noeuds/StrategieEquation/StrategieTableauInitialisation.h"
 #include "Compilateur/AST/Interfaces/IConstructeurArbre.h"
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
-#include "Compilateur/AST/Noeuds/Operande/NoeudLitteral.h"
 #include "Compilateur/AST/Noeuds/Operande/NoeudTableauInitialisation.h"
-#include <memory>
 #include <vector>
 
 StrategieTableauInitialisation::StrategieTableauInitialisation(IConstructeurArbre* constructeurArbreEquation)
@@ -24,7 +22,7 @@ INoeud* StrategieTableauInitialisation::construire(std::vector<Token>& equation)
         if (equation[index].type == TOKEN_VIRGULE) {
             index++;
             INoeud* element = _constructeurArbreEquation->construire(sousEquation);
-            if (element) {
+            if (element != nullptr) {
                 elementsTableau.push_back(element);
             }
             sousEquation.clear();
@@ -38,7 +36,7 @@ INoeud* StrategieTableauInitialisation::construire(std::vector<Token>& equation)
     // Retourner un conteneur avec tous les éléments
     if (!sousEquation.empty()) {
         INoeud* element = _constructeurArbreEquation->construire(sousEquation);
-        if (element) {
+        if (element != nullptr) {
             elementsTableau.push_back(element);
         }
     }

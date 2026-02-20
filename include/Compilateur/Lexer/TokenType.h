@@ -39,6 +39,7 @@ enum TokenType {
     TOKEN_CROCHET_FERME,
     TOKEN_POINT_VIRGULE,
     TOKEN_VIRGULE,      
+    TOKEN_GUILLEMET,
     
     // Mots-clés 
     TOKEN_FONCTION,    
