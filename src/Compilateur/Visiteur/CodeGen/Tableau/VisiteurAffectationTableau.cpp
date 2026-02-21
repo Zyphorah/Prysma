@@ -30,8 +30,12 @@ void VisiteurGeneralGenCode::visiter(NoeudAffectationTableau* noeudAffectationTa
         valeur, 
         indices
     );
+
+    // Cast automatique de la valeur vers le type de l'élément du tableau (ex: int -> float)
+    llvm::Type* typeElement = arrayType->getArrayElementType();
+    llvm::Value* valeurCastee = _contextGenCode->backend->creerAutoCast(expressionResult, typeElement);
     
-    _contextGenCode->backend->getBuilder().CreateStore(expressionResult, ptrCase);
+    _contextGenCode->backend->getBuilder().CreateStore(valeurCastee, ptrCase);
     
     // Reset la valeur pour éviter des problèmes
     _contextGenCode->valeurTemporaire.adresse = nullptr;
