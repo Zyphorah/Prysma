@@ -1,5 +1,6 @@
 scope {
-
+   import "teste.p";
+   
    fn void teste()
    {
       call print(1);
@@ -9,13 +10,7 @@ scope {
    {
       dec int64 a = 10; 
 
-      dec string[] tableau = "a, b, c, d, e, f, g, h, i, j";
-
-      call print(ref tableau);
-      call print(10);
-      call print(a);
-      call print(true);
-      
+      call teste();
       return 0;
    }
 }

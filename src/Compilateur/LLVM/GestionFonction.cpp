@@ -193,6 +193,18 @@ void GestionFonction::declarerFonction()
     initialiserContexte();
     traiterArgumentsConstruit(function, argumentsCodeGen);
     traiterCorpsFonction();
+
+    // Si la fonction est void et que le bloc courant n'a pas de terminateur,
+    // on insère un ret void pour que le code LLVM IR soit valide.
+    llvm::BasicBlock* blocCourant = _contextGenCode->backend->getBuilder().GetInsertBlock();
+    if (blocCourant && !blocCourant->getTerminator())
+    {
+        if (typeDeRetour->isVoidTy())
+        {
+            _contextGenCode->backend->getBuilder().CreateRetVoid();
+        }
+    }
+
     finaliserContexte();
 
     _contextGenCode->valeurTemporaire.adresse = function;
