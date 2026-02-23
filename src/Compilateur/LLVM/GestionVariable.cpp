@@ -59,18 +59,6 @@ llvm::AllocaInst* GestionVariable::allouerVariable(llvm::Type* type, const std::
     return allocaInst;
 }
 
-void GestionVariable::enregistrerVariable(const std::string& nomVariable, llvm::AllocaInst* allocaInst, IType* type)
-{
-    Token nomDeLaVariable;
-    nomDeLaVariable.value = nomVariable;
-    nomDeLaVariable.type = TOKEN_IDENTIFIANT;
-
-    Symbole symbole;
-    symbole.adresse = allocaInst;
-    symbole.type = type;
-    _contextGenCode->registreVariable->enregistrer(nomDeLaVariable, symbole);
-}
-
 void GestionVariable::stockerVariable(llvm::Value* valeur, llvm::AllocaInst* allocaInst)
 {
     _contextGenCode->backend->getBuilder().CreateStore(valeur, allocaInst);

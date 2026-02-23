@@ -45,8 +45,6 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
         
         // Allouer et enregistrer le tableau
         llvm::AllocaInst* allocaInstTableau = gestionVariable.allouerVariable(typeVariable, noeudDeclarationVariable->getNom());
-        gestionVariable.enregistrerVariable(noeudDeclarationVariable->getNom(), allocaInstTableau, noeudDeclarationVariable->getType());
-        
         // Initialiser chaque élément du tableau
         auto* typeTableauLLVM = llvm::dyn_cast<llvm::ArrayType>(typeVariable);
         for (size_t i = 0; i < tableauInit->getElements().size(); ++i) {
@@ -65,7 +63,6 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
         // Variable simple (non-tableau)
         llvm::Type* typeVariable = noeudDeclarationVariable->getType()->genererTypeLLVM(_contextGenCode->backend->getContext());
         llvm::AllocaInst* allocaInst = gestionVariable.allouerVariable(typeVariable, noeudDeclarationVariable->getNom());
-        gestionVariable.enregistrerVariable(noeudDeclarationVariable->getNom(), allocaInst, noeudDeclarationVariable->getType());
         
         llvm::Value* valeurCalculee = evaluerExpression(expression).adresse;
         if (valeurCalculee == nullptr) {

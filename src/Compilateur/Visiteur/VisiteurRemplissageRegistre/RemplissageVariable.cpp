@@ -10,5 +10,4 @@ void VisiteurRemplissageRegistre::visiter(NoeudDeclarationVariable* noeudDeclara
     token.value = noeudDeclarationVariable->getNom();
    
     Symbole symboleVariable(nullptr, type);
-    
 }
