@@ -4,7 +4,6 @@
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include <llvm/IR/Instructions.h>
-#include <memory>
 
 class ContextGenCode;
 

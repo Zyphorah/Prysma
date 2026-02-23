@@ -2,7 +2,6 @@
 #include <cstdarg> 
 
 extern "C" {
-
     void print(int type, ...) {
         va_list args;
         va_start(args, type);
@@ -30,7 +29,6 @@ extern "C" {
                 break;
             }
         }
-
         va_end(args);
     }
 

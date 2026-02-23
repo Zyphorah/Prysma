@@ -5,14 +5,13 @@
 #include "Compilateur/AST/Registre/ContextGenCode.h"
 #include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
-#include "Compilateur/Visiteur/MacroGenerationVisiteur.h"
+#include "Compilateur/Visiteur/VisiteurBaseGenerale.h"
 
-CLASS_NOEUD
 
 class RegistreVariable; 
 class LlvmBackend; 
 
-class VisiteurGeneralGenCode : public IVisiteur
+class VisiteurGeneralGenCode : public VisiteurBaseGenerale
 {
 private:
     ContextGenCode* _contextGenCode;
@@ -23,8 +22,6 @@ public:
     void parcourirEnfant(NoeudInstruction* noeud);
     
     Symbole evaluerExpression(INoeud* expression);
-    
-    DECLARER_METHODES_VISITEUR
 };
 
 #endif /* FDDB5968_6DEF_49B0_AD11_8791D523278A */

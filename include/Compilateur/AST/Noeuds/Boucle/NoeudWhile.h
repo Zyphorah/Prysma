@@ -2,7 +2,6 @@
 #define F158F3CA_48BA_406A_A611_87940EE9E015
 
 #include "Compilateur/AST/Noeuds/NoeudInstruction.h"
-#include <memory>
 
 class INoeud;
 class VisiteurGeneralGenCode;

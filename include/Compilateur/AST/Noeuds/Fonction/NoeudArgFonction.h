@@ -2,8 +2,8 @@
 #define B9F8948B_23A4_4812_A098_C71C4D92373B
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/AST/Registre/Types/IType.h"
-#include <memory>
 #include <string>
+
 class NoeudArgFonction: public INoeud
 {
 private:

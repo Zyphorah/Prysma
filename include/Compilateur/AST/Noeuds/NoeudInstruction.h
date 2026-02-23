@@ -2,7 +2,7 @@
 #define CE440E6B_95E4_4EC8_8C66_1916C9716A77
 #include "Compilateur/AST/Noeuds/Interfaces/IInstruction.h"
 #include <vector>
-#include <memory>
+
 class NoeudInstruction: public IInstruction
 {
 protected: 

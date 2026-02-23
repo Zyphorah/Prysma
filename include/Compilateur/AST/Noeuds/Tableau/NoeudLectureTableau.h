@@ -3,8 +3,6 @@
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
-#include <memory>
-#include <string>
 
 // dec int a = tableau[0];
 class NoeudLectureTableau : public INoeud

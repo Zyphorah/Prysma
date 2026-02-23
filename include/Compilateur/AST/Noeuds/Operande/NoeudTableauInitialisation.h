@@ -2,7 +2,6 @@
 #define CA289681_8429_4E5D_807A_243BEDD63664
 
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
-#include <memory>
 #include <vector>
 
 class NoeudTableauInitialisation : public INoeud {

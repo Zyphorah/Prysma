@@ -57,10 +57,18 @@
 
 int main(int argc, char* argv[])
 {
+
+    // Faire un système d'héritage pour les visiteur, une classe de base qui contient toute les définition de visiteur 
+    // ça va éviter d'avoir une dupplication de code, ou une définition de contrat pour les visiteur que je veux seulement faire une action précise, 
+    // exemple remplir un registre de fonction, ou remplir un registre de variable, tout les registres peuvent être rempli en avance puis ensuite 
+    // utiliser une technique de multi threade pour faire la génération de code en parallèle, le but est d'avoir un système découplé pour ne pas 
+    // avoir de problème de race condition. 
+
     if (argc < 2) {
         std::cerr << "Erreur: Aucun fichier spécifié" << std::endl;
         return 1;
     }
+    
     // Arena bump allocator pour optimiser les performances d'allocation mémoire
     llvm::BumpPtrAllocator arena;
     

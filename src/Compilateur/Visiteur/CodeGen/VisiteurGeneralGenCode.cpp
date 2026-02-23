@@ -1,6 +1,5 @@
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/AST/Noeuds/NoeudInstruction.h"
-#include "Compilateur/AST/Noeuds/Operande/NoeudLitteral.h"
 #include <llvm/IR/Constants.h>
 
 VisiteurGeneralGenCode::VisiteurGeneralGenCode(ContextGenCode* contextGenCode) : _contextGenCode(contextGenCode)
@@ -8,7 +7,6 @@ VisiteurGeneralGenCode::VisiteurGeneralGenCode(ContextGenCode* contextGenCode) :
 
 VisiteurGeneralGenCode::~VisiteurGeneralGenCode()
 {}
-
 
 void VisiteurGeneralGenCode::parcourirEnfant(NoeudInstruction* noeud)
 {
