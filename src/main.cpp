@@ -13,6 +13,8 @@
 #include "Compilateur/AST/Noeuds/StrategieEquation/StrategieNegation.h"
 #include "Compilateur/AST/Noeuds/StrategieEquation/StrategieLitteral.h"
 #include "Compilateur/AST/Noeuds/StrategieEquation/StrategieIdentifiant.h"
+#include "Compilateur/AST/Utils/ConstructeurEnvironnementRegistreFonction.h"
+#include "Compilateur/AST/Utils/ConstructeurEnvironnementRegistreVariable.h"
 #include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
 #include "Compilateur/AnalyseSyntaxique/Equation/ParseurInstructionAppel.h"
 #include "Compilateur/AnalyseSyntaxique/Instruction/Boucle/ParseurWhile.h"
@@ -243,6 +245,13 @@ int main(int argc, char* argv[])
 
         VisiteurRemplissageRegistre visiteurRemplissageRegistre(context);
         arbre->accept(&visiteurRemplissageRegistre);
+
+        ConstructeurEnvironnementRegistreFonction constructeurEnvironnementRegistreFonction(context);
+        constructeurEnvironnementRegistreFonction.remplir();
+
+        ConstructeurEnvironnementRegistreVariable constructeurEnvironnementRegistreVariable(context);
+        constructeurEnvironnementRegistreVariable.remplir();
+
         
         VisiteurGeneralGenCode visiteur(context);
         arbre->accept(&visiteur);

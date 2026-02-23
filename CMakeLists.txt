@@ -95,6 +95,8 @@ set(SOURCES
     src/Compilateur/AST/Registre/TypeSimple.cpp
     src/Compilateur/AST/Registre/TypeTableau.cpp
     src/Compilateur/Builder/Equation/ConstructeurEquationFlottante.cpp
+    src/Compilateur/Utils/ConstructeurEnvironnementRegistreFonction.cpp
+    src/Compilateur/Utils/ConstructeurEnvironnementRegistreVariable.cpp
     src/Compilateur/Lexer/Lexer.cpp
     src/Compilateur/LLVM/LlvmBackend.cpp
     src/Compilateur/LLVM/LlvmSerializer.cpp

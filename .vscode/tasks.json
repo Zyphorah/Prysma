@@ -1,4 +1,5 @@
 {
+    "version": "2.0.0",
     "tasks": [
         {
             "label": "Clangd: Setup & Build",
@@ -36,7 +37,7 @@
             "problemMatcher": []
         },
         {
-            "label": "CMake: rebuild",
+            "label": "CMake: rebuild (C++ Code)",
             "type": "shell",
             "command": "cmake",
             "args": [
@@ -45,9 +46,8 @@
                 "--config",
                 "Debug",
                 "--",
-                "clean",
                 "-j",
-                "${env:NUMBER_OF_PROCESSORS}"
+                "4" 
             ],
             "presentation": {
                 "reveal": "always",
@@ -55,10 +55,14 @@
             },
             "problemMatcher": [
                 "$gcc"
-            ]
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false 
+            }
         },
         {
-            "label": "Compiler Prysma (Build)",
+            "label": "Run Prysma Compiler",
             "type": "shell",
             "command": "./Prysma",
             "args": ["${file}"],
@@ -67,13 +71,13 @@
             },
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": true 
             },
             "presentation": {
-                "reveal": "silent", 
+                "reveal": "always", 
                 "panel": "shared",
-                "clear": true,
-                "focus": false
+                "clear": false,
+                "focus": true
             },
             "problemMatcher": {
                 "owner": "prysma_language",
@@ -86,7 +90,6 @@
                     "message": 4
                 }
             }
-        },
-    ],
-    "version": "2.0.0"
+        }
+    ]
 }

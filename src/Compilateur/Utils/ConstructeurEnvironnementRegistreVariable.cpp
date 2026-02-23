@@ -4,6 +4,15 @@
 #include "Compilateur/LLVM/LlvmBackend.h"
 #include "llvm/IR/GlobalVariable.h"
 
+ConstructeurEnvironnementRegistreVariable::ConstructeurEnvironnementRegistreVariable(ContextGenCode* contextGenCode)
+    : _contextGenCode(contextGenCode)
+{
+}
+
+ConstructeurEnvironnementRegistreVariable::~ConstructeurEnvironnementRegistreVariable()
+{
+}
+
 void ConstructeurEnvironnementRegistreVariable::remplir()
 {   
     auto* nouveauRegistre = new RegistreVariable();

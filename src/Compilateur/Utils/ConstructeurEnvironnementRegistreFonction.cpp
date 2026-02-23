@@ -1,6 +1,15 @@
 #include "Compilateur/AST/Registre/RegistreFonction.h"
 #include "Compilateur/AST/Utils/ConstructeurEnvironnementRegistreFonction.h"
 
+ConstructeurEnvironnementRegistreFonction::ConstructeurEnvironnementRegistreFonction(ContextGenCode* contextGenCode)
+    : _contextGenCode(contextGenCode)
+{
+}
+
+ConstructeurEnvironnementRegistreFonction::~ConstructeurEnvironnementRegistreFonction()
+{
+}
+
 void ConstructeurEnvironnementRegistreFonction::remplir()
 {   
     // Construire un nouveau registre avec des valeurs initialisée 

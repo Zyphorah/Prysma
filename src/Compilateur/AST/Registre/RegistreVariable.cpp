@@ -30,19 +30,20 @@ void RegistreVariable::enregistrer(const Token& token, Symbole symbole )
 
 Symbole RegistreVariable::recupererVariables(const Token& token)
 {
-
     if(_variables.empty())
     {
         throw ErreurCompilation("La pile des variables est vide ! Variable non disponible : '" + token.value + "'", token.ligne, token.colonne);
     }
 
-    if(!_variables.empty())
+    std::stack<std::map<std::string, Symbole>> tempStack = _variables;
+    while(!tempStack.empty())
     {
-        auto iterateur = _variables.top().find(token.value);
-        if (iterateur != _variables.top().end())
+        auto iterateur = tempStack.top().find(token.value);
+        if (iterateur != tempStack.top().end())
         {
             return iterateur->second;
         }
+        tempStack.pop();
     }
     throw ErreurCompilation("Variable '" + token.value + "' non déclarée", token.ligne, token.colonne);
 }
@@ -54,7 +55,7 @@ void RegistreVariable::piler()
 
 void RegistreVariable::depiler()
 {
-    if (!_variables.empty())
+    if (_variables.size() > 1)
     {
         _variables.pop();
     }
