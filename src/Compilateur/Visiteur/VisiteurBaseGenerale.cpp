@@ -21,45 +21,47 @@
 // Implémentations des méthodes visiter de base générale par défaut (ne font rien)
 void VisiteurBaseGenerale::visiter(NoeudScope* NoeudScope)
 {
-    NoeudScope->accept(this);
+    for (auto* instruction : NoeudScope->getEnfants()) 
+    {
+        if (instruction != nullptr) 
+        {
+            instruction->accept(this);
+        }
+    }
 }
 void VisiteurBaseGenerale::visiter(NoeudAffectationVariable* noeudAffectationVariable)
 {
-    noeudAffectationVariable->accept(this);
     noeudAffectationVariable->getExpression()->accept(this);
 }
 
 void VisiteurBaseGenerale::visiter(NoeudDeclarationVariable* noeudDeclarationVariable)
 {
-    noeudDeclarationVariable->accept(this);
     if (noeudDeclarationVariable->getExpression() != nullptr)
     {
         noeudDeclarationVariable->getExpression()->accept(this);
     }
 }
 
-void VisiteurBaseGenerale::visiter(NoeudAppelFonction* noeudAppelFonction)
+void VisiteurBaseGenerale::visiter(NoeudAppelFonction* noeudAppelFonction [[maybe_unused]])
 {
-    noeudAppelFonction->accept(this);
+    
 }
 
 void VisiteurBaseGenerale::visiter(NoeudRetour* noeudReturn)
 {
-    noeudReturn->accept(this);
     if (noeudReturn->getValeurRetour() != nullptr)
     {
         noeudReturn->getValeurRetour()->accept(this);
     }
 }
 
-void VisiteurBaseGenerale::visiter(NoeudArgFonction* noeudArgFonction)
+void VisiteurBaseGenerale::visiter(NoeudArgFonction* noeudArgFonction [[maybe_unused]])
 {
-    noeudArgFonction->accept(this);
+ 
 }
 
 void VisiteurBaseGenerale::visiter(NoeudDeclarationFonction* noeudDeclarationFonction)
 {
-    noeudDeclarationFonction->accept(this);
     for (auto* arg : noeudDeclarationFonction->getArguments())
     {
         arg->accept(this);
@@ -72,7 +74,6 @@ void VisiteurBaseGenerale::visiter(NoeudDeclarationFonction* noeudDeclarationFon
 
 void VisiteurBaseGenerale::visiter(NoeudOperation* noeudOperation)
 {
-    noeudOperation->accept(this);
     if (noeudOperation->getGauche() != nullptr)
     {
         noeudOperation->getGauche()->accept(this);
@@ -83,33 +84,28 @@ void VisiteurBaseGenerale::visiter(NoeudOperation* noeudOperation)
     }
 }
 
-void VisiteurBaseGenerale::visiter(NoeudLitteral* noeudLitteral)
+void VisiteurBaseGenerale::visiter(NoeudLitteral* noeudLitteral [[maybe_unused]])
 {
-    noeudLitteral->accept(this);
 }
 
 void VisiteurBaseGenerale::visiter(NoeudInstruction* instruction)
 {
-    instruction->accept(this);
     for (auto* enfant : instruction->getEnfants())
     {
         enfant->accept(this);
     }
 }
 
-void VisiteurBaseGenerale::visiter(NoeudUnRefVariable* noeudUnRefVariable)
+void VisiteurBaseGenerale::visiter(NoeudUnRefVariable* noeudUnRefVariable [[maybe_unused]])
 {
-    noeudUnRefVariable->accept(this);
 }
 
 void VisiteurBaseGenerale::visiter(NoeudRefVariable* noeudRefVariable)
 {
-    noeudRefVariable->accept(this);
 }
 
 void VisiteurBaseGenerale::visiter(NoeudIf* noeudIf)
 {
-    noeudIf->accept(this);
     if (noeudIf->getNoeudCondition() != nullptr)
     {
         noeudIf->getNoeudCondition()->accept(this);
@@ -130,7 +126,6 @@ void VisiteurBaseGenerale::visiter(NoeudIf* noeudIf)
 
 void VisiteurBaseGenerale::visiter(NoeudWhile* noeudWhile)
 {
-    noeudWhile->accept(this);
     if (noeudWhile->getNoeudCondition() != nullptr)
     {
         noeudWhile->getNoeudCondition()->accept(this);
@@ -147,7 +142,6 @@ void VisiteurBaseGenerale::visiter(NoeudWhile* noeudWhile)
 
 void VisiteurBaseGenerale::visiter(NoeudNegation* noeudNegation)
 {
-    noeudNegation->accept(this);
     if (noeudNegation->getOperande() != nullptr)
     {
         noeudNegation->getOperande()->accept(this);
@@ -156,7 +150,6 @@ void VisiteurBaseGenerale::visiter(NoeudNegation* noeudNegation)
 
 void VisiteurBaseGenerale::visiter(NoeudTableauInitialisation* noeudTableauInit)
 {
-    noeudTableauInit->accept(this);
     for (auto* element : noeudTableauInit->getElements())
     {
         element->accept(this);
@@ -165,7 +158,6 @@ void VisiteurBaseGenerale::visiter(NoeudTableauInitialisation* noeudTableauInit)
 
 void VisiteurBaseGenerale::visiter(NoeudAffectationTableau* noeudAffectationTableau)
 {
-    noeudAffectationTableau->accept(this);
     if (noeudAffectationTableau->getExpressionIndex() != nullptr)
     {
         noeudAffectationTableau->getExpressionIndex()->accept(this);
@@ -178,7 +170,6 @@ void VisiteurBaseGenerale::visiter(NoeudAffectationTableau* noeudAffectationTabl
 
 void VisiteurBaseGenerale::visiter(NoeudLectureTableau* noeudLectureTableau)
 {
-    noeudLectureTableau->accept(this);
     if (noeudLectureTableau->getIndexEquation() != nullptr)
     {
         noeudLectureTableau->getIndexEquation()->accept(this);
