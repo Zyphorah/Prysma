@@ -156,6 +156,8 @@ set(SOURCES
     src/Compilateur/Visiteur/ASTGraphViz/Tableau/VisiteurLectureTableau.cpp
     # Graph visuel 
     src/Compilateur/GrapheVisuel/SortieArbreVisuelTexte.cpp
+    # Orchestrateur include 
+    src/Compilateur/Utils/OrchestrateurInclude/OrchestrateurInclude.cpp
     
     src/main.cpp
 )
