@@ -1,5 +1,7 @@
 #include "Compilateur/AST/Registre/RegistreFonction.h"
+#include "Compilateur/AST/Utils/OrchestrateurInclude/FacadeConfigurationEnvironnement.h"
 #include "Compilateur/AST/Utils/OrchestrateurInclude/OrchestrateurInclude.h"
+#include "Compilateur/TraitementFichier/ConstructeurSysteme.h"
 #include "Compilateur/TraitementFichier/FichierLecture.h"
 #include "Compilateur/GestionnaireErreur.h"
 #include <iostream>
@@ -67,9 +69,15 @@ int main(int argc, char* argv[])
         
         // Le seule registre qui sera utilisée globalement par tout le monde
         std::unique_ptr<RegistreFonction> registreFonctionGlobale = std::make_unique<RegistreFonction>();
+        std::unique_ptr<FacadeConfigurationEnvironnement> facadeConfigurationEnvironnement = std::make_unique<FacadeConfigurationEnvironnement>(registreFonctionGlobale.get());
         
-        OrchestrateurInclude orchestrateurInclude(registreFonctionGlobale.get());
+        OrchestrateurInclude orchestrateurInclude(facadeConfigurationEnvironnement.get(), registreFonctionGlobale.get());
         orchestrateurInclude.nouvelleInstance(cheminFichier);
+
+        // Link les fichiers ensemble 
+        ConstructeurSysteme constructeur("../src/Lib", "Lib", "output.ll", "programme");
+        constructeur.compilerLib();
+        constructeur.lierLibExecutable();
 
     }
     catch (const ErreurCompilation& erreur) {

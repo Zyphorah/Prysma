@@ -158,6 +158,8 @@ set(SOURCES
     src/Compilateur/GrapheVisuel/SortieArbreVisuelTexte.cpp
     # Orchestrateur include 
     src/Compilateur/Utils/OrchestrateurInclude/OrchestrateurInclude.cpp
+    #façade de configuration 
+    src/Compilateur/Utils/OrchestrateurInclude/FacadeConfigurationEnvironnement.cpp
     
     src/main.cpp
 )
