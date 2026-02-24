@@ -1,6 +1,5 @@
 #ifndef E5CE13D3_6823_4DDE_BB20_5311A0E477B6
 #define E5CE13D3_6823_4DDE_BB20_5311A0E477B6
-#include "Compilateur/AST/Noeuds/NoeudScope.h"
 #include "Compilateur/AST/Noeuds/Variable/NoeudDeclarationVariable.h"
 #include "Compilateur/AST/Registre/ContextGenCode.h"
 #include "Compilateur/Visiteur/VisiteurBaseGenerale.h"
@@ -19,7 +18,6 @@ public:
     virtual ~VisiteurRemplissageRegistre();
     void visiter(NoeudDeclarationVariable* noeudDeclarationVariable) override;
     void visiter(NoeudDeclarationFonction* noeudDeclarationFonction) override;
-    void visiter(NoeudScope* noeudScope) override;
 };
 
 #endif /* E5CE13D3_6823_4DDE_BB20_5311A0E477B6 */

@@ -2,9 +2,7 @@
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/GestionnaireErreur.h"
 #include <llvm-18/llvm/IR/Instructions.h>
-#include <stdexcept>
 #include <utility>
-
 
 RegistreVariable::RegistreVariable()
 {

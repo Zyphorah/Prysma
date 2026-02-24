@@ -3,7 +3,6 @@
 #include "Compilateur/AST/Registre/ContextGenCode.h"
 #include "Compilateur/AST/Registre/RegistreFonction.h"
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
-#include <memory>
 
 class VisiteurGeneralGenCode;
 
@@ -24,7 +23,7 @@ class GestionFonction
         ArgumentsCodeGen chargerArguments();
         
         // Étapes logiques de génération
-        llvm::Function* creerFonction(llvm::Type* typeDeRetour, const ArgumentsCodeGen& argumentsCodeGen);
+        llvm::Function* creerFonction();
         void enregistrerFonction(llvm::Function* function);
         void initialiserContexte();
         void traiterArgumentsConstruit(llvm::Function* function, const ArgumentsCodeGen& argumentsCodeGen);

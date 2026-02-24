@@ -1,7 +1,6 @@
 #include "Compilateur/AnalyseSyntaxique/Instruction/Variable/ParseurUnRefVariable.h"
 #include "Compilateur/AST/Noeuds/Variable/NoeudUnRefVariable.h"
 #include "Compilateur/Lexer/TokenType.h"
-#include <memory>
 
 ParseurUnRefVariable::ParseurUnRefVariable(llvm::BumpPtrAllocator& arena)
     : _arena(arena)

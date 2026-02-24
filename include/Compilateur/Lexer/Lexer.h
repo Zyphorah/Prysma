@@ -62,9 +62,6 @@ class Lexer {
                                         string& motCourant, int ligne, int& colonne, int& colonneMotCourant);
     
     public: 
-        Lexer() {}
-        ~Lexer() {}
-
         vector<Token> tokenizer(const string& sourceCode);
 };
 

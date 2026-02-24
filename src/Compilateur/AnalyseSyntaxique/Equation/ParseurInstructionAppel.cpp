@@ -2,7 +2,6 @@
 
 #include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurAppelFonction.h"
 #include "Compilateur/Lexer/TokenType.h"
-#include <memory>
 
 ParseurInstructionAppel::ParseurInstructionAppel(IConstructeurArbre* constructeurArbreEquation)
     : _constructeurArbreEquation(constructeurArbreEquation)

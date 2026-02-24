@@ -2,7 +2,6 @@
 #include "Compilateur/AST/Interfaces/IConstructeurArbre.h"
 #include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
-#include <memory>
 
 ParseurEquation::ParseurEquation(IConstructeurArbre* constructeurArbre) : _constructeurArbre(constructeurArbre)
 {

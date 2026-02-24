@@ -33,7 +33,7 @@ GestionFonction::ArgumentsCodeGen GestionFonction::chargerArguments()
     return ArgumentsCodeGen{argTypes, arguments};
 }
 
-llvm::Function* GestionFonction::creerFonction(llvm::Type* typeDeRetour, const ArgumentsCodeGen& argumentsCodeGen)
+llvm::Function* GestionFonction::creerFonction()
 {
     SymboleFonction symbole = _contextGenCode->registreFonction->recuperer(_noeudDeclarationFonction->getNom());
     llvm::Function* function = symbole.fonction;
@@ -183,7 +183,7 @@ void GestionFonction::declarerFonction()
     // Étapes logiques de génération
 
     // retirer les args
-    llvm::Function* function = creerFonction(typeDeRetour, argumentsCodeGen);
+    llvm::Function* function = creerFonction();
     enregistrerFonction(function);
     initialiserContexte();
     traiterArgumentsConstruit(function, argumentsCodeGen);

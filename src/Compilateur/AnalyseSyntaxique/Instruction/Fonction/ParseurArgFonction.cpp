@@ -2,9 +2,6 @@
 #include "Compilateur/AST/Registre/Types/IType.h"
 #include "Compilateur/AnalyseSyntaxique/ParseurType.h"
 #include "Compilateur/Lexer/TokenType.h"
-#include <memory>
-#include <stdexcept>
-#include <utility>
 #include "Compilateur/AST/Noeuds/Fonction/NoeudArgFonction.h"
 
 ParseurArgFonction::ParseurArgFonction(ParseurType* constructeurType, llvm::BumpPtrAllocator& arena) 

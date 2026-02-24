@@ -78,7 +78,7 @@
 
 // Le premier visiteur c'est le visiteur de remplissage de registre, VisiteurRemplissageRegistre.cpp
 
-
+// Ne pas oblier les contexte objet llvm sont strictement privé et ne peuvent pas être partagé entre eux
 int main(int argc, char* argv[])
 {
 

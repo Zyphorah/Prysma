@@ -1,5 +1,0 @@
-#ifndef AMISVISITEURS_H
-#define AMISVISITEURS_H
-
-#endif /* AMISVISITEURS_H */
-
