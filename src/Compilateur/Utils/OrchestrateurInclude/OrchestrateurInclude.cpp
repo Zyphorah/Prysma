@@ -28,7 +28,11 @@ OrchestrateurInclude::~OrchestrateurInclude()
 {}
 
 void OrchestrateurInclude::nouvelleInstance(const std::string& cheminFichier) {
+    auto [context, arbre, nomFichier, ancienRepertoire] = passe1(cheminFichier);
+    passe2(context, arbre, nomFichier, ancienRepertoire);
+}
 
+std::tuple<ContextGenCode*, INoeud*, std::string, std::string> OrchestrateurInclude::passe1(const std::string& cheminFichier) {
     // Résoudre le chemin absolu du fichier
     std::filesystem::path cheminAbsolu = std::filesystem::absolute(cheminFichier);
     
@@ -44,7 +48,6 @@ void OrchestrateurInclude::nouvelleInstance(const std::string& cheminFichier) {
     _repertoireCourant = cheminAbsolu.parent_path().string();
 
     std::string pathProgramme = "programme/";
-    std::string pathGraphe = "graphe/";
     
     std::string nomFichier = cheminResolu.substr(cheminResolu.find_last_of("/\\") + 1);
     nomFichier = nomFichier.substr(0, nomFichier.find_last_of('.'));
@@ -72,6 +75,13 @@ void OrchestrateurInclude::nouvelleInstance(const std::string& cheminFichier) {
 
     ConstructeurEnvironnementRegistreVariable constructeurEnvironnementRegistreVariable(context);
     constructeurEnvironnementRegistreVariable.remplir();
+
+    return {context, arbre, nomFichier, ancienRepertoire};
+}
+
+void OrchestrateurInclude::passe2(ContextGenCode* context, INoeud* arbre, const std::string& nomFichier, const std::string& ancienRepertoire) {
+    std::string pathProgramme = "programme/";
+    std::string pathGraphe = "graphe/";
 
     VisiteurGeneralGenCode visiteur(context, this);
     arbre->accept(&visiteur);
