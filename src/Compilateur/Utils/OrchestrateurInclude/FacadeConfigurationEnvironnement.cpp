@@ -38,7 +38,7 @@
 #include <llvm-18/llvm/IR/Instructions.h>
 #include <llvm-18/llvm/IR/Value.h>
 
-FacadeConfigurationEnvironnement::FacadeConfigurationEnvironnement(RegistreFonction* registreFonctionGlobale, RegistreFichier* registreFichier)
+FacadeConfigurationEnvironnement::FacadeConfigurationEnvironnement(RegistreFonctionGlobale* registreFonctionGlobale, RegistreFichier* registreFichier)
     : _registreFonctionGlobale(registreFonctionGlobale),
       _registreFichier(registreFichier),
       _registreStrategieEquation(nullptr),
@@ -63,7 +63,7 @@ void FacadeConfigurationEnvironnement::creerRegistres()
     _backend = std::make_unique<LlvmBackend>();
     _registreInstruction = std::make_unique<RegistreInstruction>();
     _registreVariable = std::make_unique<RegistreVariable>();
-    _registreFonctionLocale = std::make_unique<RegistreFonction>();
+    _registreFonctionLocale = std::make_unique<RegistreFonctionLocale>();
     _registreType = std::make_unique<RegistreType>();
     _returnContextCompilation = std::make_unique<RetourContexteCompilation>();
     _registreArgument = std::make_unique<RegistreArgument>();

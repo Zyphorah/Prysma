@@ -10,13 +10,13 @@ class OrchestrateurInclude
 {
 private: 
    FacadeConfigurationEnvironnement* _facadeConfigurationEnvironnement;
-   RegistreFonction* _registreFonctionGlobale;
+   RegistreFonctionGlobale* _registreFonctionGlobale;
    RegistreFichier* _registreFichier;
    std::string _repertoireCourant;
    std::vector<std::unique_ptr<FacadeConfigurationEnvironnement>> _facadesEnfants;
 
 public:
-    OrchestrateurInclude(FacadeConfigurationEnvironnement* facadeConfigurationEnvironnement, RegistreFonction* registreFonctionGlobale, RegistreFichier* registreFichier);
+    OrchestrateurInclude(FacadeConfigurationEnvironnement* facadeConfigurationEnvironnement, RegistreFonctionGlobale* registreFonctionGlobale, RegistreFichier* registreFichier);
     ~OrchestrateurInclude();
 
    void nouvelleInstance(const std::string& cheminFichier);

@@ -18,7 +18,7 @@
 #include <filesystem>
 #include <iostream>
 
-OrchestrateurInclude::OrchestrateurInclude(FacadeConfigurationEnvironnement* facadeConfigurationEnvironnement, RegistreFonction* registreFonctionGlobale, RegistreFichier* registreFichier) : 
+OrchestrateurInclude::OrchestrateurInclude(FacadeConfigurationEnvironnement* facadeConfigurationEnvironnement, RegistreFonctionGlobale* registreFonctionGlobale, RegistreFichier* registreFichier) : 
 _facadeConfigurationEnvironnement(facadeConfigurationEnvironnement),
 _registreFonctionGlobale(registreFonctionGlobale),
 _registreFichier(registreFichier)
@@ -117,6 +117,8 @@ void OrchestrateurInclude::inclureFichier(const std::string& cheminAbsolu) {
     // Restaurer la facade du parent
     _facadeConfigurationEnvironnement = ancienneFacade;
 
-    // Sauvegarder la mémoire de l'environnement enfant
+    // Sauvegarder la mémoire de l'environnement enfant, vitale pour la gestion de la mémoire, delete automatiquement à la fin de vie de l'instance
+    // sert de support de vie pour les objets alloués dans l'environnement enfant
+    // évite la destruction de la mémoire à la fin du scope de la méthode, ce qui corromprait la mémoire du parent(segmentation fault)
     _facadesEnfants.push_back(std::move(facadeInclude));
 }

@@ -13,7 +13,7 @@
 class FacadeConfigurationEnvironnement
 {
 private:
-    RegistreFonction* _registreFonctionGlobale;
+    RegistreFonctionGlobale* _registreFonctionGlobale;
     RegistreFichier* _registreFichier;
 
     llvm::BumpPtrAllocator _arena;
@@ -21,7 +21,7 @@ private:
     std::unique_ptr<LlvmBackend> _backend;
     std::unique_ptr<RegistreInstruction> _registreInstruction;
     std::unique_ptr<RegistreVariable> _registreVariable;
-    std::unique_ptr<RegistreFonction> _registreFonctionLocale;
+    std::unique_ptr<RegistreFonctionLocale> _registreFonctionLocale;
     std::unique_ptr<RegistreType> _registreType;
     std::unique_ptr<RetourContexteCompilation> _returnContextCompilation;
     std::unique_ptr<RegistreArgument> _registreArgument;
@@ -40,7 +40,7 @@ private:
     void enregistrerInstructions();
 
 public:
-    explicit FacadeConfigurationEnvironnement(RegistreFonction* registreFonctionGlobale, RegistreFichier* registreFichier);
+    explicit FacadeConfigurationEnvironnement(RegistreFonctionGlobale* registreFonctionGlobale, RegistreFichier* registreFichier);
     ~FacadeConfigurationEnvironnement() = default;
 
     /// Initialise tout l'environnement de compilation en une seule étape

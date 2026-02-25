@@ -20,8 +20,8 @@ struct ContextGenCode
     LlvmBackend* backend;
     RegistreInstruction* registreInstruction;
     RegistreVariable* registreVariable;
-    RegistreFonction* registreFonctionGlobale;
-    RegistreFonction* registreFonctionLocale;
+    RegistreFonctionGlobale* registreFonctionGlobale;
+    RegistreFonctionLocale* registreFonctionLocale;
     RegistreType* registreType;
     RetourContexteCompilation* returnContextCompilation;
     RegistreArgument* registreArgument;
@@ -32,8 +32,8 @@ struct ContextGenCode
         LlvmBackend* p_backend,
         RegistreInstruction* p_registreInstruction,
         RegistreVariable* p_registreVariable,
-        RegistreFonction* p_registreFonctionGlobale,
-        RegistreFonction* p_registreFonctionLocale,
+        RegistreFonctionGlobale* p_registreFonctionGlobale,
+        RegistreFonctionLocale* p_registreFonctionLocale,
         RegistreType* p_registreType,
         RetourContexteCompilation* p_returnContextCompilation,
         RegistreArgument* p_registreArgument,

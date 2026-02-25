@@ -3,6 +3,7 @@
 
 #include "RegistreGeneric.h"
 #include <llvm-18/llvm/IR/Function.h>
+#include <mutex>
 #include <string>
 #include <memory>
 
@@ -32,11 +33,18 @@ public:
     NoeudDeclarationFonction* noeud = nullptr;
 };
 
-class RegistreFonction : public RegistreGeneric<std::string, std::unique_ptr<ISymboleRegistreFonction>>
+class RegistreFonctionGlobale : public RegistreGeneric<std::string, std::unique_ptr<ISymboleRegistreFonction>, std::mutex>
 {
 public:
-    RegistreFonction() = default;
-    ~RegistreFonction() = default;
+    RegistreFonctionGlobale() = default;
+    ~RegistreFonctionGlobale() = default;
+};
+
+class RegistreFonctionLocale : public RegistreGeneric<std::string, std::unique_ptr<ISymboleRegistreFonction>>
+{
+public:
+    RegistreFonctionLocale() = default;
+    ~RegistreFonctionLocale() = default;
 };
 
 #endif /* F2141F07_2C85_4ADB_9BC9_A909EBD34394 */
