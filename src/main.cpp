@@ -24,7 +24,8 @@
 // Utilisation d'un DFA mais avec SIMD (Single Instruction, Multiple Data), pour un maximum de gain de performance
 // Utilisation d'un système multi thread pour la compilation, un thread par fichier source. 
 // Transformer la structure de l'arbre syntaxique abstrait en "SoA" (Structure of Arrays) amélioration de la localité du cache et de la performance d'exécution. 
-
+// La Sharded Map pour les registre de fonction afin de retirer le golo d'étranglement du mutex pour les registres de fonction, chaque thread aura sa propre 
+// shard de la map pour les fonctions. Pour un gain d'environ 70 pourcents en vitesse d'exécution pour les projet avec beaucoup de fonction.
 
 // Explication du fonctionnnement pour la nouvelle refactorisation des registres pour supporter le multi thread: 
 // Je vais faire une première passe qui va construire des registres globaux pour les fonctions, et les variables

@@ -2,6 +2,19 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "CMake: build",
+            "dependsOn": [
+                "CMake: configure",
+                "CMake: rebuild (C++ Code)"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Clangd: Setup & Build",
             "type": "shell",
             "command": "${workspaceFolder}/setup-clangd.sh",

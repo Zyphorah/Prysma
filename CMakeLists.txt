@@ -113,6 +113,7 @@ set(SOURCES
     src/Compilateur/Visiteur/VisiteurRemplissageRegistre/VisiteurRemplissageVariable.cpp
     src/Compilateur/Visiteur/VisiteurRemplissageRegistre/VisiteurRemplissageRegistre.cpp
     src/Compilateur/Visiteur/VisiteurRemplissageRegistre/VisiteurRemplissageFonction.cpp
+    src/Compilateur/Visiteur/VisiteurRemplissageRegistre/VisiteurRemplissageInclude.cpp
     # Visiteur code gen
     src/Compilateur/Visiteur/CodeGen/Fonction/VisiteurAppelFonction.cpp
     src/Compilateur/Visiteur/CodeGen/Boucle/VisiteurNoeudWhile.cpp
@@ -161,6 +162,8 @@ set(SOURCES
     src/Compilateur/Utils/OrchestrateurInclude/OrchestrateurInclude.cpp
     #façade de configuration 
     src/Compilateur/Utils/OrchestrateurInclude/FacadeConfigurationEnvironnement.cpp
+    # Unité de compilation
+    src/Compilateur/Utils/OrchestrateurInclude/UniteCompilation.cpp
     
     src/main.cpp
 )
