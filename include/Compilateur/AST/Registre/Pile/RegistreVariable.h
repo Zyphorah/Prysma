@@ -15,7 +15,7 @@ struct Symbole {
 
     Symbole() : adresse(nullptr), type(nullptr) {}
 
-    Symbole(llvm::Value* adresse, IType* type) : adresse(adresse), type(type) {}
+    Symbole(llvm::Value* pAdresse, IType* pType) : adresse(pAdresse), type(pType) {}
 };
 
 class RegistreVariable 

@@ -18,6 +18,7 @@ private:
     OrchestrateurInclude* _orchestrateur;
     
 public:
+    using VisiteurBaseGenerale::visiter;
     VisiteurRemplissageRegistre(ContextGenCode* contextGenCode, OrchestrateurInclude* orchestrateur);
     virtual ~VisiteurRemplissageRegistre();
     void visiter(NoeudDeclarationVariable* noeudDeclarationVariable) override;

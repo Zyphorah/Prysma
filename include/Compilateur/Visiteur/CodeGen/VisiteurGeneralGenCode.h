@@ -21,6 +21,7 @@ private:
     OrchestrateurInclude* _orchestrateurInclude;
     
 public:
+    using VisiteurBaseGenerale::visiter;
     DECLARER_METHODES_VISITEUR
     VisiteurGeneralGenCode(ContextGenCode* contextGenCode, OrchestrateurInclude* orchestrateurInclude);
     virtual ~VisiteurGeneralGenCode();

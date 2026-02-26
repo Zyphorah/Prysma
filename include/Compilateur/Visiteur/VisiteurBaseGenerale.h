@@ -2,7 +2,6 @@
 #define A6C62833_A7E3_461B_B74D_D0AC0C2559AE
 
 #include "Compilateur/Visiteur/MacroGenerationVisiteur.h"
-#include "Compilateur/AST/Noeuds/Include/NoeudInclude.h"
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
 
 CLASS_NOEUD

@@ -21,9 +21,9 @@
 UniteCompilation::UniteCompilation(OrchestrateurInclude* orchestrateur, RegistreFichier* registre, std::string cheminFichier, RegistreFonctionGlobale* registreFonctionGlobale) 
     : _orchestrateur(orchestrateur), 
       _registreFichier(registre),
-      _cheminFichierOriginal(std::move(cheminFichier)),
       _context(nullptr),
-      _arbre(nullptr) 
+      _arbre(nullptr),
+      _cheminFichierOriginal(std::move(cheminFichier)) 
 {
     // Initialisation du contexte séparé (la bulle privée)
     _facadeConfigurationEnvironnement = std::make_unique<FacadeConfigurationEnvironnement>(registreFonctionGlobale, _registreFichier);
