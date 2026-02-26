@@ -118,7 +118,7 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
 ### Itération 2 du projet fonctionnalités à réaliser en 2 semaines ?
 
 - Exporter l'AST en format texte et graphique (Graphviz) pour faciliter le débogage
-- supporter les  opérantes && || == != % #12
+- supporter les  opérantes && || == != % 
 - Supporter l'instruction if, 
 - Supporter l'instruction while, passer par la pile avec alloca
 - Supporter les tableaux programmés en LLVM IR 
