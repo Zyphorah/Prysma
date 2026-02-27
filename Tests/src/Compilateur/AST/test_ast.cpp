@@ -237,3 +237,60 @@ TEST_CASE("Constructeur Arbre equation priorite", "[AST]")
     REQUIRE(noeudLitteral3 != nullptr);
     REQUIRE(noeudLitteral3->getToken().value == "3");
 }
+
+TEST_CASE("Constructeur Arbre equation profondeur parenthèse", "[AST]")
+{
+    cout << "\nTest 3 - Construction d'un arbre avec des parenthèses" << endl;
+    EnvironnementAST env;
+    INoeud* arbre = construireEquationDepuisString(env, "(((40/2 +10)+ 5 * 3)+10)");
+
+    // 1. racine : addition (+)
+    auto* noeudAddition1 = dynamic_cast<NoeudOperation*>(arbre);
+    REQUIRE(noeudAddition1 != nullptr);
+    REQUIRE(noeudAddition1->getToken().type == TOKEN_PLUS);
+
+    auto* litteral10_1_droite = dynamic_cast<NoeudLitteral*>(noeudAddition1->getDroite());
+    REQUIRE(litteral10_1_droite != nullptr);
+    REQUIRE(litteral10_1_droite->getToken().value == "10");
+
+    auto* noeudAdditionGauche = dynamic_cast<NoeudOperation*>(noeudAddition1->getGauche());
+    REQUIRE(noeudAdditionGauche != nullptr);
+    REQUIRE(noeudAdditionGauche->getToken().type == TOKEN_PLUS);
+
+    // 2. branche gauche de la racine : addition ((40/2 +10) + 5 * 3)
+
+    // 2a. droite de noeudAdditionGauche : multiplication (5 * 3)
+    auto* noeudMultiplication = dynamic_cast<NoeudOperation*>(noeudAdditionGauche->getDroite());
+    REQUIRE(noeudMultiplication != nullptr);
+    REQUIRE(noeudMultiplication->getToken().type == TOKEN_ETOILE);
+
+    auto* litteral5 = dynamic_cast<NoeudLitteral*>(noeudMultiplication->getGauche());
+    REQUIRE(litteral5 != nullptr);
+    REQUIRE(litteral5->getToken().value == "5");
+
+    auto* litteral3 = dynamic_cast<NoeudLitteral*>(noeudMultiplication->getDroite());
+    REQUIRE(litteral3 != nullptr);
+    REQUIRE(litteral3->getToken().value == "3");
+
+    // 2b. gauche de noeudAdditionGauche : addition (40/2 + 10)
+    auto* noeudAddition2 = dynamic_cast<NoeudOperation*>(noeudAdditionGauche->getGauche());
+    REQUIRE(noeudAddition2 != nullptr);
+    REQUIRE(noeudAddition2->getToken().type == TOKEN_PLUS);
+
+    auto* litteral10_2 = dynamic_cast<NoeudLitteral*>(noeudAddition2->getDroite());
+    REQUIRE(litteral10_2 != nullptr);
+    REQUIRE(litteral10_2->getToken().value == "10");
+
+    // 2c. gauche de noeudAddition2 : division (40 / 2)
+    auto* noeudDivision = dynamic_cast<NoeudOperation*>(noeudAddition2->getGauche());
+    REQUIRE(noeudDivision != nullptr);
+    REQUIRE(noeudDivision->getToken().type == TOKEN_SLASH);
+
+    auto* litteral40 = dynamic_cast<NoeudLitteral*>(noeudDivision->getGauche());
+    REQUIRE(litteral40 != nullptr);
+    REQUIRE(litteral40->getToken().value == "40");
+
+    auto* litteral2 = dynamic_cast<NoeudLitteral*>(noeudDivision->getDroite());
+    REQUIRE(litteral2 != nullptr);
+    REQUIRE(litteral2->getToken().value == "2");
+}
