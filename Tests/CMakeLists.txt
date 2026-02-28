@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Générer compile_commands.json pour clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-include_directories(include)
+include_directories(include ${CMAKE_SOURCE_DIR}/include)
 
 # Par défaut, si aucun type de build n'est fourni, utiliser Debug
 if(NOT CMAKE_BUILD_TYPE)
@@ -196,17 +196,3 @@ if(MSVC)
 else()
 endif()
 
-target_compile_options(PrysmaTests PRIVATE
-    $<$<CONFIG:Debug>:-g;-O0;-fno-omit-frame-pointer>
-    $<$<NOT:$<CONFIG:Debug>>:-O2>
-    -Wall -Wextra -Wpedantic
-    -Wno-sign-conversion
-    -Wno-conversion
-)
-
-# Supprimez les avertissements LLVM seulement pour les tests
-set_source_files_properties(
-    ${MAIN_SOURCES}
-    PROPERTIES
-    COMPILE_FLAGS "-Wno-sign-conversion -Wno-conversion"
-)

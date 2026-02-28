@@ -30,14 +30,18 @@ private:
    // Indicateur d'erreur thread-safe pour savoir si la compilation a échoué
    std::atomic<bool> _aDesErreurs{false};
 
+   // Flag pour activer la génération du graphe AST
+   bool _activerGraphViz;
+
 public:
-    OrchestrateurInclude(RegistreFonctionGlobale* registreFonctionGlobale, RegistreFichier* registreFichier, std::mutex* mutex);
+    OrchestrateurInclude(RegistreFonctionGlobale* registreFonctionGlobale, RegistreFichier* registreFichier, std::mutex* mutex, bool activerGraphViz = false);
     ~OrchestrateurInclude();
 
    void compilerProjet(const std::string& cheminFichier);
    void inclureFichier(const std::string& cheminAbsolu);
    static void attendreFinPass(std::vector<std::thread>& threads);
    bool aDesErreurs() const;
+   bool estGraphVizActif() const;
 };
 
 #endif /* D2577958_A8A8_4878_AFA0_2B3478129911 */

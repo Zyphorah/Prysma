@@ -92,17 +92,19 @@ void UniteCompilation::passe2() {
     VisiteurGeneralGenCode visiteur(_context, _orchestrateur);
     _arbre->accept(&visiteur);
 
-    SortieGrapheVisuelTexte sortieGrapheVisuel(pathGraphe + _nomFichier + ".dot");
-    VisiteurGeneralGraphViz visiteurGraphViz(std::move(sortieGrapheVisuel));
-    _arbre->accept(&visiteurGraphViz);
-    visiteurGraphViz.generer();
+    if (_orchestrateur->estGraphVizActif()) {
+        SortieGrapheVisuelTexte sortieGrapheVisuel(pathGraphe + _nomFichier + ".dot");
+        VisiteurGeneralGraphViz visiteurGraphViz(std::move(sortieGrapheVisuel));
+        _arbre->accept(&visiteurGraphViz);
+        visiteurGraphViz.generer();
 
-    if (system(("dot -Tsvg " + pathGraphe + _nomFichier + ".dot -o " + pathGraphe + _nomFichier + ".svg").c_str()) != 0) {
-        std::cerr << "Erreur lors de la génération du graphe." << std::endl;
+        if (system(("dot -Tsvg " + pathGraphe + _nomFichier + ".dot -o " + pathGraphe + _nomFichier + ".svg").c_str()) != 0) {
+            std::cerr << "Erreur lors de la génération du graphe." << std::endl;
+        }
+
+        // Supprimer le fichier .dot intermédiaire
+        std::filesystem::remove(pathGraphe + _nomFichier + ".dot");
     }
-
-    // Supprimer le fichier .dot intermédiaire
-    std::filesystem::remove(pathGraphe + _nomFichier + ".dot");
 
     LlvmSerializer serializer(_context->backend->getContext(), _context->backend->getModule());
     serializer.SauvegarderCodeLLVM(pathProgramme + _nomFichier + ".ll"); 

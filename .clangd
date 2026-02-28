@@ -18,7 +18,16 @@ CompileFlags:
     - "-O0"
     - "-g"
   # Database de compilation
-  CompilationDatabase: "build"
+  CompilationDatabase: build
+
+---
+
+If:
+  PathMatch: Tests/.*
+CompileFlags:
+  CompilationDatabase: Tests/build
+
+---
 
 # Chemins d'include
 Index:

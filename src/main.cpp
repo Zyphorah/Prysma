@@ -71,9 +71,27 @@ int main(int argc, char* argv[])
 {
     if (argc < 2) {
         std::cerr << "Erreur: Aucun fichier spécifié" << std::endl;
+        std::cerr << "Usage: Prysma <fichier.p> [--graphviz]" << std::endl;
         return 1;
     }
-    std::string cheminFichier = argv[1];
+    
+    std::string cheminFichier;
+    bool activerGraphViz = false;
+
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "--graphviz") {
+            activerGraphViz = true;
+        } else {
+            cheminFichier = arg;
+        }
+    }
+
+    if (cheminFichier.empty()) {
+        std::cerr << "Erreur: Aucun fichier spécifié" << std::endl;
+        return 1;
+    }
+
     std::string nomFichier = std::filesystem::path(cheminFichier).filename().string(); 
     try {  
         
@@ -88,8 +106,11 @@ int main(int argc, char* argv[])
         std::filesystem::path buildDir = exePath.parent_path();
         std::filesystem::path racineProjet = buildDir.parent_path();
 
+        // ./Prysma --graphviz fichier.p pour activer la génération du graphe AST
         std::filesystem::create_directories(buildDir / "programme");
-        std::filesystem::create_directories(buildDir / "graphe");
+        if (activerGraphViz) {
+            std::filesystem::create_directories(buildDir / "graphe");
+        }
 
         std::string srcLib = (racineProjet / "src" / "Lib").string();
         std::string objLib = (buildDir / "obj" / "Lib").string();
@@ -98,7 +119,7 @@ int main(int argc, char* argv[])
         std::unique_ptr<RegistreFichier> registreFichiers = std::make_unique<RegistreFichier>();
         std::unique_ptr<FacadeConfigurationEnvironnement> facadeConfigurationEnvironnement = std::make_unique<FacadeConfigurationEnvironnement>(registreFonctionGlobale.get(), registreFichiers.get());
         
-        OrchestrateurInclude orchestrateurInclude(registreFonctionGlobale.get(), registreFichiers.get(), mutex.get());
+        OrchestrateurInclude orchestrateurInclude(registreFonctionGlobale.get(), registreFichiers.get(), mutex.get(), activerGraphViz);
         orchestrateurInclude.compilerProjet(cheminFichier);
 
         if (orchestrateurInclude.aDesErreurs()) {

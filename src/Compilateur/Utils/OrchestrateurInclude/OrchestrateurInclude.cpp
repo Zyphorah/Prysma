@@ -13,8 +13,8 @@
 #include <string>
 #include <thread>
 
-OrchestrateurInclude::OrchestrateurInclude(RegistreFonctionGlobale* registreFonctionGlobale, RegistreFichier* registreFichier, std::mutex* mutex)
-    : _mutex(mutex), _registreFonctionGlobale(registreFonctionGlobale), _registreFichier(registreFichier)
+OrchestrateurInclude::OrchestrateurInclude(RegistreFonctionGlobale* registreFonctionGlobale, RegistreFichier* registreFichier, std::mutex* mutex, bool activerGraphViz)
+    : _mutex(mutex), _registreFonctionGlobale(registreFonctionGlobale), _registreFichier(registreFichier), _activerGraphViz(activerGraphViz)
 {}
 
 OrchestrateurInclude::~OrchestrateurInclude()
@@ -104,4 +104,9 @@ void OrchestrateurInclude::inclureFichier(const std::string& cheminAbsolu)
 bool OrchestrateurInclude::aDesErreurs() const
 {
     return _aDesErreurs.load();
+}
+
+bool OrchestrateurInclude::estGraphVizActif() const
+{
+    return _activerGraphViz;
 }
