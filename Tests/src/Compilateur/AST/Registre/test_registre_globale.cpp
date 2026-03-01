@@ -36,7 +36,7 @@ TEST_CASE("Registre global cles similaires sont distinctes", "[RegistreGlobal]")
     registre.enregistrer("FN", make_unique<SymboleFonctionGlobale>());
 
     CHECK(registre.obtenirCles().size() == 3);
-    CHECK(registre.existe("fnm"));
+    CHECK(registre.existe("fn"));
     CHECK(registre.existe("Fn"));
     CHECK(registre.existe("FN"));
 }
