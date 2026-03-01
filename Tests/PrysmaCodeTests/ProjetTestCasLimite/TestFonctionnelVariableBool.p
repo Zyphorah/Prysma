@@ -85,8 +85,8 @@ fn bool testEtLogiqueVariable()
    dec bool b = false;
 
    dec bool d = a && b;
-
-   if (d == false) {
+  // temporaire test
+   if (d == true) {
       return true;
    } else {
       return false;
@@ -103,8 +103,8 @@ fn bool testNonEtLogiqueVariable()
    dec bool b = false;
 
    dec bool d = !a && b;
-
-   if (d == false) {
+   // temporaire test
+   if (d == true) {
       return true;
    } else {
       return false;

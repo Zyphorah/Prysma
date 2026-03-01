@@ -12,29 +12,37 @@ class TestProjetPrysma:
         self.executable_path = os.path.join(self.build_dir, executable_name)
         self.file  = file 
 
-    # Récupérer que les resultats false pour afficher uniquement les échecs des tests
-    def __parse_result_false(self, result):
-        lines = result.stdout.splitlines()
-        if not lines:
-            return False
-        return lines[-1] == "false"
+    def __get_false_lines(self, result):
+        """Récupère toutes les lignes contenant 'false'"""
+        return [ligne for ligne in result.stdout.split('\n') if 'false' in ligne.lower()]
+
         
     def executer_projet(self):
             
         print("--- Lancement des tests (seuls les échecs sont affichés) ---")
 
-        # commande pour executer le compilateur sur le fichier de test 
-
         file_path = os.path.join(self.project_root, self.file)
-        command = [self.compiler_path, file_path]
-        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         
-        self.__afficher_resultats(result, command)
+        # Compiler
+        command = [self.compiler_path, file_path]
+        compile_result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        
+        if compile_result.returncode != 0:
+            return self.__afficher_resultats(compile_result, command)
+        
+        # Exécuter l'exécutable généré (executable_path)
+        if not os.path.exists(self.executable_path):
+            print(f"Exécutable non trouvé: {self.executable_path}")
+            return False
+        
+        exec_command = [self.executable_path]
+        result = subprocess.run(exec_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        
+        return self.__afficher_resultats(result, exec_command)
 
     def __afficher_resultats(self, result, command):
-        """Affiche les résultats avec couleurs"""
+        """Affiche les résultats avec couleurs et retourne True si succès"""
         
-        # Code couleur ANSI
         VERT = "\033[92m"
         ROUGE = "\033[91m"
         RESET = "\033[0m"
@@ -46,9 +54,14 @@ class TestProjetPrysma:
             print(f"{ROUGE}Code de retour: {result.returncode}{RESET}")
             if result.stderr:
                 print(f"{ROUGE}Erreur: {result.stderr}{RESET}")
+            return False
         else:
-            if self.__parse_result_false(result):
+            false_lines = self.__get_false_lines(result)
+            if false_lines:
                 print(f"{ROUGE}{BOLD}Test échoué{RESET}")
-                print(f"{ROUGE}Sortie: {result.stdout}{RESET}")
+                for ligne in false_lines:
+                    print(f"{ROUGE}Échec: {ligne.strip()}{RESET}")
+                return False
             else:
                 print(f"{VERT}{BOLD}Test réussi{RESET}")
+                return True
