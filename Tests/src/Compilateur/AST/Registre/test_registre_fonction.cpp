@@ -78,8 +78,7 @@ TEST_CASE("Registre local fonctionne independamment du global", "[RegistreFoncti
     CHECK(dynamic_cast<SymboleFonctionLocale*>(locale.get()) != nullptr);
 }
 
-// ========== CAS NON-FONCTIONNELS (SAD TEST) ==========
-
+// cas non fonctionnel sad test 
 TEST_CASE("RegistreFonction - Enregistrer null et recuperer ne plante pas", "[RegistreFonction][SadTest]") {
     RegistreFonctionLocale registre;
 
