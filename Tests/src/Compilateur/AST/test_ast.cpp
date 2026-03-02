@@ -143,9 +143,6 @@ struct EnvironnementAST {
 };
 
 
-
-
-
 /// Construit un arbre d'équation à partir d'une string de code source.
 INoeud* construireEquationDepuisString(EnvironnementAST& env, const std::string& code) {
     Lexer lexer;
@@ -175,53 +172,105 @@ TypeAttendu* verifierTypeEtCaster(TypeEntrer* noeud) {
 }
 
 
-template<typename TypeAttendu, typename TypeValeur>
+template<auto getter, typename TypeAttendu, typename TypeValeur, auto accessor = nullptr>
 struct matcherNoeud
 {
     TypeValeur valeurAttendue;
-    matcherNoeud<TypeAttendu, TypeValeur>(TypeValeur p_valeurAttendue) : valeurAttendue(std::move(p_valeurAttendue)) {}
+    
+    matcherNoeud(TypeValeur p_valeurAttendue) : valeurAttendue(std::move(p_valeurAttendue)) {}
 
     template<typename typeBase>
     void operator()(typeBase* noeud) {
        auto* noeudCast = verifierTypeEtCaster<TypeAttendu>(noeud);
-       REQUIRE(noeudCast->getToken().value == valeurAttendue);
+       if constexpr (accessor == nullptr) {
+           REQUIRE((noeudCast->*getter)() == valeurAttendue);
+       } else {
+           REQUIRE(((noeudCast->*getter)().*accessor) == valeurAttendue);
+       }
     }
 };
 
 // Utilisation de la technique fonctor
-template<typename TypeCible,typename Gauche, typename Droite>
-struct matcherGeneral
+template<typename TypeCible, auto getter, typename TypeValeur, auto accessor, typename Gauche, typename Droite>
+struct matcherGeneralBinaire
 {
     Gauche verificateurGauche;
     Droite verificateurDroite;
+    TypeValeur valeurAttendue;
 
-    matcherGeneral(Gauche p_noeudGaucheAttendu, Droite p_noeudDroiteAttendu) 
-        : verificateurGauche(std::move(p_noeudGaucheAttendu)), verificateurDroite(std::move(p_noeudDroiteAttendu)) {}
+    matcherGeneralBinaire(const TypeValeur& p_valeur, Gauche p_noeudGaucheAttendu, Droite p_noeudDroiteAttendu) 
+        : verificateurGauche(std::move(p_noeudGaucheAttendu)), verificateurDroite(std::move(p_noeudDroiteAttendu)), valeurAttendue(p_valeur) {}
 
     template<typename typeBase>
     void operator()(typeBase* noeud) {
         auto* noeudOperation = verifierTypeEtCaster<TypeCible>(noeud);
         
+        if constexpr (accessor == nullptr) {
+            REQUIRE((noeudOperation->*getter)() == valeurAttendue);
+        } else {
+            REQUIRE(((noeudOperation->*getter)().*accessor) == valeurAttendue);
+        }
         verificateurDroite(noeudOperation->getDroite());
         verificateurGauche(noeudOperation->getGauche());
-    
     }
 };
 
-// Faire les helper pour éviter d'avoir beaucoup de syntaxe dans les tests template 
+// Matcher pour une liste d'enfant d'un noeud instruction ou autre
+template<typename TypeCible, auto getter, typename... Matchers>
+struct matcherListsEnfant 
+{
+    std::tuple<Matchers...> verificateurs;
 
+    matcherListsEnfant(Matchers... p_verificateurs) : verificateurs(std::make_tuple(std::move(p_verificateurs)...)) {}
+
+    template<typename typeBase>
+    void operator()(typeBase* noeud) {
+        auto* noeudCast = verifierTypeEtCaster<TypeCible>(noeud);
+
+        // Je ne dois pas faire que get enfant car il peux y avoir noeudIf noeudWhile
+        const auto& enfants = (noeudCast->*getter)();
+        REQUIRE(enfants.size() == sizeof...(Matchers));
+        verifierEnfants(enfants, std::index_sequence_for<Matchers...>{});
+    }
+};
+
+
+// Faire les helper pour éviter d'avoir beaucoup de syntaxe dans les tests template 
 auto Litteral(const std::string& valeur) {
-    return matcherNoeud<NoeudLitteral, std::string>(valeur);
+    return matcherNoeud<&NoeudLitteral::getToken, NoeudLitteral, std::string, &Token::value>(valeur);
 }
 
 // Helper pour les opérations
 auto operateur() {
     return [](const std::string& type, auto gauche, auto droite) {
-        return matcherGeneral<NoeudOperation, decltype(gauche), decltype(droite)>(
-            gauche, droite
+        return matcherGeneralBinaire<NoeudOperation, &NoeudOperation::getToken, std::string, &Token::value, decltype(gauche), decltype(droite)>(
+            type, gauche, droite
         );
     };
 }
+
+// Helper pour les listes d'enfant
+template<typename T, auto Method, typename M>
+struct matcherPropriete {
+    M m;
+    matcherPropriete(M m) : m(std::move(m)) {}
+    void operator()(INoeud* n) {
+        auto* t = verifierTypeEtCaster<T>(n);
+        m((t->*Method)()); 
+    }
+};
+
+// matcher utilitaire pour appliquer plusieurs matcher sur le même noeud
+template<typename T, typename... Ms>
+struct matcherCombine {
+    std::tuple<Ms...> ms;
+    matcherCombine(Ms... ms) : ms(std::make_tuple(std::move(ms)...)) {}
+    void operator()(INoeud* n) {
+        auto* t = verifierTypeEtCaster<T>(n);
+        // Applique chaque matcher au nœud casté
+        std::apply([&](auto&&... args) { (args(t), ...); }, ms);
+    }
+};
 
 // C'est un fichier de test exclusif à l'arbre syntaxique abstrait première partie du test sera de vérifier la construction de l'arbre 
 // d'equation et de tester des operations de base comme l'addition, la soustraction, la multiplication et la division.
@@ -317,7 +366,7 @@ TEST_CASE("Construction Arbre If simple avec else", "[AST][Branch]")
     INoeud* arbre = construireArbreDepuisString(env,
         "if (a > 5) { aff x = 1; } else { aff x = 2; }"
     );
-
+     
     REQUIRE(arbre != nullptr);
 
     // 1. Racine = NoeudInstruction qui contient le if
