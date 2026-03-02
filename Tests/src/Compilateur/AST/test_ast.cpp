@@ -183,8 +183,8 @@ struct matcherNoeud
 
     template<typename typeBase>
     void operator()(typeBase* noeud) {
-   
-        verifierTypeEtCaster<TypeAttendu>(noeud);
+       auto* noeudCast = verifierTypeEtCaster<TypeAttendu>(noeud);
+       REQUIRE(noeudCast->getToken().value == valeurAttendue);
     }
 };
 
