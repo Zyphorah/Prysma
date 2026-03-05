@@ -128,6 +128,24 @@ void FacadeConfigurationEnvironnement::enregistrerFonctionsExternes()
         symPrintLocal->noeud = nullptr;
         _context->registreFonctionLocale->enregistrer("print", std::move(symPrintLocal));
     }
+
+    // prysma_malloc
+    std::vector<llvm::Type*> malloc_args;
+    malloc_args.push_back(llvm::Type::getInt64Ty(_context->backend->getContext()));
+    llvm::FunctionType* malloc_type = llvm::FunctionType::get(llvm::PointerType::getUnqual(_context->backend->getContext()), malloc_args, false);
+    llvm::Function* mallocFunc = llvm::Function::Create(malloc_type, llvm::Function::ExternalLinkage, "prysma_malloc", _context->backend->getModule());
+    {
+        auto symMallocGlobal = std::make_unique<SymboleFonctionGlobale>();
+        symMallocGlobal->typeRetour = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::PointerType::getUnqual(_context->backend->getContext()));
+        symMallocGlobal->noeud = nullptr;
+        _context->registreFonctionGlobale->enregistrer("prysma_malloc", std::move(symMallocGlobal));
+
+        auto symMallocLocal = std::make_unique<SymboleFonctionLocale>();
+        symMallocLocal->fonction = mallocFunc;
+        symMallocLocal->typeRetour = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::PointerType::getUnqual(_context->backend->getContext()));
+        symMallocLocal->noeud = nullptr;
+        _context->registreFonctionLocale->enregistrer("prysma_malloc", std::move(symMallocLocal));
+    }
 }
 
 void FacadeConfigurationEnvironnement::enregistrerTypesDeBase()
@@ -139,6 +157,7 @@ void FacadeConfigurationEnvironnement::enregistrerTypesDeBase()
     _context->registreType->enregistrer(TOKEN_TYPE_FLOAT, llvm::Type::getFloatTy(_context->backend->getContext()));
     _context->registreType->enregistrer(TOKEN_TYPE_BOOL, llvm::Type::getInt1Ty(_context->backend->getContext()));
     _context->registreType->enregistrer(TOKEN_TYPE_VOID, llvm::Type::getVoidTy(_context->backend->getContext()));
+    _context->registreType->enregistrer(TOKEN_TYPE_PTR, llvm::PointerType::getUnqual(_context->backend->getContext()));
 }
 
 void FacadeConfigurationEnvironnement::enregistrerStrategiesEquation()

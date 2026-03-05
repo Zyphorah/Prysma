@@ -46,7 +46,8 @@ class Lexer {
         {"ref", TOKEN_REF},
         {"unref", TOKEN_UNREF},
         {"include", TOKEN_INCLUDE},
-        {"new", TOKEN_NEW}
+        {"new", TOKEN_NEW},
+        {"ptr",TOKEN_TYPE_PTR}
         
     };
 

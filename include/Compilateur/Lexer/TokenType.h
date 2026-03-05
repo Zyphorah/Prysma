@@ -68,6 +68,7 @@ enum TokenType {
     TOKEN_TYPE_CHAR,
     TOKEN_TYPE_INT64,
     TOKEN_TYPE_INT32,
+    TOKEN_TYPE_PTR,
 
     // new
     TOKEN_NEW,

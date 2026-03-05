@@ -19,7 +19,6 @@ public:
 
     LlvmBackend();
 
-
     ~LlvmBackend() = default;
 
     llvm::LLVMContext& getContext() { return *_context; }
