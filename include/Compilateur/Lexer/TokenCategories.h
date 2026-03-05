@@ -2,67 +2,94 @@
 #define F8BDAEE4_757F_4EA2_8A22_AEAA9D20C58E
 
 #include "Compilateur/Lexer/TokenType.h"
-#include <unordered_set>
 
-namespace TokenCategories {
-    inline const std::unordered_set<TokenType> OPERATEURS = {
-        TOKEN_PLUS,
-        TOKEN_MOINS,
-        TOKEN_ETOILE,
-        TOKEN_SLASH,
-        TOKEN_MODULO
-    };
+constexpr bool estOperateur(TokenType type) noexcept {
+    switch (type) {
+        case TOKEN_PLUS:
+        case TOKEN_MOINS:
+        case TOKEN_ETOILE:
+        case TOKEN_SLASH:
+        case TOKEN_MODULO:
+            return true;
+        default:
+            return false;
+    }
+}
 
-    inline const std::unordered_set<TokenType> OPERANDES = {
-        TOKEN_LIT_INT,
-        TOKEN_LIT_FLOAT,
-        TOKEN_LIT_BOLEEN,
-        TOKEN_IDENTIFIANT,
-        TOKEN_UNREF,
-        TOKEN_REF,
-    };
+constexpr bool estOperande(TokenType type) noexcept {
+    switch (type) {
+        case TOKEN_LIT_INT:
+        case TOKEN_LIT_FLOAT:
+        case TOKEN_LIT_BOLEEN:
+        case TOKEN_IDENTIFIANT:
+        case TOKEN_UNREF:
+        case TOKEN_REF:
+            return true;
+        default:
+            return false;
+    }
+}
 
-    inline const std::unordered_set<TokenType> OPERATEURS_COMPARAISON = {
-        TOKEN_PLUS_PETIT,
-        TOKEN_PLUS_GRAND,
-        TOKEN_PLUS_PETIT_EGAL,
-        TOKEN_PLUS_GRAND_EGAL,
-        TOKEN_EGAL_EGAL,
-        TOKEN_DIFFERENT
-    };
+constexpr bool estOperateurComparaison(TokenType type) noexcept {
+    switch (type) {
+        case TOKEN_PLUS_PETIT:
+        case TOKEN_PLUS_GRAND:
+        case TOKEN_PLUS_PETIT_EGAL:
+        case TOKEN_PLUS_GRAND_EGAL:
+        case TOKEN_EGAL_EGAL:
+        case TOKEN_DIFFERENT:
+            return true;
+        default:
+            return false;
+    }
+}
 
-    inline const std::unordered_set<TokenType> TYPES = {
-        TOKEN_TYPE_FLOAT,
-        TOKEN_TYPE_STRING,
-        TOKEN_TYPE_BOOL,
-        TOKEN_TYPE_VOID,
-        TOKEN_TYPE_CHAR,
-         TOKEN_TYPE_INT64,
-        TOKEN_TYPE_INT32
-    };
+constexpr bool estType(TokenType type) noexcept {
+    switch (type) {
+        case TOKEN_TYPE_FLOAT:
+        case TOKEN_TYPE_STRING:
+        case TOKEN_TYPE_BOOL:
+        case TOKEN_TYPE_VOID:
+        case TOKEN_TYPE_CHAR:
+        case TOKEN_TYPE_INT64:
+        case TOKEN_TYPE_INT32:
+            return true;
+        default:
+            return false;
+    }
+}
 
-    inline const std::unordered_set<TokenType> MOTS_CLES = {
-        TOKEN_FONCTION,
-        TOKEN_SI,
-        TOKEN_SINON,
-        TOKEN_TANT_QUE,
-        TOKEN_POUR,
-        TOKEN_RETOUR,
-        TOKEN_SCOPE,
-        TOKEN_AFF,
-        TOKEN_DEC
-    };
+constexpr bool estMotCle(TokenType type) noexcept {
+    switch (type) {
+        case TOKEN_FONCTION:
+        case TOKEN_SI:
+        case TOKEN_SINON:
+        case TOKEN_TANT_QUE:
+        case TOKEN_POUR:
+        case TOKEN_RETOUR:
+        case TOKEN_SCOPE:
+        case TOKEN_AFF:
+        case TOKEN_DEC:
+            return true;
+        default:
+            return false;
+    }
+}
 
-    inline const std::unordered_set<TokenType> STRUCTURE = {
-        TOKEN_PAREN_OUVERTE,
-        TOKEN_PAREN_FERMEE,
-        TOKEN_ACCOLADE_OUVERTE,
-        TOKEN_ACCOLADE_FERMEE,
-        TOKEN_CROCHET_OUVERT,
-        TOKEN_CROCHET_FERME,
-        TOKEN_POINT_VIRGULE,
-        TOKEN_VIRGULE
-    };
+constexpr bool estStructure(TokenType type) noexcept {
+    switch (type) {
+        case TOKEN_PAREN_OUVERTE:
+        case TOKEN_PAREN_FERMEE:
+        case TOKEN_ACCOLADE_OUVERTE:
+        case TOKEN_ACCOLADE_FERMEE:
+        case TOKEN_CROCHET_OUVERT:
+        case TOKEN_CROCHET_FERME:
+        case TOKEN_POINT_VIRGULE:
+        case TOKEN_VIRGULE:
+            return true;
+        default:
+            return false;
+    }
 }
 
 #endif /* F8BDAEE4_757F_4EA2_8A22_AEAA9D20C58E */

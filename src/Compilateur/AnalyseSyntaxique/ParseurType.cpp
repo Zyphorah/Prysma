@@ -14,7 +14,7 @@ ParseurType::ParseurType(RegistreType* registreType, IConstructeurArbre* constru
 IType* ParseurType::parser(std::vector<Token>& tokens, int& index)
 {
     // Vérifier que le token courant est un type valide
-    if (TokenCategories::TYPES.find(tokens[static_cast<size_t>(index)].type) == TokenCategories::TYPES.end()) {
+    if (!estType(tokens[static_cast<size_t>(index)].type)) {
         throw ErreurCompilation("Erreur : type attendu", tokens[static_cast<size_t>(index)].ligne, tokens[static_cast<size_t>(index)].colonne);
     }
 
