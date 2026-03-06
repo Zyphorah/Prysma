@@ -87,6 +87,7 @@ set(MAIN_SOURCES
     ../src/Compilateur/AST/Noeuds/Condition/NoeudIf.cpp
     ../src/Compilateur/AST/Noeuds/Boucle/NoeudWhile.cpp
     ../src/Compilateur/AST/Noeuds/Include/NoeudInclude.cpp
+    ../src/Compilateur/AST/Noeuds/new/NoeudNew.cpp
     # Tableau
     ../src/Compilateur/AST/Noeuds/Tableau/NoeudAffectationTableau.cpp
     ../src/Compilateur/AST/Noeuds/Tableau/NoeudLectureTableau.cpp
