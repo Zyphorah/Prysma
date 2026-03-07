@@ -74,3 +74,4 @@ __pycache__/
 # Visiteur
 /include/Compilateur/Visiteur/Interfaces/IVisiteur.h
 /include/Compilateur/Visiteur/VisiteurBaseGenerale.h
+/src/Compilateur/Visiteur/VisiteurBaseGenerale.cpp

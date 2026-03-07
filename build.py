@@ -2,6 +2,7 @@ import os
 from Tests.Orchestration.build_manager import BuildManager
 from Tests.Orchestration.generation.generateur_ast import GenerateurAST
 from Tests.Orchestration.generation.generateur_visiteur import GenerateurVisiteur
+from Tests.Orchestration.generation.generateur_visiteur_cpp import GenerateurVisiteurCpp
 
 
 def main():
@@ -10,6 +11,7 @@ def main():
 
     GenerateurAST(script_dir).generer()
     GenerateurVisiteur(script_dir).generer()
+    GenerateurVisiteurCpp(script_dir).generer()
 
     BuildManager.executer_commande(["cmake", "-S", ".", "-B", "build"])
     os.makedirs("build", exist_ok=True)

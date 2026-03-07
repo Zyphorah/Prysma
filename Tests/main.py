@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from Tests.Orchestration import build_manager
 from Tests.Orchestration.generation.generateur_ast import GenerateurAST
 from Tests.Orchestration.generation.generateur_visiteur import GenerateurVisiteur
+from Tests.Orchestration.generation.generateur_visiteur_cpp import GenerateurVisiteurCpp
 import Orchestration.test_projet_prysma
 import Orchestration.test_cpp_unittest
 
@@ -16,6 +17,7 @@ def main():
 
     GenerateurAST(racine).generer()
     GenerateurVisiteur(racine).generer()
+    GenerateurVisiteurCpp(racine).generer()
 
     build_manager.BuildManager.executer_commande(["python3", "../build.py"])
 
