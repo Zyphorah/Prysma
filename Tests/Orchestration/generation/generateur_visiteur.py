@@ -1,7 +1,6 @@
 import yaml
 import os
 
-
 class GenerateurVisiteur:
 
     NOEUDS_EXTRA = ["Instruction"]
