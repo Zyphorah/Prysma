@@ -19,29 +19,12 @@ sudo apt install graphviz
 
 ## 2. Configuration du projet
 
-### Créer le répertoire de compilation
-```bash
-cmake -S . -B build
-```
-
-### Générer le fichier compile_commands.json
-Ce fichier permet à **clangd** d'analyser correctement votre code.
-
-```bash
-mkdir -p build && bear --output build/compile_commands.json -- make -j$(nproc)
-```
-### Pour activer les warnings et les traiter comme des erreurs, utilisez cette commande :
-```bash
-mkdir -p build && bear --output build/compile_commands.json -- make -j$(nproc) CXXFLAGS="-Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wconversion -Wsign-conversion -Wnull-dereference -Wformat=2 -Werror"
-```
-## 3. Visualisation des graphes
-
-Pour convertir un graphe au format PNG :
-```bash
-dot -Tpng mon_graphe.dot -o mon_graphe.png
-```
-
-## 4. Configuration de VS Code (tasks.json)
+### Compilation du projet 
+ ```bash
+ python3 build.py
+ ```
+ 
+## 3. Configuration de VS Code (tasks.json)
 
 Incluez cette tâche dans votre `tasks.json` pour activer la vérification des erreurs lors de `Ctrl+Shift+B` :
 

@@ -1,8 +1,8 @@
 import os
 from Tests.Orchestration.build_manager import BuildManager
 from generation.generateur_ast import GenerateurAST
-from generation.generateur_visiteur import GenerateurVisiteur
-from generation.generateur_visiteur_cpp import GenerateurVisiteurCpp
+from generation.generateur_interface_visiteur import GenerateurInterfaceVisiteur
+from generation.generateur_visiteur_base_generale import GenerateurVisiteurBaseGenerale
 
 
 def main():
@@ -10,8 +10,8 @@ def main():
     os.chdir(script_dir)
 
     GenerateurAST(script_dir).generer()
-    GenerateurVisiteur(script_dir).generer()
-    GenerateurVisiteurCpp(script_dir).generer()
+    GenerateurInterfaceVisiteur(script_dir).generer()
+    GenerateurVisiteurBaseGenerale(script_dir).generer()
 
     BuildManager.executer_commande(["cmake", "-S", ".", "-B", "build"])
     os.makedirs("build", exist_ok=True)

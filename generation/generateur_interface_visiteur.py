@@ -1,7 +1,7 @@
 import yaml
 import os
 
-class GenerateurVisiteur:
+class GenerateurInterfaceVisiteur:
 
     NOEUDS_EXTRA = ["Instruction"]
 

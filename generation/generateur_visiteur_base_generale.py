@@ -2,7 +2,7 @@ import yaml
 import os
 
 
-class GenerateurVisiteurCpp:
+class GenerateurVisiteurBaseGenerale:
 
     def __init__(self, racine_projet):
         self._racine = racine_projet
