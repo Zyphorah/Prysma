@@ -1,19 +1,22 @@
-import subprocess
 import sys
 import os
 
-# Ajouter le répertoire parent au chemin Python pour les imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from Tests.Orchestration import build_manager
+from Tests.Orchestration.generation.generateur_ast import GenerateurAST
+from Tests.Orchestration.generation.generateur_visiteur import GenerateurVisiteur
 import Orchestration.test_projet_prysma
 import Orchestration.test_cpp_unittest
 
 def main():
 
     tableau_tests_prysma = []
+    racine = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    #Compilation du compilateur (génère AST_Genere.h nécessaire aux tests)
+    GenerateurAST(racine).generer()
+    GenerateurVisiteur(racine).generer()
+
     build_manager.BuildManager.executer_commande(["python3", "../build.py"])
 
     # Compilation des tests 

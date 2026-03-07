@@ -66,5 +66,11 @@ __pycache__/
 *.pyd
 .Python
 
+# Code généré automatiquement 
+
 # AST_genere 
 /include/Compilateur/AST/AST_Genere.h
+
+# Visiteur
+/include/Compilateur/Visiteur/Interfaces/IVisiteur.h
+/include/Compilateur/Visiteur/VisiteurBaseGenerale.h

@@ -5,14 +5,31 @@
 #include "Compilateur/AST/Registre/ContextGenCode.h"
 #include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
-#include "Compilateur/Visiteur/MacroGenerationVisiteur.h"
 #include "Compilateur/Visiteur/VisiteurBaseGenerale.h"
 
 
 class RegistreVariable; 
 class LlvmBackend; 
 class OrchestrateurInclude;
-CLASS_NOEUD
+class NoeudInstruction;
+class NoeudAffectationVariable;
+class NoeudDeclarationVariable;
+class NoeudAppelFonction;
+class NoeudRetour;
+class NoeudArgFonction;
+class NoeudDeclarationFonction;
+class NoeudLitteral;
+class NoeudUnRefVariable;
+class NoeudRefVariable;
+class NoeudIf;
+class NoeudElse;
+class NoeudWhile;
+class NoeudOperation;
+class NoeudNegation;
+class NoeudTableauInitialisation;
+class NoeudAffectationTableau;
+class NoeudLectureTableau;
+class NoeudNew;
 
 class VisiteurGeneralGenCode : public VisiteurBaseGenerale
 {
@@ -22,7 +39,24 @@ private:
     
 public:
     using VisiteurBaseGenerale::visiter;
-    DECLARER_METHODES_VISITEUR
+    void visiter(NoeudAffectationVariable* noeudAffectationVariable) override;
+    void visiter(NoeudDeclarationVariable* noeudDeclarationVariable) override;
+    void visiter(NoeudAppelFonction* noeudAppelFonction) override;
+    void visiter(NoeudRetour* noeudReturn) override;
+    void visiter(NoeudArgFonction* noeudArgFonction) override;
+    void visiter(NoeudDeclarationFonction* noeudDeclarationFonction) override;
+    void visiter(NoeudOperation* noeudOperation) override;
+    void visiter(NoeudLitteral* noeudLitteral) override;
+    void visiter(NoeudInstruction* instruction) override;
+    void visiter(NoeudUnRefVariable* noeudUnRefVariable) override;
+    void visiter(NoeudRefVariable* noeudRefVariable) override;
+    void visiter(NoeudIf* noeudIf) override;
+    void visiter(NoeudWhile* noeudWhile) override;
+    void visiter(NoeudNegation* noeudNegation) override;
+    void visiter(NoeudTableauInitialisation* noeudTableauInit) override;
+    void visiter(NoeudAffectationTableau* noeudAffectationTableau) override;
+    void visiter(NoeudLectureTableau* noeudLectureTableau) override;
+    void visiter(NoeudNew* noeudNew) override;
     VisiteurGeneralGenCode(ContextGenCode* contextGenCode, OrchestrateurInclude* orchestrateurInclude);
     virtual ~VisiteurGeneralGenCode();
     void parcourirEnfant(NoeudInstruction* noeud);
