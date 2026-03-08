@@ -1,0 +1,18 @@
+#ifndef IVISITEUR_H
+#define IVISITEUR_H
+
+{% for nom in noeuds %}
+class Noeud{{ nom }};
+{% endfor %}
+
+class IVisiteur
+{
+public:
+    virtual ~IVisiteur() = default;
+
+{% for nom in noeuds %}
+    virtual void visiter(Noeud{{ nom }}* noeud{{ nom }}) = 0;
+{% endfor %}
+};
+
+#endif

@@ -1,0 +1,19 @@
+#ifndef VISITEUR_BASE_GENERALE_H
+#define VISITEUR_BASE_GENERALE_H
+
+#include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
+
+{% for nom in noeuds %}
+class Noeud{{ nom }};
+{% endfor %}
+
+class VisiteurBaseGenerale : public IVisiteur
+{
+public:
+
+{% for nom in noeuds %}
+    void visiter(Noeud{{ nom }}* noeud{{ nom }}) override;
+{% endfor %}
+};
+
+#endif

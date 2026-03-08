@@ -7,13 +7,13 @@ from generation.generateur_graphe_viz import GenerateurGrapheViz
 
 
 def main():
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(script_dir)
+    dossier_script = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(dossier_script)
 
-    GenerateurAST(script_dir).generer()
-    GenerateurInterfaceVisiteur(script_dir).generer()
-    GenerateurVisiteurBaseGenerale(script_dir).generer()
-    GenerateurGrapheViz(script_dir).generer()
+    GenerateurAST(dossier_script).generer()
+    GenerateurInterfaceVisiteur(dossier_script).generer()
+    GenerateurVisiteurBaseGenerale(dossier_script).generer()
+    GenerateurGrapheViz(dossier_script).generer()
 
     BuildManager.executer_commande(["cmake", "-S", ".", "-B", "build"])
     os.makedirs("build", exist_ok=True)

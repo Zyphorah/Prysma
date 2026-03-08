@@ -1,0 +1,24 @@
+#include "Compilateur/Visiteur/VisiteurBaseGenerale.h"
+#include "Compilateur/AST/AST_Genere.h"
+
+{% for nom, champs_traversables in methodes.items() %}
+void VisiteurBaseGenerale::visiter(Noeud{{ nom }}* noeud{{ nom }}{{ ' [[maybe_unused]]' if not champs_traversables else '' }})
+{
+{%- if champs_traversables %}
+{%- for getter, type_champ in champs_traversables %}
+{%- if type_champ == 'std::vector<INoeud*>' %}
+    for (auto* element : noeud{{ nom }}->{{ getter }}())
+    {
+        element->accept(this);
+    }
+{%- else %}
+    if (noeud{{ nom }}->{{ getter }}() != nullptr)
+    {
+        noeud{{ nom }}->{{ getter }}()->accept(this);
+    }
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+}
+
+{% endfor %}

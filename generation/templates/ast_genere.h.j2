@@ -1,0 +1,54 @@
+#ifndef AST_GENERE_H
+#define AST_GENERE_H
+
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
+#include "Compilateur/AST/Noeuds/NoeudInstruction.h"
+#include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
+#include "Compilateur/Lexer/Lexer.h"
+#include <string>
+#include <vector>
+#include <utility>
+#include "Compilateur/AST/Registre/Types/IType.h"
+
+{% for nom in noeuds_noms %}
+class Noeud{{ nom }};
+{% endfor %}
+
+{% for classe in classes %}
+class Noeud{{ classe.nom }} : public {{ classe.parent }} {
+private:
+{% for nom_champ, type_champ in classe.champs.items() %}
+    {{ type_champ }} _{{ nom_champ }};
+{% endfor %}
+
+public:
+    Noeud{{ classe.nom }}() = default;
+{%- if classe.champs %}
+    Noeud{{ classe.nom }}({{ classe.params_constructeur }}) : {{ classe.inits_constructeur }} {}
+{%- endif %}
+    ~Noeud{{ classe.nom }}() override = default;
+
+    void accept(IVisiteur* visiteur) override {
+        visiteur->visiter(this);
+    }
+{%- if classe.parent == 'IExpression' %}
+
+    IExpression* ajouterExpression(INoeud* gauche, INoeud* droite) override {
+{%- if 'gauche' in classe.champs %}
+        _gauche = gauche;
+{%- endif %}
+{%- if 'droite' in classe.champs %}
+        _droite = droite;
+{%- endif %}
+        return this;
+    }
+{%- endif %}
+
+{% for nom_champ, type_champ in classe.champs.items() %}
+    {{ classe.getters[nom_champ] }} get{{ nom_champ[0]|upper }}{{ nom_champ[1:] }}() const { return _{{ nom_champ }}; }
+{% endfor %}
+};
+
+{% endfor %}
+#endif

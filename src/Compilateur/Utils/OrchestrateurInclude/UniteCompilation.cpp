@@ -13,6 +13,7 @@
 #include <llvm-18/llvm/IR/Instructions.h>
 #include <llvm-18/llvm/IR/Value.h>
 #include <cstdlib>
+#include <memory>
 #include <string>
 #include <filesystem>
 #include <iostream>
@@ -94,9 +95,9 @@ void UniteCompilation::passe2() {
 
     if (_orchestrateur->estGraphVizActif()) {
         SortieGrapheVisuelTexte sortieGrapheVisuel(pathGraphe + _nomFichier + ".dot");
-        VisiteurGeneralGraphViz visiteurGraphViz(std::move(sortieGrapheVisuel));
-        _arbre->accept(&visiteurGraphViz);
-        visiteurGraphViz.generer();
+        auto visiteurGraphViz = std::make_unique<VisiteurGeneralGraphViz>(std::move(sortieGrapheVisuel));
+        _arbre->accept(visiteurGraphViz.get());
+        visiteurGraphViz->generer();
 
         if (system(("dot -Tsvg " + pathGraphe + _nomFichier + ".dot -o " + pathGraphe + _nomFichier + ".svg").c_str()) != 0) {
             std::cerr << "Erreur lors de la génération du graphe." << std::endl;

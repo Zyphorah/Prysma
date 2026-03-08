@@ -61,6 +61,7 @@ set(SOURCES
     src/Compilateur/AST/ConstructeurArbreEquation.cpp
     src/Compilateur/AST/ConstructeurArbreInstruction.cpp
     # Noeuds
+    src/Compilateur/AST/Noeuds/NoeudInstruction.cpp
     # StrategieEquation
     src/Compilateur/AST/Noeuds/StrategieEquation/StrategieAppelFonction.cpp
     src/Compilateur/AST/Noeuds/StrategieEquation/StrategieRef.cpp

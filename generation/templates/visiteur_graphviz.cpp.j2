@@ -1,0 +1,57 @@
+#include "Compilateur/Visiteur/ASTGraphViz/VisiteurGeneralGraphViz.h"
+#include "Compilateur/GrapheVisuel/SortieGrapheVisuelTexte.h"
+#include "Compilateur/Visiteur/VisiteurBaseGenerale.h"
+#include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/AST/Noeuds/NoeudInstruction.h"
+
+VisiteurGeneralGraphViz::VisiteurGeneralGraphViz(SortieGrapheVisuelTexte sortieGrapheVisuel)
+    : _sortieGrapheVisuel(std::move(sortieGrapheVisuel))
+{}
+
+VisiteurGeneralGraphViz::~VisiteurGeneralGraphViz()
+{}
+
+void VisiteurGeneralGraphViz::generer()
+{
+    _sortieGrapheVisuel.generer();
+}
+
+{% for nom, label, traversables in methodes %}
+void VisiteurGeneralGraphViz::visiter(Noeud{{ nom }}* noeud)
+{
+    int idNoeud = _sortieGrapheVisuel.ajouterNoeud({{ label }});
+{% for getter, type_champ in traversables %}
+{% if type_champ == 'std::vector<INoeud*>' %}
+    for (auto* element : noeud->{{ getter }}())
+    {
+        element->accept(this);
+        int idEnfant = _pileIds.top();
+        _pileIds.pop();
+        _sortieGrapheVisuel.ajouterArete(idNoeud, idEnfant);
+    }
+{% else %}
+    if (noeud->{{ getter }}() != nullptr)
+    {
+        noeud->{{ getter }}()->accept(this);
+        int idEnfant = _pileIds.top();
+        _pileIds.pop();
+        _sortieGrapheVisuel.ajouterArete(idNoeud, idEnfant);
+    }
+{% endif %}
+{% endfor %}
+    _pileIds.push(idNoeud);
+}
+{% endfor %}
+void VisiteurGeneralGraphViz::visiter(NoeudInstruction* noeud)
+{
+    int idNoeud = _sortieGrapheVisuel.ajouterNoeud("Instruction");
+
+    for (INoeud* enfant : noeud->getEnfants())
+    {
+        enfant->accept(this);
+        int idEnfant = _pileIds.top();
+        _pileIds.pop();
+        _sortieGrapheVisuel.ajouterArete(idNoeud, idEnfant);
+    }
+    _pileIds.push(idNoeud);
+}
