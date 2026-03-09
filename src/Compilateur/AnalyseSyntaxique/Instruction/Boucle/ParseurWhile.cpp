@@ -1,11 +1,10 @@
-#include "Compilateur/AnalyseSyntaxique/Instruction/Boucle/ParseurWhile.h"
-#include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurWhile.h"
 #include "Compilateur/AST/Noeuds/NoeudInstruction.h"
-#include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
+#include "Compilateur/AST/AST_Genere.h"
 #include "Compilateur/Lexer/TokenType.h"
 
-ParseurWhile::ParseurWhile(IConstructeurArbre* constructeurArbreEquation, IConstructeurArbre* constructeurArbreInstruction) 
-    : _constructeurArbreEquation(constructeurArbreEquation), _constructeurArbreInstruction(constructeurArbreInstruction)
+ParseurWhile::ParseurWhile(ContextParseur& contextParseur) 
+    : _contextParseur(contextParseur)
 {}
 
 ParseurWhile::~ParseurWhile()
@@ -20,19 +19,19 @@ INoeud* ParseurWhile::parser(std::vector<Token>& tokens, int& index)
 
     consommer(tokens,index,TOKEN_PAREN_OUVERTE,"Erreur, le token n'est pas '('! ");
     
-    INoeud* condition = _constructeurArbreEquation->construire(tokens, index);
+    INoeud* condition = _contextParseur.constructeurArbreEquation->construire(tokens, index);
 
     consommer(tokens,index,TOKEN_PAREN_FERMEE,"Erreur, le token n'est pas ')'! ");
 
-    NoeudInstruction* noeudBlocWhile = _constructeurArbreInstruction->allouer<NoeudInstruction>();
+    IInstruction* noeudBlocWhile = _contextParseur.constructeurArbreInstruction->allouer<NoeudInstruction>();
     consommer(tokens,index,TOKEN_ACCOLADE_OUVERTE, "Erreur, le token n'est pas '{'");
-    consommerEnfantCorps(tokens,index,noeudBlocWhile,_constructeurArbreInstruction,TOKEN_ACCOLADE_FERMEE);
+    consommerEnfantCorps(tokens,index,noeudBlocWhile,_contextParseur.constructeurArbreInstruction,TOKEN_ACCOLADE_FERMEE);
     consommer(tokens,index,TOKEN_ACCOLADE_FERMEE,"Erreur, le token n'est pas '}'");
 
 
-    NoeudInstruction* noeudBlocEndWhile = _constructeurArbreInstruction->allouer<NoeudInstruction>();
+    IInstruction* noeudBlocEndWhile = _contextParseur.constructeurArbreInstruction->allouer<NoeudInstruction>();
 
-    NoeudWhile* noeudWhile = _constructeurArbreInstruction->allouer<NoeudWhile>(condition, noeudBlocWhile, noeudBlocEndWhile);
+    IInstruction* noeudWhile = _contextParseur.constructeurArbreInstruction->allouer<NoeudWhile>(condition, noeudBlocWhile, noeudBlocEndWhile);
 
     return noeudWhile;
 }

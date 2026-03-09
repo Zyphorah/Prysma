@@ -1,0 +1,24 @@
+#ifndef PARSEUR_{{nom | upper}}_CPP
+#define PARSEUR_{{nom | upper}}_CPP
+
+#include "Compilateur/AnalyseSyntaxique/Instruction/Boucle/ParseurWhile.h"
+
+
+Parseur{{nom}}::Parseur{{nom}}(ContextParseur& contextParseur) 
+    : _constructeurArbreEquation(contextParseur), _constructeurArbreInstruction(contextParseur)
+{}
+
+Parseur{{nom}}::~Parseur{{nom}}()
+{}
+
+INoeud* Parseur{{nom}}::parser(std::vector<Token>& tokens, int& index)
+{
+  // TODO: Implémenter le parseur pour {{nom}}
+}
+
+#endif /* PARSEUR_{{nom | upper}}_CPP */
+
+
+
+
+

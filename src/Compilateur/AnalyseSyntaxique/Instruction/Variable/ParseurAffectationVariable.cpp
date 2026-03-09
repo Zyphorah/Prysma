@@ -1,10 +1,9 @@
-#include "Compilateur/AnalyseSyntaxique/Instruction/Variable/ParseurAffectationVariable.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurAffectationVariable.h"
 #include "Compilateur/AST/AST_Genere.h"
-#include "Compilateur/Lexer/TokenType.h"
-#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 
-ParseurAffectationVariable::ParseurAffectationVariable(LlvmBackend* backend, RegistreVariable* registreVariable, RegistreType* registreType, IConstructeurArbre* constructeurEquation)
-    : _backend(backend), _registreVariable(registreVariable), _registreType(registreType), _constructeurEquation(constructeurEquation)
+
+ParseurAffectationVariable::ParseurAffectationVariable(ContextParseur& contextParseur)
+    : _contextParseur(contextParseur)
 {
 }
 
@@ -23,17 +22,17 @@ INoeud* ParseurAffectationVariable::parser(std::vector<Token>& tokens, int& inde
     if (tokens[static_cast<size_t>(index)].type == TOKEN_CROCHET_OUVERT) {
  
         consommer(tokens, index, TOKEN_CROCHET_OUVERT, "Erreur '['");
-        expressionIndex = _constructeurEquation->construire(tokens, index);
+        expressionIndex = _contextParseur.constructeurArbreEquation->construire(tokens, index);
         consommer(tokens, index, TOKEN_CROCHET_FERME, "Erreur : ']' attendu après l'index");
     }
 
     consommer(tokens, index, TOKEN_EGAL, "Erreur : '=' attendu");
-    INoeud* expression = _constructeurEquation->construire(tokens, index);
+    INoeud* expression = _contextParseur.constructeurArbreEquation->construire(tokens, index);
     consommer(tokens, index, TOKEN_POINT_VIRGULE, "Erreur : ';' attendu");
 
     if (expressionIndex != nullptr) {
-        return _constructeurEquation->allouer<NoeudAffectationTableau>(nomVariable, expressionIndex, expression, nomToken);
+        return _contextParseur.constructeurArbreEquation->allouer<NoeudAffectationTableau>(nomVariable, expressionIndex, expression, nomToken);
     }
     
-    return _constructeurEquation->allouer<NoeudAffectationVariable>(nomVariable, expression, nomToken);
+    return _contextParseur.constructeurArbreEquation->allouer<NoeudAffectationVariable>(nomVariable, expression, nomToken);
 }

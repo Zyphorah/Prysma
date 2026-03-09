@@ -43,6 +43,8 @@
 
 // Jinja2 pour la génération du code source 
 
+// FUTAMURA projection pour faire un compilateur qui se compile lui même
+
 
 int main(int argc, char* argv[])
 {

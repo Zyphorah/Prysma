@@ -1,17 +1,14 @@
 #include "Compilateur/AST/Noeuds/StrategieEquation/StrategieAppelFonction.h"
-#include "Compilateur/AST/ConstructeurArbreEquation.h"
-#include "Compilateur/AST/Interfaces/IConstructeurArbre.h"
-#include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurAppelFonction.h"
+#include "Compilateur/AST/Registre/ContextParseur.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurAppelFonction.h"
 #include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
-#include <memory>
 
 
-StrategieAppelFonction::StrategieAppelFonction(IConstructeurArbre* constructeurEquation) : _constructeurEquation(constructeurEquation)
+StrategieAppelFonction::StrategieAppelFonction(ContextParseur& contextParseur) : _contextParseur(contextParseur)
 {}
 
 INoeud* StrategieAppelFonction::construire(std::vector<Token>& equation) {
-    ParseurAppelFonction parseurAppel(_constructeurEquation);
+    ParseurAppelFonction parseurAppel(_contextParseur);
     int indexZero = 0;
-    std::vector<Token> equationAvecIndex = equation;
-    return parseurAppel.parser(equationAvecIndex, indexZero);
+    return parseurAppel.parser(equation, indexZero);
 }

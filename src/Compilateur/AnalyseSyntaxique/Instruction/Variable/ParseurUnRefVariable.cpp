@@ -1,9 +1,8 @@
-#include "Compilateur/AnalyseSyntaxique/Instruction/Variable/ParseurUnRefVariable.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurUnRefVariable.h"
 #include "Compilateur/AST/AST_Genere.h"
-#include "Compilateur/Lexer/TokenType.h"
 
-ParseurUnRefVariable::ParseurUnRefVariable(llvm::BumpPtrAllocator& arena)
-    : _arena(arena)
+ParseurUnRefVariable::ParseurUnRefVariable(ContextParseur& contextParseur)
+    : _contextParseur(contextParseur)
 {
 }
 
@@ -19,5 +18,5 @@ INoeud* ParseurUnRefVariable::parser(std::vector<Token>& tokens, int& index)
     Token nomToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Erreur : nom de variable attendu après 'unref'");
     std::string nomVariable = nomToken.value;
     
-    return new (_arena.Allocate(sizeof(NoeudUnRefVariable), alignof(NoeudUnRefVariable))) NoeudUnRefVariable(nomVariable);
+    return _contextParseur.constructeurArbreEquation->allouer<NoeudUnRefVariable>(nomVariable);
 }

@@ -2,6 +2,7 @@
 #define D8FAA486_F5BA_43FB_BFFC_AB9990B46458
 
 #include "Compilateur/AST/Registre/ContextGenCode.h"
+#include "Compilateur/AST/Registre/ContextParseur.h"
 #include "Compilateur/AST/Registre/RegistreStrategieEquation.h"
 #include "Compilateur/AST/ConstructeurArbreInstruction.h"
 #include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
@@ -31,9 +32,11 @@ private:
     ConstructeurArbreInstruction* _constructeurArbreInstruction;
     ConstructeurEquationFlottante* _constructeurEquation;
     ParseurType* _parseurType;
+    ContextParseur* _contextParseur;
 
     void creerRegistres();
     void creerContexte(const std::string& cheminFichier);
+    void creerContextParseur();
     void enregistrerFonctionsExternes();
     void enregistrerTypesDeBase();
     void enregistrerStrategiesEquation();
@@ -45,7 +48,7 @@ public:
 
     /// Initialise tout l'environnement de compilation en une seule étape
     void initialiser(const std::string& cheminFichier);
-
+    
     ContextGenCode* getContext() const;
     llvm::BumpPtrAllocator& getArena();
     ConstructeurArbreInstruction* getConstructeurArbreInstruction() const;

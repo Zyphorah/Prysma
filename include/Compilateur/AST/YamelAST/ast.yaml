@@ -1,95 +1,94 @@
 Noeud:
-  Include:
-    champs:
-      path: "std::string"
+  Fonction:
+    AppelFonction:
+      parent: "NoeudInstruction"
+      champs:
+        nomFonction: "Token"
+    ArgFonction:
+      champs:
+        type: "IType*"
+        nom: "std::string"
+    DeclarationFonction:
+      champs:
+        typeRetour: "IType*"
+        nom: "std::string"
+        arguments: "std::vector<INoeud*>"
+        corps: "INoeud*"
+    Retour:
+      champs:
+        valeurRetour: "INoeud*"
 
-  DeclarationVariable:
-    champs:
-      nom: "std::string"
-      type: "IType*"
-      expression: "INoeud*"
+  Variable:
+    AffectationVariable:
+      champs:
+        nom: "std::string"
+        expression: "INoeud*"
+        token: "Token"
+    DeclarationVariable:
+      champs:
+        nom: "std::string"
+        type: "IType*"
+        expression: "INoeud*"  
+    RefVariable:
+      champs:
+        nomVariable: "std::string"
+    UnRefVariable:
+      champs:
+        nomVariable: "std::string"
+    Include:
+      champs:
+        path: "std::string"
 
-  DeclarationFonction:
-    champs:
-      typeRetour: "IType*"
-      nom: "std::string"
-      arguments: "std::vector<INoeud*>"
-      corps: "INoeud*"
+  Tableau:
+    AffectationTableau:
+      champs:
+        nom: "std::string"
+        expressionIndex: "INoeud*"
+        expression: "INoeud*"
+        token: "Token"
+    TableauInitialisation:
+      champs:
+        elements: "std::vector<INoeud*>"
+    LectureTableau:
+      champs:
+        indexEquation: "INoeud*"
+        nomTableau: "Token"
 
-  ArgFonction:
-    champs:
-      type: "IType*"
-      nom: "std::string"
+  Instruction:
+    If:
+      parent: "NoeudInstruction"
+      champs:
+        noeudCondition: "INoeud*"
+        noeudBlocIf: "INoeud*"
+        noeudBlocElse: "INoeud*"
+        noeudBlocEndif: "INoeud*"
 
-  AffectationVariable:
-    champs:
-      nom: "std::string"
-      expression: "INoeud*"
-      token: "Token"
+    While:
+      parent: "NoeudInstruction"
+      champs:
+        noeudCondition: "INoeud*"
+        noeudBlocWhile: "INoeud*"
+        noeudBlocFinWhile: "INoeud*"
+    New:
+      champs:
+        nomType: "Token"
+    Delete:
+      champs:
+        nomType: "Token"
+        
+  Math:
+    Operation:
+      parent: "IExpression"
+      champs:
+        token: "Token"
+        gauche: "INoeud*"
+        droite: "INoeud*"
 
-  AffectationTableau:
-    champs:
-      nom: "std::string"
-      expressionIndex: "INoeud*"
-      expression: "INoeud*"
-      token: "Token"
+    Litteral:
+      champs:
+        token: "Token"
 
-  Retour:
-    champs:
-      valeurRetour: "INoeud*"
-
-  If:
-    parent: "NoeudInstruction"
-    champs:
-      noeudCondition: "INoeud*"
-      noeudBlocIf: "INoeud*"
-      noeudBlocElse: "INoeud*"
-      noeudBlocEndif: "INoeud*"
-
-  While:
-    parent: "NoeudInstruction"
-    champs:
-      noeudCondition: "INoeud*"
-      noeudBlocWhile: "INoeud*"
-      noeudBlocFinWhile: "INoeud*"
-
-  Operation:
-    parent: "IExpression"
-    champs:
-      token: "Token"
-      gauche: "INoeud*"
-      droite: "INoeud*"
-
-  Litteral:
-    champs:
-      token: "Token"
-
-  AppelFonction:
-    parent: "NoeudInstruction"
-    champs:
-      nomFonction: "Token"
-
-  LectureTableau:
-    champs:
-      indexEquation: "INoeud*"
-      nomTableau: "Token"
-
-  TableauInitialisation:
-    champs:
-      elements: "std::vector<INoeud*>"
-
-  Negation:
-    champs:
-      operateur: "Token"
-      operande: "INoeud*"
-
-  RefVariable:
-    champs:
-      nomVariable: "std::string"
-
-  UnRefVariable:
-    champs:
-      nomVariable: "std::string"
-  New:
-    champs:
-      nomType: "Token"
+    Negation:
+      champs:
+        operateur: "Token"
+        operande: "INoeud*"

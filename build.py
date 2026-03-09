@@ -4,6 +4,7 @@ from generation.generateur_ast import GenerateurAST
 from generation.generateur_interface_visiteur import GenerateurInterfaceVisiteur
 from generation.generateur_visiteur_base_generale import GenerateurVisiteurBaseGenerale
 from generation.generateur_graphe_viz import GenerateurGrapheViz
+from generation.generateur_parseur import GenerateurParseur
 
 
 def main():
@@ -14,6 +15,7 @@ def main():
     GenerateurInterfaceVisiteur(dossier_script).generer()
     GenerateurVisiteurBaseGenerale(dossier_script).generer()
     GenerateurGrapheViz(dossier_script).generer()
+    GenerateurParseur(dossier_script).generer()
 
     BuildManager.executer_commande(["cmake", "-S", ".", "-B", "build"])
     os.makedirs("build", exist_ok=True)

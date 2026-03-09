@@ -4,15 +4,16 @@
 #include <utility>
 #include <vector>
 #include <llvm-18/llvm/Support/Allocator.h>
+#include <llvm/Support/TargetSelect.h>
 #include "Compilateur/Lexer/TokenType.h"
 #include "catch.hpp"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/AST/ConstructeurArbreInstruction.h"
 #include "Compilateur/AST/Registre/RegistreInstruction.h"
 #include "Compilateur/AST/Registre/RegistreStrategieEquation.h"
-#include "Compilateur/AST/Registre/RegistreType.h"
-#include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
-#include "Compilateur/AnalyseSyntaxique/ParseurType.h"
+#include "Compilateur/AST/Registre/ContextParseur.h"
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
+#include "Compilateur/LLVM/LlvmBackend.h"
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/AST/AST_Genere.h"
 
@@ -27,17 +28,17 @@
 #include "Compilateur/AST/Noeuds/StrategieEquation/StrategieAppelFonction.h"
 
 // Parseurs d'instructions
-#include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurDeclarationFonction.h"
-#include "Compilateur/AnalyseSyntaxique/Instruction/Variable/ParseurAffectationVariable.h"
-#include "Compilateur/AnalyseSyntaxique/Instruction/Variable/ParseurDeclarationVariable.h"
-#include "Compilateur/AnalyseSyntaxique/Instruction/Variable/ParseurRefVariable.h"
-#include "Compilateur/AnalyseSyntaxique/Instruction/Variable/ParseurUnRefVariable.h"
-#include "Compilateur/AnalyseSyntaxique/Equation/ParseurInstructionAppel.h"
-#include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurRetour.h"
-#include "Compilateur/AnalyseSyntaxique/Instruction/Fonction/ParseurArgFonction.h"
-#include "Compilateur/AnalyseSyntaxique/Instruction/Condition/ParseurIf.h"
-#include "Compilateur/AnalyseSyntaxique/Instruction/Boucle/ParseurWhile.h"
-#include "Compilateur/AnalyseSyntaxique/Instruction/Include/ParseurInclude.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurDeclarationFonction.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurAffectationVariable.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurAppelFonction.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurDeclarationVariable.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurRefVariable.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurUnRefVariable.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurRetour.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurArgFonction.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurIf.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurWhile.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurInclude.h"
 
 using namespace std;
 
@@ -49,14 +50,19 @@ struct EnvironnementAST {
     std::unique_ptr<RegistreInstruction> registreInstruction;
     std::unique_ptr<RegistreStrategieEquation> registreStrategieEquation;
     std::unique_ptr<RegistreType> registreType;
+    std::unique_ptr<RegistreVariable> registreVariable;
+
     ConstructeurArbreInstruction* constructeurArbre = nullptr;
     ConstructeurEquationFlottante* constructeurEquation = nullptr;
     ParseurType* parseurType = nullptr;
+    ContextParseur* contextParseur = nullptr;
 
     EnvironnementAST() {
+    
         registreInstruction = std::make_unique<RegistreInstruction>();
         registreStrategieEquation = std::make_unique<RegistreStrategieEquation>();
         registreType = std::make_unique<RegistreType>();
+        registreVariable = std::make_unique<RegistreVariable>();
 
         // Constructeur d'arbre d'instruction 
         #pragma GCC diagnostic push
@@ -71,6 +77,16 @@ struct EnvironnementAST {
         #pragma GCC diagnostic pop
 
         parseurType = new (arena.Allocate<ParseurType>()) ParseurType(registreType.get(), constructeurEquation->recupererConstructeurArbre());
+
+        // Créer le ContextParseur
+        contextParseur = new (arena.Allocate<ContextParseur>()) ContextParseur(
+            constructeurEquation->recupererConstructeurArbre(),
+            constructeurArbre,
+            parseurType,
+            arena,
+            registreVariable.get(),
+            registreType.get()
+        );
 
         auto* stratLitInt = new (arena.Allocate<StrategieLitteral>()) StrategieLitteral(arena);
         registreStrategieEquation->enregistrer(TOKEN_LIT_INT, stratLitInt);
@@ -99,42 +115,41 @@ struct EnvironnementAST {
         auto* stratString = new (arena.Allocate<StrategieString>()) StrategieString(arena);
         registreStrategieEquation->enregistrer(TOKEN_GUILLEMET, stratString);
 
-        auto* stratCall = new (arena.Allocate<StrategieAppelFonction>()) StrategieAppelFonction(constructeurEquation->recupererConstructeurArbre());
+        auto* stratCall = new (arena.Allocate<StrategieAppelFonction>()) StrategieAppelFonction(*contextParseur);
         registreStrategieEquation->enregistrer(TOKEN_CALL, stratCall);
 
         // Parseurs d'instructions
-        auto* parsFonc = new (arena.Allocate<ParseurDeclarationFonction>()) ParseurDeclarationFonction(constructeurArbre, parseurType);
+        auto* parsFonc = new (arena.Allocate<ParseurDeclarationFonction>()) ParseurDeclarationFonction(*contextParseur);
         registreInstruction->enregistrer(TOKEN_FONCTION, parsFonc);
 
-        // Note: backend, registreVariable, registreType passés à nullptr car non utilisés au parsing
-        auto* parsAff = new (arena.Allocate<ParseurAffectationVariable>()) ParseurAffectationVariable(nullptr, nullptr, nullptr, constructeurEquation->recupererConstructeurArbre());
+        auto* parsAff = new (arena.Allocate<ParseurAffectationVariable>()) ParseurAffectationVariable(*contextParseur);
         registreInstruction->enregistrer(TOKEN_AFF, parsAff);
 
-        auto* parsDec = new (arena.Allocate<ParseurDeclarationVariable>()) ParseurDeclarationVariable(parseurType, constructeurEquation->recupererConstructeurArbre());
+        auto* parsDec = new (arena.Allocate<ParseurDeclarationVariable>()) ParseurDeclarationVariable(*contextParseur);
         registreInstruction->enregistrer(TOKEN_DEC, parsDec);
 
-        auto* parsCall = new (arena.Allocate<ParseurInstructionAppel>()) ParseurInstructionAppel(constructeurEquation->recupererConstructeurArbre());
+        auto* parsCall = new (arena.Allocate<ParseurAppelFonction>()) ParseurAppelFonction(*contextParseur);
         registreInstruction->enregistrer(TOKEN_CALL, parsCall);
 
-        auto* parsRet = new (arena.Allocate<ParseurRetour>()) ParseurRetour(constructeurEquation->recupererConstructeurArbre());
+        auto* parsRet = new (arena.Allocate<ParseurRetour>()) ParseurRetour(*contextParseur);
         registreInstruction->enregistrer(TOKEN_RETOUR, parsRet);
 
-        auto* parsArg = new (arena.Allocate<ParseurArgFonction>()) ParseurArgFonction(parseurType, arena);
+        auto* parsArg = new (arena.Allocate<ParseurArgFonction>()) ParseurArgFonction(*contextParseur);
         registreInstruction->enregistrer(TOKEN_ARG, parsArg);
 
-        auto* parsUnRef = new (arena.Allocate<ParseurUnRefVariable>()) ParseurUnRefVariable(arena);
+        auto* parsUnRef = new (arena.Allocate<ParseurUnRefVariable>()) ParseurUnRefVariable(*contextParseur);
         registreInstruction->enregistrer(TOKEN_UNREF, parsUnRef);
 
-        auto* parsRefVar = new (arena.Allocate<ParseurRefVariable>()) ParseurRefVariable(arena);
+        auto* parsRefVar = new (arena.Allocate<ParseurRefVariable>()) ParseurRefVariable(*contextParseur);
         registreInstruction->enregistrer(TOKEN_REF, parsRefVar);
 
-        auto* parsIf = new (arena.Allocate<ParseurIf>()) ParseurIf(constructeurEquation->recupererConstructeurArbre(), constructeurArbre);
+        auto* parsIf = new (arena.Allocate<ParseurIf>()) ParseurIf(*contextParseur);
         registreInstruction->enregistrer(TOKEN_SI, parsIf);
 
-        auto* parsWhile = new (arena.Allocate<ParseurWhile>()) ParseurWhile(constructeurEquation->recupererConstructeurArbre(), constructeurArbre);
+        auto* parsWhile = new (arena.Allocate<ParseurWhile>()) ParseurWhile(*contextParseur);
         registreInstruction->enregistrer(TOKEN_TANT_QUE, parsWhile);
 
-        auto* parsInclude = new (arena.Allocate<ParseurInclude>()) ParseurInclude(arena);
+        auto* parsInclude = new (arena.Allocate<ParseurInclude>()) ParseurInclude(*contextParseur);
         registreInstruction->enregistrer(TOKEN_INCLUDE, parsInclude);
     }
 };

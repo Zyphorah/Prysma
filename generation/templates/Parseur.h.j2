@@ -1,0 +1,29 @@
+#ifndef PARSEUR_{{nom | upper}}_H
+#define PARSEUR_{{nom | upper}}_H
+
+#include "Compilateur/AST/Registre/ContextParseur.h"
+#include "Compilateur/Lexer/Lexer.h"
+#include "Compilateur/AnalyseSyntaxique/Interfaces/IParseur.h"
+#include "Compilateur/AnalyseSyntaxique/ParseurBase.h"
+
+
+class Parseur{{nom}} : public IParseur, public ParseurBase
+{
+private:
+    ContextParseur& _contextParseur;
+    
+public: 
+
+    Parseur{{nom}}(ContextParseur& contextParseur);
+    ~Parseur{{nom}}();
+    
+    INoeud* parser(std::vector<Token>& tokens, int& index) override;
+};
+
+
+#endif /* PARSEUR_{{nom | upper}}_H */
+
+
+
+
+

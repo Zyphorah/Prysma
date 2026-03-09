@@ -16,8 +16,16 @@ class MoteurGeneration:
 
     def _charger_noeuds_yaml(self):
         with open(self._fichier_yaml, "r", encoding="utf-8") as fichier:
-            return yaml.safe_load(fichier).get("Noeud", {})
-
+            noeuds = yaml.safe_load(fichier).get("Noeud", {})
+        return self._applatir_noeuds(noeuds)
+        
+    def _applatir_noeuds(self, noeuds):
+        noeuds_applatir = {}
+        for _, donnees in noeuds.items():
+            noeuds_applatir.update(donnees)
+           
+        return noeuds_applatir
+    
     def _rendre_et_ecrire(self, nom_template, chemin_sortie, **kwargs):
         contenu = self._env.get_template(nom_template).render(**kwargs)
         os.makedirs(os.path.dirname(chemin_sortie), exist_ok=True)
