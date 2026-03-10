@@ -8,13 +8,13 @@
 ConstructeurArbreEquation::ConstructeurArbreEquation(
     ChaineResponsabilite* chaineResponsabilite,
     RegistreSymbole* registreSymbole,
-    RegistreStrategieEquation* registreStrategieEquation,
+    RegistreExpression* registreExpression,
     IGestionnaireParenthese* gestionnaireParenthese,
     llvm::BumpPtrAllocator& arena,
     IConstructeurArbre* instructionBuilder)
     : _chaineResponsabilite(chaineResponsabilite), 
       _registreSymbole(registreSymbole), 
-      _registreStrategieEquation(registreStrategieEquation),
+    _registreExpression(registreExpression),
       _gestionnaireParenthese(gestionnaireParenthese),
       _instructionBuilder(instructionBuilder),
       _arena(arena),
@@ -35,8 +35,8 @@ INoeud* ConstructeurArbreEquation::construire(std::vector<Token> &equation) {
     if (indice == -1) {
         TokenType type = equation[0].type;
 
-        if ((_registreStrategieEquation != nullptr) && _registreStrategieEquation->existe(type)) {
-            return _registreStrategieEquation->recuperer(type)->construire(equation);
+        if ((_registreExpression != nullptr) && _registreExpression->existe(type)) {
+            return _registreExpression->recuperer(type)->construire(equation);
         }
 
         throw ErreurCompilation("Erreur: token non reconnu dans l'équation", equation[0].ligne, equation[0].colonne);

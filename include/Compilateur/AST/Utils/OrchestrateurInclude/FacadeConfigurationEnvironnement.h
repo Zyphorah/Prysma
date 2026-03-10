@@ -2,8 +2,9 @@
 #define D8FAA486_F5BA_43FB_BFFC_AB9990B46458
 
 #include "Compilateur/AST/Registre/ContextGenCode.h"
+#include "Compilateur/AST/Registre/ContexteExpression.h"
 #include "Compilateur/AST/Registre/ContextParseur.h"
-#include "Compilateur/AST/Registre/RegistreStrategieEquation.h"
+#include "Compilateur/AST/Registre/RegistreExpression.h"
 #include "Compilateur/AST/ConstructeurArbreInstruction.h"
 #include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
 #include "Compilateur/AnalyseSyntaxique/ParseurType.h"
@@ -28,18 +29,19 @@ private:
     std::unique_ptr<RegistreArgument> _registreArgument;
     std::unique_ptr<ContextGenCode> _context;
 
-    RegistreStrategieEquation* _registreStrategieEquation;
+    RegistreExpression* _registreExpression;
     ConstructeurArbreInstruction* _constructeurArbreInstruction;
     ConstructeurEquationFlottante* _constructeurEquation;
     ParseurType* _parseurType;
     ContextParseur* _contextParseur;
+    ContexteExpression* _contexteExpression;
 
     void creerRegistres();
     void creerContexte(const std::string& cheminFichier);
     void creerContextParseur();
     void enregistrerFonctionsExternes();
     void enregistrerTypesDeBase();
-    void enregistrerStrategiesEquation();
+    void enregistrerExpressions();
     void enregistrerInstructions();
 
 public:

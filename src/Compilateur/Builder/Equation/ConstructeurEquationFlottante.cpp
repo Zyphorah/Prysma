@@ -3,8 +3,8 @@
 #include "Compilateur/AST/AST_Genere.h"
 #include "Compilateur/Lexer/TokenType.h"
 
-ConstructeurEquationFlottante::ConstructeurEquationFlottante(IConstructeurArbre* instructionBuilder, RegistreStrategieEquation* registreStrategieEquation, llvm::BumpPtrAllocator& arena)
-    : _instructionBuilder(instructionBuilder), _arena(arena), _registreStrategieEquation(registreStrategieEquation)
+ConstructeurEquationFlottante::ConstructeurEquationFlottante(IConstructeurArbre* instructionBuilder, RegistreExpression* registreExpression, llvm::BumpPtrAllocator& arena)
+    : _instructionBuilder(instructionBuilder), _arena(arena), _registreExpression(registreExpression)
 {
     _registreSymbole = new (_arena.Allocate(sizeof(RegistreSymbole), alignof(RegistreSymbole))) RegistreSymbole();
 
@@ -45,7 +45,7 @@ ConstructeurEquationFlottante::ConstructeurEquationFlottante(IConstructeurArbre*
     _constructeurArbre = new (_arena) ConstructeurArbreEquation(
         _chaineResponsabilite.get(), 
         _registreSymbole, 
-        _registreStrategieEquation,
+    _registreExpression,
         _serviceParenthese.get(),
         _arena,
         instructionBuilder

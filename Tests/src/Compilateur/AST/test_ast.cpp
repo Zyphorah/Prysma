@@ -9,22 +9,24 @@
 #include "catch.hpp"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/AST/ConstructeurArbreInstruction.h"
+#include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
 #include "Compilateur/AST/Registre/RegistreInstruction.h"
-#include "Compilateur/AST/Registre/RegistreStrategieEquation.h"
+#include "Compilateur/AST/Registre/RegistreExpression.h"
+#include "Compilateur/AST/Registre/ContexteExpression.h"
 #include "Compilateur/AST/Registre/ContextParseur.h"
 #include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/AST/AST_Genere.h"
 
-// Stratégies d'équation
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieLitteral.h"
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieIdentifiant.h"
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieRef.h"
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieUnRef.h"
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieNegation.h"
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieTableauInitialisation.h"
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieString.h"
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieAppelFonction.h"
+// Expressions
+#include "Compilateur/Math/ExpressionLitteral.h"
+#include "Compilateur/Variable/ExpressionIdentifiant.h"
+#include "Compilateur/Variable/ExpressionRefVariable.h"
+#include "Compilateur/Variable/ExpressionUnRefVariable.h"
+#include "Compilateur/Math/ExpressionNegation.h"
+#include "Compilateur/Math/ExpressionString.h"
+#include "Compilateur/Tableau/ExpressionTableauInitialisation.h"
+#include "Compilateur/Fonction/ExpressionAppelFonction.h"
 
 // Parseurs d'instructions
 #include "Compilateur/Fonction/ParseurDeclarationFonction.h"
@@ -47,7 +49,7 @@ using namespace std;
 struct EnvironnementAST {
     llvm::BumpPtrAllocator arena;
     std::unique_ptr<RegistreInstruction> registreInstruction;
-    std::unique_ptr<RegistreStrategieEquation> registreStrategieEquation;
+    std::unique_ptr<RegistreExpression> registreExpression;
     std::unique_ptr<RegistreType> registreType;
     std::unique_ptr<RegistreVariable> registreVariable;
 
@@ -55,11 +57,12 @@ struct EnvironnementAST {
     ConstructeurEquationFlottante* constructeurEquation = nullptr;
     ParseurType* parseurType = nullptr;
     ContextParseur* contextParseur = nullptr;
+    ContexteExpression* contexteExpression = nullptr;
 
     EnvironnementAST() {
     
         registreInstruction = std::make_unique<RegistreInstruction>();
-        registreStrategieEquation = std::make_unique<RegistreStrategieEquation>();
+    registreExpression = std::make_unique<RegistreExpression>();
         registreType = std::make_unique<RegistreType>();
         registreVariable = std::make_unique<RegistreVariable>();
 
@@ -72,7 +75,7 @@ struct EnvironnementAST {
         //  Strategie d'équation 
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wmismatched-new-delete"
-        constructeurEquation = new (arena) ConstructeurEquationFlottante(constructeurArbre, registreStrategieEquation.get(), arena);
+    constructeurEquation = new (arena) ConstructeurEquationFlottante(constructeurArbre, registreExpression.get(), arena);
         #pragma GCC diagnostic pop
 
         parseurType = new (arena.Allocate<ParseurType>()) ParseurType(registreType.get(), constructeurEquation->recupererConstructeurArbre());
@@ -87,35 +90,45 @@ struct EnvironnementAST {
             registreType.get()
         );
 
-        auto* stratLitInt = new (arena.Allocate<StrategieLitteral>()) StrategieLitteral(arena);
-        registreStrategieEquation->enregistrer(TOKEN_LIT_INT, stratLitInt);
+        contexteExpression = new (arena.Allocate<ContexteExpression>()) ContexteExpression(
+            constructeurEquation->recupererConstructeurArbre(),
+            constructeurArbre,
+            parseurType,
+            contextParseur,
+            arena,
+            registreVariable.get(),
+            registreType.get()
+        );
 
-        auto* stratLitFloat = new (arena.Allocate<StrategieLitteral>()) StrategieLitteral(arena);
-        registreStrategieEquation->enregistrer(TOKEN_LIT_FLOAT, stratLitFloat);
+        auto* exprLitInt = new (arena.Allocate<ExpressionLitteral>()) ExpressionLitteral(*contexteExpression);
+        registreExpression->enregistrer(TOKEN_LIT_INT, exprLitInt);
 
-        auto* stratLitBool = new (arena.Allocate<StrategieLitteral>()) StrategieLitteral(arena);
-        registreStrategieEquation->enregistrer(TOKEN_LIT_BOLEEN, stratLitBool);
+        auto* exprLitFloat = new (arena.Allocate<ExpressionLitteral>()) ExpressionLitteral(*contexteExpression);
+        registreExpression->enregistrer(TOKEN_LIT_FLOAT, exprLitFloat);
 
-        auto* stratIdent = new (arena.Allocate<StrategieIdentifiant>()) StrategieIdentifiant(constructeurEquation);
-        registreStrategieEquation->enregistrer(TOKEN_IDENTIFIANT, stratIdent);
+        auto* exprLitBool = new (arena.Allocate<ExpressionLitteral>()) ExpressionLitteral(*contexteExpression);
+        registreExpression->enregistrer(TOKEN_LIT_BOLEEN, exprLitBool);
 
-        auto* stratRef = new (arena.Allocate<StrategieRef>()) StrategieRef(arena);
-        registreStrategieEquation->enregistrer(TOKEN_REF, stratRef);
+        auto* exprIdentifiant = new (arena.Allocate<ExpressionIdentifiant>()) ExpressionIdentifiant(*contexteExpression);
+        registreExpression->enregistrer(TOKEN_IDENTIFIANT, exprIdentifiant);
 
-        auto* stratUnRef = new (arena.Allocate<StrategieUnRef>()) StrategieUnRef(arena);
-        registreStrategieEquation->enregistrer(TOKEN_UNREF, stratUnRef);
+        auto* exprRef = new (arena.Allocate<ExpressionRefVariable>()) ExpressionRefVariable(*contexteExpression);
+        registreExpression->enregistrer(TOKEN_REF, exprRef);
 
-        auto* stratNeg = new (arena.Allocate<StrategieNegation>()) StrategieNegation(constructeurEquation);
-        registreStrategieEquation->enregistrer(TOKEN_NON, stratNeg);
+        auto* exprUnRef = new (arena.Allocate<ExpressionUnRefVariable>()) ExpressionUnRefVariable(*contexteExpression);
+        registreExpression->enregistrer(TOKEN_UNREF, exprUnRef);
 
-        auto* stratTab = new (arena.Allocate<StrategieTableauInitialisation>()) StrategieTableauInitialisation(constructeurEquation->recupererConstructeurArbre());
-        registreStrategieEquation->enregistrer(TOKEN_CROCHET_OUVERT, stratTab);
+        auto* exprNeg = new (arena.Allocate<ExpressionNegation>()) ExpressionNegation(*contexteExpression);
+        registreExpression->enregistrer(TOKEN_NON, exprNeg);
 
-        auto* stratString = new (arena.Allocate<StrategieString>()) StrategieString(arena);
-        registreStrategieEquation->enregistrer(TOKEN_GUILLEMET, stratString);
+        auto* exprString = new (arena.Allocate<ExpressionString>()) ExpressionString(*contexteExpression);
+        registreExpression->enregistrer(TOKEN_GUILLEMET, exprString);
 
-        auto* stratCall = new (arena.Allocate<StrategieAppelFonction>()) StrategieAppelFonction(*contextParseur);
-        registreStrategieEquation->enregistrer(TOKEN_CALL, stratCall);
+        auto* exprTab = new (arena.Allocate<ExpressionTableauInitialisation>()) ExpressionTableauInitialisation(*contexteExpression);
+        registreExpression->enregistrer(TOKEN_CROCHET_OUVERT, exprTab);
+
+        auto* exprCall = new (arena.Allocate<ExpressionAppelFonction>()) ExpressionAppelFonction(*contexteExpression);
+        registreExpression->enregistrer(TOKEN_CALL, exprCall);
 
         // Parseurs d'instructions
         auto* parsFonc = new (arena.Allocate<ParseurDeclarationFonction>()) ParseurDeclarationFonction(*contextParseur);

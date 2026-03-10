@@ -18,7 +18,14 @@ BIN_DIR = build
 TARGET = $(BIN_DIR)/Prysma
 
 # Trouver tous les fichiers .cpp
-SRCS := $(shell find $(SRC_DIR) -name "*.cpp")
+SRCS := $(shell find $(SRC_DIR) \
+	-path "$(SRC_DIR)/Compilateur/AST/Noeuds/StrategieEquation" -prune -o \
+	-path "$(SRC_DIR)/Compilateur/AnalyseSyntaxique/ParseurInstruction.cpp" -prune -o \
+	-path "$(SRC_DIR)/Compilateur/AnalyseSyntaxique/ParseurEquation.cpp" -prune -o \
+	-path "$(SRC_DIR)/Compilateur/AnalyseSyntaxique/Math/ParseurLitteral.cpp" -prune -o \
+	-path "$(SRC_DIR)/Compilateur/AnalyseSyntaxique/Math/ParseurNegation.cpp" -prune -o \
+	-path "$(SRC_DIR)/Compilateur/AnalyseSyntaxique/Tableau/ParseurTableauInitialisation.cpp" -prune -o \
+	-name "*.cpp" -print)
 GEN_SRCS := $(shell find $(GEN_DIR)/src -name "*.cpp" 2>/dev/null)
 OBJS := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 GEN_OBJS := $(GEN_SRCS:$(GEN_DIR)/%.cpp=$(OBJ_DIR)/gen/%.o)

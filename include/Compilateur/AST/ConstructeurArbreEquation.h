@@ -3,7 +3,7 @@
 #include "Compilateur/AST/Interfaces/IConstructeurArbre.h"
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/AST/Registre/RegistreSymbole.h"
-#include "Compilateur/AST/Registre/RegistreStrategieEquation.h"
+#include "Compilateur/AST/Registre/RegistreExpression.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/AnalyseSyntaxique/Equation/ChaineResponsabilite.h"
 #include "Compilateur/AnalyseSyntaxique/Equation/Interfaces/IGestionnaireParenthese.h"
@@ -16,7 +16,7 @@ class ConstructeurArbreEquation : public IConstructeurArbre
 private:
     ChaineResponsabilite* _chaineResponsabilite;
     RegistreSymbole* _registreSymbole;
-    RegistreStrategieEquation* _registreStrategieEquation;
+    RegistreExpression* _registreExpression;
     IGestionnaireParenthese* _gestionnaireParenthese;
     IConstructeurArbre* _instructionBuilder;
     llvm::BumpPtrAllocator& _arena;
@@ -27,7 +27,7 @@ public:
     ConstructeurArbreEquation(
         ChaineResponsabilite* chaineResponsabilite,
         RegistreSymbole* registreSymbole,
-        RegistreStrategieEquation* registreStrategieEquation,
+    RegistreExpression* registreExpression,
         IGestionnaireParenthese* gestionnaireParenthese,
         llvm::BumpPtrAllocator& arena,
         IConstructeurArbre* instructionBuilder = nullptr

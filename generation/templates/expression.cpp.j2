@@ -1,0 +1,19 @@
+#ifndef EXPRESSION_{{nom | upper}}_CPP
+#define EXPRESSION_{{nom | upper}}_CPP
+
+#include "{{ include_expression }}"
+
+Expression{{nom}}::Expression{{nom}}(ContexteExpression& contexteExpression)
+    : _contexteExpression(contexteExpression)
+{}
+
+Expression{{nom}}::~Expression{{nom}}()
+{}
+
+INoeud* Expression{{nom}}::construire(std::vector<Token>& equation)
+{
+    (void)equation;
+    return nullptr;
+}
+
+#endif /* EXPRESSION_{{nom | upper}}_CPP */

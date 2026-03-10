@@ -10,7 +10,7 @@
 #include "Compilateur/AnalyseSyntaxique/Equation/ServiceParenthese.h"
 #include "Compilateur/AnalyseSyntaxique/Equation/GestionnaireOperateur.h"
 #include "Compilateur/AST/Registre/RegistreSymbole.h"
-#include "Compilateur/AST/Registre/RegistreStrategieEquation.h"
+#include "Compilateur/AST/Registre/RegistreExpression.h"
 
 struct Token;
 
@@ -40,13 +40,13 @@ private:
     IConstructeurArbre* _instructionBuilder;
     llvm::BumpPtrAllocator& _arena;
 
-    RegistreStrategieEquation* _registreStrategieEquation;
+    RegistreExpression* _registreExpression;
 
     void initialiserRegistre();
 
 public: 
 
-    ConstructeurEquationFlottante(IConstructeurArbre* instructionBuilder, RegistreStrategieEquation* registreStrategieEquation, llvm::BumpPtrAllocator& arena);
+    ConstructeurEquationFlottante(IConstructeurArbre* instructionBuilder, RegistreExpression* registreExpression, llvm::BumpPtrAllocator& arena);
     
     ~ConstructeurEquationFlottante() = default;
 

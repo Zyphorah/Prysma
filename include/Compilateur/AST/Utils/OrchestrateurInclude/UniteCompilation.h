@@ -28,7 +28,6 @@ private:
     std::string _ancienRepertoire;
     std::string _repertoireCourant;
 
-    // --- Ajouts nécessaires pour la compilation et le passage de données ---
     RegistreFichier* _registreFichier;
     ContextGenCode* _context;
     INoeud* _arbre;
@@ -39,7 +38,7 @@ public:
     ~UniteCompilation();
 
     void passe1();
-    // Appelée APRÈS que tous les threads passe1 soient terminés.
+    // Appelée après que tous les threads passe1 soient terminés.
     // Remplit les registres locaux (fonction, variable) à partir du registre global complet.
     void passe2();
 

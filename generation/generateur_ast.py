@@ -2,6 +2,13 @@ import os
 from generation.moteur_generation import MoteurGeneration
 
 
+_CLES_METADONNEES_NOEUD = {
+    "parent",
+    "champs",
+    "moteur",
+}
+
+
 class GenerateurAST(MoteurGeneration):
 
     def __init__(self, racine_projet):
@@ -53,8 +60,14 @@ class GenerateurAST(MoteurGeneration):
             donnees = {}
         parent = donnees.get("parent", "INoeud")
         champs = donnees.get("champs", {})
+        if champs is None:
+            champs = {}
         if not champs and "parent" not in donnees:
-            champs = donnees
+            champs = {
+                cle: valeur
+                for cle, valeur in donnees.items()
+                if cle not in _CLES_METADONNEES_NOEUD
+            }
         return parent, champs
 
     def _trouver_debut_trailing_defaults(self, liste_champs):

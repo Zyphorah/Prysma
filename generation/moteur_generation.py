@@ -22,6 +22,9 @@ class MoteurGeneration:
             noeuds = yaml.safe_load(fichier).get("Noeud", {})
         return self._applatir_noeuds(noeuds)
 
+    def _charger_definitions_noeuds(self):
+        return self._charger_noeuds_yaml()
+
     def _charger_noeuds_yaml_par_categories(self):
         with open(self._fichier_yaml, "r", encoding="utf-8") as fichier:
             return yaml.safe_load(fichier).get("Noeud", {})
@@ -60,6 +63,28 @@ class MoteurGeneration:
             for nom_noeud in (noeuds or {}).keys():
                 mapping[nom_noeud] = categorie
         return mapping
+
+    def _resoudre_categorie_noeud(self, nom_noeud, donnees_noeud=None, cle_override=None, categorie_defaut="AnalyseSyntaxique"):
+        if donnees_noeud is not None and cle_override is not None and donnees_noeud.get(cle_override):
+            return donnees_noeud[cle_override]
+
+        definitions = self._charger_definitions_noeuds()
+        definition = donnees_noeud or definitions.get(nom_noeud, {})
+
+        if cle_override is not None and definition.get(cle_override):
+            return definition[cle_override]
+
+        return self._construire_mapping_noeud_categorie().get(nom_noeud, categorie_defaut)
+
+    @staticmethod
+    def _normaliser_moteurs(donnees_noeud):
+        moteurs = donnees_noeud.get("moteur", ["parseur"])
+        if isinstance(moteurs, str):
+            return [moteurs]
+        return list(moteurs)
+
+    def _a_moteur(self, donnees_noeud, moteur):
+        return moteur in self._normaliser_moteurs(donnees_noeud)
 
     @staticmethod
     def _extraire_traversables(champs):

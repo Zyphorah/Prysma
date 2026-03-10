@@ -1,0 +1,19 @@
+#ifndef EXPRESSION_{{nom | upper}}_H
+#define EXPRESSION_{{nom | upper}}_H
+
+#include "Compilateur/AST/Noeuds/Expression/IExpressionMoteur.h"
+#include "Compilateur/AST/Registre/ContexteExpression.h"
+
+class Expression{{nom}} : public IExpressionMoteur
+{
+private:
+    ContexteExpression& _contexteExpression;
+
+public:
+    Expression{{nom}}(ContexteExpression& contexteExpression);
+    ~Expression{{nom}}() override;
+
+    INoeud* construire(std::vector<Token>& equation) override;
+};
+
+#endif /* EXPRESSION_{{nom | upper}}_H */

@@ -1,26 +1,27 @@
 #include "Compilateur/AST/Utils/OrchestrateurInclude/FacadeConfigurationEnvironnement.h"
 
+#include "Compilateur/AST/Registre/ContexteExpression.h"
 #include "Compilateur/AST/Registre/ContextParseur.h"
 #include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/AST/Registre/Pile/RetourContexteCompilation.h"
 #include "Compilateur/AST/Registre/RegistreArgument.h"
-#include "Compilateur/AST/Registre/RegistreStrategieEquation.h"
+#include "Compilateur/AST/Registre/RegistreExpression.h"
 #include "Compilateur/AST/Registre/Types/TypeSimple.h"
 #include "Compilateur/AST/ConstructeurArbreInstruction.h"
 #include "Compilateur/Instruction/ParseurInclude.h"
 #include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
 #include "Compilateur/AnalyseSyntaxique/ParseurType.h"
 
-// Stratégies d'équation
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieLitteral.h"
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieIdentifiant.h"
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieRef.h"
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieUnRef.h"
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieNegation.h"
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieTableauInitialisation.h"
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieString.h"
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieAppelFonction.h"
-#include "Compilateur/AST/Noeuds/StrategieEquation/StrategieNew.h"
+// Expressions
+#include "Compilateur/Math/ExpressionLitteral.h"
+#include "Compilateur/Variable/ExpressionIdentifiant.h"
+#include "Compilateur/Variable/ExpressionRefVariable.h"
+#include "Compilateur/Variable/ExpressionUnRefVariable.h"
+#include "Compilateur/Math/ExpressionNegation.h"
+#include "Compilateur/Math/ExpressionString.h"
+#include "Compilateur/Tableau/ExpressionTableauInitialisation.h"
+#include "Compilateur/Fonction/ExpressionAppelFonction.h"
+#include "Compilateur/Instruction/ExpressionNew.h"
 
 // Parseurs d'instructions
 #include "Compilateur/Fonction/ParseurDeclarationFonction.h"
@@ -43,11 +44,12 @@
 FacadeConfigurationEnvironnement::FacadeConfigurationEnvironnement(RegistreFonctionGlobale* registreFonctionGlobale, RegistreFichier* registreFichier)
     : _registreFonctionGlobale(registreFonctionGlobale),
       _registreFichier(registreFichier),
-      _registreStrategieEquation(nullptr),
+    _registreExpression(nullptr),
       _constructeurArbreInstruction(nullptr),
       _constructeurEquation(nullptr),
       _parseurType(nullptr),
-      _contextParseur(nullptr)
+    _contextParseur(nullptr),
+    _contexteExpression(nullptr)
 {
 }
 
@@ -57,7 +59,7 @@ void FacadeConfigurationEnvironnement::initialiser(const std::string& cheminFich
     creerContexte(cheminFichier);
     enregistrerFonctionsExternes();
     enregistrerTypesDeBase();
-    enregistrerStrategiesEquation();
+    enregistrerExpressions();
     enregistrerInstructions();
 }
 
@@ -179,16 +181,16 @@ void FacadeConfigurationEnvironnement::creerContextParseur()
     );
 }
 
-void FacadeConfigurationEnvironnement::enregistrerStrategiesEquation()
+void FacadeConfigurationEnvironnement::enregistrerExpressions()
 {
     // Construire les chef d'orchestre de l'arbre syntaxique abstrait
     _constructeurArbreInstruction = new (_arena)
         ConstructeurArbreInstruction(_context->registreInstruction, _arena);
 
-    _registreStrategieEquation = new (_arena.Allocate<RegistreStrategieEquation>()) RegistreStrategieEquation();
+    _registreExpression = new (_arena.Allocate<RegistreExpression>()) RegistreExpression();
 
     _constructeurEquation = new (_arena)
-        ConstructeurEquationFlottante(_constructeurArbreInstruction, _registreStrategieEquation, _arena);
+        ConstructeurEquationFlottante(_constructeurArbreInstruction, _registreExpression, _arena);
 
     // Créer le ParseurType avec le registre
     _parseurType = new (_arena.Allocate<ParseurType>())
@@ -198,41 +200,48 @@ void FacadeConfigurationEnvironnement::enregistrerStrategiesEquation()
         creerContextParseur();
     }
 
-    // Enregistrer les stratégies d'équation
-    auto* stratLitInt = new (_arena.Allocate<StrategieLitteral>()) StrategieLitteral(_arena);
-    _registreStrategieEquation->enregistrer(TOKEN_LIT_INT, stratLitInt);
+    _contexteExpression = new (_arena.Allocate<ContexteExpression>()) ContexteExpression(
+        _constructeurEquation->recupererConstructeurArbre(),
+        _constructeurArbreInstruction,
+        _parseurType,
+        _contextParseur,
+        _arena,
+        _registreVariable.get(),
+        _registreType.get()
+    );
 
-    auto* stratLitFloat = new (_arena.Allocate<StrategieLitteral>()) StrategieLitteral(_arena);
-    _registreStrategieEquation->enregistrer(TOKEN_LIT_FLOAT, stratLitFloat);
+    auto* exprLitInt = new (_arena.Allocate<ExpressionLitteral>()) ExpressionLitteral(*_contexteExpression);
+    _registreExpression->enregistrer(TOKEN_LIT_INT, exprLitInt);
 
-    auto* stratLitBool = new (_arena.Allocate<StrategieLitteral>()) StrategieLitteral(_arena);
-    _registreStrategieEquation->enregistrer(TOKEN_LIT_BOLEEN, stratLitBool);
+    auto* exprLitFloat = new (_arena.Allocate<ExpressionLitteral>()) ExpressionLitteral(*_contexteExpression);
+    _registreExpression->enregistrer(TOKEN_LIT_FLOAT, exprLitFloat);
 
-    auto* stratIdent = new (_arena.Allocate<StrategieIdentifiant>()) StrategieIdentifiant(_constructeurEquation);
-    _registreStrategieEquation->enregistrer(TOKEN_IDENTIFIANT, stratIdent);
+    auto* exprLitBool = new (_arena.Allocate<ExpressionLitteral>()) ExpressionLitteral(*_contexteExpression);
+    _registreExpression->enregistrer(TOKEN_LIT_BOLEEN, exprLitBool);
 
-    auto* stratRef = new (_arena.Allocate<StrategieRef>()) StrategieRef(_arena);
-    _registreStrategieEquation->enregistrer(TOKEN_REF, stratRef);
+    auto* exprIdentifiant = new (_arena.Allocate<ExpressionIdentifiant>()) ExpressionIdentifiant(*_contexteExpression);
+    _registreExpression->enregistrer(TOKEN_IDENTIFIANT, exprIdentifiant);
 
-    auto* stratUnRef = new (_arena.Allocate<StrategieUnRef>()) StrategieUnRef(_arena);
-    _registreStrategieEquation->enregistrer(TOKEN_UNREF, stratUnRef);
+    auto* exprRef = new (_arena.Allocate<ExpressionRefVariable>()) ExpressionRefVariable(*_contexteExpression);
+    _registreExpression->enregistrer(TOKEN_REF, exprRef);
 
-    auto* stratNeg = new (_arena.Allocate<StrategieNegation>()) StrategieNegation(_constructeurEquation);
-    _registreStrategieEquation->enregistrer(TOKEN_NON, stratNeg);
+    auto* exprUnRef = new (_arena.Allocate<ExpressionUnRefVariable>()) ExpressionUnRefVariable(*_contexteExpression);
+    _registreExpression->enregistrer(TOKEN_UNREF, exprUnRef);
 
-    auto* stratTab = new (_arena.Allocate<StrategieTableauInitialisation>()) StrategieTableauInitialisation(_constructeurEquation->recupererConstructeurArbre());
-    _registreStrategieEquation->enregistrer(TOKEN_CROCHET_OUVERT, stratTab);
+    auto* exprNeg = new (_arena.Allocate<ExpressionNegation>()) ExpressionNegation(*_contexteExpression);
+    _registreExpression->enregistrer(TOKEN_NON, exprNeg);
 
-    auto* stratString = new (_arena.Allocate<StrategieString>()) StrategieString(_arena);
-    _registreStrategieEquation->enregistrer(TOKEN_GUILLEMET, stratString);
+    auto* exprString = new (_arena.Allocate<ExpressionString>()) ExpressionString(*_contexteExpression);
+    _registreExpression->enregistrer(TOKEN_GUILLEMET, exprString);
 
-    // Ajouter la stratégie TOKEN_CALL
-    auto* stratCall = new (_arena.Allocate<StrategieAppelFonction>()) StrategieAppelFonction(*_contextParseur);
-    _registreStrategieEquation->enregistrer(TOKEN_CALL, stratCall);
+    auto* exprTab = new (_arena.Allocate<ExpressionTableauInitialisation>()) ExpressionTableauInitialisation(*_contexteExpression);
+    _registreExpression->enregistrer(TOKEN_CROCHET_OUVERT, exprTab);
 
-    // Ajouter la stratégie TOKEN_NEW
-    auto* stratNew = new (_arena.Allocate<StrategieNew>()) StrategieNew(_arena);
-    _registreStrategieEquation->enregistrer(TOKEN_NEW, stratNew);
+    auto* exprCall = new (_arena.Allocate<ExpressionAppelFonction>()) ExpressionAppelFonction(*_contexteExpression);
+    _registreExpression->enregistrer(TOKEN_CALL, exprCall);
+
+    auto* exprNew = new (_arena.Allocate<ExpressionNew>()) ExpressionNew(*_contexteExpression);
+    _registreExpression->enregistrer(TOKEN_NEW, exprNew);
 }
 
 void FacadeConfigurationEnvironnement::enregistrerInstructions()

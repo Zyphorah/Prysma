@@ -50,7 +50,6 @@ set(MAIN_SOURCES
     # AnalyseSyntaxique
     ../src/Compilateur/AnalyseSyntaxique/Equation/ChaineResponsabilite.cpp
     ../src/Compilateur/AnalyseSyntaxique/Equation/GestionnaireOperateur.cpp
-    ../src/Compilateur/AnalyseSyntaxique/Instruction/ParseurEquation.cpp
     ../src/Compilateur/AnalyseSyntaxique/Equation/ServiceParenthese.cpp
     ../src/Compilateur/AnalyseSyntaxique/Fonction/ParseurAppelFonction.cpp
     ../src/Compilateur/AnalyseSyntaxique/Fonction/ParseurArgFonction.cpp
@@ -72,16 +71,16 @@ set(MAIN_SOURCES
     # Noeuds
     ../src/Compilateur/AST/Noeuds/NoeudInstruction.cpp
     # Tableau
-    # StrategieEquation
-    ../src/Compilateur/AST/Noeuds/StrategieEquation/StrategieAppelFonction.cpp
-    ../src/Compilateur/AST/Noeuds/StrategieEquation/StrategieRef.cpp
-    ../src/Compilateur/AST/Noeuds/StrategieEquation/StrategieTableauInitialisation.cpp
-    ../src/Compilateur/AST/Noeuds/StrategieEquation/StrategieUnRef.cpp
-    ../src/Compilateur/AST/Noeuds/StrategieEquation/StrategieNegation.cpp
-    ../src/Compilateur/AST/Noeuds/StrategieEquation/StrategieLitteral.cpp
-    ../src/Compilateur/AST/Noeuds/StrategieEquation/StrategieIdentifiant.cpp
-    ../src/Compilateur/AST/Noeuds/StrategieEquation/StrategieString.cpp
-    ../src/Compilateur/AST/Noeuds/StrategieEquation/StrategieNew.cpp
+    # Expressions
+    ../src/Compilateur/AST/Noeuds/Expression/Fonction/ExpressionAppelFonction.cpp
+    ../src/Compilateur/AST/Noeuds/Expression/Variable/ExpressionRefVariable.cpp
+    ../src/Compilateur/AST/Noeuds/Expression/Variable/ExpressionUnRefVariable.cpp
+    ../src/Compilateur/AST/Noeuds/Expression/Variable/ExpressionIdentifiant.cpp
+    ../src/Compilateur/AST/Noeuds/Expression/Tableau/ExpressionTableauInitialisation.cpp
+    ../src/Compilateur/AST/Noeuds/Expression/Math/ExpressionNegation.cpp
+    ../src/Compilateur/AST/Noeuds/Expression/Math/ExpressionLitteral.cpp
+    ../src/Compilateur/AST/Noeuds/Expression/Math/ExpressionString.cpp
+    ../src/Compilateur/AST/Noeuds/Expression/Instruction/ExpressionNew.cpp
     # Registres
     ../src/Compilateur/AST/Registre/RegistreArgument.cpp
     ../src/Compilateur/AST/Registre/RegistreVariable.cpp

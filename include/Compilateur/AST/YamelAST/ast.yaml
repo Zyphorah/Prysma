@@ -1,58 +1,73 @@
 Noeud:
   Fonction:
     AppelFonction:
+      moteur: [parseur, expression]
       parent: "NoeudInstruction"
       champs:
         nomFonction: "Token"
     ArgFonction:
+      moteur: [parseur]
       champs:
         type: "IType*"
         nom: "std::string"
     DeclarationFonction:
+      moteur: [parseur]
       champs:
         typeRetour: "IType*"
         nom: "std::string"
         arguments: "std::vector<INoeud*>"
         corps: "INoeud*"
     Retour:
+      moteur: [parseur]
       champs:
         valeurRetour: "INoeud*"
 
   Variable:
     AffectationVariable:
+      moteur: [parseur]
       champs:
         nom: "std::string"
         expression: "INoeud*"
         token: "Token"
     DeclarationVariable:
+      moteur: [parseur]
       champs:
         nom: "std::string"
         type: "IType*"
         expression: "INoeud*"  
     RefVariable:
+      moteur: [parseur, expression]
       champs:
         nomVariable: "std::string"
     UnRefVariable:
+      moteur: [parseur, expression]
       champs:
         nomVariable: "std::string"
+    Identifiant:
+      moteur: [expression]
+      champs: {}
 
   Tableau:
     AffectationTableau:
+      moteur: []
       champs:
         nom: "std::string"
         expressionIndex: "INoeud*"
         expression: "INoeud*"
         token: "Token"
     TableauInitialisation:
+      moteur: [expression]
       champs:
         elements: "std::vector<INoeud*>"
     LectureTableau:
+      moteur: []
       champs:
         indexEquation: "INoeud*"
         nomTableau: "Token"
 
   Instruction:
     If:
+      moteur: [parseur]
       parent: "NoeudInstruction"
       champs:
         noeudCondition: "INoeud*"
@@ -61,23 +76,28 @@ Noeud:
         noeudBlocEndif: "INoeud*"
 
     While:
+      moteur: [parseur]
       parent: "NoeudInstruction"
       champs:
         noeudCondition: "INoeud*"
         noeudBlocWhile: "INoeud*"
         noeudBlocFinWhile: "INoeud*"
     New:
+      moteur: [expression]
       champs:
         nomType: "Token"
     Delete:
+      moteur: [parseur]
       champs:
         nomType: "Token"
     Include:
+      moteur: [parseur]
       champs:
         path: "std::string"
         
   Math:
     Operation:
+      moteur: []
       parent: "IExpression"
       champs:
         token: "Token"
@@ -85,13 +105,15 @@ Noeud:
         droite: "INoeud*"
 
     Litteral:
+      moteur: [expression]
       champs:
         token: "Token"
 
     Negation:
+      moteur: [expression]
       champs:
         operateur: "Token"
         operande: "INoeud*"
-
-# moteur : strategie 
-# moteur : parseur
+    String:
+      moteur: [expression]
+      champs: {}
