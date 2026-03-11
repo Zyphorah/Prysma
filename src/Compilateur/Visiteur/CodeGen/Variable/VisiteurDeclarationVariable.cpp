@@ -10,16 +10,12 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
 {
     GestionVariable gestionVariable(_contextGenCode);
     INoeud* expression = noeudDeclarationVariable->getExpression();
-    
-    // L'utilisation de dynamic_cast ici est un peu délicate, 
-    // pour le moment je n'ai pas trouvé de solution optimal pour retirer ça, sinon je dois dépendre de llvm dans les INoeud, ce qui n'est pas idéal.
-    // Le double dispatch est compliqué à mettre en place et ajouter une dépendance dans le context de génération du code 
-    // Je dois trouver une solution pour éviter ce dynamic_cast, sans avoir c'est problème architectural. 
-    // Sans doute utiliser un système de stratégie s'il y a plus de 2 types d'initialisation aussi. 
-    // Beaucoup trop de static cast, je dois faire quelque chose pour éviter ça, c'est vraiment pas propre.
-    
+       
     // Vérifier si l'expression est une initialisation de tableau
-    NoeudTableauInitialisation* tableauInit = dynamic_cast<NoeudTableauInitialisation*>(expression);
+    NoeudTableauInitialisation* tableauInit = nullptr;
+    if (expression != nullptr && expression->getTypeGenere() == NoeudTypeGenere::TableauInitialisation) {
+        tableauInit = static_cast<NoeudTableauInitialisation*>(expression);
+    }
     
     llvm::AllocaInst* allocaCree = nullptr; 
     
@@ -28,7 +24,11 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
         llvm::Type* typeVariable = nullptr;
         llvm::Type* typeElement = nullptr;
         
-        TypeTableau* typeTableauDecl = dynamic_cast<TypeTableau*>(noeudDeclarationVariable->getType());
+        IType* typeDecl = noeudDeclarationVariable->getType();
+        TypeTableau* typeTableauDecl = nullptr;
+        if (typeDecl != nullptr && typeDecl->estTableau()) {
+            typeTableauDecl = static_cast<TypeTableau*>(typeDecl);
+        }
         
         if (typeTableauDecl != nullptr && typeTableauDecl->getTaille() == nullptr) {
             size_t tailleReelle = tableauInit->getElements().size();
@@ -88,7 +88,11 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
         
         // Si on a un tableau avec taille dynamique (nullptr), on doit utiliser le type réel qu'on a calculé
         if (typeVariable == nullptr) {
-            TypeTableau* typeTableauDecl = dynamic_cast<TypeTableau*>(noeudDeclarationVariable->getType());
+            IType* typeDecl = noeudDeclarationVariable->getType();
+            TypeTableau* typeTableauDecl = nullptr;
+            if (typeDecl != nullptr && typeDecl->estTableau()) {
+                typeTableauDecl = static_cast<TypeTableau*>(typeDecl);
+            }
             if (typeTableauDecl != nullptr && tableauInit != nullptr) {
                 // On peut recalculer à partir de l'initialisation
                 size_t tailleReelle = tableauInit->getElements().size();

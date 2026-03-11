@@ -14,6 +14,7 @@ public:
     virtual bool estFlottant() const = 0;
     virtual bool estBooleen() const = 0;
     virtual bool estChaine() const = 0;
+    virtual bool estTableau() const = 0;
 };
 
 

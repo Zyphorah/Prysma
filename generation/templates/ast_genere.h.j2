@@ -11,6 +11,13 @@
 #include <utility>
 #include "Compilateur/AST/Registre/Types/IType.h"
 
+// Enum généré dynamiquement pour tous les noeuds AST
+enum class NoeudTypeGenere {
+{%- for classe in classes %}
+    {{ classe.nom }},
+{%- endfor %}
+};
+
 {% for nom in noeuds_noms %}
 class Noeud{{ nom }};
 {% endfor %}
@@ -18,6 +25,7 @@ class Noeud{{ nom }};
 {% for classe in classes %}
 class Noeud{{ classe.nom }} : public {{ classe.parent }} {
 private:
+    NoeudTypeGenere noeudTypeGenere = NoeudTypeGenere::{{ classe.nom }};
 {% for nom_champ, type_champ in classe.champs.items() %}
     {{ type_champ }} _{{ nom_champ }};
 {% endfor %}
@@ -31,6 +39,10 @@ public:
 
     void accept(IVisiteur* visiteur) override {
         visiteur->visiter(this);
+    }
+
+    [[nodiscard]] NoeudTypeGenere getTypeGenere() const override {
+        return noeudTypeGenere;
     }
 {%- if classe.parent == 'IExpression' %}
 
@@ -46,7 +58,7 @@ public:
 {%- endif %}
 
 {% for nom_champ, type_champ in classe.champs.items() %}
-    {{ classe.getters[nom_champ] }} get{{ nom_champ[0]|upper }}{{ nom_champ[1:] }}() const { return _{{ nom_champ }}; }
+    [[nodiscard]] {{ classe.getters[nom_champ] }} get{{ nom_champ[0]|upper }}{{ nom_champ[1:] }}() const { return _{{ nom_champ }}; }
 {% endfor %}
 };
 

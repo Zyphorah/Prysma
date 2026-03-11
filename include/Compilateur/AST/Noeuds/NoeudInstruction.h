@@ -3,6 +3,8 @@
 #include "Compilateur/AST/Noeuds/Interfaces/IInstruction.h"
 #include <vector>
 
+enum class NoeudTypeGenere;
+
 class NoeudInstruction: public IInstruction
 {
 protected: 
@@ -14,6 +16,8 @@ public:
 
     void accept(IVisiteur* visiteur) override;
     void ajouterInstruction(INoeud* enfant) override;
+    
+    [[nodiscard]] NoeudTypeGenere getTypeGenere() const override;
     
     [[nodiscard]] const std::vector<INoeud*>& getEnfants() const { return enfants; }
 };

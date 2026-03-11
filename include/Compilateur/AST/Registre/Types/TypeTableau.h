@@ -18,6 +18,7 @@ public:
     bool estFlottant() const override;
     bool estBooleen() const override;
     bool estChaine() const override;
+    bool estTableau() const override { return true; }
 
     IType* getTypeEnfant() const { return _typeEnfant; }
     INoeud* getTaille() const { return _taille; }

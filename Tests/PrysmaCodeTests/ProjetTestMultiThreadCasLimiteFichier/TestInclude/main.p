@@ -14,7 +14,7 @@ fn int32 main()
     call print(ref titreValidation); call backSlashN();
     call executerTestsValidation();
 
-    dec string[] fin = "=== Fin ===";
-    call print(ref fin); call backSlashN();
+    dec string[] msgFin = "=== Fin ===";
+    call print(ref msgFin); call backSlashN();
     return 0;
 }

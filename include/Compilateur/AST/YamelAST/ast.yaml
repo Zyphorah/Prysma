@@ -65,6 +65,20 @@ Noeud:
         indexEquation: "INoeud*"
         nomTableau: "Token"
 
+  objet:
+    Class:
+      moteur: [parseur, expression]
+      champs: 
+        Heritage: "std::vector<INoeud*>"
+        listVariable: "std::vector<INoeud*>"
+        listFonction: "std::vector<INoeud*>"
+        listVariablePrive: "std::vector<INoeud*>"
+        listFonctionPrive: "std::vector<INoeud*>"
+        listVariableProtected: "std::vector<INoeud*>"
+        listFonctionProtected: "std::vector<INoeud*>"
+        constructeur: "std::vector<INoeud*>"
+        nomClass: "Token"
+
   Instruction:
     If:
       moteur: [parseur]
@@ -94,6 +108,7 @@ Noeud:
       moteur: [parseur]
       champs:
         path: "std::string"
+    
         
   Math:
     Operation:
@@ -117,3 +132,4 @@ Noeud:
     String:
       moteur: [expression]
       champs: {}
+    

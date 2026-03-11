@@ -16,6 +16,7 @@ public:
     bool estFlottant() const override;
     bool estBooleen() const override;
     bool estChaine() const override;
+    bool estTableau() const override { return false; }
 };
 
 #endif /* D3CF3339_1CBC_4EEE_9EE7_B2E99140A4CB */

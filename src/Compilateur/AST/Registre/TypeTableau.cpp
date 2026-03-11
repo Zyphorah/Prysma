@@ -19,7 +19,12 @@ llvm::Type* TypeTableau::genererTypeLLVM(llvm::LLVMContext& context)
         return nullptr;
     }
 
-    auto* litteral = dynamic_cast<NoeudLitteral*>(_taille);
+    NoeudLitteral* litteral = nullptr;
+
+    if (_taille->getTypeGenere() == NoeudTypeGenere::Litteral) {
+        litteral = static_cast<NoeudLitteral*>(_taille);
+    }
+    
     if (litteral == nullptr) {
         throw std::runtime_error("Erreur : la taille du tableau doit être un littéral entier");
     }

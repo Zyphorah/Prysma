@@ -48,7 +48,11 @@ class Lexer {
         {"include", TOKEN_INCLUDE},
         {"new", TOKEN_NEW},
         {"ptr",TOKEN_TYPE_PTR},
-        {"delete", TOKEN_DELETE}
+        {"delete", TOKEN_DELETE},
+        {"class", TOKEN_CLASS},
+        {"public", TOKEN_PUBLIC},
+        {"private", TOKEN_PRIVATE},
+        {"fin", TOKEN_FIN}
         
     };
 
