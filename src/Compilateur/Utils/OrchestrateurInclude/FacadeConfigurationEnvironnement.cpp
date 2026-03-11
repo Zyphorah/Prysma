@@ -37,6 +37,7 @@
 #include "Compilateur/Instruction/ParseurWhile.h"
 
 #include "Compilateur/Lexer/TokenType.h"
+#include "Compilateur/objet/ParseurClass.h"
 
 #include <llvm-18/llvm/IR/DerivedTypes.h>
 #include <llvm-18/llvm/IR/Instructions.h>
@@ -300,6 +301,9 @@ void FacadeConfigurationEnvironnement::enregistrerInstructions()
 
     auto* parsDelete = new (_arena.Allocate<ParseurDelete>()) ParseurDelete(*_contextParseur);
     _context->registreInstruction->enregistrer(TOKEN_DELETE, parsDelete);
+
+    auto* parsClass = new (_arena.Allocate<ParseurClass>()) ParseurClass(*_contextParseur);
+    _context->registreInstruction->enregistrer(TOKEN_CLASS, parsClass);
 }
 
 ContextGenCode* FacadeConfigurationEnvironnement::getContext() const

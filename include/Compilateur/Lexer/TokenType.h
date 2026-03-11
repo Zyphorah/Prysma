@@ -72,6 +72,7 @@ enum TokenType {
     TOKEN_CLASS,
     TOKEN_PUBLIC,
     TOKEN_PRIVATE,
+    TOKEN_PROTECTED,
     TOKEN_FIN,
 
     // new
