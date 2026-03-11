@@ -66,6 +66,7 @@ set(MAIN_SOURCES
     ../src/Compilateur/AnalyseSyntaxique/Instruction/ParseurWhile.cpp
     ../src/Compilateur/AnalyseSyntaxique/Instruction/ParseurInclude.cpp
     ../src/Compilateur/AnalyseSyntaxique/Instruction/ParseurDelete.cpp
+    ../src/Compilateur/AnalyseSyntaxique/objet/ParseurClass.cpp
     # ConstructeurArbre
     ../src/Compilateur/AST/ConstructeurArbreEquation.cpp
     ../src/Compilateur/AST/ConstructeurArbreInstruction.cpp
