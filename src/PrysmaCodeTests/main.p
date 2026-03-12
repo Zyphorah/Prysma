@@ -1,15 +1,15 @@
 
-class animal
+class Animal
 {
 
    public:
 
-      fn void animal()
+      fn void Animal()
       {
 
       }
 
-      fn void crier(string[] crie)
+      fn void crier(arg string[] crie)
       {
          call print(crie);
       }
@@ -20,7 +20,7 @@ class animal
 class Chien 
 { 
    private: 
-      dec ptr animal = new animal();
+     // dec ptr animal = new Animal();
       
       dec string[] crie = " ";
 
@@ -40,18 +40,17 @@ class Chien
 
       fn void crier()
       {
-         animal.crier(crie);
+         //animal.crier(crie);
       }
    fin;
 }
 
 
-
 fn int32 main() 
 {
-   dec NomClasse objet = new NomClasse(42, "Hello");
+   //dec ptr Chien = new Chien();
 
-   call objet.methodePrint();
+  // call objet.methodePrint();
 
    return 0;
 }

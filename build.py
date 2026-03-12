@@ -25,8 +25,8 @@ def main():
     shutil.rmtree(os.path.join("build", "obj"), ignore_errors=True)
 
     nb_coeurs = str(os.cpu_count() or 1)
-    cxxflags = "-Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wconversion -Wsign-conversion -Wnull-dereference -Wformat=2 -Werror"
-
+    cxxflags = "-g -O0 -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wconversion -Wsign-conversion -Wnull-dereference -Wformat=2 -Werror"
+    
     BuildManager.executer_commande([
         "bear", "--output", "build/compile_commands.json", "--", 
         "make", f"-j{nb_coeurs}", 

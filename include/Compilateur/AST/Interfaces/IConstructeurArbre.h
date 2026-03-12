@@ -5,8 +5,6 @@
 #include "Compilateur/Lexer/Lexer.h"
 #include "llvm/Support/Allocator.h"
 #include <cstddef>
-#include <memory>
-#include <new>
 #include <utility>
 
 class IConstructeurArbre
@@ -25,6 +23,17 @@ public:
 
     void* operator new(size_t taille, llvm::BumpPtrAllocator& arena) {
         return arena.Allocate(taille, 8); 
+    }
+    
+    static void operator delete(void* ptr, llvm::BumpPtrAllocator& allocator) {
+        // On ne fait rien ici ! 
+        // Le BumpPtrAllocator libère toute la mémoire d'un coup à sa destruction.
+        (void)ptr;
+        (void)allocator;
+    }
+    static void operator delete(void* ptr) {
+        // On ne fait rien ! C'est le BumpPtrAllocator qui libérera la mémoire à la fin.
+        (void)ptr;
     }
 };
 
