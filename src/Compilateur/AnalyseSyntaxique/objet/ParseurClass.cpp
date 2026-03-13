@@ -9,17 +9,6 @@
 
 namespace
 {
-  Token consommerSectionClasse(std::vector<Token>& tokens, int& index, TokenType typeAttendu, const std::string& messageErreur)
-  {
-    if (index < 0 || index >= static_cast<int>(tokens.size()) || tokens[static_cast<size_t>(index)].type != typeAttendu) {
-      if (index >= 0 && index < static_cast<int>(tokens.size())) {
-        throw ErreurCompilation(messageErreur, tokens[static_cast<size_t>(index)].ligne, tokens[static_cast<size_t>(index)].colonne);
-      }
-      throw ErreurCompilation(messageErreur, 1, 1);
-    }
-    return tokens[static_cast<size_t>(index++)];
-  }
-
   void classerNoeudClasse(INoeud* noeud,
               const Token& nomClasseToken,
               std::vector<INoeud*>& variables,
@@ -57,16 +46,13 @@ namespace
                std::vector<INoeud*>& constructeurs)
   {
     while (index < static_cast<int>(tokens.size())
-      && tokens[static_cast<size_t>(index)].type != TOKEN_FIN
       && tokens[static_cast<size_t>(index)].type != TOKEN_PUBLIC
       && tokens[static_cast<size_t>(index)].type != TOKEN_PRIVATE
+      && tokens[static_cast<size_t>(index)].type != TOKEN_PROTECTED
       && tokens[static_cast<size_t>(index)].type != TOKEN_ACCOLADE_FERMEE) {
       INoeud* noeud = contextParseur.constructeurArbreInstruction->construire(tokens, index);
       classerNoeudClasse(noeud, nomClasseToken, variables, fonctions, constructeurs);
     }
-
-    consommerSectionClasse(tokens, index, TOKEN_FIN, "Attendu 'fin' pour terminer la section de classe.");
-    consommerSectionClasse(tokens, index, TOKEN_POINT_VIRGULE, "Attendu ';' après 'fin' dans la section de classe.");
   }
 }
 
@@ -78,7 +64,7 @@ ParseurClass::ParseurClass(ContextParseur& contextParseur)
 ParseurClass::~ParseurClass()
 {}
 
-// Exemple: class NomClasse 
+// Exemple: class NomClasse : parent
 //          { 
 //              private: 
 //                  dec int64 attributPrive;
@@ -88,7 +74,6 @@ ParseurClass::~ParseurClass()
 //                      aff attributPrive = parametre;
 //                      aff attributPrive2 = parametre2;
 //                  }
-//              fin;
 //              public:
 //                  fn void NomClasse(arg int64 parametre, arg string parametre2)
 //                  {
@@ -100,7 +85,6 @@ ParseurClass::~ParseurClass()
 //                      aff attributPrive = parametre;
 //                      aff attributPrive2 = parametre2;
 //                  }
-//              fin;
 //           }
 
 INoeud* ParseurClass::parser(std::vector<Token>& tokens, int& index)
@@ -108,9 +92,18 @@ INoeud* ParseurClass::parser(std::vector<Token>& tokens, int& index)
     consommer(tokens, index, TOKEN_CLASS, "Attendu 'class' au début de la déclaration de classe.");
     Token nomClasseToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Attendu un identifiant après 'class' pour le nom de la classe.");
     
-    consommer(tokens, index, TOKEN_ACCOLADE_OUVERTE, "Attendu '{' après le nom de la classe.");
-
+    // Gestion de l'héritage : class NomClasse : Parent
     std::vector<INoeud*> heritage;
+    if (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type == TOKEN_DEUX_POINTS) {
+        consommer(tokens, index, TOKEN_DEUX_POINTS, "Attendu ':' pour l'héritage.");
+        Token parentToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Attendu un identifiant après ':' pour le nom de la classe parente.");
+        
+        // Créer un noeud identifiant pour le parent avec son nom
+        auto* noeudParent = _contextParseur.constructeurArbreInstruction->allouer<NoeudIdentifiant>(parentToken);
+        heritage.push_back(noeudParent);
+    }
+    
+    consommer(tokens, index, TOKEN_ACCOLADE_OUVERTE, "Attendu '{' après le nom de la classe.");
     std::vector<INoeud*> listVariable;
     std::vector<INoeud*> listFonction;
     std::vector<INoeud*> listVariablePrive;
@@ -119,28 +112,43 @@ INoeud* ParseurClass::parser(std::vector<Token>& tokens, int& index)
     std::vector<INoeud*> listFonctionProtected;
     std::vector<INoeud*> constructeurs;
 
+    // Par défaut, on commence en section PRIVATE si pas de mot-clé de visibilité
+    std::vector<INoeud*>* currentListVariable = &listVariablePrive;
+    std::vector<INoeud*>* currentListFonction = &listFonctionPrive;
+
     while (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != TOKEN_ACCOLADE_FERMEE) {
         TokenType tokenType = tokens[static_cast<size_t>(index)].type;
 
         if (tokenType == TOKEN_PUBLIC) {
             consommer(tokens, index, TOKEN_PUBLIC, "Attendu 'public' pour la section publique de la classe.");
+            consommer(tokens, index, TOKEN_DEUX_POINTS, "Attendu ':' après 'public'.");
             parserSectionClasse(tokens, index, nomClasseToken, _contextParseur, listVariable, listFonction, constructeurs);
+            currentListVariable = &listVariable;
+            currentListFonction = &listFonction;
             continue;
         }
 
         if (tokenType == TOKEN_PRIVATE) {
             consommer(tokens, index, TOKEN_PRIVATE, "Attendu 'private' pour la section privée de la classe.");
+            consommer(tokens, index, TOKEN_DEUX_POINTS, "Attendu ':' après 'private'.");
             parserSectionClasse(tokens, index, nomClasseToken, _contextParseur, listVariablePrive, listFonctionPrive, constructeurs);
+            currentListVariable = &listVariablePrive;
+            currentListFonction = &listFonctionPrive;
             continue;
         }
 
         if (tokenType == TOKEN_PROTECTED) {
           consommer(tokens, index, TOKEN_PROTECTED, "Attendu 'protected' pour la section protégée de la classe.");
+          consommer(tokens, index, TOKEN_DEUX_POINTS, "Attendu ':' après 'protected'.");
           parserSectionClasse(tokens, index, nomClasseToken, _contextParseur, listVariableProtected, listFonctionProtected, constructeurs);
+          currentListVariable = &listVariableProtected;
+          currentListFonction = &listFonctionProtected;
           continue;
         }
 
-        throw ErreurCompilation("Section de classe invalide.", tokens[static_cast<size_t>(index)].ligne, tokens[static_cast<size_t>(index)].colonne);
+        // Si aucun mot-clé de visibilité, on parse les membres dans la section courante (private par défaut)
+        INoeud* noeud = _contextParseur.constructeurArbreInstruction->construire(tokens, index);
+        classerNoeudClasse(noeud, nomClasseToken, *currentListVariable, *currentListFonction, constructeurs);
     }
 
     consommer(tokens, index, TOKEN_ACCOLADE_FERMEE, "Attendu '}' à la fin de la déclaration de classe.");

@@ -163,6 +163,9 @@ void Lexer::traiterDelimiteurs(char current, vector<Token>& tokens, int ligne, i
         case ';': 
             tokens.push_back({TOKEN_POINT_VIRGULE, ";", ligne, colonne}); 
             break;
+        case ':':
+            tokens.push_back({TOKEN_DEUX_POINTS, ":", ligne, colonne});
+            break;
         case ',': 
             tokens.push_back({TOKEN_VIRGULE, ",", ligne, colonne}); 
             break;

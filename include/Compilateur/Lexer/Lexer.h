@@ -53,7 +53,6 @@ class Lexer {
         {"public", TOKEN_PUBLIC},
         {"private", TOKEN_PRIVATE},
         {"protected",TOKEN_PROTECTED},
-        {"fin", TOKEN_FIN},
         
     };
 

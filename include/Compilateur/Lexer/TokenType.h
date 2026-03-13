@@ -39,6 +39,7 @@ enum TokenType {
     TOKEN_CROCHET_FERME,
     TOKEN_POINT,
     TOKEN_POINT_VIRGULE,
+    TOKEN_DEUX_POINTS,
     TOKEN_VIRGULE,      
     TOKEN_GUILLEMET,
     
@@ -74,7 +75,6 @@ enum TokenType {
     TOKEN_PUBLIC,
     TOKEN_PRIVATE,
     TOKEN_PROTECTED,
-    TOKEN_FIN,
 
     // new
     TOKEN_NEW,

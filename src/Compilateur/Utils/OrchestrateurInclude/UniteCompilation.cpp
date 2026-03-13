@@ -8,6 +8,7 @@
 #include "Compilateur/LLVM/LlvmSerializer.h"
 #include "Compilateur/Visiteur/ASTGraphViz/VisiteurGeneralGraphViz.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
+#include "Compilateur/Visiteur/VisiteurRemplissageCorpsClass/VisiteurRemplissageCorpsClass.h"
 #include "Compilateur/Visiteur/VisiteurRemplissageRegistre/VisiteurRemplissageRegistre.h"
 #include <llvm-18/llvm/IR/DerivedTypes.h>
 #include <llvm-18/llvm/IR/Instructions.h>
@@ -72,6 +73,8 @@ void UniteCompilation::passe1() {
 
     VisiteurRemplissageRegistre visiteurRemplissageRegistre(_context, _orchestrateur);
     _arbre->accept(&visiteurRemplissageRegistre);
+    VisiteurRemplissageCoprsClass visiteurRemplissageCorpsClass(_context);
+    _arbre->accept(&visiteurRemplissageCorpsClass);
 }
 
 void UniteCompilation::passe2() {

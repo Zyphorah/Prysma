@@ -1,4 +1,3 @@
-
 class Animal
 {
 
@@ -6,7 +5,6 @@ class Animal
 
       fn void Animal()
       {
-
       }
 
       fn void crier(arg string[] crie)
@@ -29,8 +27,6 @@ class Chien
          call print("Woof!");
       }
 
-   fin;
-
    public:
 
       fn void Chien()
@@ -42,13 +38,11 @@ class Chien
       {
          //animal.crier(crie);
       }
-   fin;
 }
-
 
 fn int32 main() 
 {
-   //dec ptr Chien = new Chien();
+   dec ptr Chien = new Chien();
 
   // call objet.methodePrint();
 
