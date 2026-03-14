@@ -60,10 +60,7 @@ public:
         return cles;
     }
 
-    std::map<TKey, TValeur> getElements() const {
-        std::lock_guard<TLock> guard(_lock);
-        return _elements;
-    }
+ 
 
 protected:
    virtual std::string genererMessageErreur(const TKey& cle) const {

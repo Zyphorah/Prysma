@@ -26,13 +26,10 @@ void VisiteurRemplissageCoprsClass::construireVTable(Class* classInfo, const std
         
         // Chercher la méthode correspondante dans la classe courante
         llvm::Function* functionImpl = nullptr;
-        auto methodesClasses = classInfo->registreFonctionLocale->getElements();
-        for (const auto& pair : methodesClasses) {
-            if (pair.first == nomMethodeParent) {
-                auto* symbole = static_cast<SymboleFonctionLocale*>(pair.second.get());
-                functionImpl = symbole->fonction;
-                break;
-            }
+        if (classInfo->registreFonctionLocale->existe(nomMethodeParent)) {
+            auto& symbole = classInfo->registreFonctionLocale->recuperer(nomMethodeParent);
+            auto* symboleLocal = static_cast<SymboleFonctionLocale*>(symbole.get());
+            functionImpl = symboleLocal->fonction;
         }
         
         // Si trouvée, ajouter le pointeur de fonction à la vtable
@@ -45,9 +42,9 @@ void VisiteurRemplissageCoprsClass::construireVTable(Class* classInfo, const std
     }
     
     // Ajouter les méthodes supplémentaires de la classe courante qui ne sont pas dans le parent
-    auto methodesClasses = classInfo->registreFonctionLocale->getElements();
-    for (const auto& pair : methodesClasses) {
-        std::string nomMethode = pair.first;
+    auto clesMethodes = classInfo->registreFonctionLocale->obtenirCles();
+    for (const auto& cle : clesMethodes) {
+        std::string nomMethode = cle;
         bool estDansParent = false;
         
         // Vérifier si cette méthode est dans le parent
@@ -61,10 +58,11 @@ void VisiteurRemplissageCoprsClass::construireVTable(Class* classInfo, const std
         
         // Si ce n'est pas une méthode du parent, l'ajouter à la fin de la vtable
         if (!estDansParent) {
-            auto* symbole = static_cast<SymboleFonctionLocale*>(pair.second.get());
-            if (symbole->fonction != nullptr) {
+            auto& symbole = classInfo->registreFonctionLocale->recuperer(nomMethode);
+            auto* symboleLocal = static_cast<SymboleFonctionLocale*>(symbole.get());
+            if (symboleLocal->fonction != nullptr) {
                 vtableElements.push_back(llvm::ConstantExpr::getBitCast(
-                    symbole->fonction,
+                    symboleLocal->fonction,
                     llvm::PointerType::get(llvm::Type::getInt8Ty(_contextGenCode->backend->getContext()), 0)
                 ));
             }
@@ -99,10 +97,12 @@ void VisiteurRemplissageCoprsClass::visiter(NoeudClass* noeudClass)
 
     // 2. Résolution récursive de l'héritage 
     INoeud* ParentHeritage = classInfo->parentHeritage;
-    ParentHeritage->accept(this);
+    if(ParentHeritage != nullptr)
+    {
+        ParentHeritage->accept(this);
+    }
 
     // 3. Initialisation du layout ( vecteur de type) 
-    
     std::vector<llvm::Type*> elementsCorpsClass;
 
     // Faire le vpointeur à l'adresse zéro 
@@ -113,8 +113,7 @@ void VisiteurRemplissageCoprsClass::visiter(NoeudClass* noeudClass)
         ));
 
 
-    // 4. Héritage des champs du parent 
-   
+    // 4. Héritage des champs du parent et construction de la VTable
     if(ParentHeritage != nullptr)
     {
         if(ParentHeritage->getTypeGenere() != NoeudTypeGenere::Class)
@@ -126,16 +125,16 @@ void VisiteurRemplissageCoprsClass::visiter(NoeudClass* noeudClass)
         Class* classParentInfo = _contextGenCode->registreClass->recuperer(nomParent);
 
         // On extrait les méthodes du parent pour les binder à la même position de la vtable
-        auto methodesParent = classParentInfo->registreFonctionLocale->getElements();
+        auto clesMethodesParent = classParentInfo->registreFonctionLocale->obtenirCles();
       
         std::vector<INoeud*> listMethodeParent;
-        for (const auto& pair : methodesParent) {
-            auto* symbole = static_cast<SymboleFonctionLocale*>(pair.second.get());
-            if (symbole->noeud != nullptr) {
-                listMethodeParent.push_back(symbole->noeud);
+        for (const auto& cle : clesMethodesParent) {
+            auto& symbole = classParentInfo->registreFonctionLocale->recuperer(cle);
+            auto* symboleLocal = static_cast<SymboleFonctionLocale*>(symbole.get());
+            if (symboleLocal->noeud != nullptr) {
+                listMethodeParent.push_back(symboleLocal->noeud);
             }
         }
-
 
         // On regarde si il y a les méthodes du parent dans la classe courante, si non c'est une erreur 
         for(INoeud* methodeParent : listMethodeParent)
@@ -167,8 +166,21 @@ void VisiteurRemplissageCoprsClass::visiter(NoeudClass* noeudClass)
         // Construire la vtable
         construireVTable(classInfo, nomClass, listMethodeParent);
     }
-
+    else
+    {
+        // Classe sans parent : construire la VTable avec ses propres méthodes
+        std::vector<INoeud*> listMethodes;
+        for (INoeud* methode : noeudClass->getListFonction()) {
+            if (methode->getTypeGenere() == NoeudTypeGenere::DeclarationFonction) {
+                listMethodes.push_back(methode);
+            }
+        }
+        construireVTable(classInfo, nomClass, listMethodes);
+    }
     // 5. Extraction des variables de l'AST
+    // L'index commence à 1 car l'index 0 est réservé au vtable pointer
+    unsigned int indexCourant = 1;
+    
     // Parcourir les variables publiques
     for(INoeud* variable : noeudClass->getListVariable())
     {
@@ -184,6 +196,9 @@ void VisiteurRemplissageCoprsClass::visiter(NoeudClass* noeudClass)
         llvm::Type* typeVariable = itype->genererTypeLLVM(_contextGenCode->backend->getContext());
         if (typeVariable != nullptr) {
             elementsCorpsClass.push_back(typeVariable);
+            // Enregistrer l'index pour la Passe 3
+            classInfo->memberIndices[declarationVariable->getNom()] = indexCourant;
+            indexCourant++;
         }
     }
     
@@ -202,6 +217,9 @@ void VisiteurRemplissageCoprsClass::visiter(NoeudClass* noeudClass)
         llvm::Type* typeVariable = itype->genererTypeLLVM(_contextGenCode->backend->getContext());
         if (typeVariable != nullptr) {
             elementsCorpsClass.push_back(typeVariable);
+            // Enregistrer l'index pour la Passe 3
+            classInfo->memberIndices[declarationVariable->getNom()] = indexCourant;
+            indexCourant++;
         }
     }
     
@@ -220,6 +238,9 @@ void VisiteurRemplissageCoprsClass::visiter(NoeudClass* noeudClass)
         llvm::Type* typeVariable = itype->genererTypeLLVM(_contextGenCode->backend->getContext());
         if (typeVariable != nullptr) {
             elementsCorpsClass.push_back(typeVariable);
+            // Enregistrer l'index pour la Passe 3
+            classInfo->memberIndices[declarationVariable->getNom()] = indexCourant;
+            indexCourant++;
         }
     }
 

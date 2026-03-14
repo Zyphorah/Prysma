@@ -28,9 +28,7 @@ def main():
     cxxflags = "-g -O0 -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wconversion -Wsign-conversion -Wnull-dereference -Wformat=2 -Werror"
     
     BuildManager.executer_commande([
-        "bear", "--output", "build/compile_commands.json", "--", 
-        "make", f"-j{nb_coeurs}", 
-        f"CXXFLAGS={cxxflags}"
+        "cmake", "--build", "build", "--parallel", nb_coeurs
     ])
     
 if __name__ == "__main__":

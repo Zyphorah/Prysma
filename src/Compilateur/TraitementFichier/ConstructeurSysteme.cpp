@@ -32,7 +32,7 @@ std::vector<std::string> ConstructeurSysteme::parcourirEtCollecterFichiers(const
 void ConstructeurSysteme::compilerLib()
 {
     if (!fs::exists(_libObjDir)) {
-        fs::create_directory(_libObjDir);
+        fs::create_directories(_libObjDir);
     }
 
     std::vector<std::string> fichiersCpp = ConstructeurSysteme::parcourirEtCollecterFichiers(_pathLib, ".cpp");

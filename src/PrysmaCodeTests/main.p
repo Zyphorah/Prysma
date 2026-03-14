@@ -1,6 +1,5 @@
 class Animal
 {
-
    public:
 
       fn void Animal()

@@ -1,28 +1,27 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
+
+# faut absolument forcer clang ICI avant le project() 
+set(CMAKE_CXX_COMPILER clang++)
+set(CMAKE_C_COMPILER clang)
+
 project(Prysma)
 
-# Configuration du standard C++
+# setup du C++17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Générer compile_commands.json pour clangd
+# pour que mon éditeur comprenne le code et souligne les erreurs direct 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Par défaut, si aucun type de build n'est fourni, utiliser Debug
+# par défaut on compile en Debug pour voir ce qu'on fait
 if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "CMAKE_BUILD_TYPE non défini -> configuration par défaut: Debug")
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
 endif()
 
-# --- BLOC LLVM AJOUTÉ ---
-# 1. Localisation du paquet LLVM
+# LLVM 
+# on laisse cmake se débrouiller pour trouver llvm et ses paths tout seul
 find_package(LLVM REQUIRED CONFIG)
-
-# 2. Définition des macros de préprocesseur LLVM
-add_definitions(${LLVM_DEFINITIONS})
-
-# 3. Sélection des composants (Core et Support sont le minimum)
-# Ajoutez les architectures cibles pour InitializeAllTargets()
 llvm_map_components_to_libnames(llvm_libs 
     core 
     support 
@@ -30,136 +29,53 @@ llvm_map_components_to_libnames(llvm_libs
     bitwriter 
     ${LLVM_TARGETS_TO_BUILD}
 )
-# ------------------------
 
-# Dossiers include (Ajout de ${LLVM_INCLUDE_DIRS})
-include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/build/generationCode/include ${LLVM_INCLUDE_DIRS})
+# mes fichiers source 
+# on récupère tous mes .cpp (le CONFIGURE_DEPENDS c'est pour plus devoir raser le dossier build quand j'ajoute un fichier)
+file(GLOB_RECURSE SOURCES_LOCALES CONFIGURE_DEPENDS "src/*.cpp")
+file(GLOB_RECURSE SOURCES_GENEREES CONFIGURE_DEPENDS "build/generationCode/src/*.cpp")
 
-# Sources
-set(SOURCES
-    # AnalyseSyntaxique 
-    src/Compilateur/AnalyseSyntaxique/Equation/ChaineResponsabilite.cpp
-    src/Compilateur/AnalyseSyntaxique/Equation/GestionnaireOperateur.cpp
-    src/Compilateur/AnalyseSyntaxique/Equation/ServiceParenthese.cpp
-    src/Compilateur/AnalyseSyntaxique/Fonction/ParseurAppelFonction.cpp
-    src/Compilateur/AnalyseSyntaxique/Fonction/ParseurArgFonction.cpp
-    src/Compilateur/AnalyseSyntaxique/Fonction/ParseurDeclarationFonction.cpp
-    src/Compilateur/AnalyseSyntaxique/Fonction/ParseurRetour.cpp
-    src/Compilateur/AnalyseSyntaxique/objet/ParseurAppelCentral.cpp
-    src/Compilateur/AnalyseSyntaxique/objet/ParseurAppelObjet.cpp
-    src/Compilateur/Registre/RegistreFichier.cpp
-    src/Compilateur/AnalyseSyntaxique/Variable/ParseurAffectationVariable.cpp
-    src/Compilateur/AnalyseSyntaxique/Variable/ParseurDeclarationVariable.cpp
-    src/Compilateur/AnalyseSyntaxique/Variable/ParseurRefVariable.cpp
-    src/Compilateur/AnalyseSyntaxique/Variable/ParseurUnRefVariable.cpp
-    src/Compilateur/AnalyseSyntaxique/ParseurBase.cpp
-    src/Compilateur/AnalyseSyntaxique/ParseurType.cpp
-    src/Compilateur/AnalyseSyntaxique/Instruction/ParseurIf.cpp
-    src/Compilateur/AnalyseSyntaxique/Instruction/ParseurWhile.cpp
-    src/Compilateur/AnalyseSyntaxique/Instruction/ParseurInclude.cpp
-    src/Compilateur/AnalyseSyntaxique/Instruction/ParseurDelete.cpp
-    src/Compilateur/AnalyseSyntaxique/objet/ParseurClass.cpp
-    # ConstructeurArbre
-    src/Compilateur/AST/ConstructeurArbreEquation.cpp
-    src/Compilateur/AST/ConstructeurArbreInstruction.cpp
-    # Noeuds
-    src/Compilateur/AST/Noeuds/NoeudInstruction.cpp
-    # Expressions
-    src/Compilateur/AST/Noeuds/Expression/Fonction/ExpressionAppelFonction.cpp
-    src/Compilateur/AST/Noeuds/Expression/Variable/ExpressionRefVariable.cpp
-    src/Compilateur/AST/Noeuds/Expression/Variable/ExpressionUnRefVariable.cpp
-    src/Compilateur/AST/Noeuds/Expression/Variable/ExpressionIdentifiant.cpp
-    src/Compilateur/AST/Noeuds/Expression/Tableau/ExpressionTableauInitialisation.cpp
-    src/Compilateur/AST/Noeuds/Expression/Math/ExpressionNegation.cpp
-    src/Compilateur/AST/Noeuds/Expression/Math/ExpressionLitteral.cpp
-    src/Compilateur/AST/Noeuds/Expression/Math/ExpressionString.cpp
-    src/Compilateur/AST/Noeuds/Expression/Instruction/ExpressionNew.cpp
-    src/Compilateur/AST/Noeuds/Expression/objet/ExpressionAppelCentral.cpp
-    src/Compilateur/AST/Noeuds/Expression/objet/ExpressionAppelObjet.cpp
-    # Visiteur
-    # Arbre syntaxique abstrait
-    src/Compilateur/AST/Registre/RegistreArgument.cpp
-    src/Compilateur/AST/Registre/RegistreVariable.cpp
-    src/Compilateur/AST/Registre/ReturnContextCompilation.cpp
-    src/Compilateur/AST/Registre/TypeSimple.cpp
-    src/Compilateur/AST/Registre/TypeTableau.cpp
-    src/Compilateur/Builder/Equation/ConstructeurEquationFlottante.cpp
-    src/Compilateur/Utils/ConstructeurEnvironnementRegistreVariable.cpp
-    src/Compilateur/Utils/ConstructeurEnvironnementRegistreFonction.cpp
-    src/Compilateur/Lexer/Lexer.cpp
-    src/Compilateur/LLVM/LlvmBackend.cpp
-    src/Compilateur/LLVM/LlvmSerializer.cpp
-    src/Compilateur/LLVM/GestionFonction.cpp
-    src/Compilateur/LLVM/GestionVariable.cpp
-    src/Compilateur/TraitementFichier/ConstructeurSysteme.cpp
-    src/Compilateur/TraitementFichier/FichierEcriture.cpp
-    src/Compilateur/TraitementFichier/FichierLecture.cpp
-    # visiteur de base 
-    build/generationCode/src/Compilateur/Visiteur/VisiteurBaseGenerale.cpp
-    # visiteur de remplissage registre
-    src/Compilateur/Visiteur/VisiteurRemplissageRegistre/VisiteurRemplissageVariable.cpp
-    src/Compilateur/Visiteur/VisiteurRemplissageRegistre/VisiteurRemplissageRegistre.cpp
-    src/Compilateur/Visiteur/VisiteurRemplissageRegistre/VisiteurRemplissageFonction.cpp
-    src/Compilateur/Visiteur/VisiteurRemplissageRegistre/VisiteurRemplissageInclude.cpp
-    src/Compilateur/Visiteur/VisiteurRemplissageRegistre/VisiteurRemplissageClass.cpp
-    src/Compilateur/Visiteur/VisiteurRemplissageCorpsClass/VisiteurRemplissageCorpsClass.cpp
-    # Visiteur code gen
-    src/Compilateur/Visiteur/CodeGen/Fonction/VisiteurAppelFonction.cpp
-    src/Compilateur/Visiteur/CodeGen/Boucle/VisiteurNoeudWhile.cpp
-    src/Compilateur/Visiteur/CodeGen/Fonction/VisiteurArgFonction.cpp
-    src/Compilateur/Visiteur/CodeGen/Fonction/VisiteurDeclarationFonction.cpp
-    src/Compilateur/Visiteur/CodeGen/Fonction/VisiteurRetour.cpp
-    src/Compilateur/Visiteur/CodeGen/Operande/VisiteurOperation.cpp
-    src/Compilateur/Visiteur/CodeGen/Operande/VisiteurNoeudLitteral.cpp
-    src/Compilateur/Visiteur/CodeGen/Operande/VisiteurNoeudNegation.cpp
-    src/Compilateur/Visiteur/CodeGen/Operande/VisiteurTableauInitialisation.cpp
-    # Variable
-    src/Compilateur/Visiteur/CodeGen/Variable/VisiteurAffectationVariable.cpp
-    src/Compilateur/Visiteur/CodeGen/Variable/VisiteurDeclarationVariable.cpp
-    src/Compilateur/Visiteur/CodeGen/Variable/VisiteurRefVariable.cpp
-    src/Compilateur/Visiteur/CodeGen/Variable/VisiteurUnRefVariable.cpp
-    src/Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.cpp
-    src/Compilateur/Visiteur/CodeGen/VisiteurInstruction.cpp
-    src/Compilateur/Visiteur/CodeGen/Condition/VisiteurNoeudIf.cpp
-    src/Compilateur/Visiteur/CodeGen/Boucle/VisiteurNoeudWhile.cpp
-    # New - code gen
-    src/Compilateur/Visiteur/CodeGen/New/VisiteurNew.cpp
-    # Delete - code gen
-    src/Compilateur/Visiteur/CodeGen/Delete/VisiteurDelete.cpp
-    # Tableau - code gen
-    src/Compilateur/Visiteur/CodeGen/Tableau/VisiteurAffectationTableau.cpp
-    src/Compilateur/Visiteur/CodeGen/Tableau/VisiteurLectureTableau.cpp
-    # Visiteur ast graphviz dump 
-    build/generationCode/src/Compilateur/Visiteur/ASTGraphViz/VisiteurGeneralGraphViz.cpp
-    # Graph visuel 
-    src/Compilateur/GrapheVisuel/SortieArbreVisuelTexte.cpp
-    # Orchestrateur include 
-    src/Compilateur/Utils/OrchestrateurInclude/OrchestrateurInclude.cpp
-    #façade de configuration 
-    src/Compilateur/Utils/OrchestrateurInclude/FacadeConfigurationEnvironnement.cpp
-    # Unité de compilation
-    src/Compilateur/Utils/OrchestrateurInclude/UniteCompilation.cpp
-    
-    src/main.cpp
-)
+# on fusionne tout ça 
+set(SOURCES ${SOURCES_LOCALES} ${SOURCES_GENEREES})
 
-# Créer l'exécutable
-add_executable(Prysma ${SOURCES})
-
-# --- LIEN LLVM AJOUTÉ ---
-# Lier les bibliothèques LLVM identifiées plus haut
-target_link_libraries(Prysma PRIVATE ${llvm_libs})
-# ------------------------
-
-# Flags de compilation
-if(MSVC)
-    target_compile_options(Prysma PRIVATE /W4)
-else()
+# au cas où le main.cpp passe à la trappe
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
+    list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
 endif()
 
-# Options de compilation par configuration (ajout des symboles de debug en Debug)
+# on crée l'exécutable
+add_executable(Prysma ${SOURCES})
+
+# on balance les définitions llvm
+target_compile_definitions(Prysma PRIVATE ${LLVM_DEFINITIONS})
+
+# mes dossiers include
+target_include_directories(Prysma PRIVATE 
+    ${CMAKE_SOURCE_DIR}/include 
+    ${CMAKE_SOURCE_DIR}/build/generationCode/include
+)
+
+# on inclut llvm en SYSTEM pour que clang arrête de crier sur leurs 1000 warnings
+target_include_directories(Prysma SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
+
+# on lie les libs llvm
+target_link_libraries(Prysma PRIVATE ${llvm_libs})
+
+# mes flags de compilation
 target_compile_options(Prysma PRIVATE
+    # pas d'opti en Debug, max d'opti en Release
     $<$<CONFIG:Debug>:-g;-O0;-fno-omit-frame-pointer>
     $<$<NOT:$<CONFIG:Debug>>:-O2>
-    -Wall -Wextra -Wpedantic
+    
+    # pour lire les erreurs sans avoir mal au crâne (couleurs, 3 erreurs max, petit curseur)
+    -fcolor-diagnostics     
+    -ferror-limit=3        
+    -fshow-column            
+    -fcaret-diagnostics    
+    
+    # analyse stricte pour coder proprement
+    -Wall -Wextra -Wpedantic 
+    -Wshadow                
+    -Wnon-virtual-dtor      
+    -Wnull-dereference      
 )

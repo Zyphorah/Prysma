@@ -93,15 +93,9 @@ INoeud* ParseurClass::parser(std::vector<Token>& tokens, int& index)
     Token nomClasseToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Attendu un identifiant après 'class' pour le nom de la classe.");
     
     // Gestion de l'héritage : class NomClasse : Parent
-    std::vector<INoeud*> heritage;
-    if (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type == TOKEN_DEUX_POINTS) {
-        consommer(tokens, index, TOKEN_DEUX_POINTS, "Attendu ':' pour l'héritage.");
-        Token parentToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Attendu un identifiant après ':' pour le nom de la classe parente.");
-        
-        // Créer un noeud identifiant pour le parent avec son nom
-        auto* noeudParent = _contextParseur.constructeurArbreInstruction->allouer<NoeudIdentifiant>(parentToken);
-        heritage.push_back(noeudParent);
-    }
+    Token parentToken;
+    std::vector<INoeud*> heritage; // TODO : gérer plusieurs héritages 
+    
     
     consommer(tokens, index, TOKEN_ACCOLADE_OUVERTE, "Attendu '{' après le nom de la classe.");
     std::vector<INoeud*> listVariable;

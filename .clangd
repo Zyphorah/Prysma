@@ -1,23 +1,22 @@
 ---
 # Configuration pour clangd
 
-# IntelliSense
 InlayHints:
   Enabled: true
   ParameterNames: true
   DeducedTypes: true
 
-# Contrôle du compilateur
 CompileFlags:
-  # Drapeaux de compilation supplémentaires
   Add: 
     - "-std=c++17"
     - "-Wall"
     - "-Wextra"
     - "-Wpedantic"
+    - "-Wshadow"
+    - "-Wnon-virtual-dtor"
+    - "-Wnull-dereference"
     - "-O0"
     - "-g"
-  # Database de compilation
   CompilationDatabase: build
 
 ---
@@ -29,14 +28,10 @@ CompileFlags:
 
 ---
 
-# Chemins d'include
 Index:
-  # Répertoires à indexer pour la recherche de symboles
   Background: Build
 
-# Diagnostics (erreurs/avertissements)
 Diagnostics:
-  # Activer les diagnostics
   ClangTidy:
     Add:
       - "modernize-*"
@@ -46,10 +41,8 @@ Diagnostics:
       - "modernize-use-trailing-return-type"
       - "readability-magic-numbers"
 
-# Assistant de code
 Hover:
   ShowAKA: true
 
-# Completion
 Completion:
   AllScopes: true

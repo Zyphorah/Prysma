@@ -7,7 +7,7 @@
 #include <llvm-18/llvm/IR/DerivedTypes.h>
 #include <llvm-18/llvm/IR/GlobalVariable.h>
 #include <string>
-
+#include <map>
 
 struct Class
 {
@@ -19,6 +19,10 @@ struct Class
     // Pour calculer la taille automatique de l'objet avec llvm 
     llvm::StructType* structType;
     INoeud* parentHeritage;
+    
+    // Mapping des indices des membres pour la Passe 3
+    // Clé : nom de la variable, Valeur : index dans la structure LLVM
+    std::map<std::string, unsigned int> memberIndices;
 };
 
 
