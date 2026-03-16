@@ -48,4 +48,21 @@ void VisiteurRemplissageRegistre::visiter(NoeudClass* noeudClass)
 
     // 7. Enregistrer la classe dans le registre global du compilateur
     _contextGenCode->registreClass->enregistrer(nomClasse, infosClasse);
+
+    // 8. Visiter le corps de la classe pour remplir ses registres (méthodes, etc.)
+    std::string ancienneClasse = _contextGenCode->nomClasseCourante;
+    _contextGenCode->nomClasseCourante = nomClasse;
+
+    for (auto* membre : noeudClass->getListMembres()) {
+        if (membre->getTypeGenere() == NoeudTypeGenere::DeclarationFonction) {
+            membre->accept(this);
+        }
+    }
+
+    // Aussi visiter les constructeurs si nécessaire :
+    for (auto* constructeur : noeudClass->getConstructeur()) {
+        constructeur->accept(this);
+    }
+
+    _contextGenCode->nomClasseCourante = ancienneClasse;
 }

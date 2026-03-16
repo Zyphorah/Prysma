@@ -34,10 +34,19 @@ GestionFonction::ArgumentsCodeGen GestionFonction::chargerArguments()
 
 llvm::Function* GestionFonction::creerFonction()
 {
-    // Récupérer la fonction LLVM depuis le registre local (thread-privé)
     std::string nomFonction = _noeudDeclarationFonction->getNom();
-    const auto& symbolePtr = _contextGenCode->registreFonctionLocale->recuperer(nomFonction);
-    const auto* symbole = static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
+    const SymboleFonctionLocale* symbole = nullptr;
+
+    if (!_contextGenCode->nomClasseCourante.empty()) {
+        std::string nomClasse = _contextGenCode->nomClasseCourante;
+        auto* classInfo = _contextGenCode->registreClass->recuperer(nomClasse);
+        const auto& symbolePtr = classInfo->registreFonctionLocale->recuperer(nomFonction);
+        symbole = static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
+    } else {
+        const auto& symbolePtr = _contextGenCode->registreFonctionLocale->recuperer(nomFonction);
+        symbole = static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
+    }
+
     llvm::Function* function = symbole->fonction;
 
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(_contextGenCode->backend->getContext(), "entry", function);
@@ -91,8 +100,7 @@ void GestionFonction::passArguments(NoeudAppelFonction* noeudAppelFonction)
     _contextGenCode->registreArgument->vider();
 
     std::string nomFonction = noeudAppelFonction->getNomFonction().value;
-    const auto& symbolePtr = _contextGenCode->registreFonctionLocale->recuperer(nomFonction);
-    const auto* symboleFonction = static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
+    const SymboleFonctionLocale* symboleFonction = obtenirFonctionLocale(nomFonction);
     llvm::Function* fonctionCible = symboleFonction->fonction;
 
     llvm::FunctionType* typeFonction = fonctionCible->getFunctionType();
@@ -127,10 +135,25 @@ void GestionFonction::passArguments(NoeudAppelFonction* noeudAppelFonction)
 
 const SymboleFonctionLocale* GestionFonction::obtenirFonctionLocale(const std::string& nomFonction)
 {
-    const auto& symbolePtr = _contextGenCode->registreFonctionLocale->recuperer(nomFonction);
-    const auto* symboleFonction = static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
+    const SymboleFonctionLocale* symboleFonction = nullptr;
 
-    if (symboleFonction->fonction == nullptr) {
+    if (!_contextGenCode->nomClasseCourante.empty()) {
+        std::string nomClasse = _contextGenCode->nomClasseCourante;
+        auto* classInfo = _contextGenCode->registreClass->recuperer(nomClasse);
+        if(classInfo->registreFonctionLocale->existe(nomFonction)){
+            const auto& symbolePtr = classInfo->registreFonctionLocale->recuperer(nomFonction);
+            symboleFonction = static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
+        }
+    } 
+
+    if (symboleFonction == nullptr) {
+        if (_contextGenCode->registreFonctionLocale->existe(nomFonction)) {
+            const auto& symbolePtr = _contextGenCode->registreFonctionLocale->recuperer(nomFonction);
+            symboleFonction = static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
+        }
+    }
+
+    if (symboleFonction == nullptr || symboleFonction->fonction == nullptr) {
         throw std::runtime_error("Fonction introuvable dans le registre local : " + nomFonction);
     }
 

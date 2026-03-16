@@ -1,5 +1,6 @@
 #include "Compilateur/AST/Utils/ConstructeurEnvironnementRegistreFonction.h"
 #include "Compilateur/AST/Registre/RegistreFonction.h"
+#include "Compilateur/AST/Registre/RegistreClass.h"
 #include "Compilateur/AST/AST_Genere.h"
 
 ConstructeurEnvironnementRegistreFonction::ConstructeurEnvironnementRegistreFonction(ContextGenCode* contextGenCode)
@@ -7,20 +8,15 @@ ConstructeurEnvironnementRegistreFonction::ConstructeurEnvironnementRegistreFonc
 
 ConstructeurEnvironnementRegistreFonction::~ConstructeurEnvironnementRegistreFonction() {}
 
-
-// Je vais jetter ça, plus besoins car je vais opter pour un système de stockage unique du noeud dans le registre global 
-// multi thread, c'est les thread qui ce chargera de reconstruire les fonctions llvm à partir du noeud dans le registre global
 void ConstructeurEnvironnementRegistreFonction::remplir()
 {   
+    // 1. Remplissage des fonctions globales
     for(const auto& cle : _contextGenCode->registreFonctionGlobale->obtenirCles())
     {
         const auto& ancienSymboleUniquePtr = _contextGenCode->registreFonctionGlobale->recuperer(cle);
         const auto* ancienSymbole = static_cast<const SymboleFonctionGlobale*>(ancienSymboleUniquePtr.get());
         
-        if (ancienSymbole->noeud == nullptr) {
-            // Ne devrait pas arriver avec la nouvelle logique, mais par sécurité
-            continue;
-        }
+        if (ancienSymbole->noeud == nullptr) continue;
 
         llvm::Type* retType = ancienSymbole->typeRetour->genererTypeLLVM(_contextGenCode->backend->getContext());
         
@@ -45,5 +41,47 @@ void ConstructeurEnvironnementRegistreFonction::remplir()
         nouveauSymbole->noeud = ancienSymbole->noeud;
         
         _contextGenCode->registreFonctionLocale->enregistrer(cle, std::move(nouveauSymbole));        
+    }
+
+    // Remplissage des méthodes de classes (VTable, mangling)
+    for (const auto& nomClasse : _contextGenCode->registreClass->obtenirCles())
+    {
+        auto* classInfo = _contextGenCode->registreClass->recuperer(nomClasse);
+        
+        for (const auto& nomMethode : classInfo->registreFonctionLocale->obtenirCles())
+        {
+            // On récupère le SymboleFonctionLocale créé dans VisiteurRemplissageRegistre
+            const auto& symboleUniquePtr = classInfo->registreFonctionLocale->recuperer(nomMethode);
+            auto* symbole = static_cast<SymboleFonctionLocale*>(symboleUniquePtr.get());
+            
+            if (symbole->noeud == nullptr || symbole->fonction != nullptr) continue;
+
+            llvm::Type* retType = symbole->typeRetour->genererTypeLLVM(_contextGenCode->backend->getContext());
+            
+            std::vector<llvm::Type*> paramTypes;
+            // TODO: Ajouter le paramètre 'this' caché comme premier paramètre
+            // Ce sera le type pointeur vers la classe : classInfo->structType->getPointerTo()
+
+            for (auto* arg : symbole->noeud->getArguments()) {
+                auto* argFonction = static_cast<NoeudArgFonction*>(arg);
+                paramTypes.push_back(argFonction->getType()->genererTypeLLVM(_contextGenCode->backend->getContext()));
+            }
+
+            llvm::FunctionType* funcType = llvm::FunctionType::get(retType, paramTypes, false);
+            
+            // Mangling du nom pour LLVM (ex: Joueur_initialiser)
+            std::string nomLLVM = nomClasse;
+            nomLLVM += "_";
+            nomLLVM += nomMethode;
+
+            llvm::Function* vraieFonction = llvm::Function::Create(
+                funcType, 
+                llvm::Function::ExternalLinkage, 
+                nomLLVM,          
+                _contextGenCode->backend->getModule()
+            );
+
+            symbole->fonction = vraieFonction;     
+        }
     }
 }

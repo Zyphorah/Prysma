@@ -59,6 +59,7 @@ public:
     void visiter(NoeudLectureTableau* noeudLectureTableau) override;
     void visiter(NoeudNew* noeudNew) override;
     void visiter(NoeudDelete* noeudDelete) override;
+    void visiter(NoeudClass* noeudClass) override;
     VisiteurGeneralGenCode(ContextGenCode* contextGenCode, OrchestrateurInclude* orchestrateurInclude);
     virtual ~VisiteurGeneralGenCode();
     void parcourirEnfant(NoeudInstruction* noeud);

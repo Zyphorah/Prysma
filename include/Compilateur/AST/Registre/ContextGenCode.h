@@ -29,6 +29,7 @@ struct ContextGenCode
     RegistreClass* registreClass;
     llvm::BumpPtrAllocator* arena;
     std::string cheminFichierCourant;
+    std::string nomClasseCourante = "";
 
     ContextGenCode(
         RegistreFichier* p_registreFichier,
