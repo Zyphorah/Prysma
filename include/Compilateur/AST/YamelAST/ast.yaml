@@ -107,6 +107,7 @@ Noeud:
     New:
       moteur: [expression]
       champs:
+        arguments: "std::vector<INoeud*>"
         nomType: "Token"
     Delete:
       moteur: [parseur]

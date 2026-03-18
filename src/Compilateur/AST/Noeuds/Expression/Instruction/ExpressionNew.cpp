@@ -39,15 +39,31 @@ INoeud* ExpressionNew::construire(std::vector<Token>& equation)
         throw ErreurCompilation("Erreur: aucun type valide pour l'objet créé avec 'new'", nomType.ligne, nomType.colonne);
     }
 
+    
+
+    // Nous devons remplir les arguments du new (ex: new MaClasse(arg1, arg2)) en ajoutant les enfants du noeudNew
+    std::vector<INoeud*> arguments;
     if (nomType.type == TOKEN_IDENTIFIANT) {
-        if (index + 2 < static_cast<int>(equation.size()) && 
-            equation[index + 1].type == TOKEN_PAREN_OUVERTE && 
-            equation[index + 2].type == TOKEN_PAREN_FERMEE) {
-            index += 2;
+        index++; // Passer le nom du type
+        
+        if (index < static_cast<int>(equation.size()) && equation[index].type == TOKEN_PAREN_OUVERTE) {
+            index++; // Passer '('
+
+            while(index < static_cast<int>(equation.size()) && equation[index].type != TOKEN_PAREN_FERMEE) {
+                
+                arguments.push_back(_contexteExpression.contextParseur->constructeurArbreEquation->construire(equation, index));
+
+                if (index < static_cast<int>(equation.size()) && equation[index].type == TOKEN_VIRGULE) {
+                    index++; // Passer la virgule
+                }
+            }
+            if (index < static_cast<int>(equation.size()) && equation[index].type == TOKEN_PAREN_FERMEE) {
+                index++; // Passer ')'
+            }
         }
     }
 
-    return new (_contexteExpression.arena.Allocate(sizeof(NoeudNew), alignof(NoeudNew))) NoeudNew(nomType);
+    return new (_contexteExpression.arena.Allocate(sizeof(NoeudNew), alignof(NoeudNew))) NoeudNew(arguments,nomType);
 }
 
 #endif /* EXPRESSION_NEW_CPP */

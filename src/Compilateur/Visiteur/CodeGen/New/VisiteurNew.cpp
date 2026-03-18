@@ -38,6 +38,16 @@ void VisiteurGeneralGenCode::visiter(NoeudNew* noeudNew)
 
     llvm::Value* adresseAllouee = builder.CreateCall(mallocFunc, {tailleLLVM}, "memoire_new");
 
+    // Il faut remplir le vecteur d'argument du constructeur avec les argument du noeudNew exemple ; new MaClasse(arg1, arg2)
+    std::vector<llvm::Value*> argsConstructeur;
+    argsConstructeur.push_back(adresseAllouee);  // this
+
+    // Ajouter les arguments passés au new (les enfants du noeud)
+    for (INoeud* arg : noeudNew->getArguments()) {
+        arg->accept(this);  // Évalue l'expression (ex: entier = 204)
+        argsConstructeur.push_back(_contextGenCode->valeurTemporaire.adresse);
+    }
+
     if (infoClasse != nullptr && infoClasse->vtable != nullptr) {
         // Initialiser le vptr à l'adresse 0 de l'objet alloué
         llvm::Value* vptrAdresse = builder.CreateStructGEP(typeCible, adresseAllouee, 0, "vptr_adresse");
@@ -45,12 +55,13 @@ void VisiteurGeneralGenCode::visiter(NoeudNew* noeudNew)
         builder.CreateStore(vtablePtr, vptrAdresse);
     }
 
+    // Construction du constructeur avec arguments
     if (infoClasse != nullptr) {
         std::string nomConstructeur = noeudNew->getNomType().value;
         if (infoClasse->registreFonctionLocale->existe(nomConstructeur)) {
             const auto& symbolePtr = infoClasse->registreFonctionLocale->recuperer(nomConstructeur);
-            const SymboleFonctionLocale* symboleFonction = static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
-            builder.CreateCall(symboleFonction->fonction, {adresseAllouee});
+            const auto* symboleFonction = static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
+            builder.CreateCall(symboleFonction->fonction, argsConstructeur);
         }
     }
 
