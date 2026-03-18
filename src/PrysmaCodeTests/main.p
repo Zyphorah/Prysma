@@ -8,38 +8,36 @@ class Animal
 
       fn void crier(arg string[] crie)
       {
-         call print(crie);
+         call print(unref crie);
       }
 }
 
 class Chien 
 { 
    private: 
-     // dec ptr animal = new Animal();
-      
-      dec string[] crie = " ";
 
-      fn void crierPriv()
-      {
-         call print("Woof!");
-      }
+   dec int64 _test = 0; 
 
    public:
 
-      fn void Chien()
+      fn void Chien(arg int32 test)
       {
-         aff crie = "Woof!";
+         aff _test = test;
+         call print(_test);
       }
 
       fn void crier()
-      {
-         //call animal.crier(crie);
+      {   
+         dec string[] crie = "Woof!";
+         dec ptr animal = new Animal();
+         call animal.crier(ref crie);
       }
 }
 
 fn int32 main() 
 {
-   dec ptr chien = new Chien();
+   dec int32 entier = 204; 
+   dec ptr chien = new Chien(entier);
 
    call chien.crier();
 

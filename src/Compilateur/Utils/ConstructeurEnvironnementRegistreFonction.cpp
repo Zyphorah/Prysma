@@ -59,8 +59,9 @@ void ConstructeurEnvironnementRegistreFonction::remplir()
             llvm::Type* retType = symbole->typeRetour->genererTypeLLVM(_contextGenCode->backend->getContext());
             
             std::vector<llvm::Type*> paramTypes;
-            // TODO: Ajouter le paramètre 'this' caché comme premier paramètre
-            // Ce sera le type pointeur vers la classe : classInfo->structType->getPointerTo()
+            
+            // Ajouter le paramètre 'this' caché comme premier paramètre
+            paramTypes.push_back(llvm::PointerType::getUnqual(_contextGenCode->backend->getContext()));
 
             for (auto* arg : symbole->noeud->getArguments()) {
                 auto* argFonction = static_cast<NoeudArgFonction*>(arg);

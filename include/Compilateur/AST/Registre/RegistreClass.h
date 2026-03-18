@@ -23,8 +23,11 @@ struct Class
     // Mapping des indices des membres pour la Passe 3
     // Clé : nom de la variable, Valeur : index dans la structure LLVM
     std::map<std::string, unsigned int> memberIndices;
+    
+    // Mapping des indices des méthodes dans la vtable
+    std::map<std::string, unsigned int> methodIndices;
 };
-
+// TODO : supporter les mutex multi thread pour les classes Sinon le multi fichier n'est pas possible
 
 class RegistreClass : public RegistreGeneric<std::string, Class*> 
 {

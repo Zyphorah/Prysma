@@ -11,7 +11,7 @@ private:
     using VisiteurBaseGenerale::visiter;
     
     void construireVTable(Class* classInfo, const std::string& nomClass, 
-                         const std::vector<INoeud*>& listMethodeParent);
+                         const std::vector<NoeudDeclarationFonction*>& listMethodeParent);
     
 public:
     VisiteurRemplissageCoprsClass(ContextGenCode* contextGenCode);

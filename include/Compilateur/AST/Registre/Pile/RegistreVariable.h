@@ -43,6 +43,8 @@ public:
     void depiler();
     void viderTop();
 
+    bool existeVariable(const std::string& nom);
+
     std::map<std::string, Symbole>& getGlobalVariables() {
         return _variables.top();
     }

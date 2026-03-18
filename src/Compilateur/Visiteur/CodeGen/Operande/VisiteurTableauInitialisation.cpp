@@ -1,15 +1,8 @@
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/AST/AST_Genere.h"
-#include <llvm/IR/Constants.h>
 
-void VisiteurGeneralGenCode::visiter(NoeudTableauInitialisation* noeudTableauInit)
+void VisiteurGeneralGenCode::visiter(NoeudTableauInitialisation* noeudInitialisation [[maybe_unused]])
 {
-    if (noeudTableauInit == nullptr) {
-        _contextGenCode->valeurTemporaire.adresse = nullptr;
-        _contextGenCode->valeurTemporaire.type = nullptr;
-        return;
-    }
-
     // On ne peut pas vraiment initialiser un tableau en tant que "constante temporaire"
     // car les tableaux ont besoin d'être alloués. Ce visiteur sera appelé lors
     // de l'évaluation d'une expression qui contient [1, 2, 3, ...].

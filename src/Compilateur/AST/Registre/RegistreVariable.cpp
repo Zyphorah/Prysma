@@ -65,3 +65,17 @@ void RegistreVariable::viderTop()
         _variables.top().clear();
     }
 }
+
+bool RegistreVariable::existeVariable(const std::string& nom)
+{
+    if(_variables.empty()) return false;
+    
+    std::stack<std::map<std::string, Symbole>> tempStack = _variables;
+    while(!tempStack.empty())
+    {
+        auto iterateur = tempStack.top().find(nom);
+        if (iterateur != tempStack.top().end()) return true;
+        tempStack.pop();
+    }
+    return false;
+}

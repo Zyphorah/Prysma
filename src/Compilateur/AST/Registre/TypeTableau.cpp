@@ -13,10 +13,10 @@ llvm::Type* TypeTableau::genererTypeLLVM(llvm::LLVMContext& context)
 {
     llvm::Type* typeElement = _typeEnfant->genererTypeLLVM(context);
 
-    // Si la taille est nullptr (tableau à taille dynamique), on retourne nullptr
-    // La taille réelle sera calculée lors de l'initialisation
+    // Si la taille est nullptr (tableau à taille dynamique), on retourne un pointeur
+    // car en paramètre ou allocation dynamique, ça représente une adresse.
     if (_taille == nullptr) {
-        return nullptr;
+        return llvm::PointerType::getUnqual(context);
     }
 
     NoeudLitteral* litteral = nullptr;

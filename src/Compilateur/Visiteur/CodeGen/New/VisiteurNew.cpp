@@ -45,6 +45,15 @@ void VisiteurGeneralGenCode::visiter(NoeudNew* noeudNew)
         builder.CreateStore(vtablePtr, vptrAdresse);
     }
 
+    if (infoClasse != nullptr) {
+        std::string nomConstructeur = noeudNew->getNomType().value;
+        if (infoClasse->registreFonctionLocale->existe(nomConstructeur)) {
+            const auto& symbolePtr = infoClasse->registreFonctionLocale->recuperer(nomConstructeur);
+            const SymboleFonctionLocale* symboleFonction = static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
+            builder.CreateCall(symboleFonction->fonction, {adresseAllouee});
+        }
+    }
+
     _contextGenCode->valeurTemporaire.adresse = adresseAllouee;
     _contextGenCode->valeurTemporaire.typePointeElement = typeCible;
 }

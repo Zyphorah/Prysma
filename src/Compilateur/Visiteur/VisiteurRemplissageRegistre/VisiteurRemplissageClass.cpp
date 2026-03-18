@@ -57,6 +57,12 @@ void VisiteurRemplissageRegistre::visiter(NoeudClass* noeudClass)
         if (membre->getTypeGenere() == NoeudTypeGenere::DeclarationFonction) {
             membre->accept(this);
         }
+        else if (membre->getTypeGenere() == NoeudTypeGenere::DeclarationVariable) {
+            auto* declVar = static_cast<NoeudDeclarationVariable*>(membre);
+            Token token;
+            token.value = declVar->getNom();
+            infosClasse->registreVariable->enregistrer(token, Symbole(nullptr, declVar->getType()));
+        }
     }
 
     // Aussi visiter les constructeurs si nécessaire :

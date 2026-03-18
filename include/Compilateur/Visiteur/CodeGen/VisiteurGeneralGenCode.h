@@ -31,6 +31,7 @@ class NoeudAffectationTableau;
 class NoeudLectureTableau;
 class NoeudNew;
 class NoeudDelete;
+class NoeudAppelObjet;
 
 class VisiteurGeneralGenCode : public VisiteurBaseGenerale
 {
@@ -60,6 +61,7 @@ public:
     void visiter(NoeudNew* noeudNew) override;
     void visiter(NoeudDelete* noeudDelete) override;
     void visiter(NoeudClass* noeudClass) override;
+    void visiter(NoeudAppelObjet* noeudAppelObjet) override;
     VisiteurGeneralGenCode(ContextGenCode* contextGenCode, OrchestrateurInclude* orchestrateurInclude);
     virtual ~VisiteurGeneralGenCode();
     void parcourirEnfant(NoeudInstruction* noeud);

@@ -25,7 +25,9 @@ class GestionVariable
 
         void stockerVariable(llvm::Value* valeur, llvm::AllocaInst* allocaInst);
 
-        void affecterVariable(llvm::AllocaInst* allocaInst, llvm::Value* valeur);
+        void affecterVariable(llvm::Value* variableExistante, llvm::Value* valeur, llvm::Type* typeVariableLLVM = nullptr);
+
+        Symbole recupererAdresseVariable(const std::string& nomVariable);
 };
 
 #endif /* D5B94044_819C_4C15_B528_AAE97CBCB264 */

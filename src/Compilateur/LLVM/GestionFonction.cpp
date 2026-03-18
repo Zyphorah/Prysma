@@ -3,6 +3,8 @@
 #include "Compilateur/AST/AST_Genere.h"
 #include "Compilateur/AST/Registre/ContextGenCode.h"
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
+#include "Compilateur/Visiteur/VisiteurBaseGenerale.h"
+#include "Compilateur/Visiteur/Extracteurs/ExtracteurArgFonction.h"
 #include <llvm/IR/Instructions.h>
 
 GestionFonction::GestionFonction(ContextGenCode* contextGenCode, NoeudDeclarationFonction* noeudDeclarationFonction, IVisiteur* visiteurGeneralCodeGen) 
@@ -21,12 +23,16 @@ GestionFonction::ArgumentsCodeGen GestionFonction::chargerArguments()
     std::vector<llvm::Type*> argTypes;
     std::vector<NoeudArgFonction*> arguments;
     
-    // Utiliser directement la liste stricte d'arguments
+    ExtracteurArgFonction extracteur;
     for (INoeud* noeud : _noeudDeclarationFonction->getArguments()) {
-        auto* arg = static_cast<NoeudArgFonction*>(noeud);
-        arguments.push_back(arg);
-        llvm::Type* argType = arg->getType()->genererTypeLLVM(_contextGenCode->backend->getContext());
-        argTypes.push_back(argType);
+        extracteur.arg = nullptr;
+        noeud->accept(&extracteur);
+        
+        if (extracteur.arg != nullptr) {
+            arguments.push_back(extracteur.arg);
+            llvm::Type* argType = extracteur.arg->getType()->genererTypeLLVM(_contextGenCode->backend->getContext());
+            argTypes.push_back(argType);
+        }
     }
     
     return ArgumentsCodeGen{argTypes, arguments};
@@ -66,6 +72,34 @@ void GestionFonction::initialiserContexte()
 void GestionFonction::traiterArgumentsConstruit(llvm::Function* function, const ArgumentsCodeGen& argumentsCodeGen)
 {
     size_t argIndex = 0;
+    
+    // Si nous sommes dans une méthode de classe, le premier argument LLVM est 'this'
+    bool estMethode = !_contextGenCode->nomClasseCourante.empty();
+    
+    if (estMethode && function->arg_size() > 0) {
+        // Traiter le paramètre 'this' implicite
+        llvm::Argument* thisArg = function->getArg(0);
+        thisArg->setName("this");
+        
+        llvm::Type* argType = thisArg->getType();
+        llvm::AllocaInst* alloca = _contextGenCode->backend->getBuilder().CreateAlloca(argType);
+        _contextGenCode->backend->getBuilder().CreateStore(thisArg, alloca);
+        
+        Token thisToken;
+        thisToken.value = "this";
+        thisToken.type = TOKEN_IDENTIFIANT;
+        
+        Symbole symboleThis;
+        symboleThis.adresse = alloca;
+
+        symboleThis.type = nullptr; 
+        
+        _contextGenCode->registreVariable->enregistrer(thisToken, symboleThis);
+        
+        // Décaler l'index des arguments explicites
+        argIndex = 1;
+    }
+
     for (auto* noeudArg : argumentsCodeGen.arguments) {
         llvm::Argument* arg = function->getArg(static_cast<unsigned int>(argIndex));
         arg->setName(noeudArg->getNom());
