@@ -1,6 +1,1 @@
-
-fn void test()
-{
-    call print(999);
-}
-
+fn void main() { call print(999); }

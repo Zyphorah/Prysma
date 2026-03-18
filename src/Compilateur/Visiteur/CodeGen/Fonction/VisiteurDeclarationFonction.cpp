@@ -1,4 +1,4 @@
-#include "Compilateur/LLVM/GenerateurFonction.h"
+#include "Compilateur/LLVM/GestionFonction.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/AST/AST_Genere.h"
 
@@ -6,6 +6,6 @@
 
 void VisiteurGeneralGenCode::visiter(NoeudDeclarationFonction* noeudDeclarationFonction) 
 {
-    GestionFonction generateurFonction(_contextGenCode,noeudDeclarationFonction,this);
-    generateurFonction.declarerFonction();
+    auto generateur = GenerateurDeclarationFonction::creer(_contextGenCode, noeudDeclarationFonction, this);
+    generateur->declarerFonction();
 }
