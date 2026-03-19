@@ -62,6 +62,10 @@ void VisiteurRemplissageRegistre::visiter(NoeudClass* noeudClass)
             Token token;
             token.value = declVar->getNom();
             infosClasse->registreVariable->enregistrer(token, Symbole(nullptr, declVar->getType()));
+            
+            if (declVar->getExpression() != nullptr) {
+                infosClasse->memberInitializers[declVar->getNom()] = declVar->getExpression();
+            }
         }
     }
 

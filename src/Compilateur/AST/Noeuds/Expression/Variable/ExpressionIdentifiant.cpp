@@ -41,6 +41,10 @@ INoeud* ExpressionIdentifiant::construire(std::vector<Token>& equation)
         return _contexteExpression.constructeurArbreEquation->allouer<NoeudLectureTableau>(indexEquation, equation[0]);
     }
 
+    if (equation.size() == 3 && equation[1].type == TOKEN_POINT) {
+        return _contexteExpression.constructeurArbreEquation->allouer<NoeudAccesAttribut>(equation[0], equation[2]);
+    }
+
     return _contexteExpression.constructeurArbreEquation->allouer<NoeudLitteral>(equation[0]);
 }
 

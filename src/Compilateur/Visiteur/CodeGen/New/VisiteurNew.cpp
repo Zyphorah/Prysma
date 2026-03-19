@@ -55,6 +55,30 @@ void VisiteurGeneralGenCode::visiter(NoeudNew* noeudNew)
         builder.CreateStore(vtablePtr, vptrAdresse);
     }
 
+    if (infoClasse != nullptr) {
+        for (const auto& pair : infoClasse->memberInitializers) {
+            const std::string& nomMembre = pair.first;
+            INoeud* expressionInit = pair.second;
+
+            if (expressionInit != nullptr) {
+                expressionInit->accept(this);
+                llvm::Value* valeurCalculee = _contextGenCode->valeurTemporaire.adresse;
+
+                if (valeurCalculee != nullptr && infoClasse->memberIndices.find(nomMembre) != infoClasse->memberIndices.end()) {
+                    unsigned int idx = infoClasse->memberIndices[nomMembre];
+                    
+                    Token tokenMembre; tokenMembre.value = nomMembre;
+                    Symbole modele = infoClasse->registreVariable->recupererVariables(tokenMembre);
+                    llvm::Type* typeMembre = modele.type->genererTypeLLVM(_contextGenCode->backend->getContext());
+
+                    llvm::Value* valeurCastee = _contextGenCode->backend->creerAutoCast(valeurCalculee, typeMembre);
+                    llvm::Value* membrePtr = builder.CreateStructGEP(typeCible, adresseAllouee, idx, nomMembre + "_ptrinit");
+                    builder.CreateStore(valeurCastee, membrePtr);
+                }
+            }
+        }
+    }
+
     // Construction du constructeur avec arguments
     if (infoClasse != nullptr) {
         std::string nomConstructeur = noeudNew->getNomType().value;

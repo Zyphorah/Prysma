@@ -62,11 +62,14 @@ public:
     void visiter(NoeudDelete* noeudDelete) override;
     void visiter(NoeudClass* noeudClass) override;
     void visiter(NoeudAppelObjet* noeudAppelObjet) override;
+    void visiter(NoeudAccesAttribut* noeudAccesAttribut) override;
     VisiteurGeneralGenCode(ContextGenCode* contextGenCode, OrchestrateurInclude* orchestrateurInclude);
     virtual ~VisiteurGeneralGenCode();
     void parcourirEnfant(NoeudInstruction* noeud);
     
     Symbole evaluerExpression(INoeud* expression);
+    
+    static std::string obtenirNomClasseDepuisSymbole(const Symbole& objetSymbole);
 };
 
 #endif /* FDDB5968_6DEF_49B0_AD11_8791D523278A */

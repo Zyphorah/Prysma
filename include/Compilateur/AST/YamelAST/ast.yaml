@@ -81,6 +81,11 @@ Noeud:
       champs:
         nomObjet: "Token"
         nomMethode: "Token"
+    AccesAttribut:
+      moteur: []
+      champs:
+        nomObjet: "Token"
+        nomAttribut: "Token"
     DeclarationObjet:
       moteur: []
       champs:
@@ -140,4 +145,3 @@ Noeud:
     String:
       moteur: [expression]
       champs: {}
-    

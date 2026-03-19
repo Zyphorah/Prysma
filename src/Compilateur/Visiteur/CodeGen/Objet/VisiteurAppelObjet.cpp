@@ -2,7 +2,6 @@
 #include "Compilateur/AST/AST_Genere.h"
 #include "Compilateur/LLVM/GestionVariable.h"
 #include "Compilateur/AST/Registre/RegistreClass.h"
-#include "Compilateur/AST/Registre/Types/TypeComplexe.h"
 #include <stdexcept>
 #include <llvm/IR/Instructions.h>
 
@@ -20,30 +19,14 @@ void VisiteurGeneralGenCode::visiter(NoeudAppelObjet* noeudAppelObjet)
     Symbole objetSymbole = chargeur.charger(nomObjet);
     llvm::Value* objet = objetSymbole.adresse;
 
-    std::string nomClasse = "";
-    if (objetSymbole.type != nullptr) {
-        if (auto* typeComplexe = dynamic_cast<TypeComplexe*>(objetSymbole.type)) {
-            nomClasse = typeComplexe->getNomClasse();
-        }
-    }
-
-    if (nomClasse.empty() && objetSymbole.typePointeElement != nullptr) {
-        if (auto* structType = llvm::dyn_cast<llvm::StructType>(objetSymbole.typePointeElement)) {
-            llvm::StringRef structName = structType->getName();
-            if (structName.starts_with("Class_")) {
-                nomClasse = structName.drop_front(6).str();
-            } else {
-                nomClasse = structName.str();
-            }
-        }
-    }
+    std::string nomClasse = obtenirNomClasseDepuisSymbole(objetSymbole);
 
     if (nomClasse.empty()) {
         throw std::runtime_error("Erreur: impossible de determiner la classe de l'objet " + nomObjet);
     }
 
     auto* classInfo = _contextGenCode->registreClass->recuperer(nomClasse);
-    if (!classInfo) {
+    if (classInfo == nullptr) {
         throw std::runtime_error("Erreur: classe " + nomClasse + " non trouvée dans le registre.");
     }
 
