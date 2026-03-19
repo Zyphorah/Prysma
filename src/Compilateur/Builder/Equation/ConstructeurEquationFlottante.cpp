@@ -6,9 +6,9 @@
 ConstructeurEquationFlottante::ConstructeurEquationFlottante(RegistreExpression* registreExpression, llvm::BumpPtrAllocator& arena)
     : _arena(arena), _registreExpression(registreExpression)
 {
-    _registreSymbole = new (_arena.Allocate(sizeof(RegistreSymbole), alignof(RegistreSymbole))) RegistreSymbole();
+    _registreSymbole = std::make_unique<RegistreSymbole>();
 
-    _serviceParenthese = std::make_unique<ServiceParenthese>(_registreSymbole);
+    _serviceParenthese = std::make_unique<ServiceParenthese>(_registreSymbole.get());
 
     _gestionnaireAddition = std::make_unique<GestionnaireOperateur>(TOKEN_PLUS);
     _gestionnaireSoustraction = std::make_unique<GestionnaireOperateur>(TOKEN_MOINS);
@@ -44,7 +44,7 @@ ConstructeurEquationFlottante::ConstructeurEquationFlottante(RegistreExpression*
                     
     _constructeurArbre = new (_arena) ConstructeurArbreEquation(
         _chaineResponsabilite.get(), 
-        _registreSymbole, 
+        _registreSymbole.get(), 
     _registreExpression,
         _serviceParenthese.get(),
         _arena

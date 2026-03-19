@@ -24,7 +24,7 @@ LlvmBackend::LlvmBackend() {
     }
 
     TargetOptions opt;
-    target->createTargetMachine(targetTriple, "generic", "", opt, Reloc::Model::PIC_);
+    _targetMachine.reset(target->createTargetMachine(targetTriple, "generic", "", opt, Reloc::Model::PIC_));
 }
 
 

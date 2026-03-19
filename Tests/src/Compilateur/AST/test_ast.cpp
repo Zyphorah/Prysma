@@ -62,7 +62,7 @@ struct EnvironnementAST {
     EnvironnementAST() {
     
         registreInstruction = std::make_unique<RegistreInstruction>();
-    registreExpression = std::make_unique<RegistreExpression>();
+        registreExpression = std::make_unique<RegistreExpression>();
         registreType = std::make_unique<RegistreType>();
         registreVariable = std::make_unique<RegistreVariable>();
 
@@ -75,7 +75,7 @@ struct EnvironnementAST {
         //  Strategie d'équation 
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wmismatched-new-delete"
-    constructeurEquation = new (arena) ConstructeurEquationFlottante(constructeurArbre, registreExpression.get(), arena);
+        constructeurEquation = new (arena) ConstructeurEquationFlottante(registreExpression.get(), arena);
         #pragma GCC diagnostic pop
 
         parseurType = new (arena.Allocate<ParseurType>()) ParseurType(registreType.get(), constructeurEquation->recupererConstructeurArbre());

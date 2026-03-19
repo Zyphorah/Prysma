@@ -1,0 +1,18 @@
+#ifndef VISITEUR_DESTRUCTION_H
+#define VISITEUR_DESTRUCTION_H
+
+#include "Compilateur/Visiteur/VisiteurBaseGenerale.h"
+#include "Compilateur/AST/AST_Genere.h"
+
+class VisiteurDestruction : public VisiteurBaseGenerale
+{
+public:
+{% for nom in noeuds %}
+    void visiter(Noeud{{ nom }}* noeud) override {
+        VisiteurBaseGenerale::visiter(noeud);
+        noeud->~Noeud{{ nom }}();
+    }
+{% endfor %}
+};
+
+#endif

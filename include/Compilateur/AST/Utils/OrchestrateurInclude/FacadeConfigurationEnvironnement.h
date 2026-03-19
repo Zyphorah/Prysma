@@ -48,7 +48,7 @@ private:
 
 public:
     explicit FacadeConfigurationEnvironnement(RegistreFonctionGlobale* registreFonctionGlobale, RegistreFichier* registreFichier);
-    ~FacadeConfigurationEnvironnement() = default;
+    ~FacadeConfigurationEnvironnement();
 
     /// Initialise tout l'environnement de compilation en une seule étape
     void initialiser(const std::string& cheminFichier);

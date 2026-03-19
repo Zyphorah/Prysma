@@ -28,6 +28,11 @@ struct Class
     
     // Mapping des indices des méthodes dans la vtable
     std::map<std::string, unsigned int> methodIndices;
+
+    ~Class() {
+        delete registreFonctionLocale;
+        delete registreVariable;
+    }
 };
 // TODO : supporter les mutex multi thread pour les classes Sinon le multi fichier n'est pas possible
 
@@ -35,7 +40,11 @@ class RegistreClass : public RegistreGeneric<std::string, Class*>
 {
 public:
     RegistreClass() = default;
-    virtual ~RegistreClass() = default;
+    virtual ~RegistreClass() {
+        for (auto& pair : _elements) {
+            delete pair.second;
+        }
+    }
 };
 
 

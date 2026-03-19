@@ -8,12 +8,14 @@
 #include <llvm/IR/NoFolder.h>
 #include <llvm/IR/Type.h>
 #include <llvm/IR/Constants.h>
+#include <llvm/Target/TargetMachine.h>
 
 class LlvmBackend {
 private:
     std::unique_ptr<llvm::LLVMContext> _context;
     std::unique_ptr<llvm::Module> _module;
     std::unique_ptr<llvm::IRBuilder<llvm::NoFolder>> _builder;
+    std::unique_ptr<llvm::TargetMachine> _targetMachine;
 
 public:
 
@@ -30,4 +32,4 @@ public:
     llvm::Value* chargerValeur(llvm::Value* adresseMemoire, const std::string& nomVariable);
     void definirPointInsertionApresAllocation();
 };
- 
+

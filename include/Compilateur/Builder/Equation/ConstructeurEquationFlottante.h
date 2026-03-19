@@ -17,7 +17,7 @@ struct Token;
 class ConstructeurEquationFlottante : public IConstructeurArbre
 {
 private:
-    RegistreSymbole* _registreSymbole;
+    std::unique_ptr<RegistreSymbole> _registreSymbole;
     
     std::unique_ptr<GestionnaireOperateur> _gestionnaireAddition;
     std::unique_ptr<GestionnaireOperateur> _gestionnaireSoustraction;

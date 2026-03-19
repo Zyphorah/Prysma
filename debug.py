@@ -7,6 +7,7 @@ from generation.generateur_visiteur_base_generale import GenerateurVisiteurBaseG
 from generation.generateur_graphe_viz import GenerateurGrapheViz
 from generation.generateur_expression import GenerateurExpression
 from generation.generateur_parseur import GenerateurParseur
+from generation.generateur_visiteur_destruction import GenerateurVisiteurDestruction
 
 
 def main():
@@ -19,13 +20,14 @@ def main():
     GenerateurGrapheViz(dossier_script).generer()
     GenerateurExpression(dossier_script).generer()
     GenerateurParseur(dossier_script).generer()
+    GenerateurVisiteurDestruction(dossier_script).generer()
 
     cxxflags = (
         "-fno-rtti -g3 -O0 " # Debug info max, aucune optimisation
         "-fsanitize=address -fsanitize=undefined " # Les détecteurs de bugs mémoire
         "-fstack-protector-all " # Ajout du protecteur de pile
         "-fno-omit-frame-pointer " # Pour des backtraces propres
-        "-D_DEBUG -D_GLIBCXX_DEBUG " # Assertions et debug de la lib standard
+        "-D_DEBUG " # Assertions et debug de la lib standard
         "-Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor "
         "-Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual "
         "-Wconversion -Wsign-conversion -Wnull-dereference -Wformat=2 "

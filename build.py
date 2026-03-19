@@ -4,6 +4,7 @@ from Tests.Orchestration.build_manager import BuildManager
 from generation.generateur_ast import GenerateurAST
 from generation.generateur_interface_visiteur import GenerateurInterfaceVisiteur
 from generation.generateur_visiteur_base_generale import GenerateurVisiteurBaseGenerale
+from generation.generateur_visiteur_destruction import GenerateurVisiteurDestruction
 from generation.generateur_graphe_viz import GenerateurGrapheViz
 from generation.generateur_expression import GenerateurExpression
 from generation.generateur_parseur import GenerateurParseur
@@ -15,6 +16,7 @@ def main():
     GenerateurAST(dossier_script).generer()
     GenerateurInterfaceVisiteur(dossier_script).generer()
     GenerateurVisiteurBaseGenerale(dossier_script).generer()
+    GenerateurVisiteurDestruction(dossier_script).generer()
     GenerateurGrapheViz(dossier_script).generer()
     GenerateurExpression(dossier_script).generer()
     GenerateurParseur(dossier_script).generer()

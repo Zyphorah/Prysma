@@ -20,6 +20,10 @@ class GenerateurVisiteurBaseGenerale(MoteurGeneration):
         noeuds_avec_champs = {}
         for nom, definition in noeuds.items():
             champs = definition.get("champs", {}) if definition else {}
+            if definition and definition.get("parent") == "NoeudInstruction":
+                champs_copie = dict(champs)
+                champs_copie["enfants"] = "std::vector<INoeud*>"
+                champs = champs_copie
             noeuds_avec_champs[nom] = champs
         noeuds_avec_champs["Instruction"] = {"enfants": "std::vector<INoeud*>"}
         methodes = {nom: self._extraire_traversables(champs) for nom, champs in noeuds_avec_champs.items()}

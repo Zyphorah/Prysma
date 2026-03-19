@@ -55,6 +55,28 @@ FacadeConfigurationEnvironnement::FacadeConfigurationEnvironnement(RegistreFonct
 {
 }
 
+FacadeConfigurationEnvironnement::~FacadeConfigurationEnvironnement()
+{
+    if (_contexteExpression) {
+        _contexteExpression->~ContexteExpression();
+    }
+    if (_contextParseur) {
+        _contextParseur->~ContextParseur();
+    }
+    if (_parseurType) {
+        _parseurType->~ParseurType();
+    }
+    if (_constructeurEquation) {
+        _constructeurEquation->~ConstructeurEquationFlottante();
+    }
+    if (_constructeurArbreInstruction) {
+        _constructeurArbreInstruction->~ConstructeurArbreInstruction();
+    }
+    if (_registreExpression) {
+        _registreExpression->~RegistreExpression();
+    }
+}
+
 void FacadeConfigurationEnvironnement::initialiser(const std::string& cheminFichier)
 {
     creerRegistres();
