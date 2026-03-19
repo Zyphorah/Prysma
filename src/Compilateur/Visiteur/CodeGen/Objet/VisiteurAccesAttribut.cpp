@@ -2,7 +2,7 @@
 #include "Compilateur/AST/AST_Genere.h"
 #include "Compilateur/LLVM/GestionVariable.h"
 #include "Compilateur/AST/Registre/RegistreClass.h"
-#include <stdexcept>
+#include "Compilateur/Visiteur/CodeGen/Helper/ErrorHelper.h"
 #include <llvm/IR/Instructions.h>
 
 void VisiteurGeneralGenCode::visiter(NoeudAccesAttribut* noeudAccesAttribut)
@@ -17,21 +17,19 @@ void VisiteurGeneralGenCode::visiter(NoeudAccesAttribut* noeudAccesAttribut)
     std::string nomClasse = obtenirNomClasseDepuisSymbole(objetSymbole);
 
     if (nomClasse.empty()) {
-        throw std::runtime_error("Erreur: impossible de determiner la classe de l'objet " + nomObjet);
+        ErrorHelper::erreurCompilation("Impossible de déterminer la classe de l'objet '" + nomObjet + "'");
     }
 
     auto* classInfo = _contextGenCode->registreClass->recuperer(nomClasse);
-    if (classInfo == nullptr) {
-        throw std::runtime_error("Erreur: classe " + nomClasse + " non trouvée dans le registre.");
-    }
+    classInfo = ErrorHelper::verifierNonNull(classInfo, "Classe '" + nomClasse + "' non trouvée dans le registre");
 
     if (!classInfo->registreVariable->existeVariable(nomAttribut)) {
-        throw std::runtime_error("Erreur: l'attribut " + nomAttribut + " n'existe pas dans la classe " + nomClasse);
+        ErrorHelper::erreurCompilation("Attribut '" + nomAttribut + "' inexistant dans la classe '" + nomClasse + "'");
     }
 
     auto iterator = classInfo->memberIndices.find(nomAttribut);
     if (iterator == classInfo->memberIndices.end()) {
-        throw std::runtime_error("Erreur: l'attribut " + nomAttribut + " n'a pas d'index dans " + nomClasse);
+        ErrorHelper::erreurCompilation("Attribut '" + nomAttribut + "' n'a pas d'index dans " + nomClasse);
     }
     
     unsigned int index = iterator->second;

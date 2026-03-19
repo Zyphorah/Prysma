@@ -3,7 +3,7 @@
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/AST/Registre/Types/TypeSimple.h"
 #include "Compilateur/LLVM/GestionVariable.h"
-#include <stdexcept> 
+#include "Compilateur/Visiteur/CodeGen/Helper/ErrorHelper.h"
 
 void VisiteurGeneralGenCode::visiter(NoeudLitteral* noeudLitteral)
 {
@@ -40,7 +40,7 @@ void VisiteurGeneralGenCode::visiter(NoeudLitteral* noeudLitteral)
         llvmValue = llvm::ConstantFP::get(llvmType, valeur);
     }
     else {
-        throw std::runtime_error("Erreur de compilation : Type de littéral non supporté (" + token.value + ")");
+        ErrorHelper::erreurCompilation("Type de littéral non supporté (" + token.value + ")");
     }
 
     _contextGenCode->valeurTemporaire.adresse = llvmValue;

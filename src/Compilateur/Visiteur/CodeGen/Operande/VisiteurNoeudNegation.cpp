@@ -2,13 +2,13 @@
 #include "Compilateur/AST/AST_Genere.h"
 #include "Compilateur/AST/Registre/Types/TypeSimple.h"
 #include <llvm/IR/Instructions.h>
-#include <stdexcept>
+#include "Compilateur/Visiteur/CodeGen/Helper/ErrorHelper.h"
 
 void VisiteurGeneralGenCode::visiter(NoeudNegation* noeud)
 {
     // Vérification de sécurité
     if (noeud == nullptr || noeud->getOperande() == nullptr) {
-        throw std::runtime_error("Erreur : NoeudNegation ou opérande invalide");
+        ErrorHelper::erreurCompilation("NoeudNegation ou opérande invalide");
     }
     
     // Évaluer l'opérande (doit être un booléen)

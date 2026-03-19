@@ -1,5 +1,6 @@
 #include "Compilateur/AST/AST_Genere.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
+#include "Compilateur/Visiteur/CodeGen/Helper/ControlFlowHelper.h"
 
 void VisiteurGeneralGenCode::visiter(NoeudWhile* noeudWhile) 
 {
@@ -10,9 +11,7 @@ void VisiteurGeneralGenCode::visiter(NoeudWhile* noeudWhile)
     
     // construire les blocs de base pour le while 
     llvm::Function* fonctionEnCours = _contextGenCode->backend->getBuilder().GetInsertBlock()->getParent();
-    llvm::BasicBlock* blocCondition = llvm::BasicBlock::Create(_contextGenCode->backend->getContext(), "while.cond", fonctionEnCours);
-    llvm::BasicBlock* blocWhile = llvm::BasicBlock::Create(_contextGenCode->backend->getContext(), "while.body", fonctionEnCours);
-    llvm::BasicBlock* blocEndWhile = llvm::BasicBlock::Create(_contextGenCode->backend->getContext(), "while.end", fonctionEnCours);
+    auto [blocCondition, blocWhile, blocEndWhile] = ControlFlowHelper::creerBlocsControle(fonctionEnCours, _contextGenCode->backend->getContext(), "while.cond", "while.body", "while.end");
 
     // Générer le code pour la condition du while while.cond
     _contextGenCode->backend->getBuilder().CreateBr(blocCondition);

@@ -38,7 +38,7 @@ class VisiteurGeneralGenCode : public VisiteurBaseGenerale
 private:
     ContextGenCode* _contextGenCode;
     OrchestrateurInclude* _orchestrateurInclude;
-    
+
 public:
     using VisiteurBaseGenerale::visiter;
     void visiter(NoeudAffectationVariable* noeudAffectationVariable) override;

@@ -3,6 +3,8 @@
 #include "Compilateur/AST/Registre/Types/TypeSimple.h"
 #include <llvm/IR/Type.h>
 
+#include "Compilateur/Visiteur/CodeGen/Helper/ErrorHelper.h"
+
 void VisiteurGeneralGenCode::visiter(NoeudOperation* noeud)
 {
     // On évalue la gauche et on SAUVEGARDE le Symbole complet
@@ -70,9 +72,7 @@ void VisiteurGeneralGenCode::visiter(NoeudOperation* noeud)
         }
     }
 
-    if (resultat == nullptr) {
-        throw std::runtime_error("Opération inconnue");
-    }
+    resultat = ErrorHelper::verifierNonNull(resultat, "Opération inconnue");
 
     _contextGenCode->valeurTemporaire.adresse = resultat;
     _contextGenCode->valeurTemporaire.type = new (_contextGenCode->arena->Allocate<TypeSimple>()) TypeSimple(typeResultat);

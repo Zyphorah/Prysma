@@ -1,5 +1,7 @@
 #include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
+#include "Compilateur/Visiteur/CodeGen/Helper/ControlFlowHelper.h"
 #include <llvm-18/llvm/IR/Value.h>
 
 void VisiteurGeneralGenCode::visiter(NoeudIf* noeudIf) 
@@ -15,16 +17,14 @@ void VisiteurGeneralGenCode::visiter(NoeudIf* noeudIf)
 
     llvm::Function* fonctionEnCours = _contextGenCode->backend->getBuilder().GetInsertBlock()->getParent();
 
-    llvm::BasicBlock* blocThen = llvm::BasicBlock::Create(_contextGenCode->backend->getContext(), "if", fonctionEnCours);
-    llvm::BasicBlock* blocElse = llvm::BasicBlock::Create(_contextGenCode->backend->getContext(), "else", fonctionEnCours);
-    llvm::BasicBlock* blocFin = llvm::BasicBlock::Create(_contextGenCode->backend->getContext(), "endif", fonctionEnCours);
+    auto [blocThen, blocElse, blocFin] = ControlFlowHelper::creerBlocsControle(fonctionEnCours, _contextGenCode->backend->getContext(), "if", "else", "endif");
 
     // Générer le code de branchement conditionnel
     _contextGenCode->backend->getBuilder().CreateCondBr(cmp, blocThen, blocElse);
 
     // Générer le code pour le bloc "if"
     _contextGenCode->backend->getBuilder().SetInsertPoint(blocThen);
-    if (noeudBlocIf) {
+    if (noeudBlocIf != nullptr) {
         noeudBlocIf->accept(this);
     }
     // Brancher vers endif à la fin du bloc if
@@ -32,7 +32,7 @@ void VisiteurGeneralGenCode::visiter(NoeudIf* noeudIf)
 
     // Générer le code pour le bloc "else"
     _contextGenCode->backend->getBuilder().SetInsertPoint(blocElse);
-    if (noeudBlocElse) {
+    if (noeudBlocElse != nullptr) {
         noeudBlocElse->accept(this);
     }
     // Brancher vers endif à la fin du bloc else

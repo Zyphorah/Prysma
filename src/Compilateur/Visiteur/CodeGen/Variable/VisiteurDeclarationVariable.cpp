@@ -1,10 +1,20 @@
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
+#include "Compilateur/AST/Registre/Types/IType.h"
+#include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/AST/AST_Genere.h"
 #include "Compilateur/LLVM/GestionVariable.h"
 #include "Compilateur/AST/Registre/Types/TypeTableau.h"
+#include <cstddef>
+#include <cstdint>
 #include <llvm-18/llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Constants.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/Support/Casting.h>
+#include <vector>
+
+#include "Compilateur/Visiteur/CodeGen/Helper/ErrorHelper.h"
 
 void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationVariable) 
 {
@@ -37,11 +47,11 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
         } else {
             typeVariable = noeudDeclarationVariable->getType()->genererTypeLLVM(_contextGenCode->backend->getContext());
             if (typeVariable == nullptr) {
-                throw std::runtime_error("Erreur : impossible de déterminer la taille du tableau");
+                ErrorHelper::erreurCompilation("Impossible de déterminer la taille du tableau");
             }
             auto* typeTableauLLVM = llvm::dyn_cast<llvm::ArrayType>(typeVariable);
             if (typeTableauLLVM == nullptr) {
-                throw std::runtime_error("Erreur : le type de la variable n'est pas un tableau pour une initialisation de tableau");
+                ErrorHelper::erreurCompilation("Le type de la variable n'est pas un tableau pour une initialisation de tableau");
             }
             typeElement = typeTableauLLVM->getElementType();
         }
@@ -99,7 +109,7 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
                 llvm::Type* typeElement = typeTableauDecl->getTypeEnfant()->genererTypeLLVM(_contextGenCode->backend->getContext());
                 typeVariable = llvm::ArrayType::get(typeElement, tailleReelle);
             } else {
-                throw std::runtime_error("Erreur : impossible de déterminer le type de la variable");
+                ErrorHelper::erreurCompilation("Impossible de déterminer le type de la variable");
             }
         }
         

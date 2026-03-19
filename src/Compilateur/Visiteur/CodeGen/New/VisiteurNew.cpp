@@ -1,6 +1,9 @@
+#include "Compilateur/AST/Registre/RegistreFonction.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/AST/AST_Genere.h"
-#include <stdexcept>
+#include "Compilateur/Visiteur/CodeGen/Helper/ErrorHelper.h"
+#include <llvm-18/llvm/IR/Value.h>
+#include <string>
 
 void VisiteurGeneralGenCode::visiter(NoeudNew* noeudNew)
 {
@@ -12,16 +15,13 @@ void VisiteurGeneralGenCode::visiter(NoeudNew* noeudNew)
 
     if (noeudNew->getNomType().type == TOKEN_IDENTIFIANT) {
         infoClasse = _contextGenCode->registreClass->recuperer(noeudNew->getNomType().value);
-        if (infoClasse != nullptr) {
-            typeCible = infoClasse->structType;
-        }
+        infoClasse = ErrorHelper::verifierNonNull(infoClasse, "Classe '" + noeudNew->getNomType().value + "' non trouvée");
+        typeCible = infoClasse->structType;
     } else {
         typeCible = _contextGenCode->registreType->recuperer(noeudNew->getNomType().type);
     }
 
-    if (typeCible == nullptr) {
-        throw std::runtime_error("Erreur: le type cible n'existe pas! ");
-    }
+    typeCible = ErrorHelper::verifierNonNull(typeCible, "Type cible non déterminé pour 'new'");
 
     // C'est ici que LLVM décide si un int32 fait 4 octets, etc.
     const llvm::DataLayout& dataLayout = module.getDataLayout();
@@ -32,9 +32,7 @@ void VisiteurGeneralGenCode::visiter(NoeudNew* noeudNew)
 
     llvm::Function* mallocFunc = module.getFunction("prysma_malloc");
 
-    if (mallocFunc == nullptr) {
-        throw std::runtime_error("Erreur: la fonction prysma_malloc n'existe pas! ");
-    }
+    mallocFunc = ErrorHelper::verifierNonNull(mallocFunc, "Fonction prysma_malloc non déclarée dans le module");
 
     llvm::Value* adresseAllouee = builder.CreateCall(mallocFunc, {tailleLLVM}, "memoire_new");
 

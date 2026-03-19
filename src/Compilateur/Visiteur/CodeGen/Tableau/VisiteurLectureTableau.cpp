@@ -1,6 +1,7 @@
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/AST/AST_Genere.h"
 #include "Compilateur/AST/Registre/Types/TypeSimple.h"
+#include "Compilateur/Visiteur/CodeGen/Helper/ErrorHelper.h"
 #include <llvm-18/llvm/IR/Instructions.h>
 #include <llvm-18/llvm/Support/Casting.h>
 
@@ -12,9 +13,7 @@ void VisiteurGeneralGenCode::visiter(NoeudLectureTableau* noeudLectureTableau)
 
     // Faire une allocaInstance pour récupérer le type, on dyn cast le type llvm::Value 
     llvm::AllocaInst* allocaInst = llvm::dyn_cast<llvm::AllocaInst>(adresseTableau);
-    if (allocaInst == nullptr) {
-        throw std::runtime_error("L'adresse du tableau n'est pas une instruction d'allocation");
-    }
+    allocaInst = ErrorHelper::verifierNonNull(allocaInst, "L'adresse du tableau n'est pas une instruction d'allocation");
     llvm::Type* typeTableau = allocaInst->getAllocatedType();
     
     // Calculer l'index à partir de l'équation 

@@ -2,7 +2,7 @@
 #include "Compilateur/AST/AST_Genere.h"
 #include "Compilateur/LLVM/GestionVariable.h"
 #include "Compilateur/AST/Registre/RegistreClass.h"
-#include <stdexcept>
+#include "Compilateur/Visiteur/CodeGen/Helper/ErrorHelper.h"
 #include <llvm/IR/Instructions.h>
 
 void VisiteurGeneralGenCode::visiter(NoeudAppelObjet* noeudAppelObjet)
@@ -22,17 +22,14 @@ void VisiteurGeneralGenCode::visiter(NoeudAppelObjet* noeudAppelObjet)
     std::string nomClasse = obtenirNomClasseDepuisSymbole(objetSymbole);
 
     if (nomClasse.empty()) {
-        throw std::runtime_error("Erreur: impossible de determiner la classe de l'objet " + nomObjet);
+        ErrorHelper::erreurCompilation("Classe de l'objet '" + nomObjet + "' indéterminée");
     }
 
     auto* classInfo = _contextGenCode->registreClass->recuperer(nomClasse);
-    if (classInfo == nullptr) {
-        throw std::runtime_error("Erreur: classe " + nomClasse + " non trouvée dans le registre.");
-    }
+    classInfo = ErrorHelper::verifierNonNull(classInfo, "Classe '" + nomClasse + "' introuvable");
 
-    if (!classInfo->registreFonctionLocale->existe(nomMethode)) {
-        throw std::runtime_error("Erreur: la méthode " + nomMethode + " n'existe pas dans la classe " + nomClasse);
-    }
+    ErrorHelper::verifierExistence(*classInfo->registreFonctionLocale, nomMethode,
+        "Méthode '" + nomMethode + "' inexistante dans '" + nomClasse + "'");
 
     auto& builder = _contextGenCode->backend->getBuilder();
     
@@ -50,9 +47,7 @@ void VisiteurGeneralGenCode::visiter(NoeudAppelObjet* noeudAppelObjet)
         argumentEnfant->accept(this);
         llvm::Value* valeurArgument = _contextGenCode->valeurTemporaire.adresse;
         
-        if (valeurArgument == nullptr) {
-            throw std::runtime_error("Erreur : L'argument d'appel d'objet n'a pas généré de valeur.");
-        }
+        valeurArgument = ErrorHelper::verifierNonNull(valeurArgument, "L'argument d'appel d'objet n'a pas généré de valeur");
 
         llvm::Value* valeurFinale = valeurArgument;
         if (indexParam < typeFonction->getNumParams()) {
