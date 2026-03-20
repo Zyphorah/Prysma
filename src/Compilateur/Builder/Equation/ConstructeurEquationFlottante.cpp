@@ -1,10 +1,21 @@
+#include "Compilateur/AST/ConstructeurArbreEquation.h"
 #include "Compilateur/Builder/Equation/ConstructeurEquationFlottante.h"
+#include "Compilateur/AST/Interfaces/IConstructeurArbre.h"
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
 #include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/Registre/RegistreExpression.h"
+#include "Compilateur/AnalyseSyntaxique/Equation/ChaineResponsabilite.h"
+#include "Compilateur/AnalyseSyntaxique/Equation/GestionnaireOperateur.h"
+#include "Compilateur/AnalyseSyntaxique/Equation/ServiceParenthese.h"
 #include "Compilateur/Lexer/TokenType.h"
+#include <llvm/Support/Allocator.h>
+#include <memory>
+#include <utility>
+#include <vector>
 
 ConstructeurEquationFlottante::ConstructeurEquationFlottante(RegistreExpression* registreExpression, llvm::BumpPtrAllocator& arena)
-    : _arena(arena), _registreExpression(registreExpression)
+    : _registreExpression(registreExpression), _arena(arena)
 {
     _registreSymbole = std::make_unique<RegistreSymbole>();
 
@@ -42,13 +53,15 @@ ConstructeurEquationFlottante::ConstructeurEquationFlottante(RegistreExpression*
             
     _chaineResponsabilite = std::make_unique<ChaineResponsabilite>(_serviceParenthese.get(), operateurs);
                     
-    _constructeurArbre = new (_arena) ConstructeurArbreEquation(
-        _chaineResponsabilite.get(), 
-        _registreSymbole.get(), 
-    _registreExpression,
-        _serviceParenthese.get(),
-        _arena
-    );
+    _constructeurArbre = std::unique_ptr<IConstructeurArbre>(
+        new (_arena) ConstructeurArbreEquation(
+            _chaineResponsabilite.get(), 
+            _registreSymbole.get(), 
+            _registreExpression,
+            _serviceParenthese.get(),
+            _arena
+        )
+    ).release();
 
     initialiserRegistre();
 }
@@ -56,7 +69,7 @@ ConstructeurEquationFlottante::ConstructeurEquationFlottante(RegistreExpression*
 void ConstructeurEquationFlottante::initialiserRegistre()
 {
     _registreSymbole->enregistrer(TOKEN_PLUS, [this](Token token) -> IExpression* { 
-        return new (_arena.Allocate(sizeof(NoeudOperation), alignof(NoeudOperation))) NoeudOperation(std::move(token)); 
+        return new (_arena.Allocate(sizeof(NoeudOperation), alignof(NoeudOperation))) NoeudOperation(std::move(token)); // NOLINT(cppcoreguidelines-owning-memory)
     });
 
     _registreSymbole->enregistrer(TOKEN_MOINS, [this](Token token) -> IExpression* { 
@@ -101,17 +114,17 @@ void ConstructeurEquationFlottante::initialiserRegistre()
 
 
 
-INoeud* ConstructeurEquationFlottante::construire(std::vector<Token> &tokens)
+auto ConstructeurEquationFlottante::construire(std::vector<Token> &tokens) -> INoeud*
 {
     return _constructeurArbre->construire(tokens);
 }
 
-IConstructeurArbre* ConstructeurEquationFlottante::recupererConstructeurArbre() const
+auto ConstructeurEquationFlottante::recupererConstructeurArbre() const -> IConstructeurArbre*
 {
     return _constructeurArbre;
 }
 
-INoeud* ConstructeurEquationFlottante::construire(std::vector<Token>& tokens, int& index)
+auto ConstructeurEquationFlottante::construire(std::vector<Token>& tokens, int& index) -> INoeud*
 {
     return _constructeurArbre->construire(tokens, index);
 }

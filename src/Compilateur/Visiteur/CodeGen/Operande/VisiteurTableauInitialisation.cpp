@@ -1,3 +1,4 @@
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/AST/AST_Genere.h"
 
@@ -9,6 +10,6 @@ void VisiteurGeneralGenCode::visiter(NoeudTableauInitialisation* noeudInitialisa
     // Pour l'instant, retourner nullptr - le vrai traitement doit se faire
     // dans VisiteurDeclarationVariable qui connaît le type du tableau.
     
-    _contextGenCode->valeurTemporaire.adresse = nullptr;
-    _contextGenCode->valeurTemporaire.type = nullptr;
+    _contextGenCode->modifierValeurTemporaire(Symbole(nullptr, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+    _contextGenCode->modifierValeurTemporaire(Symbole(_contextGenCode->getValeurTemporaire().getAdresse(), nullptr, _contextGenCode->getValeurTemporaire().getTypePointeElement()));
 }

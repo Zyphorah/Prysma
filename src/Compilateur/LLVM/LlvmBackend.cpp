@@ -1,9 +1,21 @@
 #include "Compilateur/LLVM/LlvmBackend.h"
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/InstrTypes.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/NoFolder.h>
+#include <llvm/IR/Value.h>
+#include <llvm/Support/Casting.h>
+#include <llvm/Support/CodeGen.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/MC/TargetRegistry.h>
+#include <llvm/Support/raw_ostream.h>
 #include <llvm/Target/TargetOptions.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/TargetParser/Host.h>
+#include <memory>
+#include <string>
 #include <vector>
 
 using namespace llvm;
@@ -66,7 +78,7 @@ void LlvmBackend::declarerExterne(const std::string& nom, llvm::Type* ret, const
     llvm::Function::Create(type, llvm::Function::ExternalLinkage, nom, *_module);
 }
 
-llvm::Value* LlvmBackend::chargerValeur(llvm::Value* adresseMemoire, const std::string& nomVariable)
+auto LlvmBackend::chargerValeur(llvm::Value* adresseMemoire, const std::string& nomVariable) -> llvm::Value*
 {
     if (adresseMemoire == nullptr) 
     { 

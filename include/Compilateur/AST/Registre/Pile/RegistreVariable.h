@@ -6,20 +6,27 @@
 #include <llvm-18/llvm/IR/Value.h>
 #include <map>
 #include <stack>
+#include <string>
 
 namespace llvm { class AllocaInst; }
 
 struct Symbole {
+private:
     llvm::Value* adresse;
     IType* type;
-    llvm::Type* typePointeElement;  
+    llvm::Type* typePointeElement;
 
+public:
     Symbole() : adresse(nullptr), type(nullptr), typePointeElement(nullptr) {}
 
     Symbole(llvm::Value* pAdresse, IType* pType) : adresse(pAdresse), type(pType), typePointeElement(nullptr) {}
 
-    Symbole(llvm::Value* pAdresse, IType* pType, llvm::Type* pTypePointeElement) 
+    Symbole(llvm::Value* pAdresse, IType* pType, llvm::Type* pTypePointeElement)
         : adresse(pAdresse), type(pType), typePointeElement(pTypePointeElement) {}
+
+    [[nodiscard]] auto getAdresse() const -> llvm::Value* { return adresse; }
+    [[nodiscard]] auto getType() const -> IType* { return type; }
+    [[nodiscard]] auto getTypePointeElement() const -> llvm::Type* { return typePointeElement; }
 };
 
 class RegistreVariable 
@@ -31,8 +38,13 @@ public:
     RegistreVariable();
     
     ~RegistreVariable();
+
+    RegistreVariable(const RegistreVariable&) = delete;
+    auto operator=(const RegistreVariable&) -> RegistreVariable& = delete;
+    RegistreVariable(RegistreVariable&&) = delete;
+    auto operator=(RegistreVariable&&) -> RegistreVariable& = delete;
     
-    Symbole recupererVariables(const Token& token);
+    auto recupererVariables(const Token& token) -> Symbole;
 
     void enregistrer(
         const Token& token,
@@ -43,9 +55,9 @@ public:
     void depiler();
     void viderTop();
 
-    bool existeVariable(const std::string& nom);
+    auto existeVariable(const std::string& nom) -> bool;
 
-    std::map<std::string, Symbole>& getGlobalVariables() {
+    auto getGlobalVariables() -> std::map<std::string, Symbole>& {
         return _variables.top();
     }
 };

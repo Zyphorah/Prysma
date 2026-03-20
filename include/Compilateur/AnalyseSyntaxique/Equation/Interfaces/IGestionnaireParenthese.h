@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Compilateur/Lexer/Lexer.h"
+#include <vector>
 
 /**
  * @interface IGestionnaireParenthese
@@ -8,7 +9,12 @@
  */
 class IGestionnaireParenthese {
 public:
+    IGestionnaireParenthese() = default;
     virtual ~IGestionnaireParenthese() = default;
+    IGestionnaireParenthese(const IGestionnaireParenthese&) = delete;
+    auto operator=(const IGestionnaireParenthese&) -> IGestionnaireParenthese& = delete;
+    IGestionnaireParenthese(IGestionnaireParenthese&&) = delete;
+    auto operator=(IGestionnaireParenthese&&) -> IGestionnaireParenthese& = delete;
     
     /**
      * @brief Enlève les parenthèses qui englobent toute l'expression
@@ -16,7 +22,7 @@ public:
      * @param equation L'équation à traiter
      * @return L'équation sans parenthèses englobantes
      */
-    virtual std::vector<Token> enleverParenthesesEnglobantes(const std::vector<Token>& equation) = 0;
+    virtual auto enleverParenthesesEnglobantes(const std::vector<Token>& equation) -> std::vector<Token> = 0;
     
     /**
      * @brief Trouve le dernier opérateur au niveau de parenthèses zéro
@@ -24,5 +30,5 @@ public:
      * @param operateur Le caractère opérateur à chercher
      * @return L'index de l'opérateur, ou -1 si non trouvé
      */
-    virtual int trouverDernierAuNiveauZero(const vector<Token>& equation, Token operateur) = 0;
+    virtual auto trouverDernierAuNiveauZero(const vector<Token>& equation, Token operateur) -> int = 0;
 };

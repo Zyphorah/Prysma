@@ -1,4 +1,9 @@
 #include "Compilateur/AnalyseSyntaxique/Equation/GestionnaireOperateur.h"
+#include "Compilateur/AnalyseSyntaxique/Equation/Interfaces/IGestionnaireOperateur.h"
+#include "Compilateur/AnalyseSyntaxique/Equation/Interfaces/IGestionnaireParenthese.h"
+#include "Compilateur/Lexer/Lexer.h"
+#include "Compilateur/Lexer/TokenType.h"
+#include <vector>
 
 GestionnaireOperateur::GestionnaireOperateur(TokenType tokenType)
     : _suivant(nullptr), _gestionnaireParenthese(nullptr), _tokenType(tokenType) {}
@@ -11,7 +16,7 @@ void GestionnaireOperateur::definirSuivant(IGestionnaireOperateur* suivant) {
     _suivant = suivant;
 }
 
-int GestionnaireOperateur::chercherOperateur(const std::vector<Token>& equation) const {
+auto GestionnaireOperateur::chercherOperateur(const std::vector<Token>& equation) const -> int {
     if (_gestionnaireParenthese == nullptr) {
         return -1;
     }
@@ -21,7 +26,7 @@ int GestionnaireOperateur::chercherOperateur(const std::vector<Token>& equation)
     return _gestionnaireParenthese->trouverDernierAuNiveauZero(equation, operateur);
 }
 
-int GestionnaireOperateur::traiter(const std::vector<Token>& equation) {
+auto GestionnaireOperateur::traiter(const std::vector<Token>& equation) -> int {
     int indice = chercherOperateur(equation);
     
     if (indice != -1) {

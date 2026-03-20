@@ -4,4 +4,4 @@
 VisiteurRemplissageRegistre::VisiteurRemplissageRegistre(ContextGenCode* contextGenCode, OrchestrateurInclude* orchestrateur) 
     : _contextGenCode(contextGenCode), _orchestrateur(orchestrateur) {}
 
-VisiteurRemplissageRegistre::~VisiteurRemplissageRegistre() {}
+VisiteurRemplissageRegistre::~VisiteurRemplissageRegistre() = default;

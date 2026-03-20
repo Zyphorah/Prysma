@@ -3,7 +3,11 @@
 
 #include "Compilateur/Variable/ExpressionIdentifiant.h"
 #include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/Registre/ContexteExpression.h"
+#include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenType.h"
+#include <cstddef>
 #include <vector>
 
 ExpressionIdentifiant::ExpressionIdentifiant(ContexteExpression& contexteExpression)
@@ -11,9 +15,9 @@ ExpressionIdentifiant::ExpressionIdentifiant(ContexteExpression& contexteExpress
 {}
 
 ExpressionIdentifiant::~ExpressionIdentifiant()
-{}
+= default;
 
-INoeud* ExpressionIdentifiant::construire(std::vector<Token>& equation)
+auto ExpressionIdentifiant::construire(std::vector<Token>& equation) -> INoeud*
 {
     bool isTableau = false;
     size_t indexCrochet = 0;
@@ -37,15 +41,15 @@ INoeud* ExpressionIdentifiant::construire(std::vector<Token>& equation)
             }
         }
 
-        INoeud* indexEquation = _contexteExpression.constructeurArbreEquation->construire(equationIndex);
-        return _contexteExpression.constructeurArbreEquation->allouer<NoeudLectureTableau>(indexEquation, equation[0]);
+        INoeud* indexEquation = _contexteExpression.getConstructeurArbreEquation()->construire(equationIndex);
+        return _contexteExpression.getConstructeurArbreEquation()->allouer<NoeudLectureTableau>(indexEquation, equation[0]);
     }
 
     if (equation.size() == 3 && equation[1].type == TOKEN_POINT) {
-        return _contexteExpression.constructeurArbreEquation->allouer<NoeudAccesAttribut>(equation[0], equation[2]);
+        return _contexteExpression.getConstructeurArbreEquation()->allouer<NoeudAccesAttribut>(equation[0], equation[2]);
     }
 
-    return _contexteExpression.constructeurArbreEquation->allouer<NoeudLitteral>(equation[0]);
+    return _contexteExpression.getConstructeurArbreEquation()->allouer<NoeudLitteral>(equation[0]);
 }
 
 #endif /* EXPRESSION_IDENTIFIANT_CPP */

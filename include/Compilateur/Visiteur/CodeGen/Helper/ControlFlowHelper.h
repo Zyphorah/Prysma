@@ -14,13 +14,13 @@ struct BlocsControle {
 
 class ControlFlowHelper {
 public:
-    static BlocsControle creerBlocsControle(
+    static auto creerBlocsControle(
         llvm::Function* fonction,
         llvm::LLVMContext& context,
         const std::string& nomEntree,
         const std::string& nomCorps, 
         const std::string& nomSortie
-    );
+    ) -> BlocsControle;
 };
 
 #endif /* C6E13746_23A9_489F_AD56_E4937A64E42F */

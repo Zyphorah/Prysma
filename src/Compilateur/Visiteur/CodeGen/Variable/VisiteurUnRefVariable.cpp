@@ -6,5 +6,5 @@ void VisiteurGeneralGenCode::visiter(NoeudUnRefVariable* noeudUnRefVariable)
 {
     ChargeurVariable chargeur(_contextGenCode);
     
-    _contextGenCode->valeurTemporaire = chargeur.chargerUnref(noeudUnRefVariable->getNomVariable());
+    _contextGenCode->modifierValeurTemporaire(chargeur.chargerUnref(noeudUnRefVariable->getNomVariable()));
 }

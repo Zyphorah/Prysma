@@ -10,8 +10,14 @@ private:
     ContextGenCode* _contextGenCode;
 
 public:
-    ConstructeurEnvironnementRegistreVariable(ContextGenCode* _contextGenCode);
-    ~ConstructeurEnvironnementRegistreVariable();
+    explicit ConstructeurEnvironnementRegistreVariable(ContextGenCode* _contextGenCode);
+    ~ConstructeurEnvironnementRegistreVariable() override;
+
+    ConstructeurEnvironnementRegistreVariable(const ConstructeurEnvironnementRegistreVariable&) = delete;
+    auto operator=(const ConstructeurEnvironnementRegistreVariable&) -> ConstructeurEnvironnementRegistreVariable& = delete;
+
+    ConstructeurEnvironnementRegistreVariable(ConstructeurEnvironnementRegistreVariable&&) = delete;
+    auto operator=(ConstructeurEnvironnementRegistreVariable&&) -> ConstructeurEnvironnementRegistreVariable& = delete;
 
     void remplir() override;
 };

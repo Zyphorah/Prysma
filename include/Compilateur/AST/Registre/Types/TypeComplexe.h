@@ -11,19 +11,19 @@ class TypeComplexe : public IType {
 private:
     std::string nomClasse;
 public:
-    TypeComplexe(const std::string& nom);
+    explicit TypeComplexe(const std::string& nom);
     
-    llvm::Type* genererTypeLLVM(llvm::LLVMContext& context) override;
+    auto genererTypeLLVM(llvm::LLVMContext& context) -> llvm::Type* override;
     
-    bool estFlottant() const override;
-    bool estBooleen() const override;
-    bool estChaine() const override;
-    bool estTableau() const override;
-    bool estComplexe() const override;
+    [[nodiscard]] auto estFlottant() const -> bool override;
+    [[nodiscard]] auto estBooleen() const -> bool override;
+    [[nodiscard]] auto estChaine() const -> bool override;
+    [[nodiscard]] auto estTableau() const -> bool override;
+    [[nodiscard]] auto estComplexe() const -> bool override;
     
-    llvm::Type* getVTableType(llvm::LLVMContext& context) override;
+    auto getVTableType(llvm::LLVMContext& context) -> llvm::Type* override;
     
-    std::string getNomClasse() const;
+    [[nodiscard]] auto getNomClasse() const -> std::string;
 };
 
 #endif /* C747FE4B_9A53_40BA_A4BE_19C00508C8C4 */

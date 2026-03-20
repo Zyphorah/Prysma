@@ -21,7 +21,7 @@ void VisiteurRemplissageRegistre::visiter(NoeudClass* noeudClass)
 
     // 2. Créer le type "Opaque" dans LLVM
     llvm::StructType* typeOpaqueLLVM = llvm::StructType::create(
-        _contextGenCode->backend->getContext(),
+        _contextGenCode->getBackend()->getContext(),
         "Class_" + nomClasse
     );
 
@@ -29,29 +29,29 @@ void VisiteurRemplissageRegistre::visiter(NoeudClass* noeudClass)
     auto* infosClasse = new Class();
 
     // 4. Lier le type LLVM opaque à la structure
-    infosClasse->structType = typeOpaqueLLVM;
+    infosClasse->setStructType(typeOpaqueLLVM);
 
     // 5. Initialiser l'héritage
     const auto& heritage = noeudClass->getHeritage();
     if (!heritage.empty()) {
-        infosClasse->parentHeritage = heritage[0];
+        infosClasse->setParentHeritage(heritage[0]);
     } else {
-        infosClasse->parentHeritage = nullptr;
+        infosClasse->setParentHeritage(nullptr);
     }
 
     // 6. Préparer les registres internes (vides pour l'instant, seront remplis en Passe 2)
-    infosClasse->registreVariable = new RegistreVariable();
-    infosClasse->registreFonctionLocale = new RegistreFonctionLocale();
+    infosClasse->setRegistreVariable(new RegistreVariable());
+    infosClasse->setRegistreFonctionLocale(new RegistreFonctionLocale());
 
     // La VTable sera générée plus tard lors de la résolution des méthodes virtuelles
-    infosClasse->vtable = nullptr;
+    infosClasse->setVTable(nullptr);
 
     // 7. Enregistrer la classe dans le registre global du compilateur
-    _contextGenCode->registreClass->enregistrer(nomClasse, infosClasse);
+    _contextGenCode->getRegistreClass()->enregistrer(nomClasse, std::unique_ptr<Class>(infosClasse));
 
     // 8. Visiter le corps de la classe pour remplir ses registres (méthodes, etc.)
-    std::string ancienneClasse = _contextGenCode->nomClasseCourante;
-    _contextGenCode->nomClasseCourante = nomClasse;
+    std::string ancienneClasse = _contextGenCode->getNomClasseCourante();
+    _contextGenCode->modifierNomClasseCourante(nomClasse);
 
     for (auto* membre : noeudClass->getListMembres()) {
         if (membre->getTypeGenere() == NoeudTypeGenere::DeclarationFonction) {
@@ -61,10 +61,10 @@ void VisiteurRemplissageRegistre::visiter(NoeudClass* noeudClass)
             auto* declVar = static_cast<NoeudDeclarationVariable*>(membre);
             Token token;
             token.value = declVar->getNom();
-            infosClasse->registreVariable->enregistrer(token, Symbole(nullptr, declVar->getType()));
+            infosClasse->getRegistreVariable()->enregistrer(token, Symbole(nullptr, declVar->getType()));
             
             if (declVar->getExpression() != nullptr) {
-                infosClasse->memberInitializers[declVar->getNom()] = declVar->getExpression();
+                infosClasse->getMemberInitializers()[declVar->getNom()] = declVar->getExpression();
             }
         }
     }
@@ -74,5 +74,5 @@ void VisiteurRemplissageRegistre::visiter(NoeudClass* noeudClass)
         constructeur->accept(this);
     }
 
-    _contextGenCode->nomClasseCourante = ancienneClasse;
+    _contextGenCode->modifierNomClasseCourante(ancienneClasse);
 }

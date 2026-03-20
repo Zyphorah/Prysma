@@ -7,7 +7,7 @@
 class ErrorHelper {
 public:
     template<typename T>
-    static T* verifierNonNull(T* ptr, const std::string& message) {
+    static auto verifierNonNull(T* ptr, const std::string& message) -> T* {
         if (ptr == nullptr) {
             throw std::runtime_error("Erreur sémantique : " + message);
         }

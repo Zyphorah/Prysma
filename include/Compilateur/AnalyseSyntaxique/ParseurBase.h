@@ -4,13 +4,14 @@
 #include "Compilateur/AST/Interfaces/IConstructeurArbre.h"
 #include "Compilateur/AST/Noeuds/Interfaces/IInstruction.h"
 #include "Compilateur/Lexer/Lexer.h"
+#include "Compilateur/Lexer/TokenType.h"
 #include <vector>
 #include <string>
 
 class ParseurBase
 {
 protected:
-    static Token consommer(std::vector<Token>& tokens, int& index, TokenType typeAttendu, const std::string& messageErreur);
+    static auto consommer(std::vector<Token>& tokens, int& index, TokenType typeAttendu, const std::string& messageErreur) -> Token;
     static void consommerEnfantCorps(std::vector<Token>& tokens, int& index, IInstruction* parent, IConstructeurArbre* constructeurArbre,TokenType fin);
 };
 

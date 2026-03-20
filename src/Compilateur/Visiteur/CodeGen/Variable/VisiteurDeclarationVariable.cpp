@@ -42,10 +42,10 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
         
         if (typeTableauDecl != nullptr && typeTableauDecl->getTaille() == nullptr) {
             size_t tailleReelle = tableauInit->getElements().size();
-            typeElement = typeTableauDecl->getTypeEnfant()->genererTypeLLVM(_contextGenCode->backend->getContext());
+            typeElement = typeTableauDecl->getTypeEnfant()->genererTypeLLVM(_contextGenCode->getBackend()->getContext());
             typeVariable = llvm::ArrayType::get(typeElement, tailleReelle);
         } else {
-            typeVariable = noeudDeclarationVariable->getType()->genererTypeLLVM(_contextGenCode->backend->getContext());
+            typeVariable = noeudDeclarationVariable->getType()->genererTypeLLVM(_contextGenCode->getBackend()->getContext());
             if (typeVariable == nullptr) {
                 ErrorHelper::erreurCompilation("Impossible de déterminer la taille du tableau");
             }
@@ -65,28 +65,28 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
         auto* typeTableauLLVM = llvm::dyn_cast<llvm::ArrayType>(typeVariable);
         for (size_t i = 0; i < tableauInit->getElements().size(); ++i) {
             std::vector<llvm::Value*> indices = {
-                _contextGenCode->backend->getBuilder().getInt32(0),
-                _contextGenCode->backend->getBuilder().getInt32(static_cast<uint32_t>(i))
+                _contextGenCode->getBackend()->getBuilder().getInt32(0),
+                _contextGenCode->getBackend()->getBuilder().getInt32(static_cast<uint32_t>(i))
             }; 
-            llvm::Value* ptrCase = _contextGenCode->backend->getBuilder().CreateGEP(typeTableauLLVM, allocaInstTableau, indices, "ptr_case");
+            llvm::Value* ptrCase = _contextGenCode->getBackend()->getBuilder().CreateGEP(typeTableauLLVM, allocaInstTableau, indices, "ptr_case");
             
             INoeud* element = tableauInit->getElements()[i];
             Symbole symboleElement = evaluerExpression(element);
-            llvm::Value* valeurCastee = _contextGenCode->backend->creerAutoCast(symboleElement.adresse, typeElement);
-            _contextGenCode->backend->getBuilder().CreateStore(valeurCastee, ptrCase);
+            llvm::Value* valeurCastee = _contextGenCode->getBackend()->creerAutoCast(symboleElement.getAdresse(), typeElement);
+            _contextGenCode->getBackend()->getBuilder().CreateStore(valeurCastee, ptrCase);
         }
     } else {
         // Variable simple (non-tableau)
-        llvm::Type* typeVariable = noeudDeclarationVariable->getType()->genererTypeLLVM(_contextGenCode->backend->getContext());
+        llvm::Type* typeVariable = noeudDeclarationVariable->getType()->genererTypeLLVM(_contextGenCode->getBackend()->getContext());
         llvm::AllocaInst* allocaInst = allocateur.allouer(typeVariable, noeudDeclarationVariable->getNom());
         allocaCree = allocaInst;
         
-        llvm::Value* valeurCalculee = evaluerExpression(expression).adresse;
+        llvm::Value* valeurCalculee = evaluerExpression(expression).getAdresse();
         if (valeurCalculee == nullptr) {
             return;
         }
 
-        llvm::Value* valeurCastee = _contextGenCode->backend->creerAutoCast(valeurCalculee, typeVariable);
+        llvm::Value* valeurCastee = _contextGenCode->getBackend()->creerAutoCast(valeurCalculee, typeVariable);
         allocateur.stocker(valeurCastee, allocaInst);
     }
     if (allocaCree != nullptr) {
@@ -94,7 +94,7 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
         token.value = noeudDeclarationVariable->getNom();
         
         // Créer le symbole avec le type pointé si c'est un pointeur
-        llvm::Type* typeVariable = noeudDeclarationVariable->getType()->genererTypeLLVM(_contextGenCode->backend->getContext());
+        llvm::Type* typeVariable = noeudDeclarationVariable->getType()->genererTypeLLVM(_contextGenCode->getBackend()->getContext());
         
         // Si on a un tableau avec taille dynamique (nullptr), on doit utiliser le type réel qu'on a calculé
         if (typeVariable == nullptr) {
@@ -106,7 +106,7 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
             if (typeTableauDecl != nullptr && tableauInit != nullptr) {
                 // On peut recalculer à partir de l'initialisation
                 size_t tailleReelle = tableauInit->getElements().size();
-                llvm::Type* typeElement = typeTableauDecl->getTypeEnfant()->genererTypeLLVM(_contextGenCode->backend->getContext());
+                llvm::Type* typeElement = typeTableauDecl->getTypeEnfant()->genererTypeLLVM(_contextGenCode->getBackend()->getContext());
                 typeVariable = llvm::ArrayType::get(typeElement, tailleReelle);
             } else {
                 ErrorHelper::erreurCompilation("Impossible de déterminer le type de la variable");
@@ -117,10 +117,10 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
         
         if (typeVariable->isPointerTy()) {
             // Pour un pointeur, on récupère le type pointé qui a été mémorisé lors de l'évaluation de l'expression (new)
-            typePointeElement = _contextGenCode->valeurTemporaire.typePointeElement;
+            typePointeElement = _contextGenCode->getValeurTemporaire().getTypePointeElement();
         }
         
-        _contextGenCode->registreVariable->enregistrer(
+        _contextGenCode->getRegistreVariable()->enregistrer(
             token, 
             Symbole(allocaCree, noeudDeclarationVariable->getType(), typePointeElement)
         );

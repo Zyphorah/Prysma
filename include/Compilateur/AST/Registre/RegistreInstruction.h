@@ -7,6 +7,10 @@
 class RegistreInstruction : public RegistreGeneric<TokenType, IParseur*> {
 public:
     RegistreInstruction() = default;
-    virtual ~RegistreInstruction() = default;
+    ~RegistreInstruction() override = default;
 
+    RegistreInstruction(const RegistreInstruction&) = delete;
+    auto operator=(const RegistreInstruction&) -> RegistreInstruction& = delete;
+    RegistreInstruction(RegistreInstruction&&) = delete;
+    auto operator=(RegistreInstruction&&) -> RegistreInstruction& = delete;
 };

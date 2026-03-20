@@ -1,4 +1,7 @@
 #include "Compilateur/TraitementFichier/FichierLecture.h"
+#include <ios>
+#include <stdexcept>
+#include <string>
 
 FichierLecture::FichierLecture(const std::string& path)
     : _path(path), _fichier(path, std::ios::in)
@@ -24,6 +27,4 @@ std::string FichierLecture :: entrer()
  
 };
 
-FichierLecture::~FichierLecture() {
-
-}
+FichierLecture::~FichierLecture() = default;

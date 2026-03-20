@@ -1,9 +1,11 @@
 #ifndef F2D02E97_AF62_409B_84AD_90905E9BE240
 #define F2D02E97_AF62_409B_84AD_90905E9BE240
 #include "TokenType.h"
+#include <array>
+#include <cstddef>
 #include <string>
+#include <utility>
 #include <vector>
-#include <string_view>
 
 using namespace std;
 // lexer utilisé pour la tokenization du code source prysma
@@ -21,7 +23,7 @@ class Lexer {
 
     // Dictionnaire pour les mots réservés du langage de programmation prysma
     // Permet de différencier les identifiants des mots-clés
-    static constexpr std::pair<std::string_view, TokenType> motsClesArray[] = {
+    static constexpr std::array<std::pair<const char*, TokenType>, 31> motsClesArray = {{
         {"char", TOKEN_TYPE_CHAR},
         {"arg", TOKEN_ARG},
         {"fn", TOKEN_FONCTION},
@@ -53,11 +55,10 @@ class Lexer {
         {"public", TOKEN_PUBLIC},
         {"private", TOKEN_PRIVATE},
         {"protected",TOKEN_PROTECTED},
-        
-    };
+    }};
 
     // Fonctions privées pour la tokenization
-    void ajouterMotCourant(const string& motCourant, vector<Token>& tokens, int ligne, int colonne);
+    static void ajouterMotCourant(const string& motCourant, vector<Token>& tokens, int ligne, int colonne);
     static void traiterOperateursEtDelimiteurs(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne);
     static void traiterOperateursMathematiques(char current, vector<Token>& tokens, int ligne, int colonne);
     static void traiterDelimiteurs(char current, vector<Token>& tokens, int ligne, int colonne);
@@ -65,12 +66,12 @@ class Lexer {
     static void traiterLitteraux(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne);
     static void traiterCommentaires(const string& sourceCode, size_t& pos);
     static void traiterNombre(const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne);
-    static bool estContexteNombreNegatif(const vector<Token>& tokens);
-    bool traiterNombreNegatifOuPositif(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, 
-                                        string& motCourant, int ligne, int& colonne, int& colonneMotCourant);
+    static auto estContexteNombreNegatif(const vector<Token>& tokens) -> bool;
+    static auto traiterNombreNegatifOuPositif(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, 
+                                        string& motCourant, int ligne, int& colonne, int& colonneMotCourant) -> bool;
     
     public: 
-        vector<Token> tokenizer(const string& sourceCode);
+    static auto tokenizer(const string& sourceCode) -> vector<Token>;
 };
 
 #endif /* F2D02E97_AF62_409B_84AD_90905E9BE240 */

@@ -1,8 +1,12 @@
 #include "Compilateur/Lexer/Lexer.h"
+#include "Compilateur/Lexer/TokenType.h"
 #include <cctype>
+#include <cstddef>
 #include <set>
+#include <string>
+#include <vector>
 
-bool Lexer::estContexteNombreNegatif(const vector<Token>& tokens) {
+auto Lexer::estContexteNombreNegatif(const vector<Token>& tokens) -> bool {
     if (tokens.empty()) {
         return true;
     }
@@ -85,7 +89,12 @@ void Lexer::traiterLitteraux(char current, const string& sourceCode, size_t& pos
     }
 }
 
-void Lexer::ajouterMotCourant(const string& motCourant, vector<Token>& tokens, int ligne, int colonne) {
+void Lexer::ajouterMotCourant(const string& motCourant, vector<Token>& tokens
+    , int ligne 
+    , int colonne 
+    )
+{
+
     if (motCourant.empty()) {
         return;
     }
@@ -134,6 +143,9 @@ void Lexer::traiterOperateursMathematiques(char current, vector<Token>& tokens, 
         case '%':
             tokens.push_back({TOKEN_MODULO, "%", ligne, colonne});
             break;
+        default:
+            // Aucun opérateur mathématique reconnu, ne rien faire
+            break;
     }
 }
 
@@ -165,6 +177,8 @@ void Lexer::traiterDelimiteurs(char current, vector<Token>& tokens, int ligne, i
             break;
         case ',': 
             tokens.push_back({TOKEN_VIRGULE, ",", ligne, colonne}); 
+        default:
+            // Aucun délimiteur reconnu, ne rien faire
             break;
     }
 }
@@ -235,6 +249,7 @@ void Lexer::traiterOperateursComplexes(char current, const string& sourceCode, s
             } else {
                 tokens.push_back({TOKEN_DEUX_POINTS, ":", ligne, colonne});
             }
+        default:
             break;
     }
 }
@@ -252,8 +267,8 @@ void Lexer::traiterOperateursEtDelimiteurs(char current, const string& sourceCod
     }
 }
 
-bool Lexer::traiterNombreNegatifOuPositif(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, 
-                                           string& motCourant, int ligne, int& colonne, int& colonneMotCourant) {
+auto Lexer::traiterNombreNegatifOuPositif(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, 
+                                           string& motCourant, int ligne, int& colonne, int& colonneMotCourant) -> bool {
     // Vérifie si c'est un signe (+/-) suivi d'un chiffre en contexte valide
     if (motCourant.empty() && (current == '-' || current == '+') && 
         pos + 1 < sourceCode.length() && isdigit(sourceCode[pos + 1]) != 0 &&
@@ -269,7 +284,8 @@ bool Lexer::traiterNombreNegatifOuPositif(char current, const string& sourceCode
     return false;
 }
 
-vector<Token> Lexer::tokenizer(const string& sourceCode) {
+auto Lexer::tokenizer(const string& sourceCode) -> vector<Token> 
+{
     vector<Token> tokens;
     string motCourant;
     

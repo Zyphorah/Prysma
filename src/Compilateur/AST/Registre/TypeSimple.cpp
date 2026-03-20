@@ -1,13 +1,15 @@
 #include "Compilateur/AST/Registre/Types/TypeSimple.h"
 #include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Type.h>
 #include <stdexcept>
+#include <string>
 
 TypeSimple::TypeSimple(llvm::Type* typeLLVM)
     : _typeLLVM(typeLLVM)
 {
 }
 
-llvm::Type* TypeSimple::genererTypeLLVM(llvm::LLVMContext& context)
+auto TypeSimple::genererTypeLLVM(llvm::LLVMContext& context) -> llvm::Type*
 {
     if (&_typeLLVM->getContext() == &context) {
         return _typeLLVM;
@@ -27,17 +29,19 @@ llvm::Type* TypeSimple::genererTypeLLVM(llvm::LLVMContext& context)
     }
 }
 
-bool TypeSimple::estFlottant() const
+auto TypeSimple::estFlottant() const -> bool
 {
     return _typeLLVM->isFloatingPointTy();
 }
 
-bool TypeSimple::estBooleen() const
+auto TypeSimple::estBooleen() const -> bool
 {
     return _typeLLVM->isIntegerTy(1);
 }
 
-bool TypeSimple::estChaine() const
+constexpr int CHAINE_BIT_WIDTH = 8;
+
+auto TypeSimple::estChaine() const -> bool
 {
-    return _typeLLVM->isIntegerTy(8);
+    return _typeLLVM->isIntegerTy(CHAINE_BIT_WIDTH);
 }

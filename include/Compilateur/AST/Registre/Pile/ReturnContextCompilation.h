@@ -10,13 +10,14 @@ private:
 
 public:
 
-    ReturnContextCompilation()
-    {}
+    ReturnContextCompilation() = default;
+    ReturnContextCompilation(const ReturnContextCompilation&) = default;
+    ReturnContextCompilation(ReturnContextCompilation&&)  noexcept = default;
+    auto operator=(const ReturnContextCompilation&) -> ReturnContextCompilation& = default;
+    auto operator=(ReturnContextCompilation&&) -> ReturnContextCompilation& = default;
+    ~ReturnContextCompilation() = default;
 
-    ~ReturnContextCompilation()
-    {}
-
-    TokenType recupererContext();
+    auto recupererContext() -> TokenType;
         
     void piler(const TokenType& token);
     void depiler();

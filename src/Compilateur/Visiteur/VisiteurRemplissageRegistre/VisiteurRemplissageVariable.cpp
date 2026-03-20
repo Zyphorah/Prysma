@@ -13,5 +13,5 @@ void VisiteurRemplissageRegistre::visiter(NoeudDeclarationVariable* noeudDeclara
     IType* type = noeudDeclarationVariable->getType();
     token.value = noeudDeclarationVariable->getNom();
    
-    _contextGenCode->registreVariable->enregistrer(token, Symbole(nullptr, type));
+    _contextGenCode->getRegistreVariable()->enregistrer(token, Symbole(nullptr, type));
 }

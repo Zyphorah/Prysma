@@ -13,35 +13,35 @@ void VisiteurGeneralGenCode::visiter(NoeudIf* noeudIf)
 
     // Évaluer la condition
     noeudCondition->accept(this);
-    llvm::Value* cmp = _contextGenCode->valeurTemporaire.adresse; 
+    llvm::Value* cmp = _contextGenCode->getValeurTemporaire().getAdresse(); 
 
-    llvm::Function* fonctionEnCours = _contextGenCode->backend->getBuilder().GetInsertBlock()->getParent();
+    llvm::Function* fonctionEnCours = _contextGenCode->getBackend()->getBuilder().GetInsertBlock()->getParent();
 
-    auto [blocThen, blocElse, blocFin] = ControlFlowHelper::creerBlocsControle(fonctionEnCours, _contextGenCode->backend->getContext(), "if", "else", "endif");
+    auto [blocThen, blocElse, blocFin] = ControlFlowHelper::creerBlocsControle(fonctionEnCours, _contextGenCode->getBackend()->getContext(), "if", "else", "endif");
 
     // Générer le code de branchement conditionnel
-    _contextGenCode->backend->getBuilder().CreateCondBr(cmp, blocThen, blocElse);
+    _contextGenCode->getBackend()->getBuilder().CreateCondBr(cmp, blocThen, blocElse);
 
     // Générer le code pour le bloc "if"
-    _contextGenCode->backend->getBuilder().SetInsertPoint(blocThen);
+    _contextGenCode->getBackend()->getBuilder().SetInsertPoint(blocThen);
     if (noeudBlocIf != nullptr) {
         noeudBlocIf->accept(this);
     }
     // Brancher vers endif à la fin du bloc if
-    _contextGenCode->backend->getBuilder().CreateBr(blocFin);
+    _contextGenCode->getBackend()->getBuilder().CreateBr(blocFin);
 
     // Générer le code pour le bloc "else"
-    _contextGenCode->backend->getBuilder().SetInsertPoint(blocElse);
+    _contextGenCode->getBackend()->getBuilder().SetInsertPoint(blocElse);
     if (noeudBlocElse != nullptr) {
         noeudBlocElse->accept(this);
     }
     // Brancher vers endif à la fin du bloc else
-    _contextGenCode->backend->getBuilder().CreateBr(blocFin);
+    _contextGenCode->getBackend()->getBuilder().CreateBr(blocFin);
 
     // Générer le code pour le bloc "endif"
-    _contextGenCode->backend->getBuilder().SetInsertPoint(blocFin);
+    _contextGenCode->getBackend()->getBuilder().SetInsertPoint(blocFin);
     
     // Car plus de noeud devrait traiter cette valeur temporaire après le if
-    _contextGenCode->valeurTemporaire.adresse = nullptr;
+    _contextGenCode->modifierValeurTemporaire(Symbole(nullptr, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
 
 }

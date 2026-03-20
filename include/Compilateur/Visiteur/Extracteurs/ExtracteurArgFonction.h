@@ -7,10 +7,12 @@ class NoeudArgFonction;
 
 class ExtracteurArgFonction : public VisiteurBaseGenerale {
 public:
-    NoeudArgFonction* arg = nullptr;
-
     using VisiteurBaseGenerale::visiter;
     void visiter(NoeudArgFonction* noeud) override;
+    [[nodiscard]] auto getArg() const -> NoeudArgFonction* { return arg; }
+
+private:
+    NoeudArgFonction* arg = nullptr;
 };
 
 #endif /* F18431EF_5246_41F8_BED6_A8C2574165E4 */

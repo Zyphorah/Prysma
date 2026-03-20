@@ -1,8 +1,12 @@
 #include "Compilateur/AST/Utils/ConstructeurEnvironnementRegistreVariable.h"
+#include "Compilateur/AST/Registre/ContextGenCode.h"
 #include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/AST/Registre/Types/IType.h"
 #include "Compilateur/LLVM/LlvmBackend.h"
+#include "Compilateur/Lexer/Lexer.h"
 #include "llvm/IR/GlobalVariable.h"
+#include <llvm/IR/GlobalValue.h>
+#include <llvm/IR/Type.h>
 
 ConstructeurEnvironnementRegistreVariable::ConstructeurEnvironnementRegistreVariable(ContextGenCode* contextGenCode)
     : _contextGenCode(contextGenCode) {}
@@ -23,16 +27,16 @@ ConstructeurEnvironnementRegistreVariable::~ConstructeurEnvironnementRegistreVar
 
 void ConstructeurEnvironnementRegistreVariable::remplir()
 {   
-    auto variablesGlobalesPasse1 = _contextGenCode->registreVariable->getGlobalVariables();
+    auto variablesGlobalesPasse1 = _contextGenCode->getRegistreVariable()->getGlobalVariables();
 
-    _contextGenCode->registreVariable->viderTop(); 
+    _contextGenCode->getRegistreVariable()->viderTop(); 
 
     for(auto const& [nom, symbole] : variablesGlobalesPasse1)
     {
-        llvm::Type* typeLLVM = symbole.type->genererTypeLLVM(_contextGenCode->backend->getContext());
+        llvm::Type* typeLLVM = symbole.getType()->genererTypeLLVM(_contextGenCode->getBackend()->getContext());
         
         auto* variableGlobale = new llvm::GlobalVariable(
-            _contextGenCode->backend->getModule(),
+            _contextGenCode->getBackend()->getModule(),
             typeLLVM,
             false,
             llvm::GlobalValue::ExternalLinkage,
@@ -43,6 +47,6 @@ void ConstructeurEnvironnementRegistreVariable::remplir()
         Token token;
         token.value = nom;
         
-        _contextGenCode->registreVariable->enregistrer(token, Symbole(variableGlobale, symbole.type));
+        _contextGenCode->getRegistreVariable()->enregistrer(token, Symbole(variableGlobale, symbole.getType()));
     }
 }

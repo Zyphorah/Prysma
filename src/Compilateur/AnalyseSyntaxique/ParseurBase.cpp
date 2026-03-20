@@ -1,14 +1,21 @@
 #include "Compilateur/AnalyseSyntaxique/ParseurBase.h"
+#include "Compilateur/AST/Interfaces/IConstructeurArbre.h"
+#include "Compilateur/AST/Noeuds/Interfaces/IInstruction.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/GestionnaireErreur.h"
+#include <cstddef>
+#include <string>
+#include <vector>
 
-Token ParseurBase::consommer(std::vector<Token>& tokens, int& index, TokenType typeAttendu, const std::string& messageErreur)
+auto ParseurBase::consommer(std::vector<Token>& tokens, int& index, TokenType typeAttendu, const std::string& messageErreur) -> Token
 {
     if (index < 0 || index >= static_cast<int>(tokens.size()) || tokens[static_cast<size_t>(index)].type != typeAttendu) {
         if (index >= 0 && index < static_cast<int>(tokens.size())) {
-            throw ErreurCompilation(messageErreur, tokens[static_cast<size_t>(index)].ligne, tokens[static_cast<size_t>(index)].colonne);
+            throw ErreurCompilation(messageErreur, Ligne(tokens[static_cast<size_t>(index)].ligne), Colonne(tokens[static_cast<size_t>(index)].colonne));
         }
-        throw ErreurCompilation(messageErreur, 1, 1);
+        throw ErreurCompilation(messageErreur, Ligne(1), Colonne(1));
     }
     return tokens[static_cast<size_t>(index++)];
 }

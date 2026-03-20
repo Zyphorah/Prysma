@@ -6,6 +6,11 @@
 class ISortie
 {
     public : 
+        ISortie(const ISortie&) = delete;
+        auto operator=(const ISortie&) -> ISortie& = delete;
+        ISortie(ISortie&&) = delete;
+        auto operator=(ISortie&&) -> ISortie& = delete;
+        ISortie() = default;
         virtual ~ISortie() = default;
         virtual void sort(const std::string& data) = 0;
 };

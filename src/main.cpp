@@ -5,6 +5,7 @@
 #include "Compilateur/TraitementFichier/FichierLecture.h"
 #include "Compilateur/GestionnaireErreur.h"
 #include "Compilateur/Registre/RegistreFichier.h"
+#include <exception>
 #include <iostream>
 #include <llvm-18/llvm/IR/DerivedTypes.h>
 #include <llvm-18/llvm/IR/Instructions.h>
@@ -14,6 +15,8 @@
 #include <memory>
 #include <mutex>
 #include <llvm/Support/TargetSelect.h>
+#include <string>
+// llvm::ThreadPool
 
 // Prouver mathématiquement que mon système est infaillible pour la compilation comme Coq, Isabelle/HOL ou TLA+, reécrire le compilateur dans un langage mathématique
 // Moteur de Réflexion LLVM génération automatique du code llvm 
@@ -114,8 +117,8 @@ int main(int argc, char* argv[])
     }
     catch (const ErreurCompilation& erreur) {
         std::cerr << nomFichier << ":" 
-                  << erreur.ligne << ":" 
-                  << erreur.colonne << ": Erreur: " 
+                  << erreur.getLigne() << ":" 
+                  << erreur.getColonne() << ": Erreur: " 
                   << erreur.what() << std::endl;
         return 1;
     }

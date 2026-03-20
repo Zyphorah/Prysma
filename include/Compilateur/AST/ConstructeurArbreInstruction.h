@@ -5,6 +5,8 @@
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/AST/Registre/RegistreInstruction.h"
+#include <llvm/Support/Allocator.h>
+#include <vector>
 
 class ConstructeurArbreInstruction : public IConstructeurArbre
 {
@@ -14,11 +16,17 @@ private:
 public: 
 
     ConstructeurArbreInstruction(RegistreInstruction* registreInstructions, llvm::BumpPtrAllocator& arena);
-    ~ConstructeurArbreInstruction();
+    ~ConstructeurArbreInstruction() override;
 
-    INoeud* construire(std::vector<Token>& tokens) override;  
-    INoeud* construire(std::vector<Token>& tokens, int& index) override;
-    llvm::BumpPtrAllocator& getArena() override;
+    // Delete copy and move constructors and assignment operators
+    ConstructeurArbreInstruction(const ConstructeurArbreInstruction&) = delete;
+    auto operator=(const ConstructeurArbreInstruction&) -> ConstructeurArbreInstruction& = delete;
+    ConstructeurArbreInstruction(ConstructeurArbreInstruction&&) = delete;
+    auto operator=(ConstructeurArbreInstruction&&) -> ConstructeurArbreInstruction& = delete;
+
+    auto construire(std::vector<Token>& tokens) -> INoeud* override;  
+    auto construire(std::vector<Token>& tokens, int& index) -> INoeud* override;
+    auto getArena() -> llvm::BumpPtrAllocator& override;
 
 };
 

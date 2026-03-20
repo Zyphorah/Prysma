@@ -1,10 +1,10 @@
 #include "Compilateur/AST/Noeuds/NoeudInstruction.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
 #include "Compilateur/AST/AST_Genere.h"
 
 NoeudInstruction::NoeudInstruction()
-{
-}
+= default;
 
 void NoeudInstruction::accept(IVisiteur* visiteur)
 {

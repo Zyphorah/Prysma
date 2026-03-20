@@ -3,6 +3,7 @@
 
 #include "Compilateur/AnalyseSyntaxique/Equation/Interfaces/IGestionnaireOperateur.h"
 #include "Compilateur/AnalyseSyntaxique/Equation/Interfaces/IGestionnaireParenthese.h"
+#include "Compilateur/Lexer/Lexer.h"
 #include <vector>
 
 
@@ -34,13 +35,18 @@ public:
      * @brief Destructor
      */
     ~ChaineResponsabilite();
+
+    ChaineResponsabilite(const ChaineResponsabilite&) = delete;
+    auto operator=(const ChaineResponsabilite&) -> ChaineResponsabilite& = delete;
+    ChaineResponsabilite(ChaineResponsabilite&&) = delete;
+    auto operator=(ChaineResponsabilite&&) -> ChaineResponsabilite& = delete;
     
     /**
      * @brief Trouve le prochain opérateur à traiter selon la priorité
      * @param equation L'équation à analyser
      * @return L'index de l'opérateur, ou -1 si aucun trouvé
      */
-    int trouverOperateur(const std::vector<Token>& equation) const;
+    [[nodiscard]] auto trouverOperateur(const std::vector<Token>& equation) const -> int;
 };
 
 

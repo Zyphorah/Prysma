@@ -1,9 +1,10 @@
 #include "Compilateur/AST/Registre/Pile/RetourContexteCompilation.h"
+#include "Compilateur/AST/Registre/Types/IType.h"
 #include <stack>
 #include <stdexcept>
 
 
-IType* RetourContexteCompilation::recupererContext()
+auto RetourContexteCompilation::recupererContext() -> IType*
 {
     return _contexte.top();
 }

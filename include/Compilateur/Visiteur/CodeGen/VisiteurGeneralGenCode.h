@@ -2,6 +2,8 @@
 #define FDDB5968_6DEF_49B0_AD11_8791D523278A
 
 #include <llvm-18/llvm/IR/Value.h>
+#include <string>
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/AST/Registre/ContextGenCode.h"
 #include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
@@ -40,6 +42,12 @@ private:
     OrchestrateurInclude* _orchestrateurInclude;
 
 public:
+    // Prévient la copie et le déplacement accidentels de ce visiteur 
+    VisiteurGeneralGenCode(const VisiteurGeneralGenCode&) = delete;
+    auto operator=(const VisiteurGeneralGenCode&) -> VisiteurGeneralGenCode& = delete;
+    VisiteurGeneralGenCode(VisiteurGeneralGenCode&&) = delete;
+    auto operator=(VisiteurGeneralGenCode&&) -> VisiteurGeneralGenCode& = delete;
+
     using VisiteurBaseGenerale::visiter;
     void visiter(NoeudAffectationVariable* noeudAffectationVariable) override;
     void visiter(NoeudDeclarationVariable* noeudDeclarationVariable) override;
@@ -64,12 +72,12 @@ public:
     void visiter(NoeudAppelObjet* noeudAppelObjet) override;
     void visiter(NoeudAccesAttribut* noeudAccesAttribut) override;
     VisiteurGeneralGenCode(ContextGenCode* contextGenCode, OrchestrateurInclude* orchestrateurInclude);
-    virtual ~VisiteurGeneralGenCode();
+    ~VisiteurGeneralGenCode() override;
     void parcourirEnfant(NoeudInstruction* noeud);
     
-    Symbole evaluerExpression(INoeud* expression);
+    auto evaluerExpression(INoeud* expression) -> Symbole;
     
-    static std::string obtenirNomClasseDepuisSymbole(const Symbole& objetSymbole);
+    static auto obtenirNomClasseDepuisSymbole(const Symbole& objetSymbole) -> std::string;
 };
 
 #endif /* FDDB5968_6DEF_49B0_AD11_8791D523278A */

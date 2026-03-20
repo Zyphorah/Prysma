@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Compilateur/Lexer/Lexer.h"
+#include <vector>
 
 
 class IGestionnaireOperateur;
@@ -11,6 +12,13 @@ class IGestionnaireOperateur;
  */
 class IGestionnaireOperateur {
 public:
+    IGestionnaireOperateur() = default;
+
+    IGestionnaireOperateur(const IGestionnaireOperateur&) = delete;
+    auto operator=(const IGestionnaireOperateur&) -> IGestionnaireOperateur& = delete;
+    IGestionnaireOperateur(IGestionnaireOperateur&&) = delete;
+    auto operator=(IGestionnaireOperateur&&) -> IGestionnaireOperateur& = delete;
+
     virtual ~IGestionnaireOperateur() = default;
     
     /**
@@ -24,5 +32,5 @@ public:
      * @param equation L'équation à traiter
      * @return L'index de l'opérateur trouvé, ou -1
      */
-    virtual int traiter(const std::vector<Token>& equation) = 0;
+    virtual auto traiter(const std::vector<Token>& equation) -> int = 0;
 };

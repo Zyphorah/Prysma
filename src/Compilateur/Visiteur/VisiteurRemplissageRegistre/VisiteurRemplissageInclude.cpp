@@ -5,7 +5,7 @@
 
 void VisiteurRemplissageRegistre::visiter(NoeudInclude* noeudInclude)
 {
-    std::filesystem::path cheminFichierParent(_contextGenCode->cheminFichierCourant);
+    std::filesystem::path cheminFichierParent(_contextGenCode->getCheminFichierCourant());
     std::filesystem::path repertoireParent = cheminFichierParent.parent_path();
     std::filesystem::path cheminAbsolu = repertoireParent / noeudInclude->getPath();
     _orchestrateur->inclureFichier(cheminAbsolu.string());

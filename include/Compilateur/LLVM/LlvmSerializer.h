@@ -5,17 +5,18 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/LLVMContext.h"
 #include <string>
+#include <system_error>
 
 using namespace llvm;
 using namespace std;
 
 class LlvmSerializer {
     private: 
-        Module& _module;
+        Module* _module;
         error_code errorCode;
             
     public: 
-        LlvmSerializer(Module& mod) : _module(mod) {}
+        explicit LlvmSerializer(Module& mod) : _module(&mod) {}
         void SauvegarderCodeLLVM(const string& path);
 };
 

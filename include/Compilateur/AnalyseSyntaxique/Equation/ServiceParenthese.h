@@ -2,7 +2,8 @@
 #define DA3AD58B_D7B7_44D3_AC56_E1DDCD78F54F
 
 #include "Compilateur/AnalyseSyntaxique/Equation/Interfaces/IGestionnaireParenthese.h"
-#include <memory>
+#include "Compilateur/Lexer/Lexer.h"
+#include <vector>
 
 class RegistreSymbole;
 
@@ -14,7 +15,7 @@ private:
      * @param equation L'équation à vérifier
      * @return true si les parenthèses englobent toute l'expression
      */
-    static bool estEnglobante(const vector<Token>& equation);
+    static auto estEnglobante(const vector<Token>& equation) -> bool;
     
     /**
      * @brief Vérifie si un opérateur à une position donnée est unaire
@@ -22,7 +23,7 @@ private:
      * @param indice L'indice de l'opérateur
      * @return true si c'est un signe unaire
      */
-    [[nodiscard]] bool estSigneUnaire(const vector<Token>& equation, int indice) const;
+    [[nodiscard]] auto estSigneUnaire(const vector<Token>& equation, int indice) const -> bool;
 
 public:
     /**
@@ -36,7 +37,7 @@ public:
      * @param equation L'équation à traiter
      * @return L'équation sans parenthèses englobantes
      */
-    std::vector<Token> enleverParenthesesEnglobantes(const std::vector<Token>& equation) override;
+    auto enleverParenthesesEnglobantes(const std::vector<Token>& equation) -> std::vector<Token> override;
     
     /**
      * @brief Trouve le dernier opérateur au niveau de parenthèses zéro
@@ -44,7 +45,7 @@ public:
      * @param operateur Le caractère opérateur à chercher
      * @return L'index de l'opérateur, ou -1 si non trouvé
      */
-    int trouverDernierAuNiveauZero(const vector<Token>& equation, Token operateur) override;
+    auto trouverDernierAuNiveauZero(const vector<Token>& equation, Token operateur) -> int override;
 };
 
 

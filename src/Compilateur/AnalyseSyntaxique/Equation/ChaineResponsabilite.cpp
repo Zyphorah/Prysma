@@ -1,5 +1,10 @@
 #include "Compilateur/AnalyseSyntaxique/Equation/ChaineResponsabilite.h"
 #include "Compilateur/AnalyseSyntaxique/Equation/GestionnaireOperateur.h"
+#include "Compilateur/AnalyseSyntaxique/Equation/Interfaces/IGestionnaireParenthese.h"
+#include "Compilateur/Lexer/Lexer.h"
+#include <cstddef>
+#include <utility>
+#include <vector>
 
 ChaineResponsabilite::ChaineResponsabilite(
     IGestionnaireParenthese* gestionnaireParenthese, 
@@ -19,11 +24,9 @@ ChaineResponsabilite::ChaineResponsabilite(
     }
 }
 
-ChaineResponsabilite::~ChaineResponsabilite() {
-    // Les gestionnaires ne sont pas supprimés ici, c'est au propriétaire de s'en charger
-}
+ChaineResponsabilite::~ChaineResponsabilite() = default;
 
-int ChaineResponsabilite::trouverOperateur(const std::vector<Token>& equation) const {
+auto ChaineResponsabilite::trouverOperateur(const std::vector<Token>& equation) const -> int {
     if (_debut == nullptr) {
         return -1;
     }

@@ -10,11 +10,15 @@ class NoeudDeclarationVariable;
 class NoeudClass;
 
 class ExtracteurMembresClass : public VisiteurBaseGenerale {
-public:
+private:
     std::vector<NoeudDeclarationFonction*> methodes;
     std::vector<NoeudDeclarationVariable*> variables;
     std::string nomClass;
-    
+
+public:
+    [[nodiscard]] auto getMethodes() const -> const std::vector<NoeudDeclarationFonction*>& { return methodes; }
+    [[nodiscard]] auto getVariables() const -> const std::vector<NoeudDeclarationVariable*>& { return variables; }
+    [[nodiscard]] auto getNomClass() const -> const std::string& { return nomClass; }
     using VisiteurBaseGenerale::visiter;
     void visiter(NoeudDeclarationFonction* node) override;
     void visiter(NoeudDeclarationVariable* node) override;

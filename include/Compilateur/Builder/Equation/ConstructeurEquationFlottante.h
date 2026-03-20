@@ -1,10 +1,11 @@
 #ifndef FLOATEQUATIONBUILDER_H
 #define FLOATEQUATIONBUILDER_H
 
+#include <llvm/Support/Allocator.h>
 #include <memory>
 #include <vector>
 
-#include "Compilateur/AST/ConstructeurArbreEquation.h"
+#include "Compilateur/AST/Interfaces/IConstructeurArbre.h"
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/AnalyseSyntaxique/Equation/ChaineResponsabilite.h"
 #include "Compilateur/AnalyseSyntaxique/Equation/ServiceParenthese.h"
@@ -37,9 +38,9 @@ private:
     std::unique_ptr<ChaineResponsabilite> _chaineResponsabilite;
         
     IConstructeurArbre* _constructeurArbre;
+    RegistreExpression* _registreExpression;
     llvm::BumpPtrAllocator& _arena;
 
-    RegistreExpression* _registreExpression;
 
     void initialiserRegistre();
 
@@ -47,13 +48,18 @@ public:
 
     ConstructeurEquationFlottante(RegistreExpression* registreExpression, llvm::BumpPtrAllocator& arena);
     
-    ~ConstructeurEquationFlottante() = default;
+    ~ConstructeurEquationFlottante() override = default;
 
-    INoeud* construire(std::vector<Token>& tokens) override;
-    INoeud* construire(std::vector<Token>& tokens, int& index) override;
-    llvm::BumpPtrAllocator& getArena() override;
+    ConstructeurEquationFlottante(const ConstructeurEquationFlottante&) = delete;
+    auto operator=(const ConstructeurEquationFlottante&) -> ConstructeurEquationFlottante& = delete;
+    ConstructeurEquationFlottante(ConstructeurEquationFlottante&&) = delete;
+    auto operator=(ConstructeurEquationFlottante&&) -> ConstructeurEquationFlottante& = delete;
+
+    auto construire(std::vector<Token>& tokens) -> INoeud* override;
+    auto construire(std::vector<Token>& tokens, int& index) -> INoeud* override;
+    auto getArena() -> llvm::BumpPtrAllocator& override;
     
-    IConstructeurArbre* recupererConstructeurArbre() const;
+    [[nodiscard]] auto recupererConstructeurArbre() const -> IConstructeurArbre*;
 };
 
 #endif /* FLOATEQUATIONBUILDER_H */

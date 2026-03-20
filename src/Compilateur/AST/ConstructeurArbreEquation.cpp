@@ -1,6 +1,12 @@
 #include "Compilateur/AST/ConstructeurArbreEquation.h"
+#include <llvm/Support/Allocator.h>
 #include <vector>
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/Registre/RegistreExpression.h"
+#include "Compilateur/AST/Registre/RegistreSymbole.h"
+#include "Compilateur/AnalyseSyntaxique/Equation/ChaineResponsabilite.h"
+#include "Compilateur/AnalyseSyntaxique/Equation/Interfaces/IGestionnaireParenthese.h"
 #include "Compilateur/GestionnaireErreur.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenType.h"
@@ -20,12 +26,12 @@ ConstructeurArbreEquation::ConstructeurArbreEquation(
 {
 }
 
-INoeud* ConstructeurArbreEquation::construire(std::vector<Token> &equation) {
+auto ConstructeurArbreEquation::construire(std::vector<Token> &equation) -> INoeud* {
     std::vector<Token> equationSansParentheses = _gestionnaireParenthese->enleverParenthesesEnglobantes(equation);
     equation = equationSansParentheses;
     
     if (equation.empty()) {
-        throw ErreurCompilation("Erreur: équation vide", _dernierToken.ligne, _dernierToken.colonne);
+        throw ErreurCompilation("Erreur: équation vide", Ligne(_dernierToken.ligne), Colonne(_dernierToken.colonne));
     }
     
     int indice = _chaineResponsabilite->trouverOperateur(equation);
@@ -37,7 +43,7 @@ INoeud* ConstructeurArbreEquation::construire(std::vector<Token> &equation) {
             return _registreExpression->recuperer(type)->construire(equation);
         }
 
-        throw ErreurCompilation("Erreur: token non reconnu dans l'équation", equation[0].ligne, equation[0].colonne);
+        throw ErreurCompilation("Erreur: token non reconnu dans l'équation", Ligne(equation[0].ligne), Colonne(equation[0].colonne));
     }
     
     IExpression* noeud = _registreSymbole->recupererNoeud(equation[static_cast<size_t>(indice)]);

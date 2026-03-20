@@ -37,12 +37,18 @@ public:
     UniteCompilation(OrchestrateurInclude* orchestrateur, RegistreFichier* registre, std::string cheminFichier, RegistreFonctionGlobale* registreFonctionGlobale);
     ~UniteCompilation();
 
+    // Delete copy and move constructors and assignment operators
+    UniteCompilation(const UniteCompilation&) = delete;
+    auto operator=(const UniteCompilation&) -> UniteCompilation& = delete;
+    UniteCompilation(UniteCompilation&&) = delete;
+    auto operator=(UniteCompilation&&) -> UniteCompilation& = delete;
+
     void passe1();
     // Appelée après que tous les threads passe1 soient terminés.
     // Remplit les registres locaux (fonction, variable) à partir du registre global complet.
     void passe2();
 
-    std::string getChemin() const;
+    [[nodiscard]] auto getChemin() const -> std::string;
 };
 
 #endif /* DB7C496D_6A43_4B78_B490_52A0C21C5224 */

@@ -1,17 +1,22 @@
+#include "Compilateur/GestionnaireErreur.h"
+#include <cstddef>
 #ifndef PARSEUR_CLASS_CPP
 #define PARSEUR_CLASS_CPP
 
 #include "Compilateur/objet/ParseurClass.h"
 #include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/Registre/ContextParseur.h"
+#include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenType.h"
-#include "Compilateur/GestionnaireErreur.h"
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
+#include <vector>
 
 namespace
 {
   void classerNoeudClasse(INoeud* noeud,
-              const Token& nomClasseToken,
-              const Token& visibilite_courante,
+              const Token& nomClasseToken, // NOLINT(bugprone-easily-swappable-parameters)
+              const Token& visibilite_courante, // NOLINT(bugprone-easily-swappable-parameters)
               ContextParseur& contextParseur,
               std::vector<INoeud*>& listMembres,
               std::vector<INoeud*>& constructeurs)
@@ -21,9 +26,9 @@ namespace
     }
 
     if (noeud->getTypeGenere() == NoeudTypeGenere::DeclarationVariable) {
-      auto* declarationVariable = static_cast<NoeudDeclarationVariable*>(noeud);
+      auto* declarationVariable = static_cast<NoeudDeclarationVariable*>(noeud); 
       if (declarationVariable != nullptr) {
-        noeud = contextParseur.constructeurArbreInstruction->allouer<NoeudDeclarationVariable>(
+        noeud = contextParseur.getConstructeurArbreInstruction()->allouer<NoeudDeclarationVariable>(
             visibilite_courante,
             declarationVariable->getNom(),
             declarationVariable->getType(),
@@ -37,7 +42,7 @@ namespace
     if (noeud->getTypeGenere() == NoeudTypeGenere::DeclarationFonction) {
       auto* declarationFonction = static_cast<NoeudDeclarationFonction*>(noeud);
       if (declarationFonction != nullptr) {
-        noeud = contextParseur.constructeurArbreInstruction->allouer<NoeudDeclarationFonction>(
+        noeud = contextParseur.getConstructeurArbreInstruction()->allouer<NoeudDeclarationFonction>(
             visibilite_courante,
             declarationFonction->getTypeRetour(),
             declarationFonction->getNom(),
@@ -55,7 +60,7 @@ namespace
       return;
     }
 
-    throw ErreurCompilation("Membre de classe invalide : '" + nomClasseToken.value + "'", nomClasseToken.ligne, nomClasseToken.colonne);
+    throw ErreurCompilation("Membre de classe invalide : '" + nomClasseToken.value + "'", Ligne(nomClasseToken.ligne), Colonne(nomClasseToken.colonne));
   }
 }
 
@@ -65,7 +70,7 @@ ParseurClass::ParseurClass(ContextParseur& contextParseur)
 {}
 
 ParseurClass::~ParseurClass()
-{}
+= default;
 
 // Exemple: class NomClasse : parent
 //          { 
@@ -134,13 +139,13 @@ INoeud* ParseurClass::parser(std::vector<Token>& tokens, int& index)
         }
 
         // Si aucun mot-clé de visibilité, on parse les membres dans la section courante (private par défaut)
-        INoeud* noeud = _contextParseur.constructeurArbreInstruction->construire(tokens, index);
+        INoeud* noeud = _contextParseur.getConstructeurArbreInstruction()->construire(tokens, index);
         classerNoeudClasse(noeud, nomClasseToken, visibilite_courante, _contextParseur, listMembres, constructeurs);
     }
 
     consommer(tokens, index, TOKEN_ACCOLADE_FERMEE, "Attendu '}' à la fin de la déclaration de classe.");
 
-    return _contextParseur.constructeurArbreInstruction->allouer<NoeudClass>(heritage,
+    return _contextParseur.getConstructeurArbreInstruction()->allouer<NoeudClass>(heritage,
                                                                               listMembres,
                                                                               constructeurs,
                                                                               nomClasseToken);

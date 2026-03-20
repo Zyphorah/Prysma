@@ -1,10 +1,11 @@
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/AST/AST_Genere.h"
+#include <string>
 
 void VisiteurGeneralGenCode::visiter(NoeudClass* noeudClass)
 {
-    std::string ancienneClasse = _contextGenCode->nomClasseCourante;
-    _contextGenCode->nomClasseCourante = noeudClass->getNomClass().value;
+    std::string ancienneClasse = _contextGenCode->getNomClasseCourante();
+    _contextGenCode->modifierNomClasseCourante( noeudClass->getNomClass().value);
 
     for (auto* membre : noeudClass->getListMembres()) {
         if (membre->getTypeGenere() == NoeudTypeGenere::DeclarationFonction) {
@@ -16,5 +17,5 @@ void VisiteurGeneralGenCode::visiter(NoeudClass* noeudClass)
         constructeur->accept(this);
     }
 
-    _contextGenCode->nomClasseCourante = ancienneClasse;
+    _contextGenCode->modifierNomClasseCourante( ancienneClasse);
 }

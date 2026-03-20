@@ -9,6 +9,10 @@ class RegistreExpression : public RegistreGeneric<TokenType, IExpressionMoteur*>
 {
 public:
     RegistreExpression() = default;
+    RegistreExpression(const RegistreExpression&) = delete;
+    auto operator=(const RegistreExpression&) -> RegistreExpression& = delete;
+    RegistreExpression(RegistreExpression&&) = delete;
+    auto operator=(RegistreExpression&&) -> RegistreExpression& = delete;
     ~RegistreExpression() override = default;
 };
 

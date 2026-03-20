@@ -1,21 +1,24 @@
 #include "Compilateur/AST/Registre/Types/TypeComplexe.h"
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Type.h>
+#include <string>
 
 TypeComplexe::TypeComplexe(const std::string& nom) : nomClasse(nom) {}
 
-llvm::Type* TypeComplexe::genererTypeLLVM(llvm::LLVMContext& context) {
+auto TypeComplexe::genererTypeLLVM(llvm::LLVMContext& context) -> llvm::Type* {
     return llvm::PointerType::getUnqual(context);
 }
 
-bool TypeComplexe::estFlottant() const { return false; }
-bool TypeComplexe::estBooleen() const { return false; }
-bool TypeComplexe::estChaine() const { return false; }
-bool TypeComplexe::estTableau() const { return false; }
-bool TypeComplexe::estComplexe() const { return true; }
+auto TypeComplexe::estFlottant() const -> bool { return false; }
+auto TypeComplexe::estBooleen() const -> bool { return false; }
+auto TypeComplexe::estChaine() const -> bool { return false; }
+auto TypeComplexe::estTableau() const -> bool { return false; }
+auto TypeComplexe::estComplexe() const -> bool { return true; }
 
-llvm::Type* TypeComplexe::getVTableType(llvm::LLVMContext& context) {
+auto TypeComplexe::getVTableType(llvm::LLVMContext& context) -> llvm::Type* {
     return llvm::PointerType::getUnqual(context);
 }
 
-std::string TypeComplexe::getNomClasse() const {
+auto TypeComplexe::getNomClasse() const -> std::string {
     return nomClasse;
 }

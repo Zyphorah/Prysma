@@ -1,6 +1,9 @@
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
+#include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/AST/AST_Genere.h"
 #include "Compilateur/AST/Registre/Types/TypeSimple.h"
+#include <llvm-18/llvm/IR/Value.h>
 #include <llvm/IR/Type.h>
 
 #include "Compilateur/Visiteur/CodeGen/Helper/ErrorHelper.h"
@@ -9,27 +12,27 @@ void VisiteurGeneralGenCode::visiter(NoeudOperation* noeud)
 {
     // On évalue la gauche et on SAUVEGARDE le Symbole complet
     noeud->getGauche()->accept(this);
-    Symbole symGauche = _contextGenCode->valeurTemporaire;
+    Symbole symGauche = _contextGenCode->getValeurTemporaire();
 
     // On évalue la droite (le valeurTemporaire de gauche n'est plus écrasé)
     noeud->getDroite()->accept(this);
-    Symbole symDroite = _contextGenCode->valeurTemporaire;
+    Symbole symDroite = _contextGenCode->getValeurTemporaire();
 
-    llvm::Value* valGauche = symGauche.adresse;
-    llvm::Value* valDroite = symDroite.adresse;
+    llvm::Value* valGauche = symGauche.getAdresse();
+    llvm::Value* valDroite = symDroite.getAdresse();
 
-    auto& builder = _contextGenCode->backend->getBuilder();
+    auto& builder = _contextGenCode->getBackend()->getBuilder();
     llvm::Value* resultat = nullptr;
     llvm::Type* typeResultat = nullptr;
 
     // C'est Prysma qui décide du type, plus LLVM
-    bool estFlottant = (symGauche.type != nullptr && symGauche.type->estFlottant()) || 
-                       (symDroite.type != nullptr && symDroite.type->estFlottant());
+    bool estFlottant = (symGauche.getType() != nullptr && symGauche.getType()->estFlottant()) || 
+                       (symDroite.getType() != nullptr && symDroite.getType()->estFlottant());
 
     if (estFlottant) {
-        llvm::Type* floatTy = llvm::Type::getFloatTy(_contextGenCode->backend->getContext());
-        valGauche = _contextGenCode->backend->creerAutoCast(valGauche, floatTy);
-        valDroite = _contextGenCode->backend->creerAutoCast(valDroite, floatTy);
+        llvm::Type* floatTy = llvm::Type::getFloatTy(_contextGenCode->getBackend()->getContext());
+        valGauche = _contextGenCode->getBackend()->creerAutoCast(valGauche, floatTy);
+        valDroite = _contextGenCode->getBackend()->creerAutoCast(valDroite, floatTy);
         typeResultat = floatTy;
 
         switch (noeud->getToken().type) {
@@ -49,7 +52,7 @@ void VisiteurGeneralGenCode::visiter(NoeudOperation* noeud)
         }
     } 
     else {
-        llvm::Type* intTy = llvm::Type::getInt32Ty(_contextGenCode->backend->getContext());
+        llvm::Type* intTy = llvm::Type::getInt32Ty(_contextGenCode->getBackend()->getContext());
         typeResultat = intTy;
 
         switch (noeud->getToken().type) {
@@ -74,6 +77,6 @@ void VisiteurGeneralGenCode::visiter(NoeudOperation* noeud)
 
     resultat = ErrorHelper::verifierNonNull(resultat, "Opération inconnue");
 
-    _contextGenCode->valeurTemporaire.adresse = resultat;
-    _contextGenCode->valeurTemporaire.type = new (_contextGenCode->arena->Allocate<TypeSimple>()) TypeSimple(typeResultat);
+    _contextGenCode->modifierValeurTemporaire(Symbole(resultat, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+    _contextGenCode->modifierValeurTemporaire(Symbole(_contextGenCode->getValeurTemporaire().getAdresse(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(typeResultat), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
 }

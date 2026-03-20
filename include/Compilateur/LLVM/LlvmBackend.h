@@ -1,5 +1,6 @@
 #pragma once
 
+#include <llvm/IR/Value.h>
 #include <memory>
 #include <string>
 #include <llvm/IR/LLVMContext.h>
@@ -9,6 +10,7 @@
 #include <llvm/IR/Type.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/Target/TargetMachine.h>
+#include <vector>
 
 class LlvmBackend {
 private:
@@ -21,15 +23,20 @@ public:
 
     LlvmBackend();
 
+    LlvmBackend(const LlvmBackend&) = delete;
+    auto operator=(const LlvmBackend&) -> LlvmBackend& = delete;
+    LlvmBackend(LlvmBackend&&) = delete;
+    auto operator=(LlvmBackend&&) -> LlvmBackend& = delete;
+
     ~LlvmBackend() = default;
 
-    llvm::LLVMContext& getContext() { return *_context; }
-    llvm::Module& getModule() { return *_module; }
-    llvm::IRBuilder<llvm::NoFolder>& getBuilder() { return *_builder; }
+    auto getContext() -> llvm::LLVMContext& { return *_context; }
+    auto getModule() -> llvm::Module& { return *_module; }
+    auto getBuilder() -> llvm::IRBuilder<llvm::NoFolder>& { return *_builder; }
 
-    llvm::Value* creerAutoCast(llvm::Value* valeurSource, llvm::Type* typeCible);
+    auto creerAutoCast(llvm::Value* valeurSource, llvm::Type* typeCible) -> llvm::Value*;
     void declarerExterne(const std::string& nom, llvm::Type* ret, const std::vector<llvm::Type*>& args);
-    llvm::Value* chargerValeur(llvm::Value* adresseMemoire, const std::string& nomVariable);
+    auto chargerValeur(llvm::Value* adresseMemoire, const std::string& nomVariable) -> llvm::Value*;
     void definirPointInsertionApresAllocation();
 };
 

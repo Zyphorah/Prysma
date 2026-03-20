@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
+#include <string>
 
 FichierEcriture::FichierEcriture(const std::string& path)
     : _path(path), _fichier(path, std::ios::out | std::ios::app)

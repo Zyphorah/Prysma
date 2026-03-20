@@ -13,9 +13,14 @@ class FichierEcriture : public ISortie
     public:
         void sort(const std::string& data) override; 
 
-        FichierEcriture(const std::string& path);
+        explicit FichierEcriture(const std::string& path);
 
-        ~FichierEcriture();      
+        ~FichierEcriture() override;
+
+        FichierEcriture(const FichierEcriture&) = delete;
+        auto operator=(const FichierEcriture&) -> FichierEcriture& = delete;
+        FichierEcriture(FichierEcriture&&) = delete;
+        auto operator=(FichierEcriture&&) -> FichierEcriture& = delete;
 };
 
 #endif /* D554AA27_6112_4847_8679_9DF99DA76B4A */

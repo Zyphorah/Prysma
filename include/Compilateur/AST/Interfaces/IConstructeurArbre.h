@@ -5,24 +5,37 @@
 #include "Compilateur/Lexer/Lexer.h"
 #include "llvm/Support/Allocator.h"
 #include <cstddef>
+#include <new>
 #include <utility>
+#include <vector>
 
 class IConstructeurArbre
 {
 public:
+    IConstructeurArbre() = default;
+    IConstructeurArbre(const IConstructeurArbre&) = delete;
+    auto operator=(const IConstructeurArbre&) -> IConstructeurArbre& = delete;
+    IConstructeurArbre(IConstructeurArbre&&) = delete;
+    auto operator=(IConstructeurArbre&&) -> IConstructeurArbre& = delete;
+
     virtual ~IConstructeurArbre() = default;
-    virtual INoeud* construire(std::vector<Token>& tokens) = 0;
-    virtual INoeud* construire(std::vector<Token>& tokens, int& index) = 0;
-    virtual llvm::BumpPtrAllocator& getArena() = 0;
+    virtual auto construire(std::vector<Token>& tokens) -> INoeud* = 0;
+    virtual auto construire(std::vector<Token>& tokens, int& index) -> INoeud* = 0;
+    virtual auto getArena() -> llvm::BumpPtrAllocator& = 0;
 
     template<typename T, typename... Args>
-    T* allouer(Args&&... args) {
+    auto allouer(Args&&... args) -> T* {
         void* mem = getArena().Allocate(sizeof(T), alignof(T));
-        return new (mem) T(std::forward<Args>(args)...);
+        return new (mem) T(std::forward<Args>(args)...); // NOLINT(cppcoreguidelines-owning-memory)
     }
 
-    void* operator new(size_t taille, llvm::BumpPtrAllocator& arena) {
-        return arena.Allocate(taille, 8); 
+    static constexpr std::size_t kArenaAlignment = 8;
+
+    auto operator new(size_t taille) -> void* { return ::operator new(taille); }
+    static void operator delete(void* ptr) { ::operator delete(ptr); }
+
+    auto operator new(size_t taille, llvm::BumpPtrAllocator& arena) -> void* {
+        return arena.Allocate(taille, kArenaAlignment); 
     }
     
     static void operator delete(void* ptr, llvm::BumpPtrAllocator& allocator) {
@@ -30,10 +43,6 @@ public:
         // Le BumpPtrAllocator libère toute la mémoire d'un coup à sa destruction.
         (void)ptr;
         (void)allocator;
-    }
-    static void operator delete(void* ptr) {
-        // On ne fait rien ! C'est le BumpPtrAllocator qui libérera la mémoire à la fin.
-        (void)ptr;
     }
 };
 

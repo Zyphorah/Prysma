@@ -1,7 +1,6 @@
 #pragma once
 
 #include "INoeud.h"
-#include <memory>
 
 /**
  * @interface IExpression
@@ -10,7 +9,13 @@
  */
 class IExpression : public INoeud {
 public:
-    virtual ~IExpression() = default;
+    IExpression() = default;
+    ~IExpression() override = default;
+
+    IExpression(const IExpression&) = delete;
+    auto operator=(const IExpression&) -> IExpression& = delete;
+    IExpression(IExpression&&) = delete;
+    auto operator=(IExpression&&) -> IExpression& = delete;
     
     /**
      * @brief Ajoute deux expressions comme enfants gauche et droit
@@ -18,8 +23,8 @@ public:
      * @param droite Expression enfant droit
      * @return Référence au nœud courant
      */
-    virtual IExpression* ajouterExpression(
+    virtual auto ajouterExpression(
         INoeud* gauche, 
         INoeud* droite
-    ) = 0;
+    ) -> IExpression* = 0;
 };

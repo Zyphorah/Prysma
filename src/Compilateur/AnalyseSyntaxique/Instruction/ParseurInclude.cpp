@@ -3,6 +3,11 @@
 
 #include "Compilateur/Instruction/ParseurInclude.h"
 #include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/Registre/ContextParseur.h"
+#include "Compilateur/Lexer/Lexer.h"
+#include "Compilateur/Lexer/TokenType.h"
+#include <vector>
 
 
 ParseurInclude::ParseurInclude(ContextParseur& contextParseur) 
@@ -10,10 +15,10 @@ ParseurInclude::ParseurInclude(ContextParseur& contextParseur)
 {}
 
 ParseurInclude::~ParseurInclude()
-{}
+= default;
 
 // Exemple : include "path"
-INoeud* ParseurInclude::parser(std::vector<Token>& tokens, int& index)
+auto ParseurInclude::parser(std::vector<Token>& tokens, int& index) -> INoeud*
 {
     consommer(tokens,index,TOKEN_INCLUDE, "Erreur : Instruction include doit commencer par le mot-clé 'include'");
     consommer(tokens,index,TOKEN_GUILLEMET, "Erreur : Instruction include doit être suivie d'une chaîne de caractères entre guillemets");
@@ -21,7 +26,7 @@ INoeud* ParseurInclude::parser(std::vector<Token>& tokens, int& index)
     consommer(tokens,index,TOKEN_GUILLEMET, "Erreur : Instruction include doit être suivie d'une chaîne de caractères entre guillemets");
     consommer(tokens,index,TOKEN_POINT_VIRGULE, "Erreur : Instruction include doit se terminer par un point-virgule");
 
-    return _contextParseur.constructeurArbreEquation->allouer<NoeudInclude>(tokenPath.value);
+    return _contextParseur.getConstructeurArbreEquation()->allouer<NoeudInclude>(tokenPath.value);
 }
 
 #endif /* PARSEUR_INCLUDE_CPP */

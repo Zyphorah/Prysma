@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <string>
+#include <utility>
 #include "Compilateur/Registre/RegistreFichier.h"
 #include "RegistreInstruction.h"
 #include "Pile/RegistreVariable.h"
@@ -16,6 +18,7 @@
 
 struct ContextGenCode
 {
+private:
     RegistreFichier* registreFichier;
     Symbole valeurTemporaire;
     LlvmBackend* backend;
@@ -29,8 +32,9 @@ struct ContextGenCode
     RegistreClass* registreClass;
     llvm::BumpPtrAllocator* arena;
     std::string cheminFichierCourant;
-    std::string nomClasseCourante = "";
+    std::string nomClasseCourante;
 
+public:
     ContextGenCode(
         RegistreFichier* p_registreFichier,
         LlvmBackend* p_backend,
@@ -89,6 +93,7 @@ struct ContextGenCode
             std::cerr << "Erreur lors de la création du contexte de génération de code : " << e.what() << std::endl;
             throw;
         }
+        this->registreFichier = p_registreFichier;
         this->cheminFichierCourant = std::move(p_cheminFichierCourant);
         this->backend = p_backend;
         this->registreInstruction = p_registreInstruction;
@@ -102,6 +107,26 @@ struct ContextGenCode
         this->valeurTemporaire = p_valeurTemporaire;
         this->arena = p_arena;
     }
+
+    
+    void modifierValeurTemporaire(Symbole p_valeurTemporaire) { valeurTemporaire = p_valeurTemporaire; }
+    void modifierNomClasseCourante(std::string p_nomClasseCourante) { nomClasseCourante = std::move(p_nomClasseCourante); }
+
+    // Getters
+    [[nodiscard]] auto getRegistreFichier() const -> RegistreFichier* { return registreFichier; }
+    [[nodiscard]] auto getValeurTemporaire() const -> Symbole { return valeurTemporaire; }
+    [[nodiscard]] auto getBackend() const -> LlvmBackend* { return backend; }
+    [[nodiscard]] auto getRegistreInstruction() const -> RegistreInstruction* { return registreInstruction; }
+    [[nodiscard]] auto getRegistreVariable() const -> RegistreVariable* { return registreVariable; }
+    [[nodiscard]] auto getRegistreFonctionGlobale() const -> RegistreFonctionGlobale* { return registreFonctionGlobale; }
+    [[nodiscard]] auto getRegistreFonctionLocale() const -> RegistreFonctionLocale* { return registreFonctionLocale; }
+    [[nodiscard]] auto getRegistreType() const -> RegistreType* { return registreType; }
+    [[nodiscard]] auto getReturnContextCompilation() const -> RetourContexteCompilation* { return returnContextCompilation; }
+    [[nodiscard]] auto getRegistreArgument() const -> RegistreArgument* { return registreArgument; }
+    [[nodiscard]] auto getRegistreClass() const -> RegistreClass* { return registreClass; }
+    [[nodiscard]] auto getArena() const -> llvm::BumpPtrAllocator* { return arena; }
+    [[nodiscard]] auto getCheminFichierCourant() const -> const std::string& { return cheminFichierCourant; }
+    [[nodiscard]] auto getNomClasseCourante() const -> const std::string& { return nomClasseCourante; }
 };
 
 #endif /* C2537ED8_1CCF_4242_BDB0_B5ED5F2AD08F */

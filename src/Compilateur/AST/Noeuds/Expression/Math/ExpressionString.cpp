@@ -3,8 +3,12 @@
 
 #include "Compilateur/Math/ExpressionString.h"
 #include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/Registre/ContexteExpression.h"
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenType.h"
+#include <cstddef>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -13,9 +17,9 @@ ExpressionString::ExpressionString(ContexteExpression& contexteExpression)
 {}
 
 ExpressionString::~ExpressionString()
-{}
+= default;
 
-INoeud* ExpressionString::construire(std::vector<Token>& equation)
+auto ExpressionString::construire(std::vector<Token>& equation) -> INoeud*
 {
     std::vector<INoeud*> elementsString;
 
@@ -36,13 +40,13 @@ INoeud* ExpressionString::construire(std::vector<Token>& equation)
     }
 
     for (size_t caractereIndex = 0; caractereIndex < chaine.value.size(); caractereIndex++) {
-        int ascii = chaine.value[caractereIndex];
+        int ascii = static_cast<unsigned char>(chaine.value[caractereIndex]);
         Token token;
         token.type = TOKEN_LIT_INT;
         token.value = std::to_string(ascii);
         token.ligne = chaine.ligne;
         token.colonne = chaine.colonne;
-        elementsString.push_back(new (_contexteExpression.arena.Allocate<NoeudLitteral>()) NoeudLitteral(token));
+        elementsString.push_back(new (_contexteExpression.getArena()->Allocate<NoeudLitteral>()) NoeudLitteral(token)); // NOLINT
     }
 
     Token tokenZero;
@@ -50,9 +54,9 @@ INoeud* ExpressionString::construire(std::vector<Token>& equation)
     tokenZero.value = "0";
     tokenZero.ligne = chaine.ligne;
     tokenZero.colonne = chaine.colonne;
-    elementsString.push_back(new (_contexteExpression.arena.Allocate<NoeudLitteral>()) NoeudLitteral(tokenZero));
+    elementsString.push_back(new (_contexteExpression.getArena()->Allocate<NoeudLitteral>()) NoeudLitteral(tokenZero)); // NOLINT
 
-    return new (_contexteExpression.arena.Allocate<NoeudTableauInitialisation>()) NoeudTableauInitialisation(elementsString);
+    return new (_contexteExpression.getArena()->Allocate<NoeudTableauInitialisation>()) NoeudTableauInitialisation(elementsString); // NOLINT
 }
 
 #endif /* EXPRESSION_STRING_CPP */

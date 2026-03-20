@@ -2,17 +2,29 @@
 #include "Compilateur/LLVM/GestionFonction.h"
 #include "Compilateur/AST/AST_Genere.h"
 #include "Compilateur/AST/Registre/ContextGenCode.h"
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
+#include "Compilateur/AST/Registre/RegistreFonction.h"
+#include "Compilateur/Lexer/Lexer.h"
+#include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
 #include "Compilateur/Visiteur/VisiteurBaseGenerale.h"
 #include "Compilateur/Visiteur/Extracteurs/ExtracteurArgFonction.h"
+#include <cstddef>
+#include <cstdint>
+#include <llvm-18/llvm/IR/Function.h>
+#include <llvm/IR/Argument.h>
+#include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Instructions.h>
+#include <memory>
+#include <stdexcept>
+#include <string>
 
 
 // Génération de la Déclaration
 
 std::unique_ptr<GenerateurDeclarationFonction> GenerateurDeclarationFonction::creer(ContextGenCode* context, NoeudDeclarationFonction* noeud, IVisiteur* visiteur)
 {
-    if (!context->nomClasseCourante.empty()) {
+    if (!context->getNomClasseCourante().empty()) {
         return std::make_unique<GenerateurDeclarationMethode>(context, noeud, visiteur);
     } 
     return std::make_unique<GenerateurDeclarationStandard>(context, noeud, visiteur);
@@ -27,31 +39,31 @@ GenerateurDeclarationFonction::GenerateurDeclarationFonction(ContextGenCode* con
 
 llvm::Function* GenerateurDeclarationStandard::creerFonction()
 {
-    std::string nomFonction = _noeudDeclarationFonction->getNom();
+    std::string nomFonction = getNoeudDeclarationFonction()->getNom();
     
-    const auto& symbolePtr = _contextGenCode->registreFonctionLocale->recuperer(nomFonction);
-    const SymboleFonctionLocale* symbole = static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
+    const auto& symbolePtr = getContextGenCode()->getRegistreFonctionLocale()->recuperer(nomFonction);
+    const auto* symbole = static_cast<const SymboleFonctionLocale*>(symbolePtr.get()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
     
     llvm::Function* function = symbole->fonction;
 
-    llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(_contextGenCode->backend->getContext(), "entry", function);
-    _contextGenCode->backend->getBuilder().SetInsertPoint(entryBlock);
+    llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(getContextGenCode()->getBackend()->getContext(), "entry", function);
+    getContextGenCode()->getBackend()->getBuilder().SetInsertPoint(entryBlock);
 
     return function;
 }
 
 llvm::Function* GenerateurDeclarationMethode::creerFonction()
 {
-    std::string nomFonction = _noeudDeclarationFonction->getNom();
-    std::string nomClasse = _contextGenCode->nomClasseCourante;
-    auto* classInfo = _contextGenCode->registreClass->recuperer(nomClasse);
-    const auto& symbolePtr = classInfo->registreFonctionLocale->recuperer(nomFonction);
-    const SymboleFonctionLocale* symbole = static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
+    std::string nomFonction = getNoeudDeclarationFonction()->getNom();
+    std::string nomClasse = getContextGenCode()->getNomClasseCourante();
+    auto const& classInfo = getContextGenCode()->getRegistreClass()->recuperer(nomClasse);
+    const auto& symbolePtr = classInfo->getRegistreFonctionLocale()->recuperer(nomFonction);
+    const auto* symbole = static_cast<const SymboleFonctionLocale*>(symbolePtr.get()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
     
     llvm::Function* function = symbole->fonction;
 
-    llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(_contextGenCode->backend->getContext(), "entry", function);
-    _contextGenCode->backend->getBuilder().SetInsertPoint(entryBlock);
+    llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(getContextGenCode()->getBackend()->getContext(), "entry", function);
+    getContextGenCode()->getBackend()->getBuilder().SetInsertPoint(entryBlock);
 
     return function;
 }
@@ -65,18 +77,18 @@ void GenerateurDeclarationMethode::traiterArgumentsConstruit(llvm::Function* fun
         thisArg->setName("this");
         
         llvm::Type* argType = thisArg->getType();
-        llvm::AllocaInst* alloca = _contextGenCode->backend->getBuilder().CreateAlloca(argType);
-        _contextGenCode->backend->getBuilder().CreateStore(thisArg, alloca);
+        llvm::AllocaInst* alloca = getContextGenCode()->getBackend()->getBuilder().CreateAlloca(argType);
+        getContextGenCode()->getBackend()->getBuilder().CreateStore(thisArg, alloca);
         
         Token thisToken;
         thisToken.value = "this";
         thisToken.type = TOKEN_IDENTIFIANT;
         
         Symbole symboleThis;
-        symboleThis.adresse = alloca;
-        symboleThis.type = nullptr; 
+        symboleThis = Symbole(alloca, symboleThis.getType(), symboleThis.getTypePointeElement());
+        symboleThis = Symbole(symboleThis.getAdresse(), nullptr, symboleThis.getTypePointeElement()); 
         
-        _contextGenCode->registreVariable->enregistrer(thisToken, symboleThis);
+        getContextGenCode()->getRegistreVariable()->enregistrer(thisToken, symboleThis);
         argIndex = 1;
     }
 
@@ -85,17 +97,17 @@ void GenerateurDeclarationMethode::traiterArgumentsConstruit(llvm::Function* fun
         arg->setName(noeudArg->getNom());
         
         llvm::Type* argType = arg->getType();
-        llvm::AllocaInst* alloca = _contextGenCode->backend->getBuilder().CreateAlloca(argType);
-        _contextGenCode->backend->getBuilder().CreateStore(arg, alloca);
+        llvm::AllocaInst* alloca = getContextGenCode()->getBackend()->getBuilder().CreateAlloca(argType);
+        getContextGenCode()->getBackend()->getBuilder().CreateStore(arg, alloca);
         
         Token argumentToken;
         argumentToken.value = noeudArg->getNom();
         argumentToken.type = TOKEN_IDENTIFIANT;
         
         Symbole symbole;
-        symbole.adresse = alloca;
-        symbole.type = noeudArg->getType();
-        _contextGenCode->registreVariable->enregistrer(argumentToken, symbole);
+        symbole = Symbole(alloca, symbole.getType(), symbole.getTypePointeElement());
+        symbole = Symbole(symbole.getAdresse(), noeudArg->getType(), symbole.getTypePointeElement());
+        getContextGenCode()->getRegistreVariable()->enregistrer(argumentToken, symbole);
         
         argIndex++;
     }
@@ -110,17 +122,17 @@ void GenerateurDeclarationStandard::traiterArgumentsConstruit(llvm::Function* fu
         arg->setName(noeudArg->getNom());
         
         llvm::Type* argType = arg->getType();
-        llvm::AllocaInst* alloca = _contextGenCode->backend->getBuilder().CreateAlloca(argType);
-        _contextGenCode->backend->getBuilder().CreateStore(arg, alloca);
+        llvm::AllocaInst* alloca = getContextGenCode()->getBackend()->getBuilder().CreateAlloca(argType);
+        getContextGenCode()->getBackend()->getBuilder().CreateStore(arg, alloca);
         
         Token argumentToken;
         argumentToken.value = noeudArg->getNom();
         argumentToken.type = TOKEN_IDENTIFIANT;
         
         Symbole symbole;
-        symbole.adresse = alloca;
-        symbole.type = noeudArg->getType();
-        _contextGenCode->registreVariable->enregistrer(argumentToken, symbole);
+        symbole = Symbole(alloca, symbole.getType(), symbole.getTypePointeElement());
+        symbole = Symbole(symbole.getAdresse(), noeudArg->getType(), symbole.getTypePointeElement());
+        getContextGenCode()->getRegistreVariable()->enregistrer(argumentToken, symbole);
         
         argIndex++;
     }
@@ -128,17 +140,16 @@ void GenerateurDeclarationStandard::traiterArgumentsConstruit(llvm::Function* fu
 
 void GenerateurDeclarationFonction::declarerFonction()
 {
-    llvm::Type* typeDeRetour = _noeudDeclarationFonction->getTypeRetour()->genererTypeLLVM(_contextGenCode->backend->getContext());
+    llvm::Type* typeDeRetour = getNoeudDeclarationFonction()->getTypeRetour()->genererTypeLLVM(getContextGenCode()->getBackend()->getContext());
     
     ArgumentsCodeGen argumentsCodeGen;
-    if (_noeudDeclarationFonction != nullptr) {
-        ExtracteurArgFonction extracteur;
-        for (INoeud* noeud : _noeudDeclarationFonction->getArguments()) {
-            extracteur.arg = nullptr;
+    if (getNoeudDeclarationFonction() != nullptr) {
+        for (INoeud* noeud : getNoeudDeclarationFonction()->getArguments()) {
+            ExtracteurArgFonction extracteur;
             noeud->accept(&extracteur);
-            if (extracteur.arg != nullptr) {
-                argumentsCodeGen.arguments.push_back(extracteur.arg);
-                llvm::Type* argType = extracteur.arg->getType()->genererTypeLLVM(_contextGenCode->backend->getContext());
+            if (extracteur.getArg() != nullptr) {
+                argumentsCodeGen.arguments.push_back(extracteur.getArg());
+                llvm::Type* argType = extracteur.getArg()->getType()->genererTypeLLVM(getContextGenCode()->getBackend()->getContext());
                 argumentsCodeGen.argTypes.push_back(argType);
             }
         }
@@ -146,36 +157,36 @@ void GenerateurDeclarationFonction::declarerFonction()
 
     llvm::Function* function = creerFonction();
     
-    _contextGenCode->returnContextCompilation->piler(_noeudDeclarationFonction->getTypeRetour());
-    _contextGenCode->registreVariable->piler();
+    getContextGenCode()->getReturnContextCompilation()->piler(getNoeudDeclarationFonction()->getTypeRetour());
+    getContextGenCode()->getRegistreVariable()->piler();
     
     traiterArgumentsConstruit(function, argumentsCodeGen);
 
-    _noeudDeclarationFonction->getCorps()->accept(_visiteurGeneralCodeGen);
+    getNoeudDeclarationFonction()->getCorps()->accept(_visiteurGeneralCodeGen);
 
-    llvm::BasicBlock* blocCourant = _contextGenCode->backend->getBuilder().GetInsertBlock();
+    llvm::BasicBlock* blocCourant = getContextGenCode()->getBackend()->getBuilder().GetInsertBlock();
     if (blocCourant != nullptr && typeDeRetour->isVoidTy())
     {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnull-dereference"
         if (blocCourant->getTerminator() == nullptr)
         {
-            _contextGenCode->backend->getBuilder().CreateRetVoid();
+            getContextGenCode()->getBackend()->getBuilder().CreateRetVoid();
         }
 #pragma GCC diagnostic pop
     }
 
-    _contextGenCode->registreVariable->depiler();
-    _contextGenCode->returnContextCompilation->depiler();
+    getContextGenCode()->getRegistreVariable()->depiler();
+    getContextGenCode()->getReturnContextCompilation()->depiler();
 
-    _contextGenCode->valeurTemporaire.adresse = function;
+    getContextGenCode()->modifierValeurTemporaire(Symbole(function, getContextGenCode()->getValeurTemporaire().getType(), getContextGenCode()->getValeurTemporaire().getTypePointeElement()));
 }
 
 // Génération de l'Appel
 
 std::unique_ptr<GenerateurAppelFonction> GenerateurAppelFonction::creer(ContextGenCode* context, IVisiteur* visiteur)
 {
-    if (!context->nomClasseCourante.empty()) {
+    if (!context->getNomClasseCourante().empty()) {
         return std::make_unique<GenerateurAppelMethode>(context, visiteur);
     }
     return std::make_unique<GenerateurAppelStandard>(context, visiteur);
@@ -188,16 +199,16 @@ GenerateurAppelFonction::GenerateurAppelFonction(ContextGenCode* context, IVisit
 
 const SymboleFonctionLocale* GenerateurAppelMethode::obtenirFonctionLocale(const std::string& nomFonction)
 {
-    std::string nomClasse = _contextGenCode->nomClasseCourante;
-    auto* classInfo = _contextGenCode->registreClass->recuperer(nomClasse);
-    if(classInfo->registreFonctionLocale->existe(nomFonction)){
-        const auto& symbolePtr = classInfo->registreFonctionLocale->recuperer(nomFonction);
-        return static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
+    std::string nomClasse = getContextGenCode()->getNomClasseCourante();
+    auto const& classInfo = getContextGenCode()->getRegistreClass()->recuperer(nomClasse);
+    if(classInfo->getRegistreFonctionLocale()->existe(nomFonction)){
+        const auto& symbolePtr = classInfo->getRegistreFonctionLocale()->recuperer(nomFonction);
+        return static_cast<const SymboleFonctionLocale*>(symbolePtr.get()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
     }
     
-    if (_contextGenCode->registreFonctionLocale->existe(nomFonction)) {
-        const auto& symbolePtr = _contextGenCode->registreFonctionLocale->recuperer(nomFonction);
-        return static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
+    if (getContextGenCode()->getRegistreFonctionLocale()->existe(nomFonction)) {
+        const auto& symbolePtr = getContextGenCode()->getRegistreFonctionLocale()->recuperer(nomFonction);
+        return static_cast<const SymboleFonctionLocale*>(symbolePtr.get()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
     }
 
     throw std::runtime_error("Méthode ou fonction introuvable dans la portée de la classe : " + nomFonction);
@@ -205,9 +216,9 @@ const SymboleFonctionLocale* GenerateurAppelMethode::obtenirFonctionLocale(const
 
 const SymboleFonctionLocale* GenerateurAppelStandard::obtenirFonctionLocale(const std::string& nomFonction)
 {
-    if (_contextGenCode->registreFonctionLocale->existe(nomFonction)) {
-        const auto& symbolePtr = _contextGenCode->registreFonctionLocale->recuperer(nomFonction);
-        return static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
+    if (getContextGenCode()->getRegistreFonctionLocale()->existe(nomFonction)) {
+        const auto& symbolePtr = getContextGenCode()->getRegistreFonctionLocale()->recuperer(nomFonction);
+        return static_cast<const SymboleFonctionLocale*>(symbolePtr.get()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
     }
 
     throw std::runtime_error("Fonction introuvable dans le registre local : " + nomFonction);
@@ -218,11 +229,11 @@ void GenerateurAppelFonction::genererAppelFonction(NoeudAppelFonction* noeudAppe
     std::string nomFonction = noeudAppelFonction->getNomFonction().value;
 
     if (RegistreBuiltIns::estBuiltIn(nomFonction)) {
-        RegistreBuiltIns::genererAppel(nomFonction, noeudAppelFonction, _contextGenCode, _visiteurGeneralCodeGen);
+        RegistreBuiltIns::genererAppel(nomFonction, noeudAppelFonction, getContextGenCode(), _visiteurGeneralCodeGen);
         return; 
     }
 
-    _contextGenCode->registreArgument->vider();
+    getContextGenCode()->getRegistreArgument()->vider();
 
     const SymboleFonctionLocale* symboleFonction = obtenirFonctionLocale(nomFonction);
     llvm::Function* fonctionCible = symboleFonction->fonction;
@@ -232,7 +243,7 @@ void GenerateurAppelFonction::genererAppelFonction(NoeudAppelFonction* noeudAppe
     for (INoeud* argumentEnfant : noeudAppelFonction->getEnfants()) 
     {
         argumentEnfant->accept(_visiteurGeneralCodeGen);
-        llvm::Value* valeurArgument = _contextGenCode->valeurTemporaire.adresse;
+        llvm::Value* valeurArgument = getContextGenCode()->getValeurTemporaire().getAdresse();
 
         if (valeurArgument == nullptr) {
             throw std::runtime_error("Erreur : L'argument n'a pas généré de valeur.");
@@ -241,30 +252,30 @@ void GenerateurAppelFonction::genererAppelFonction(NoeudAppelFonction* noeudAppe
         llvm::Value* valeurFinale = valeurArgument;
         if (indexParam < typeFonction->getNumParams()) {
             llvm::Type* typeAttendu = typeFonction->getParamType(indexParam);
-            valeurFinale = _contextGenCode->backend->creerAutoCast(valeurArgument, typeAttendu);
+            valeurFinale = getContextGenCode()->getBackend()->creerAutoCast(valeurArgument, typeAttendu);
         }
 
-        _contextGenCode->registreArgument->ajouter(valeurFinale);
+        getContextGenCode()->getRegistreArgument()->ajouter(valeurFinale);
         indexParam++;
     }
 
-    std::vector<llvm::Value*> args = _contextGenCode->registreArgument->recuperer();
-    _contextGenCode->registreArgument->vider();
+    std::vector<llvm::Value*> args = getContextGenCode()->getRegistreArgument()->recuperer();
+    getContextGenCode()->getRegistreArgument()->vider();
 
     if(fonctionCible->getReturnType()->isVoidTy())
     {
-        _contextGenCode->backend->getBuilder().CreateCall(fonctionCible, args);
-        _contextGenCode->valeurTemporaire.adresse = nullptr;
-        _contextGenCode->valeurTemporaire.type = nullptr;
+        getContextGenCode()->getBackend()->getBuilder().CreateCall(fonctionCible, args);
+        getContextGenCode()->modifierValeurTemporaire(Symbole(nullptr, getContextGenCode()->getValeurTemporaire().getType(), getContextGenCode()->getValeurTemporaire().getTypePointeElement()));
+        getContextGenCode()->modifierValeurTemporaire(Symbole(getContextGenCode()->getValeurTemporaire().getAdresse(), nullptr, getContextGenCode()->getValeurTemporaire().getTypePointeElement()));
         return;
     }
     
-    _contextGenCode->valeurTemporaire.adresse = _contextGenCode->backend->getBuilder().CreateCall(
+    getContextGenCode()->modifierValeurTemporaire(Symbole(getContextGenCode()->getBackend()->getBuilder().CreateCall(
         fonctionCible, 
         args, 
         "resultat_appel"
-    );
-    _contextGenCode->valeurTemporaire.type = symboleFonction->typeRetour;
+    ), getContextGenCode()->getValeurTemporaire().getType(), getContextGenCode()->getValeurTemporaire().getTypePointeElement()));
+    getContextGenCode()->modifierValeurTemporaire(Symbole(getContextGenCode()->getValeurTemporaire().getAdresse(), symboleFonction->typeRetour, getContextGenCode()->getValeurTemporaire().getTypePointeElement()));
 }
 
 
@@ -281,15 +292,15 @@ void RegistreBuiltIns::genererAppel(const std::string& nom, NoeudAppelFonction* 
         }
 
         noeudAppelFonction->getEnfants()[0]->accept(visiteur);
-        llvm::Value* valeurArgument = context->valeurTemporaire.adresse;
-        IType* typeArgument = context->valeurTemporaire.type;
+        llvm::Value* valeurArgument = context->getValeurTemporaire().getAdresse();
+        IType* typeArgument = context->getValeurTemporaire().getType();
         
         if (valeurArgument == nullptr) {
             throw std::runtime_error("Erreur : L'argument de print n'a pas généré de valeur.");
         }
 
         char tag = 'i';
-        auto& builder = context->backend->getBuilder();
+        auto& builder = context->getBackend()->getBuilder();
 
         if (typeArgument != nullptr && typeArgument->estFlottant()) {
             tag = 'f';
@@ -308,10 +319,10 @@ void RegistreBuiltIns::genererAppel(const std::string& nom, NoeudAppelFonction* 
 
         llvm::Value* llvmTag = builder.getInt32(static_cast<uint32_t>(tag));
         
-        const auto& symbolePtr = context->registreFonctionLocale->recuperer("print");
-        const SymboleFonctionLocale* symbolePrint = static_cast<const SymboleFonctionLocale*>(symbolePtr.get());
+        const auto& symbolePtr = context->getRegistreFonctionLocale()->recuperer("print");
+        const auto* symbolePrint = static_cast<const SymboleFonctionLocale*>(symbolePtr.get()); // nolint(cppcoreguidelines-pro-type-static-cast-downcast)
         
         builder.CreateCall(symbolePrint->fonction, { llvmTag, valeurArgument });
-        context->valeurTemporaire.adresse = nullptr;
+        context->modifierValeurTemporaire(Symbole(nullptr, context->getValeurTemporaire().getType(), context->getValeurTemporaire().getTypePointeElement()));
     }
 }

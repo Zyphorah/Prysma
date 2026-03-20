@@ -1,22 +1,29 @@
 #include "Compilateur/AnalyseSyntaxique/ParseurType.h"
 #include "Compilateur/AST/Interfaces/IConstructeurArbre.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/Registre/RegistreType.h"
+#include "Compilateur/AST/Registre/Types/IType.h"
 #include "Compilateur/AST/Registre/Types/TypeSimple.h"
 #include "Compilateur/AST/Registre/Types/TypeTableau.h"
 #include "Compilateur/AST/Registre/Types/TypeComplexe.h"
+#include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenCategories.h"
 #include "Compilateur/GestionnaireErreur.h"
 #include "Compilateur/Lexer/TokenType.h"
+#include <cstddef>
+#include <llvm/IR/Type.h>
+#include <vector>
 
 ParseurType::ParseurType(RegistreType* registreType, IConstructeurArbre* constructeurArbre)
     : _registreType(registreType), _constructeurArbre(constructeurArbre)
 {
 }
 
-IType* ParseurType::parser(std::vector<Token>& tokens, int& index)
+auto ParseurType::parser(std::vector<Token>& tokens, int& index) -> IType*
 {
     // Vérifier que le token courant est un type valide
     if (!estType(tokens[static_cast<size_t>(index)].type)) {
-        throw ErreurCompilation("Erreur : type attendu", tokens[static_cast<size_t>(index)].ligne, tokens[static_cast<size_t>(index)].colonne);
+        throw ErreurCompilation("Erreur : type attendu", Ligne(tokens[static_cast<size_t>(index)].ligne), Colonne(tokens[static_cast<size_t>(index)].colonne));
     }
 
     IType* type = nullptr;
@@ -41,7 +48,7 @@ IType* ParseurType::parser(std::vector<Token>& tokens, int& index)
         }
 
         if (index >= static_cast<int>(tokens.size()) || tokens[static_cast<size_t>(index)].type != TOKEN_CROCHET_FERME) {
-            throw ErreurCompilation("Erreur : ']' attendu après la taille du tableau", tokens[static_cast<size_t>(index)].ligne, tokens[static_cast<size_t>(index)].colonne);
+            throw ErreurCompilation("Erreur : ']' attendu après la taille du tableau", Ligne(tokens[static_cast<size_t>(index)].ligne), Colonne(tokens[static_cast<size_t>(index)].colonne));
         }
         index++; // Consommer le crochet fermant
 

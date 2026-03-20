@@ -10,8 +10,14 @@ private:
     ContextGenCode* _contextGenCode; 
 
 public:
-    ConstructeurEnvironnementRegistreFonction(ContextGenCode* _contextGenCode);
-    ~ConstructeurEnvironnementRegistreFonction();
+    explicit ConstructeurEnvironnementRegistreFonction(ContextGenCode* _contextGenCode);
+    ~ConstructeurEnvironnementRegistreFonction() override;
+
+    // Delete copy and move constructors and assignment operators
+    ConstructeurEnvironnementRegistreFonction(const ConstructeurEnvironnementRegistreFonction&) = delete;
+    auto operator=(const ConstructeurEnvironnementRegistreFonction&) -> ConstructeurEnvironnementRegistreFonction& = delete;
+    ConstructeurEnvironnementRegistreFonction(ConstructeurEnvironnementRegistreFonction&&) = delete;
+    auto operator=(ConstructeurEnvironnementRegistreFonction&&) -> ConstructeurEnvironnementRegistreFonction& = delete;
 
     void remplir() override;
 };

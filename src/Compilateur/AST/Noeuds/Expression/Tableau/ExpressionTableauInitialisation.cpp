@@ -3,15 +3,21 @@
 
 #include "Compilateur/Tableau/ExpressionTableauInitialisation.h"
 #include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/Registre/ContexteExpression.h"
+#include "Compilateur/Lexer/Lexer.h"
+#include "Compilateur/Lexer/TokenType.h"
+#include <cstddef>
+#include <vector>
 
 ExpressionTableauInitialisation::ExpressionTableauInitialisation(ContexteExpression& contexteExpression)
     : _contexteExpression(contexteExpression)
 {}
 
 ExpressionTableauInitialisation::~ExpressionTableauInitialisation()
-{}
+= default;
 
-INoeud* ExpressionTableauInitialisation::construire(std::vector<Token>& equation)
+auto ExpressionTableauInitialisation::construire(std::vector<Token>& equation) -> INoeud*
 {
     std::vector<INoeud*> elementsTableau;
     std::vector<Token> sousEquation;
@@ -20,7 +26,7 @@ INoeud* ExpressionTableauInitialisation::construire(std::vector<Token>& equation
     while (index < equation.size() && equation[index].type != TOKEN_CROCHET_FERME) {
         if (equation[index].type == TOKEN_VIRGULE) {
             index++;
-            INoeud* element = _contexteExpression.constructeurArbreEquation->construire(sousEquation);
+            INoeud* element = _contexteExpression.getConstructeurArbreEquation()->construire(sousEquation);
             if (element != nullptr) {
                 elementsTableau.push_back(element);
             }
@@ -33,13 +39,13 @@ INoeud* ExpressionTableauInitialisation::construire(std::vector<Token>& equation
     }
 
     if (!sousEquation.empty()) {
-        INoeud* element = _contexteExpression.constructeurArbreEquation->construire(sousEquation);
+        INoeud* element = _contexteExpression.getConstructeurArbreEquation()->construire(sousEquation);
         if (element != nullptr) {
             elementsTableau.push_back(element);
         }
     }
 
-    return _contexteExpression.constructeurArbreEquation->allouer<NoeudTableauInitialisation>(elementsTableau);
+    return _contexteExpression.getConstructeurArbreEquation()->allouer<NoeudTableauInitialisation>(elementsTableau);
 }
 
 #endif /* EXPRESSION_TABLEAUINITIALISATION_CPP */

@@ -3,7 +3,7 @@
 
 #include "Compilateur/Lexer/TokenType.h"
 
-constexpr bool estOperateur(TokenType type) noexcept {
+constexpr auto estOperateur(TokenType type) noexcept -> bool {
     switch (type) {
         case TOKEN_PLUS:
         case TOKEN_MOINS:
@@ -16,7 +16,7 @@ constexpr bool estOperateur(TokenType type) noexcept {
     }
 }
 
-constexpr bool estOperande(TokenType type) noexcept {
+constexpr auto estOperande(TokenType type) noexcept -> bool {
     switch (type) {
         case TOKEN_LIT_INT:
         case TOKEN_LIT_FLOAT:
@@ -30,7 +30,7 @@ constexpr bool estOperande(TokenType type) noexcept {
     }
 }
 
-constexpr bool estOperateurComparaison(TokenType type) noexcept {
+constexpr auto estOperateurComparaison(TokenType type) noexcept -> bool {
     switch (type) {
         case TOKEN_PLUS_PETIT:
         case TOKEN_PLUS_GRAND:
@@ -44,7 +44,7 @@ constexpr bool estOperateurComparaison(TokenType type) noexcept {
     }
 }
 
-constexpr bool estType(TokenType type) noexcept {
+constexpr auto estType(TokenType type) noexcept -> bool {
     switch (type) {
         case TOKEN_TYPE_FLOAT:
         case TOKEN_TYPE_STRING:
@@ -61,7 +61,7 @@ constexpr bool estType(TokenType type) noexcept {
     }
 }
 
-constexpr bool estMotCle(TokenType type) noexcept {
+constexpr auto estMotCle(TokenType type) noexcept -> bool {
     switch (type) {
         case TOKEN_FONCTION:
         case TOKEN_SI:
@@ -78,7 +78,7 @@ constexpr bool estMotCle(TokenType type) noexcept {
     }
 }
 
-constexpr bool estStructure(TokenType type) noexcept {
+constexpr auto estStructure(TokenType type) noexcept -> bool {
     switch (type) {
         case TOKEN_PAREN_OUVERTE:
         case TOKEN_PAREN_FERMEE:

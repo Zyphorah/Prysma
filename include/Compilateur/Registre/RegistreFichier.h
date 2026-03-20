@@ -9,8 +9,8 @@
 class RegistreFichier {
 public:
     void ajouterFichier(const std::string& cheminFichier);
-    bool verifierFichier(const std::string& cheminFichier);
-    std::vector<std::string> obtenirTousLesFichiers();
+    auto verifierFichier(const std::string& cheminFichier) -> bool;
+    auto obtenirTousLesFichiers() -> std::vector<std::string>;
 
 private:
     std::set<std::string> fichiersTraites;

@@ -8,8 +8,14 @@
 class IExpressionMoteur
 {
 public:
+    IExpressionMoteur() = default;
+    IExpressionMoteur(const IExpressionMoteur&) = delete;
+    auto operator=(const IExpressionMoteur&) -> IExpressionMoteur& = delete;
+    IExpressionMoteur(IExpressionMoteur&&) = delete;
+    auto operator=(IExpressionMoteur&&) -> IExpressionMoteur& = delete;
+
     virtual ~IExpressionMoteur() = default;
-    virtual INoeud* construire(std::vector<Token>& equation) = 0;
+    virtual auto construire(std::vector<Token>& equation) -> INoeud* = 0;
 };
 
 #endif /* C2F85AFD_7B01_4D87_8D01_5C59514D2B2E */

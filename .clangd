@@ -5,10 +5,8 @@ InlayHints:
   ParameterNames: true
   DeducedTypes: true
   Designators: true       
-  TypeNameLimit: 25
-
-SemanticTokens:
-  Enabled: true
+  TypeNameLimit: 0
+  BlockEnd: true
 
 CompileFlags:
   Add: 
@@ -16,6 +14,11 @@ CompileFlags:
     - "-std=c++17"
     - "-Wall"
     - "-Wextra"
+    - "-Wpedantic"
+    - "-Wshadow"
+    - "-Wconversion"
+    - "-Wsign-conversion"
+    - "-Wnull-dereference"
     - "-fcolor-diagnostics"
   CompilationDatabase: build
 
@@ -25,7 +28,6 @@ Index:
 Diagnostics:
   UnusedIncludes: Strict
   MissingIncludes: Strict
-  Suppress: ["bugprone-narrowing-conversions"]
   ClangTidy:
     Add: 
       - bugprone-*
@@ -33,9 +35,12 @@ Diagnostics:
       - modernize-*
       - performance-*
       - readability-*
-    Remove: 
-      - readability-magic-numbers
-      - modernize-use-trailing-return-type
+      - cert-*
+      - hicpp-*
+      - clang-analyzer-*
+      - misc-*
+      - portability-*
+      - concurrency-*
     CheckOptions:
       readability-identifier-naming.VariableCase: camelCase
 

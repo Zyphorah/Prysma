@@ -1,6 +1,8 @@
 #include "Compilateur/AST/Utils/OrchestrateurInclude/UniteCompilation.h"
+#include "Compilateur/AST/ConstructeurArbreInstruction.h"
 #include "Compilateur/AST/Utils/ConstructeurEnvironnementRegistreFonction.h"
 #include "Compilateur/AST/Utils/ConstructeurEnvironnementRegistreVariable.h"
+#include "Compilateur/AST/Utils/OrchestrateurInclude/FacadeConfigurationEnvironnement.h"
 #include "Compilateur/AST/Utils/OrchestrateurInclude/OrchestrateurInclude.h"
 #include "Compilateur/TraitementFichier/FichierLecture.h"
 #include "Compilateur/Lexer/Lexer.h"
@@ -19,6 +21,7 @@
 #include <string>
 #include <filesystem>
 #include <iostream>
+#include <utility>
 #include <vector>
 
 UniteCompilation::UniteCompilation(OrchestrateurInclude* orchestrateur, RegistreFichier* registre, std::string cheminFichier, RegistreFonctionGlobale* registreFonctionGlobale) 
@@ -71,8 +74,7 @@ void UniteCompilation::passe1() {
     FichierLecture fichierLecture(cheminResolu);
     std::string document = fichierLecture.entrer();
 
-    Lexer lexer;
-    std::vector<Token> tokens = lexer.tokenizer(document);
+    std::vector<Token> tokens = Lexer::tokenizer(document);
 
     _arbre = constructeurArbreInstruction->construire(tokens);
 
@@ -107,7 +109,8 @@ void UniteCompilation::passe2() {
         _arbre->accept(visiteurGraphViz.get());
         visiteurGraphViz->generer();
 
-        if (system(("dot -Tsvg " + pathGraphe + _nomFichier + ".dot -o " + pathGraphe + _nomFichier + ".svg").c_str()) != 0) {
+        if (system(("dot -Tsvg " + pathGraphe + _nomFichier + ".dot -o " + pathGraphe + _nomFichier + ".svg").c_str()) != 0)
+        {
             std::cerr << "Erreur lors de la génération du graphe." << std::endl;
         }
 
@@ -115,7 +118,7 @@ void UniteCompilation::passe2() {
         std::filesystem::remove(pathGraphe + _nomFichier + ".dot");
     }
 
-    LlvmSerializer serializer(_context->backend->getModule());
+    LlvmSerializer serializer(_context->getBackend()->getModule());
     serializer.SauvegarderCodeLLVM(pathProgramme + _nomFichier + ".ll"); 
 
     // Restaurer le répertoire courant pour les includes au même niveau

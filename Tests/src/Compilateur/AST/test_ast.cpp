@@ -94,7 +94,7 @@ struct EnvironnementAST {
             constructeurArbre,
             parseurType,
             contextParseur,
-            arena,
+            &arena,
             registreVariable.get(),
             registreType.get()
         );

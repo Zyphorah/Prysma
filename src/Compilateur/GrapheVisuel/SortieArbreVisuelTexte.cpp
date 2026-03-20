@@ -1,11 +1,12 @@
 #include "Compilateur/GrapheVisuel/SortieGrapheVisuelTexte.h"
 #include <fstream>
 #include <stdexcept>
+#include <string>
 
 SortieGrapheVisuelTexte::SortieGrapheVisuelTexte(const std::string& cheminSortie)
     : _cheminSortie(cheminSortie), _compteurId(0) {}
 
-int SortieGrapheVisuelTexte::ajouterNoeud(const std::string& label) {
+auto SortieGrapheVisuelTexte::ajouterNoeud(const std::string& label) -> int {
     int noeudId = obtenirNouvelId();
     _contenuGraphe << "    node" << noeudId 
                    << " [label=\"" << label << "\", shape=ellipse, style=filled, fillcolor=lightgreen];\n";
@@ -32,6 +33,6 @@ void SortieGrapheVisuelTexte::generer() {
     fichier.close();
 }
 
-int SortieGrapheVisuelTexte::obtenirNouvelId() {
+auto SortieGrapheVisuelTexte::obtenirNouvelId() -> int {
     return _compteurId++;
 }

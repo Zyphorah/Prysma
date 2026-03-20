@@ -1,18 +1,24 @@
 #include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/AST/Registre/Types/TypeSimple.h"
 #include "Compilateur/LLVM/GestionVariable.h"
 #include "Compilateur/Visiteur/CodeGen/Helper/ErrorHelper.h"
+#include <cstdint>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Value.h>
+#include <string>
 
 void VisiteurGeneralGenCode::visiter(NoeudLitteral* noeudLitteral)
 {
-    llvm::LLVMContext& context = _contextGenCode->backend->getContext();
+    llvm::LLVMContext& context = _contextGenCode->getBackend()->getContext();
     Token token = noeudLitteral->getToken();
 
     if (token.type == TOKEN_IDENTIFIANT) {
         ChargeurVariable chargeur(_contextGenCode);
-        _contextGenCode->valeurTemporaire = chargeur.charger(token.value);
+        _contextGenCode->modifierValeurTemporaire( chargeur.charger(token.value));
         return; 
     }
 
@@ -43,6 +49,6 @@ void VisiteurGeneralGenCode::visiter(NoeudLitteral* noeudLitteral)
         ErrorHelper::erreurCompilation("Type de littéral non supporté (" + token.value + ")");
     }
 
-    _contextGenCode->valeurTemporaire.adresse = llvmValue;
-    _contextGenCode->valeurTemporaire.type = new (_contextGenCode->arena->Allocate<TypeSimple>()) TypeSimple(llvmType);
+    _contextGenCode->modifierValeurTemporaire(Symbole(llvmValue, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+    _contextGenCode->modifierValeurTemporaire(Symbole(_contextGenCode->getValeurTemporaire().getAdresse(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(llvmType), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
 }

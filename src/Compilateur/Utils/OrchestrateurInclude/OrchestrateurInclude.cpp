@@ -5,21 +5,26 @@
 #include "Compilateur/TraitementFichier/FichierLecture.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/Visiteur/VisiteurRemplissageRegistre/VisiteurRemplissageRegistre.h"
+#include <exception>
+#include <iostream>
 #include <llvm-18/llvm/IR/DerivedTypes.h>
 #include <llvm-18/llvm/IR/Instructions.h>
 #include <llvm-18/llvm/IR/Value.h>
 #include <cstdlib>
 #include <filesystem>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
+#include <utility>
+#include <vector>
 
 OrchestrateurInclude::OrchestrateurInclude(RegistreFonctionGlobale* registreFonctionGlobale, RegistreFichier* registreFichier, std::mutex* mutex, bool activerGraphViz)
     : _mutex(mutex), _registreFonctionGlobale(registreFonctionGlobale), _registreFichier(registreFichier), _activerGraphViz(activerGraphViz)
 {}
 
 OrchestrateurInclude::~OrchestrateurInclude()
-{}
+= default;
 
 void OrchestrateurInclude::attendreFinPass(std::vector<std::thread>& threads) {
     for (auto& thread : threads) {
@@ -65,7 +70,7 @@ void OrchestrateurInclude::compilerProjet(const std::string& cheminFichier)
             catch (const ErreurCompilation& erreur)
             {
                 std::string nomFichier = std::filesystem::path(unite->getChemin()).filename().string();
-                std::cerr << nomFichier << ":" << erreur.ligne << ":" << erreur.colonne << ": " << erreur.what() << std::endl;
+                std::cerr << nomFichier << ":" << erreur.getLigne() << ":" << erreur.getColonne() << ": " << erreur.what() << std::endl;
                 _aDesErreurs = true;
             }
             catch (const std::exception& e)
@@ -99,7 +104,7 @@ void OrchestrateurInclude::inclureFichier(const std::string& cheminAbsolu)
             uniteCompilation->passe1();
         } catch (const ErreurCompilation& erreur) {
           std::string nomFichier = std::filesystem::path(cheminAbsolu).filename().string();
-          std::cerr << nomFichier << ":" << erreur.ligne << ":" << erreur.colonne << ": " << erreur.what() << std::endl;
+          std::cerr << nomFichier << ":" << erreur.getLigne() << ":" << erreur.getColonne() << ": " << erreur.what() << std::endl;
           _aDesErreurs = true;
         } catch (const std::exception& e) {
           std::string nomFichier = std::filesystem::path(cheminAbsolu).filename().string();
@@ -112,12 +117,12 @@ void OrchestrateurInclude::inclureFichier(const std::string& cheminAbsolu)
     _threads.push_back(std::move(threadCourent)); 
 }
 
-bool OrchestrateurInclude::aDesErreurs() const
+auto OrchestrateurInclude::aDesErreurs() const -> bool
 {
     return _aDesErreurs.load();
 }
 
-bool OrchestrateurInclude::estGraphVizActif() const
+auto OrchestrateurInclude::estGraphVizActif() const -> bool
 {
     return _activerGraphViz;
 }

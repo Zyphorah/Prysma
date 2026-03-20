@@ -3,6 +3,9 @@
 
 #include "Compilateur/AnalyseSyntaxique/Equation/Interfaces/IGestionnaireOperateur.h"
 #include "Compilateur/AnalyseSyntaxique/Equation/Interfaces/IGestionnaireParenthese.h"
+#include "Compilateur/Lexer/Lexer.h"
+#include "Compilateur/Lexer/TokenType.h"
+#include <vector>
 
 /**
  * @class GestionnaireOperateur
@@ -10,7 +13,7 @@
  * Implémente le pattern Chain of Responsibility
  */
 class GestionnaireOperateur : public IGestionnaireOperateur {
-protected:
+private:
     IGestionnaireOperateur* _suivant;
     IGestionnaireParenthese* _gestionnaireParenthese;
     TokenType _tokenType;
@@ -39,14 +42,14 @@ public:
      * @param equation L'équation à analyser
      * @return L'index de l'opérateur, ou -1
      */
-    virtual int chercherOperateur(const std::vector<Token>& equation) const;
+    [[nodiscard]] virtual int chercherOperateur(const std::vector<Token>& equation) const;
     
     /**
      * @brief Traite la recherche de cet opérateur ou délègue au suivant
      * @param equation L'équation à traiter
      * @return L'index de l'opérateur trouvé, ou -1
      */
-    int traiter(const std::vector<Token>& equation) override;
+    auto traiter(const std::vector<Token>& equation) -> int override;
 };
 
 

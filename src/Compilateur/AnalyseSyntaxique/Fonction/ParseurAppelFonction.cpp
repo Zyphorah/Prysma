@@ -3,6 +3,13 @@
 
 #include "Compilateur/Fonction/ParseurAppelFonction.h"
 #include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/AST/Noeuds/Interfaces/IInstruction.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/Registre/ContextParseur.h"
+#include "Compilateur/Lexer/Lexer.h"
+#include "Compilateur/Lexer/TokenType.h"
+#include <cstddef>
+#include <vector>
 
 
 ParseurAppelFonction::ParseurAppelFonction(ContextParseur& contextParseur) 
@@ -10,7 +17,7 @@ ParseurAppelFonction::ParseurAppelFonction(ContextParseur& contextParseur)
 {}
 
 ParseurAppelFonction::~ParseurAppelFonction()
-{}
+= default;
 
 INoeud* ParseurAppelFonction::parser(std::vector<Token>& tokens, int& index)
 {
@@ -20,9 +27,9 @@ INoeud* ParseurAppelFonction::parser(std::vector<Token>& tokens, int& index)
   Token nomFonction = consommer(tokens, index, TOKEN_IDENTIFIANT, "Erreur: identifiant de fonction attendu");
   consommer(tokens, index, TOKEN_PAREN_OUVERTE, "Erreur: '(' attendue");
   
-  IInstruction* noeudAppel = _contextParseur.constructeurArbreEquation->allouer<NoeudAppelFonction>(nomFonction);
+  IInstruction* noeudAppel = _contextParseur.getConstructeurArbreEquation()->allouer<NoeudAppelFonction>(nomFonction);
   
-  consommerEnfantCorps(tokens, index, noeudAppel, _contextParseur.constructeurArbreEquation, TOKEN_PAREN_FERMEE);
+  consommerEnfantCorps(tokens, index, noeudAppel, _contextParseur.getConstructeurArbreEquation(), TOKEN_PAREN_FERMEE);
 
   consommer(tokens, index, TOKEN_PAREN_FERMEE, "Erreur: ')' attendue");
 

@@ -11,19 +11,19 @@ ConstructeurEnvironnementRegistreFonction::~ConstructeurEnvironnementRegistreFon
 void ConstructeurEnvironnementRegistreFonction::remplir()
 {   
     // 1. Remplissage des fonctions globales
-    for(const auto& cle : _contextGenCode->registreFonctionGlobale->obtenirCles())
+    for(const auto& cle : _contextGenCode->getRegistreFonctionGlobale()->obtenirCles())
     {
-        const auto& ancienSymboleUniquePtr = _contextGenCode->registreFonctionGlobale->recuperer(cle);
+        const auto& ancienSymboleUniquePtr = _contextGenCode->getRegistreFonctionGlobale()->recuperer(cle);
         const auto* ancienSymbole = static_cast<const SymboleFonctionGlobale*>(ancienSymboleUniquePtr.get());
         
         if (ancienSymbole->noeud == nullptr) continue;
 
-        llvm::Type* retType = ancienSymbole->typeRetour->genererTypeLLVM(_contextGenCode->backend->getContext());
+        llvm::Type* retType = ancienSymbole->typeRetour->genererTypeLLVM(_contextGenCode->getBackend()->getContext());
         
         std::vector<llvm::Type*> paramTypes;
         for (auto* arg : ancienSymbole->noeud->getArguments()) {
             auto* argFonction = static_cast<NoeudArgFonction*>(arg);
-            paramTypes.push_back(argFonction->getType()->genererTypeLLVM(_contextGenCode->backend->getContext()));
+            paramTypes.push_back(argFonction->getType()->genererTypeLLVM(_contextGenCode->getBackend()->getContext()));
         }
 
         llvm::FunctionType* funcType = llvm::FunctionType::get(retType, paramTypes, false);
@@ -32,7 +32,7 @@ void ConstructeurEnvironnementRegistreFonction::remplir()
             funcType, 
             llvm::Function::ExternalLinkage, 
             cle,          
-            _contextGenCode->backend->getModule()
+            _contextGenCode->getBackend()->getModule()
         );
 
         auto nouveauSymbole = std::make_unique<SymboleFonctionLocale>();
@@ -40,32 +40,32 @@ void ConstructeurEnvironnementRegistreFonction::remplir()
         nouveauSymbole->typeRetour = ancienSymbole->typeRetour;
         nouveauSymbole->noeud = ancienSymbole->noeud;
         
-        _contextGenCode->registreFonctionLocale->enregistrer(cle, std::move(nouveauSymbole));        
+        _contextGenCode->getRegistreFonctionLocale()->enregistrer(cle, std::move(nouveauSymbole));        
     }
 
     // Remplissage des méthodes de classes (VTable, mangling)
-    for (const auto& nomClasse : _contextGenCode->registreClass->obtenirCles())
+    for (const auto& nomClasse : _contextGenCode->getRegistreClass()->obtenirCles())
     {
-        auto* classInfo = _contextGenCode->registreClass->recuperer(nomClasse);
+        auto const& classInfo = _contextGenCode->getRegistreClass()->recuperer(nomClasse);
         
-        for (const auto& nomMethode : classInfo->registreFonctionLocale->obtenirCles())
+        for (const auto& nomMethode : classInfo->getRegistreFonctionLocale()->obtenirCles())
         {
             // On récupère le SymboleFonctionLocale créé dans VisiteurRemplissageRegistre
-            const auto& symboleUniquePtr = classInfo->registreFonctionLocale->recuperer(nomMethode);
+            const auto& symboleUniquePtr = classInfo->getRegistreFonctionLocale()->recuperer(nomMethode);
             auto* symbole = static_cast<SymboleFonctionLocale*>(symboleUniquePtr.get());
             
             if (symbole->noeud == nullptr || symbole->fonction != nullptr) continue;
 
-            llvm::Type* retType = symbole->typeRetour->genererTypeLLVM(_contextGenCode->backend->getContext());
+            llvm::Type* retType = symbole->typeRetour->genererTypeLLVM(_contextGenCode->getBackend()->getContext());
             
             std::vector<llvm::Type*> paramTypes;
             
             // Ajouter le paramètre 'this' caché comme premier paramètre
-            paramTypes.push_back(llvm::PointerType::getUnqual(_contextGenCode->backend->getContext()));
+            paramTypes.push_back(llvm::PointerType::getUnqual(_contextGenCode->getBackend()->getContext()));
 
             for (auto* arg : symbole->noeud->getArguments()) {
                 auto* argFonction = static_cast<NoeudArgFonction*>(arg);
-                paramTypes.push_back(argFonction->getType()->genererTypeLLVM(_contextGenCode->backend->getContext()));
+                paramTypes.push_back(argFonction->getType()->genererTypeLLVM(_contextGenCode->getBackend()->getContext()));
             }
 
             llvm::FunctionType* funcType = llvm::FunctionType::get(retType, paramTypes, false);
@@ -79,7 +79,7 @@ void ConstructeurEnvironnementRegistreFonction::remplir()
                 funcType, 
                 llvm::Function::ExternalLinkage, 
                 nomLLVM,          
-                _contextGenCode->backend->getModule()
+                _contextGenCode->getBackend()->getModule()
             );
 
             symbole->fonction = vraieFonction;     

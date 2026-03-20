@@ -4,7 +4,12 @@
 class IConstructeurEnvironnementRegistre
 {
 public:
+    IConstructeurEnvironnementRegistre() = default;
     virtual ~IConstructeurEnvironnementRegistre() = default;
+    IConstructeurEnvironnementRegistre(const IConstructeurEnvironnementRegistre&) = delete;
+    auto operator=(const IConstructeurEnvironnementRegistre&) -> IConstructeurEnvironnementRegistre& = delete;
+    IConstructeurEnvironnementRegistre(IConstructeurEnvironnementRegistre&&) = delete;
+    auto operator=(IConstructeurEnvironnementRegistre&&) -> IConstructeurEnvironnementRegistre& = delete;
     virtual void remplir() = 0;
 };
 

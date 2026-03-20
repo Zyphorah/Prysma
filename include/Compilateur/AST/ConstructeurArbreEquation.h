@@ -7,6 +7,7 @@
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/AnalyseSyntaxique/Equation/ChaineResponsabilite.h"
 #include "Compilateur/AnalyseSyntaxique/Equation/Interfaces/IGestionnaireParenthese.h"
+#include <llvm/Support/Allocator.h>
 #include <vector>
 
 
@@ -30,7 +31,7 @@ public:
         llvm::BumpPtrAllocator& arena
     );
     
-    INoeud* construire(std::vector<Token> &equation) override;
-    INoeud* construire(std::vector<Token>& tokens, int& index) override;
-    llvm::BumpPtrAllocator& getArena() override;
+    auto construire(std::vector<Token> &equation) -> INoeud* override;
+    auto construire(std::vector<Token>& tokens, int& index) -> INoeud* override;
+    auto getArena() -> llvm::BumpPtrAllocator& override;
 };

@@ -1,7 +1,7 @@
 #include <cstdlib>
 
 extern "C" {
-    void* prysma_malloc(size_t size) {
+    auto prysma_malloc(size_t size) -> void* {
         return std::malloc(size); 
     }
 

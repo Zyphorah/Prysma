@@ -2,7 +2,6 @@
 #define D5D5CC5E_96E0_4410_95A8_57E0E7660888
 
 #include "Compilateur/AST/Registre/Types/IType.h"
-#include <memory>
 #include <stack>
 class RetourContexteCompilation
 {
@@ -12,12 +11,18 @@ private:
 public:
 
     RetourContexteCompilation()
-    {}
+    = default;
 
     ~RetourContexteCompilation()
-    {}
+    = default;
 
-    IType* recupererContext();
+    RetourContexteCompilation(const RetourContexteCompilation&) = delete;
+    auto operator=(const RetourContexteCompilation&) -> RetourContexteCompilation& = delete;
+
+    RetourContexteCompilation(RetourContexteCompilation&&) = delete;
+    auto operator=(RetourContexteCompilation&&) -> RetourContexteCompilation& = delete;
+
+    auto recupererContext() -> IType*;
         
     void piler(IType* token);
     void depiler();

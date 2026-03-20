@@ -10,11 +10,11 @@ private:
     std::string _cheminSortie;
     std::stringstream _contenuGraphe;
     int _compteurId;
-    int obtenirNouvelId();
+    auto obtenirNouvelId() -> int;
 
 public:
-    SortieGrapheVisuelTexte(const std::string& cheminSortie);
-    int ajouterNoeud(const std::string& label);
+    explicit SortieGrapheVisuelTexte(const std::string& cheminSortie);
+    auto ajouterNoeud(const std::string& label) -> int;
     void ajouterArete(int parentId, int enfantId);
     void generer();
 };

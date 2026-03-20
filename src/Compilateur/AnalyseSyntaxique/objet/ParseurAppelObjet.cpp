@@ -3,6 +3,12 @@
 
 #include "Compilateur/objet/ParseurAppelObjet.h"
 #include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/Registre/ContextParseur.h"
+#include "Compilateur/Lexer/Lexer.h"
+#include "Compilateur/Lexer/TokenType.h"
+#include <cstddef>
+#include <vector>
 
 
 ParseurAppelObjet::ParseurAppelObjet(ContextParseur& contextParseur) 
@@ -12,7 +18,7 @@ ParseurAppelObjet::ParseurAppelObjet(ContextParseur& contextParseur)
 ParseurAppelObjet::~ParseurAppelObjet()
 {}
 
-INoeud* ParseurAppelObjet::parser(std::vector<Token>& tokens, int& index)
+auto ParseurAppelObjet::parser(std::vector<Token>& tokens, int& index) -> INoeud*
 {
   const bool appelCommeInstruction = index == 0 || tokens[static_cast<size_t>(index - 1)].type != TOKEN_EGAL;
 
@@ -22,9 +28,9 @@ INoeud* ParseurAppelObjet::parser(std::vector<Token>& tokens, int& index)
   Token nomMethode = consommer(tokens, index, TOKEN_IDENTIFIANT, "Erreur: identifiant de méthode attendu");
   consommer(tokens, index, TOKEN_PAREN_OUVERTE, "Erreur: '(' attendue");
 
-  IInstruction* noeudAppel = _contextParseur.constructeurArbreEquation->allouer<NoeudAppelObjet>(nomObjet, nomMethode);
+  IInstruction* noeudAppel = _contextParseur.getConstructeurArbreEquation()->allouer<NoeudAppelObjet>(nomObjet, nomMethode);
 
-  consommerEnfantCorps(tokens, index, noeudAppel, _contextParseur.constructeurArbreEquation, TOKEN_PAREN_FERMEE);
+  consommerEnfantCorps(tokens, index, noeudAppel, _contextParseur.getConstructeurArbreEquation(), TOKEN_PAREN_FERMEE);
 
   consommer(tokens, index, TOKEN_PAREN_FERMEE, "Erreur: ')' attendue");
 

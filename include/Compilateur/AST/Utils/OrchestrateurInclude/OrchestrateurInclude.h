@@ -37,11 +37,16 @@ public:
     OrchestrateurInclude(RegistreFonctionGlobale* registreFonctionGlobale, RegistreFichier* registreFichier, std::mutex* mutex, bool activerGraphViz = false);
     ~OrchestrateurInclude();
 
+    OrchestrateurInclude(const OrchestrateurInclude&) = delete;
+    auto operator=(const OrchestrateurInclude&) -> OrchestrateurInclude& = delete;
+    OrchestrateurInclude(OrchestrateurInclude&&) = delete;
+    auto operator=(OrchestrateurInclude&&) -> OrchestrateurInclude& = delete;
+    
    void compilerProjet(const std::string& cheminFichier);
    void inclureFichier(const std::string& cheminAbsolu);
    static void attendreFinPass(std::vector<std::thread>& threads);
-   bool aDesErreurs() const;
-   bool estGraphVizActif() const;
+   [[nodiscard]] auto aDesErreurs() const -> bool;
+   [[nodiscard]] auto estGraphVizActif() const -> bool;
 };
 
 #endif /* D2577958_A8A8_4878_AFA0_2B3478129911 */

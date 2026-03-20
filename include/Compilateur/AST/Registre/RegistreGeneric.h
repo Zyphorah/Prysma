@@ -17,13 +17,18 @@ struct RegistreLock {
 
 template <typename TKey, typename TValeur, typename TLock = RegistreLock>
 class RegistreGeneric {
-protected:
+private:
     std::map<TKey, TValeur> _elements;
     std::function<std::string(TKey)> _messageErreurCallback;
     mutable TLock _lock;
 public:
     RegistreGeneric() = default;
     virtual ~RegistreGeneric() = default;
+
+    RegistreGeneric(const RegistreGeneric&) = delete;
+    auto operator=(const RegistreGeneric&) -> RegistreGeneric& = delete;
+    RegistreGeneric(RegistreGeneric&&) = delete;
+    auto operator=(RegistreGeneric&&) -> RegistreGeneric& = delete;
    
     void setMessageErreur(std::function<std::string(TKey)>&& callback) {
         std::lock_guard<TLock> guard(_lock);
@@ -36,7 +41,7 @@ public:
         _elements[cle] = std::move(valeur);
     }
 
-    const TValeur& recuperer(const TKey& cle) const {
+    auto recuperer(const TKey& cle) const -> const TValeur& {
         std::lock_guard<TLock> guard(_lock);
         auto iterator = _elements.find(cle);
         if (iterator == _elements.end()) {
@@ -45,13 +50,13 @@ public:
         return iterator->second;
     }
 
-    bool existe(const TKey& cle) const {
+    auto existe(const TKey& cle) const -> bool {
         std::lock_guard<TLock> guard(_lock);
         return _elements.count(cle) > 0;
     }
 
   
-    std::set<TKey> obtenirCles() const {
+    auto obtenirCles() const -> std::set<TKey> {
         std::lock_guard<TLock> guard(_lock);
         std::set<TKey> cles;
         for (const auto& pair : _elements) {
@@ -61,13 +66,13 @@ public:
     }
 
 protected:
-   virtual std::string genererMessageErreur(const TKey& cle) const {
+   virtual auto genererMessageErreur(const TKey& cle) const -> std::string {
         std::lock_guard<TLock> guard(_lock);
         return genererMessageErreurInterne(cle);
     }
 
 private:
-   std::string genererMessageErreurInterne(const TKey& cle) const {
+   auto genererMessageErreurInterne(const TKey& cle) const -> std::string {
         if (_messageErreurCallback) {
             return _messageErreurCallback(cle);
         }

@@ -13,6 +13,11 @@ class NoeudDeclarationFonction;
 class ISymboleRegistreFonction
 {
     public:
+        ISymboleRegistreFonction() = default;
+        ISymboleRegistreFonction(const ISymboleRegistreFonction&) = delete;
+        auto operator=(const ISymboleRegistreFonction&) -> ISymboleRegistreFonction& = delete;
+        ISymboleRegistreFonction(ISymboleRegistreFonction&&) = delete;
+        auto operator=(ISymboleRegistreFonction&&) -> ISymboleRegistreFonction& = delete;
         virtual ~ISymboleRegistreFonction() = default;
 };
 
@@ -37,14 +42,22 @@ class RegistreFonctionGlobale : public RegistreGeneric<std::string, std::unique_
 {
 public:
     RegistreFonctionGlobale() = default;
-    ~RegistreFonctionGlobale() = default;
+    RegistreFonctionGlobale(const RegistreFonctionGlobale&) = delete;
+    auto operator=(const RegistreFonctionGlobale&) -> RegistreFonctionGlobale& = delete;
+    RegistreFonctionGlobale(RegistreFonctionGlobale&&) = delete;
+    auto operator=(RegistreFonctionGlobale&&) -> RegistreFonctionGlobale& = delete;
+    ~RegistreFonctionGlobale() override = default;
 };
 
 class RegistreFonctionLocale : public RegistreGeneric<std::string, std::unique_ptr<ISymboleRegistreFonction>>
 {
 public:
     RegistreFonctionLocale() = default;
-    ~RegistreFonctionLocale() = default;
+    RegistreFonctionLocale(const RegistreFonctionLocale&) = delete;
+    auto operator=(const RegistreFonctionLocale&) -> RegistreFonctionLocale& = delete;
+    RegistreFonctionLocale(RegistreFonctionLocale&&) = delete;
+    auto operator=(RegistreFonctionLocale&&) -> RegistreFonctionLocale& = delete;
+    ~RegistreFonctionLocale() override = default;
 };
 
 #endif /* F2141F07_2C85_4ADB_9BC9_A909EBD34394 */

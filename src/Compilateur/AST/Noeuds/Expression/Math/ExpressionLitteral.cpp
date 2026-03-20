@@ -3,17 +3,21 @@
 
 #include "Compilateur/Math/ExpressionLitteral.h"
 #include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/Registre/ContexteExpression.h"
+#include "Compilateur/Lexer/Lexer.h"
+#include <vector>
 
 ExpressionLitteral::ExpressionLitteral(ContexteExpression& contexteExpression)
     : _contexteExpression(contexteExpression)
 {}
 
 ExpressionLitteral::~ExpressionLitteral()
-{}
+= default;
 
-INoeud* ExpressionLitteral::construire(std::vector<Token>& equation)
+auto ExpressionLitteral::construire(std::vector<Token>& equation) -> INoeud*
 {
-    return new (_contexteExpression.arena.Allocate(sizeof(NoeudLitteral), alignof(NoeudLitteral))) NoeudLitteral(equation[0]);
+    return new (_contexteExpression.getArena()->Allocate(sizeof(NoeudLitteral), alignof(NoeudLitteral))) NoeudLitteral(equation[0]); // NOLINT(cppcoreguidelines-owning-memory)
 }
 
 #endif /* EXPRESSION_LITTERAL_CPP */

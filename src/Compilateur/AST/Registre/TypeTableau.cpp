@@ -1,15 +1,19 @@
 #include "Compilateur/AST/Registre/Types/TypeTableau.h"
 #include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
+#include "Compilateur/AST/Registre/Types/IType.h"
+#include <cstdint>
 #include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Type.h>
 #include <stdexcept>
-#include <utility>
+#include <string>
 
 TypeTableau::TypeTableau(IType* typeEnfant, INoeud* taille)
     : _typeEnfant(typeEnfant), _taille(taille)
 {
 }
 
-llvm::Type* TypeTableau::genererTypeLLVM(llvm::LLVMContext& context)
+auto TypeTableau::genererTypeLLVM(llvm::LLVMContext& context) -> llvm::Type*
 {
     llvm::Type* typeElement = _typeEnfant->genererTypeLLVM(context);
 
@@ -22,28 +26,28 @@ llvm::Type* TypeTableau::genererTypeLLVM(llvm::LLVMContext& context)
     NoeudLitteral* litteral = nullptr;
 
     if (_taille->getTypeGenere() == NoeudTypeGenere::Litteral) {
-        litteral = static_cast<NoeudLitteral*>(_taille);
+        litteral = static_cast<NoeudLitteral*>(_taille); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
     }
     
     if (litteral == nullptr) {
         throw std::runtime_error("Erreur : la taille du tableau doit être un littéral entier");
     }
 
-    uint64_t taille = static_cast<uint64_t>(std::stoi(litteral->getToken().value));
+    auto taille = static_cast<uint64_t>(std::stoi(litteral->getToken().value));
     return llvm::ArrayType::get(typeElement, taille);
 }
 
-bool TypeTableau::estFlottant() const
+auto TypeTableau::estFlottant() const -> bool
 {
     return false;
 }
 
-bool TypeTableau::estBooleen() const
+auto TypeTableau::estBooleen() const -> bool
 {
     return false;
 }
 
-bool TypeTableau::estChaine() const
+auto TypeTableau::estChaine() const -> bool
 {
     return _typeEnfant->estChaine();
 }

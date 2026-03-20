@@ -5,7 +5,6 @@
 #include "Compilateur/AST/Registre/Types/IType.h"
 #include "Compilateur/AST/Registre/RegistreType.h"
 #include "Compilateur/Lexer/Lexer.h"
-#include <memory>
 #include <vector>
 
 class ParseurType {
@@ -17,7 +16,11 @@ public:
      ParseurType(RegistreType* registreType, IConstructeurArbre* constructeurArbre);
     ~ParseurType() = default;
 
-    IType* parser(std::vector<Token>& tokens, int& index);
+    ParseurType(const ParseurType&) = delete;
+    auto operator=(const ParseurType&) -> ParseurType& = delete;
+    ParseurType(ParseurType&&) = delete;
+    auto operator=(ParseurType&&) -> ParseurType& = delete;
+    auto parser(std::vector<Token>& tokens, int& index) -> IType*;
 };
 
 #endif /* BA12D61E_9205_4816_94C1_379B8ABA63D3 */

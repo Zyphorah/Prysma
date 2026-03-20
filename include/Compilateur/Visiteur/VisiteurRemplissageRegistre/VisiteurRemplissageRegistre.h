@@ -19,7 +19,12 @@ private:
 public:
     using VisiteurBaseGenerale::visiter;
     VisiteurRemplissageRegistre(ContextGenCode* contextGenCode, OrchestrateurInclude* orchestrateur);
-    virtual ~VisiteurRemplissageRegistre();
+     ~VisiteurRemplissageRegistre() override;
+
+    VisiteurRemplissageRegistre(const VisiteurRemplissageRegistre&) = delete;
+    auto operator=(const VisiteurRemplissageRegistre&) -> VisiteurRemplissageRegistre& = delete;
+    VisiteurRemplissageRegistre(VisiteurRemplissageRegistre&&) = delete;
+    auto operator=(VisiteurRemplissageRegistre&&) -> VisiteurRemplissageRegistre& = delete;
     void visiter(NoeudDeclarationVariable* noeudDeclarationVariable) override;
     void visiter(NoeudDeclarationFonction* noeudDeclarationFonction) override;
     void visiter(NoeudInclude* noeudInclude) override;

@@ -2,7 +2,6 @@
 
 #include <set>
 #include <functional>
-#include <memory>
 #include "Compilateur/Lexer/TokenType.h"
 
 
@@ -19,21 +18,27 @@ class IExpression;
  */
 class IRegistreSymbole {
 public:
+    IRegistreSymbole() = default;
+
     virtual ~IRegistreSymbole() = default;
+    IRegistreSymbole(const IRegistreSymbole&) = delete;
+    auto operator=(const IRegistreSymbole&) -> IRegistreSymbole& = delete;
+    IRegistreSymbole(IRegistreSymbole&&) = delete;
+    auto operator=(IRegistreSymbole&&) -> IRegistreSymbole& = delete;
 
     virtual void enregistrer(TokenType symbole, std::function<IExpression*(Token)> fournisseur) = 0;
-    virtual IExpression* recupererNoeud(Token token) = 0;
+    virtual auto recupererNoeud(Token token) -> IExpression* = 0;
     
     /**
      * @brief Vérifie si un caractère est un opérateur connu
      * @param symbole Le caractère à vérifier
      * @return true si c'est un opérateur connu
      */
-    virtual bool estOperateur(TokenType symbole) const = 0;
+    [[nodiscard]] virtual auto estOperateur(TokenType symbole) const -> bool = 0;
     
     /**
      * @brief Obtient l'ensemble des symboles enregistrés
      * @return Ensemble des symboles d'opérateurs
      */
-    virtual std::set<TokenType> obtenirSymboles() const = 0;
+    [[nodiscard]] virtual std::set<TokenType> obtenirSymboles() const = 0;
 };

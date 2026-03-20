@@ -1,21 +1,24 @@
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
+#include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/AST/AST_Genere.h"
 #include "Compilateur/Visiteur/CodeGen/Helper/ErrorHelper.h"
+#include <llvm-18/llvm/IR/Value.h>
 
 void VisiteurGeneralGenCode::visiter(NoeudDelete* noeudDelete)
 {
-    auto& module = _contextGenCode->backend->getModule();
-    auto& builder = _contextGenCode->backend->getBuilder();
+    auto& module = _contextGenCode->getBackend()->getModule();
+    auto& builder = _contextGenCode->getBackend()->getBuilder();
 
     // Récupérer le token de la variable à supprimer
     const Token& tokenVariable = noeudDelete->getNomType();
 
     // Chercher la variable dans le registre de variables pour déterminer si elle existe
-    Symbole symbole = _contextGenCode->registreVariable->recupererVariables(tokenVariable);
+    Symbole symbole = _contextGenCode->getRegistreVariable()->recupererVariables(tokenVariable);
 
-    ErrorHelper::verifierNonNull(symbole.adresse, "Variable '" + tokenVariable.value + "' non déclarée");
+    ErrorHelper::verifierNonNull(symbole.getAdresse(), "Variable '" + tokenVariable.value + "' non déclarée");
     
-    llvm::Value* adresseMemoire = symbole.adresse;
+    llvm::Value* adresseMemoire = symbole.getAdresse();
     llvm::Type* typeDonnee = adresseMemoire->getType();
 
     if (!typeDonnee->isPointerTy()) {
@@ -37,5 +40,5 @@ void VisiteurGeneralGenCode::visiter(NoeudDelete* noeudDelete)
     builder.CreateCall(freeFunc, {adresseALiberer});
 
     // Réinitialiser la valeur temporaire
-    _contextGenCode->valeurTemporaire.adresse = nullptr;
+    _contextGenCode->modifierValeurTemporaire(Symbole(nullptr, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
 }

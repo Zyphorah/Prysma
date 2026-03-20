@@ -2,39 +2,40 @@
 #define D5B94044_819C_4C15_B528_AAE97CBCB264
 
 #include "Compilateur/AST/Registre/ContextGenCode.h"
+#include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include <llvm-18/llvm/IR/Instructions.h>
 #include <llvm-18/llvm/IR/Value.h>
 #include <string>
 
 class ExtracteurTypeVariable {
-protected:
+private:
     ContextGenCode* _context;
 public:
     explicit ExtracteurTypeVariable(ContextGenCode* context);
-    llvm::Type* extraire(llvm::Value* adresseMemoire);
+    auto extraire(llvm::Value* adresseMemoire) -> llvm::Type*;
 };
 
 class AdresseurVariable {
-protected:
+private:
     ContextGenCode* _context;
 public:
     explicit AdresseurVariable(ContextGenCode* context);
-    Symbole recupererAdresse(const std::string& nomVariable);
+    auto recupererAdresse(const std::string& nomVariable) -> Symbole;
 };
 
 class ChargeurVariable {
-protected:
+private:
     ContextGenCode* _context;
     AdresseurVariable _adresseur;
     ExtracteurTypeVariable _extracteur;
 public:
     explicit ChargeurVariable(ContextGenCode* context);
-    Symbole charger(const std::string& nomVariable);
-    Symbole chargerUnref(const std::string& nomVariable);
+    auto charger(const std::string& nomVariable) -> Symbole;
+    auto chargerUnref(const std::string& nomVariable) -> Symbole;
 };
 
 class AllocateurVariable {
-protected:
+private:
     ContextGenCode* _context;
 public:
     explicit AllocateurVariable(ContextGenCode* context);
@@ -43,7 +44,7 @@ public:
 };
 
 class AffecteurVariable {
-protected:
+private:
     ContextGenCode* _context;
     ExtracteurTypeVariable _extracteur;
 public:
