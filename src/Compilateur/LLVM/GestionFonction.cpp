@@ -15,9 +15,11 @@
 #include <llvm/IR/Argument.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Instructions.h>
+#include <llvm/Support/Casting.h>
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 
 // Génération de la Déclaration

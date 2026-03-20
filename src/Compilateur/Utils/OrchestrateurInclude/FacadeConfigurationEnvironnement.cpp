@@ -21,6 +21,7 @@
 // Expressions
 #include "Compilateur/LLVM/LlvmBackend.h"
 #include "Compilateur/Math/ExpressionLitteral.h"
+#include "Compilateur/Registre/RegistreFichier.h"
 #include "Compilateur/Variable/ExpressionIdentifiant.h"
 #include "Compilateur/Variable/ExpressionRefVariable.h"
 #include "Compilateur/Variable/ExpressionUnRefVariable.h"
@@ -52,6 +53,8 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <utility>
+#include <vector>
 
 // NOLINTBEGIN(cppcoreguidelines-owning-memory)
 

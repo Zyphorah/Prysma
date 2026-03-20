@@ -24,7 +24,7 @@ TEST_CASE("Variable accessible dans le scope global", "[RegistreVariable]") {
     registre.enregistrer(tok, creerSymbole(0x100));
 
     Symbole result = registre.recupererVariables(tok);
-    CHECK(result.adresse == reinterpret_cast<llvm::Value*>(0x100));
+    CHECK(result.getAdresse() == reinterpret_cast<llvm::Value*>(0x100));
 }
 
 TEST_CASE("Variable inexistante lance exception", "[RegistreVariable]") {
@@ -52,7 +52,7 @@ TEST_CASE("Variable du scope parent visible dans le scope enfant", "[RegistreVar
     registre.piler();
 
     Symbole result = registre.recupererVariables(tok);
-    CHECK(result.adresse == reinterpret_cast<llvm::Value*>(0x100));
+    CHECK(result.getAdresse() == reinterpret_cast<llvm::Value*>(0x100));
 }
 
 TEST_CASE("Variable du scope enfant inaccessible apres depiler", "[RegistreVariable]") {
@@ -77,7 +77,7 @@ TEST_CASE("Shadowing - variable enfant masque la variable parent", "[RegistreVar
     registre.enregistrer(tok, creerSymbole(0x200));
 
     Symbole result = registre.recupererVariables(tok);
-    CHECK(result.adresse == reinterpret_cast<llvm::Value*>(0x200));
+    CHECK(result.getAdresse() == reinterpret_cast<llvm::Value*>(0x200));
 }
 
 TEST_CASE("Shadowing - variable parent restauree apres depiler", "[RegistreVariable]") {
@@ -91,7 +91,7 @@ TEST_CASE("Shadowing - variable parent restauree apres depiler", "[RegistreVaria
     registre.depiler();
 
     Symbole result = registre.recupererVariables(tok);
-    CHECK(result.adresse == reinterpret_cast<llvm::Value*>(0x100));
+    CHECK(result.getAdresse() == reinterpret_cast<llvm::Value*>(0x100));
 }
 
 TEST_CASE("Depiler ne supprime pas le scope global", "[RegistreVariable]") {
@@ -103,7 +103,7 @@ TEST_CASE("Depiler ne supprime pas le scope global", "[RegistreVariable]") {
     registre.depiler();
 
     Symbole result = registre.recupererVariables(tok);
-    CHECK(result.adresse == reinterpret_cast<llvm::Value*>(0x100));
+    CHECK(result.getAdresse() == reinterpret_cast<llvm::Value*>(0x100));
 }
 
 TEST_CASE("Variable scope frere inaccessible", "[RegistreVariable]") {
@@ -132,7 +132,7 @@ TEST_CASE("ViderTop efface le scope courant sans toucher le parent", "[RegistreV
     // Local efface
     CHECK_THROWS_AS(registre.recupererVariables(creerToken("local")), ErreurCompilation);
     // Global toujours la (visible depuis le scope vide)
-    CHECK(registre.recupererVariables(creerToken("global")).adresse == reinterpret_cast<llvm::Value*>(0x100));
+    CHECK(registre.recupererVariables(creerToken("global")).getAdresse() == reinterpret_cast<llvm::Value*>(0x100));
 }
 
 TEST_CASE("ViderTop puis re-enregistrer dans le meme scope", "[RegistreVariable]") {
@@ -144,7 +144,7 @@ TEST_CASE("ViderTop puis re-enregistrer dans le meme scope", "[RegistreVariable]
 
     // Re-enregistrer apres avoir vide
     CHECK_NOTHROW(registre.enregistrer(tok, creerSymbole(0x200)));
-    CHECK(registre.recupererVariables(tok).adresse == reinterpret_cast<llvm::Value*>(0x200));
+    CHECK(registre.recupererVariables(tok).getAdresse() == reinterpret_cast<llvm::Value*>(0x200));
 }
 
 TEST_CASE("RegistreVariable - Depilation excessive sans planter", "[RegistreVariable][SadTest]") {
@@ -159,7 +159,7 @@ TEST_CASE("RegistreVariable - Depilation excessive sans planter", "[RegistreVari
     registre.depiler();
 
     CHECK_NOTHROW(registre.recupererVariables(tok));
-    CHECK(registre.recupererVariables(tok).adresse == reinterpret_cast<llvm::Value*>(0x100));
+    CHECK(registre.recupererVariables(tok).getAdresse() == reinterpret_cast<llvm::Value*>(0x100));
 
     CHECK_NOTHROW(registre.depiler());
 
