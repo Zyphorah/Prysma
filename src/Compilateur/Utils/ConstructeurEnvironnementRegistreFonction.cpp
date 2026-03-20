@@ -1,12 +1,20 @@
 #include "Compilateur/AST/Utils/ConstructeurEnvironnementRegistreFonction.h"
+#include "Compilateur/AST/Registre/ContextGenCode.h"
 #include "Compilateur/AST/Registre/RegistreFonction.h"
 #include "Compilateur/AST/Registre/RegistreClass.h"
 #include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/Utils/PrysmaCast.h"
+#include <llvm-18/llvm/IR/Function.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 ConstructeurEnvironnementRegistreFonction::ConstructeurEnvironnementRegistreFonction(ContextGenCode* contextGenCode)
     : _contextGenCode(contextGenCode) {}
 
-ConstructeurEnvironnementRegistreFonction::~ConstructeurEnvironnementRegistreFonction() {}
+ConstructeurEnvironnementRegistreFonction::~ConstructeurEnvironnementRegistreFonction() = default;
 
 void ConstructeurEnvironnementRegistreFonction::remplir()
 {   
@@ -14,15 +22,15 @@ void ConstructeurEnvironnementRegistreFonction::remplir()
     for(const auto& cle : _contextGenCode->getRegistreFonctionGlobale()->obtenirCles())
     {
         const auto& ancienSymboleUniquePtr = _contextGenCode->getRegistreFonctionGlobale()->recuperer(cle);
-        const auto* ancienSymbole = static_cast<const SymboleFonctionGlobale*>(ancienSymboleUniquePtr.get());
+        const auto* ancienSymbole = prysma::cast<const SymboleFonctionGlobale>(ancienSymboleUniquePtr.get());
         
-        if (ancienSymbole->noeud == nullptr) continue;
+        if (ancienSymbole->noeud == nullptr) { continue;}
 
         llvm::Type* retType = ancienSymbole->typeRetour->genererTypeLLVM(_contextGenCode->getBackend()->getContext());
         
         std::vector<llvm::Type*> paramTypes;
         for (auto* arg : ancienSymbole->noeud->getArguments()) {
-            auto* argFonction = static_cast<NoeudArgFonction*>(arg);
+            auto* argFonction = prysma::cast<NoeudArgFonction>(arg);
             paramTypes.push_back(argFonction->getType()->genererTypeLLVM(_contextGenCode->getBackend()->getContext()));
         }
 
@@ -52,9 +60,9 @@ void ConstructeurEnvironnementRegistreFonction::remplir()
         {
             // On récupère le SymboleFonctionLocale créé dans VisiteurRemplissageRegistre
             const auto& symboleUniquePtr = classInfo->getRegistreFonctionLocale()->recuperer(nomMethode);
-            auto* symbole = static_cast<SymboleFonctionLocale*>(symboleUniquePtr.get());
+            auto* symbole = prysma::cast<SymboleFonctionLocale>(symboleUniquePtr.get());
             
-            if (symbole->noeud == nullptr || symbole->fonction != nullptr) continue;
+            if (symbole->noeud == nullptr || symbole->fonction != nullptr) { continue;}
 
             llvm::Type* retType = symbole->typeRetour->genererTypeLLVM(_contextGenCode->getBackend()->getContext());
             
@@ -64,7 +72,7 @@ void ConstructeurEnvironnementRegistreFonction::remplir()
             paramTypes.push_back(llvm::PointerType::getUnqual(_contextGenCode->getBackend()->getContext()));
 
             for (auto* arg : symbole->noeud->getArguments()) {
-                auto* argFonction = static_cast<NoeudArgFonction*>(arg);
+                auto* argFonction = prysma::cast<NoeudArgFonction>(arg);
                 paramTypes.push_back(argFonction->getType()->genererTypeLLVM(_contextGenCode->getBackend()->getContext()));
             }
 

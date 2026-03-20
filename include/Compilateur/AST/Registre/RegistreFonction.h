@@ -13,12 +13,14 @@ class NoeudDeclarationFonction;
 class ISymboleRegistreFonction
 {
     public:
+        enum class SymboleType { Globale, Locale };
         ISymboleRegistreFonction() = default;
         ISymboleRegistreFonction(const ISymboleRegistreFonction&) = delete;
         auto operator=(const ISymboleRegistreFonction&) -> ISymboleRegistreFonction& = delete;
         ISymboleRegistreFonction(ISymboleRegistreFonction&&) = delete;
         auto operator=(ISymboleRegistreFonction&&) -> ISymboleRegistreFonction& = delete;
         virtual ~ISymboleRegistreFonction() = default;
+        [[nodiscard]] virtual SymboleType getType() const = 0;
 };
 
 // Fait office de struct pour stocker les fonctions globales donc 
@@ -28,6 +30,11 @@ class SymboleFonctionGlobale : public ISymboleRegistreFonction {
 public: 
     IType* typeRetour = nullptr;
     NoeudDeclarationFonction* noeud = nullptr;
+    
+    [[nodiscard]] auto getType() const -> SymboleType override { return SymboleType::Globale; }
+    [[nodiscard]] static auto classof(const ISymboleRegistreFonction* s) -> bool { 
+        return s->getType() == SymboleType::Globale; 
+    }
 };
 
 // Registre local avec llvm::Function* pour la génération de code dans un thread
@@ -36,6 +43,11 @@ public:
     llvm::Function* fonction = nullptr;
     IType* typeRetour = nullptr;
     NoeudDeclarationFonction* noeud = nullptr;
+
+    [[nodiscard]] auto getType() const -> SymboleType override { return SymboleType::Locale; }
+    [[nodiscard]] static auto classof(const ISymboleRegistreFonction* s) -> bool { 
+        return s->getType() == SymboleType::Locale; 
+    }
 };
 
 class RegistreFonctionGlobale : public RegistreGeneric<std::string, std::unique_ptr<ISymboleRegistreFonction>, std::mutex>

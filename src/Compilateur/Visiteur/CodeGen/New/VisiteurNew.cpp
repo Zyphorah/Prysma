@@ -6,8 +6,10 @@
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/AST/AST_Genere.h"
 #include "Compilateur/Visiteur/CodeGen/Helper/ErrorHelper.h"
+#include "Compilateur/Utils/PrysmaCast.h"
 #include <cstdint>
 #include <llvm-18/llvm/IR/Value.h>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -88,7 +90,10 @@ void VisiteurGeneralGenCode::visiter(NoeudNew* noeudNew)
         std::string nomConstructeur = noeudNew->getNomType().value;
         if (infoClasse->getRegistreFonctionLocale()->existe(nomConstructeur)) {
             const auto& symbolePtr = infoClasse->getRegistreFonctionLocale()->recuperer(nomConstructeur);
-            const auto* symboleFonction = static_cast<const SymboleFonctionLocale*>(symbolePtr.get()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+            if (!prysma::isa<SymboleFonctionLocale>(symbolePtr.get())) {
+                throw std::runtime_error("Erreur : SymboleFonctionLocale attendu");
+            }
+            const auto* symboleFonction = prysma::cast<const SymboleFonctionLocale>(symbolePtr.get());
             builder.CreateCall(symboleFonction->fonction, argsConstructeur);
         }
     }

@@ -2,6 +2,7 @@
 #include "Compilateur/AST/AST_Genere.h"
 #include "Compilateur/AST/Noeuds/Interfaces/INoeud.h"
 #include "Compilateur/AST/Registre/Types/IType.h"
+#include "Compilateur/Utils/PrysmaCast.h"
 #include <cstdint>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Type.h>
@@ -25,8 +26,8 @@ auto TypeTableau::genererTypeLLVM(llvm::LLVMContext& context) -> llvm::Type*
 
     NoeudLitteral* litteral = nullptr;
 
-    if (_taille->getTypeGenere() == NoeudTypeGenere::Litteral) {
-        litteral = static_cast<NoeudLitteral*>(_taille); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+    if (prysma::isa<NoeudLitteral>(_taille)) {
+        litteral = prysma::cast<NoeudLitteral>(_taille);
     }
     
     if (litteral == nullptr) {

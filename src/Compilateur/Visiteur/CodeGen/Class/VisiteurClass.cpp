@@ -1,5 +1,6 @@
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/Utils/PrysmaCast.h"
 #include <string>
 
 void VisiteurGeneralGenCode::visiter(NoeudClass* noeudClass)
@@ -8,7 +9,7 @@ void VisiteurGeneralGenCode::visiter(NoeudClass* noeudClass)
     _contextGenCode->modifierNomClasseCourante( noeudClass->getNomClass().value);
 
     for (auto* membre : noeudClass->getListMembres()) {
-        if (membre->getTypeGenere() == NoeudTypeGenere::DeclarationFonction) {
+        if (prysma::isa<NoeudDeclarationFonction>(membre)) {
             membre->accept(this);
         }
     }

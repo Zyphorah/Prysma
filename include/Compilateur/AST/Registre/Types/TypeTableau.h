@@ -27,6 +27,8 @@ public:
     [[nodiscard]] auto estChaine() const -> bool override;
     [[nodiscard]] auto estTableau() const -> bool override { return true; }
 
+    [[nodiscard]] static bool classof(const IType* type) { return type->estTableau(); }
+
     [[nodiscard]] auto getTypeEnfant() const -> IType* { return _typeEnfant; }
     [[nodiscard]] auto getTaille() const -> INoeud* { return _taille; }
 };

@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "Compilateur/Visiteur/CodeGen/Helper/ErrorHelper.h"
+#include "Compilateur/Utils/PrysmaCast.h"
 
 void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationVariable) 
 {
@@ -22,10 +23,7 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
     INoeud* expression = noeudDeclarationVariable->getExpression();
        
     // Vérifier si l'expression est une initialisation de tableau
-    NoeudTableauInitialisation* tableauInit = nullptr;
-    if (expression != nullptr && expression->getTypeGenere() == NoeudTypeGenere::TableauInitialisation) {
-        tableauInit = static_cast<NoeudTableauInitialisation*>(expression);
-    }
+    auto* tableauInit = prysma::dyn_cast<NoeudTableauInitialisation>(expression);
     
     llvm::AllocaInst* allocaCree = nullptr; 
     
@@ -35,10 +33,7 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
         llvm::Type* typeElement = nullptr;
         
         IType* typeDecl = noeudDeclarationVariable->getType();
-        TypeTableau* typeTableauDecl = nullptr;
-        if (typeDecl != nullptr && typeDecl->estTableau()) {
-            typeTableauDecl = static_cast<TypeTableau*>(typeDecl);
-        }
+        auto* typeTableauDecl = prysma::dyn_cast<TypeTableau>(typeDecl);
         
         if (typeTableauDecl != nullptr && typeTableauDecl->getTaille() == nullptr) {
             size_t tailleReelle = tableauInit->getElements().size();
@@ -99,10 +94,7 @@ void VisiteurGeneralGenCode::visiter(NoeudDeclarationVariable* noeudDeclarationV
         // Si on a un tableau avec taille dynamique (nullptr), on doit utiliser le type réel qu'on a calculé
         if (typeVariable == nullptr) {
             IType* typeDecl = noeudDeclarationVariable->getType();
-            TypeTableau* typeTableauDecl = nullptr;
-            if (typeDecl != nullptr && typeDecl->estTableau()) {
-                typeTableauDecl = static_cast<TypeTableau*>(typeDecl);
-            }
+            auto* typeTableauDecl = prysma::dyn_cast<TypeTableau>(typeDecl);
             if (typeTableauDecl != nullptr && tableauInit != nullptr) {
                 // On peut recalculer à partir de l'initialisation
                 size_t tailleReelle = tableauInit->getElements().size();

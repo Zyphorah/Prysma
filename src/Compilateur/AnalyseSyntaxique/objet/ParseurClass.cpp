@@ -10,6 +10,7 @@
 #include "Compilateur/Lexer/Lexer.h"
 #include "Compilateur/Lexer/TokenType.h"
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
+#include "Compilateur/Utils/PrysmaCast.h"
 #include <vector>
 
 namespace
@@ -25,8 +26,7 @@ namespace
       return;
     }
 
-    if (noeud->getTypeGenere() == NoeudTypeGenere::DeclarationVariable) {
-      auto* declarationVariable = static_cast<NoeudDeclarationVariable*>(noeud); 
+    if (auto* declarationVariable = prysma::dyn_cast<NoeudDeclarationVariable>(noeud)) {
       if (declarationVariable != nullptr) {
         noeud = contextParseur.getConstructeurArbreInstruction()->allouer<NoeudDeclarationVariable>(
             visibilite_courante,
@@ -39,8 +39,7 @@ namespace
       return;
     }
 
-    if (noeud->getTypeGenere() == NoeudTypeGenere::DeclarationFonction) {
-      auto* declarationFonction = static_cast<NoeudDeclarationFonction*>(noeud);
+    if (auto* declarationFonction = prysma::dyn_cast<NoeudDeclarationFonction>(noeud)) {
       if (declarationFonction != nullptr) {
         noeud = contextParseur.getConstructeurArbreInstruction()->allouer<NoeudDeclarationFonction>(
             visibilite_courante,
@@ -51,7 +50,7 @@ namespace
         );
       }
       
-      auto* newDeclarationFonction = static_cast<NoeudDeclarationFonction*>(noeud);
+      auto* newDeclarationFonction = prysma::cast<NoeudDeclarationFonction>(noeud);
       if (newDeclarationFonction != nullptr && newDeclarationFonction->getNom() == nomClasseToken.value) {
         constructeurs.push_back(noeud);
         return;

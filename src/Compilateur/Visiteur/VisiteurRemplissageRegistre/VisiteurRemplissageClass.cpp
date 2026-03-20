@@ -3,6 +3,7 @@
 #include "Compilateur/AST/Registre/RegistreClass.h"
 #include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/AST/Registre/RegistreFonction.h"
+#include "Compilateur/Utils/PrysmaCast.h"
 #include "Compilateur/LLVM/LlvmBackend.h"
 
 #include <llvm-18/llvm/IR/DerivedTypes.h>
@@ -54,11 +55,10 @@ void VisiteurRemplissageRegistre::visiter(NoeudClass* noeudClass)
     _contextGenCode->modifierNomClasseCourante(nomClasse);
 
     for (auto* membre : noeudClass->getListMembres()) {
-        if (membre->getTypeGenere() == NoeudTypeGenere::DeclarationFonction) {
+        if (prysma::isa<NoeudDeclarationFonction>(membre)) {
             membre->accept(this);
         }
-        else if (membre->getTypeGenere() == NoeudTypeGenere::DeclarationVariable) {
-            auto* declVar = static_cast<NoeudDeclarationVariable*>(membre);
+        else if (auto* declVar = prysma::dyn_cast<NoeudDeclarationVariable>(membre)) {
             Token token;
             token.value = declVar->getNom();
             infosClasse->getRegistreVariable()->enregistrer(token, Symbole(nullptr, declVar->getType()));

@@ -5,6 +5,7 @@
 #include "Compilateur/AST/Registre/RegistreFonction.h"
 #include "Compilateur/Visiteur/VisiteurBaseGenerale.h"
 #include "Compilateur/Visiteur/Extracteurs/ExtracteurMembresClass.h"
+#include "Compilateur/Utils/PrysmaCast.h"
 #include <llvm-18/llvm/IR/Function.h>
 #include <llvm-18/llvm/IR/GlobalVariable.h>
 #include <llvm-18/llvm/IR/Metadata.h>
@@ -12,6 +13,7 @@
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/GlobalValue.h>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -37,7 +39,10 @@ void VisiteurRemplissageCoprsClass::construireVTable(Class* classInfo, const std
         llvm::Function* functionImpl = nullptr;
         if (classInfo->getRegistreFonctionLocale()->existe(nomMethodeParent)) {
             const auto& symbole = classInfo->getRegistreFonctionLocale()->recuperer(nomMethodeParent);
-            auto* symboleLocal = static_cast<SymboleFonctionLocale*>(symbole.get());
+            if (!prysma::isa<SymboleFonctionLocale>(symbole.get())) {
+                throw std::runtime_error("Erreur : SymboleFonctionLocale attendu");
+            }
+            auto* symboleLocal = prysma::cast<SymboleFonctionLocale>(symbole.get());
             functionImpl = symboleLocal->fonction;
         }
         
@@ -68,7 +73,10 @@ void VisiteurRemplissageCoprsClass::construireVTable(Class* classInfo, const std
         // Si ce n'est pas une méthode du parent, l'ajouter à la fin de la vtable
         if (!estDansParent) {
             const auto& symbole = classInfo->getRegistreFonctionLocale()->recuperer(nomMethode);
-            auto* symboleLocal = static_cast<SymboleFonctionLocale*>(symbole.get()); 
+            if (!prysma::isa<SymboleFonctionLocale>(symbole.get())) {
+                throw std::runtime_error("Erreur : SymboleFonctionLocale attendu");
+            }
+            auto* symboleLocal = prysma::cast<SymboleFonctionLocale>(symbole.get()); 
             if (symboleLocal->fonction != nullptr) {
                 vtableElements.push_back(llvm::ConstantExpr::getBitCast(
                     symboleLocal->fonction,
@@ -143,10 +151,13 @@ void VisiteurRemplissageCoprsClass::visiter(NoeudClass* noeudClass)
         auto clesMethodesParent = classParentInfo->getRegistreFonctionLocale()->obtenirCles();
       
         std::vector<NoeudDeclarationFonction*> listMethodeParent;
-        for (const auto& cle : clesMethodesParent) {
-            const auto& symbole = classParentInfo->getRegistreFonctionLocale()->recuperer(cle);
-            auto* symboleLocal = static_cast<SymboleFonctionLocale*>(symbole.get()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-            if (symboleLocal->noeud != nullptr) {
+          for (const auto& cle : clesMethodesParent) {
+              const auto& symbole = classParentInfo->getRegistreFonctionLocale()->recuperer(cle);
+              if (!prysma::isa<SymboleFonctionLocale>(symbole.get())) {
+                  throw std::runtime_error("Erreur : SymboleFonctionLocale attendu");
+              }
+              auto* symboleLocal = prysma::cast<SymboleFonctionLocale>(symbole.get());
+              if (symboleLocal->noeud != nullptr) {
                 ExtracteurMembresClass methodeExtr;
                 symboleLocal->noeud->accept(&methodeExtr);
                 if (!methodeExtr.getMethodes().empty()) {

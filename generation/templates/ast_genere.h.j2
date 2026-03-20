@@ -44,6 +44,11 @@ public:
     [[nodiscard]] NoeudTypeGenere getTypeGenere() const override {
         return noeudTypeGenere;
     }
+
+    [[nodiscard]] static bool classof(const INoeud* noeud) {
+        return noeud->getTypeGenere() == NoeudTypeGenere::{{ classe.nom }};
+    }
+
 {%- if classe.parent == 'IExpression' %}
 
     IExpression* ajouterExpression(INoeud* gauche, INoeud* droite) override {

@@ -4,6 +4,7 @@
 #include "Compilateur/AST/Registre/ContextGenCode.h"
 #include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/AST/Registre/Types/TypeComplexe.h"
+#include "Compilateur/Utils/PrysmaCast.h"
 #include <llvm/ADT/StringRef.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/DerivedTypes.h>
@@ -37,8 +38,7 @@ Symbole VisiteurGeneralGenCode::evaluerExpression(INoeud* expression) {
 std::string VisiteurGeneralGenCode::obtenirNomClasseDepuisSymbole(const Symbole& objetSymbole) {
     std::string nomClasse;
     if (objetSymbole.getType() != nullptr) {
-        if (objetSymbole.getType() != nullptr && objetSymbole.getType()->estComplexe()) {
-        auto* typeComplexe = static_cast<TypeComplexe*>(objetSymbole.getType());
+        if (auto* typeComplexe = prysma::dyn_cast<TypeComplexe>(objetSymbole.getType())) {
             nomClasse = typeComplexe->getNomClasse();
         }
     }

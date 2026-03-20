@@ -20,6 +20,8 @@ public:
     [[nodiscard]] auto estChaine() const -> bool override;
     [[nodiscard]] auto estTableau() const -> bool override;
     [[nodiscard]] auto estComplexe() const -> bool override;
+
+    [[nodiscard]] static auto classof(const IType* type) -> bool { return type->estComplexe(); }
     
     auto getVTableType(llvm::LLVMContext& context) -> llvm::Type* override;
     

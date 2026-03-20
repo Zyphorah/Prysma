@@ -9,6 +9,7 @@
 #include "Compilateur/Visiteur/Interfaces/IVisiteur.h"
 #include "Compilateur/Visiteur/VisiteurBaseGenerale.h"
 #include "Compilateur/Visiteur/Extracteurs/ExtracteurArgFonction.h"
+#include "Compilateur/Utils/PrysmaCast.h"
 #include <cstddef>
 #include <cstdint>
 #include <llvm-18/llvm/IR/Function.h>
@@ -44,7 +45,10 @@ llvm::Function* GenerateurDeclarationStandard::creerFonction()
     std::string nomFonction = getNoeudDeclarationFonction()->getNom();
     
     const auto& symbolePtr = getContextGenCode()->getRegistreFonctionLocale()->recuperer(nomFonction);
-    const auto* symbole = static_cast<const SymboleFonctionLocale*>(symbolePtr.get()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+    if (!prysma::isa<SymboleFonctionLocale>(symbolePtr.get())) {
+        throw std::runtime_error("Erreur : SymboleFonctionLocale attendu");
+    }
+    const auto* symbole = prysma::cast<const SymboleFonctionLocale>(symbolePtr.get());
     
     llvm::Function* function = symbole->fonction;
 
@@ -60,7 +64,10 @@ llvm::Function* GenerateurDeclarationMethode::creerFonction()
     std::string nomClasse = getContextGenCode()->getNomClasseCourante();
     auto const& classInfo = getContextGenCode()->getRegistreClass()->recuperer(nomClasse);
     const auto& symbolePtr = classInfo->getRegistreFonctionLocale()->recuperer(nomFonction);
-    const auto* symbole = static_cast<const SymboleFonctionLocale*>(symbolePtr.get()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+    if (!prysma::isa<SymboleFonctionLocale>(symbolePtr.get())) {
+        throw std::runtime_error("Erreur : SymboleFonctionLocale attendu");
+    }
+    const auto* symbole = prysma::cast<const SymboleFonctionLocale>(symbolePtr.get());
     
     llvm::Function* function = symbole->fonction;
 
@@ -205,12 +212,18 @@ const SymboleFonctionLocale* GenerateurAppelMethode::obtenirFonctionLocale(const
     auto const& classInfo = getContextGenCode()->getRegistreClass()->recuperer(nomClasse);
     if(classInfo->getRegistreFonctionLocale()->existe(nomFonction)){
         const auto& symbolePtr = classInfo->getRegistreFonctionLocale()->recuperer(nomFonction);
-        return static_cast<const SymboleFonctionLocale*>(symbolePtr.get()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+        if (!prysma::isa<SymboleFonctionLocale>(symbolePtr.get())) {
+            throw std::runtime_error("Erreur : SymboleFonctionLocale attendu");
+        }
+        return prysma::cast<const SymboleFonctionLocale>(symbolePtr.get());
     }
     
     if (getContextGenCode()->getRegistreFonctionLocale()->existe(nomFonction)) {
         const auto& symbolePtr = getContextGenCode()->getRegistreFonctionLocale()->recuperer(nomFonction);
-        return static_cast<const SymboleFonctionLocale*>(symbolePtr.get()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+        if (!prysma::isa<SymboleFonctionLocale>(symbolePtr.get())) {
+            throw std::runtime_error("Erreur : SymboleFonctionLocale attendu");
+        }
+        return prysma::cast<const SymboleFonctionLocale>(symbolePtr.get());
     }
 
     throw std::runtime_error("Méthode ou fonction introuvable dans la portée de la classe : " + nomFonction);
@@ -220,7 +233,10 @@ const SymboleFonctionLocale* GenerateurAppelStandard::obtenirFonctionLocale(cons
 {
     if (getContextGenCode()->getRegistreFonctionLocale()->existe(nomFonction)) {
         const auto& symbolePtr = getContextGenCode()->getRegistreFonctionLocale()->recuperer(nomFonction);
-        return static_cast<const SymboleFonctionLocale*>(symbolePtr.get()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+        if (!prysma::isa<SymboleFonctionLocale>(symbolePtr.get())) {
+            throw std::runtime_error("Erreur : SymboleFonctionLocale attendu");
+        }
+        return prysma::cast<const SymboleFonctionLocale>(symbolePtr.get());
     }
 
     throw std::runtime_error("Fonction introuvable dans le registre local : " + nomFonction);
@@ -322,7 +338,10 @@ void RegistreBuiltIns::genererAppel(const std::string& nom, NoeudAppelFonction* 
         llvm::Value* llvmTag = builder.getInt32(static_cast<uint32_t>(tag));
         
         const auto& symbolePtr = context->getRegistreFonctionLocale()->recuperer("print");
-        const auto* symbolePrint = static_cast<const SymboleFonctionLocale*>(symbolePtr.get()); // nolint(cppcoreguidelines-pro-type-static-cast-downcast)
+        if (!prysma::isa<SymboleFonctionLocale>(symbolePtr.get())) {
+            throw std::runtime_error("Erreur : SymboleFonctionLocale attendu pour 'print'");
+        }
+        const auto* symbolePrint = prysma::cast<const SymboleFonctionLocale>(symbolePtr.get());
         
         builder.CreateCall(symbolePrint->fonction, { llvmTag, valeurArgument });
         context->modifierValeurTemporaire(Symbole(nullptr, context->getValeurTemporaire().getType(), context->getValeurTemporaire().getTypePointeElement()));

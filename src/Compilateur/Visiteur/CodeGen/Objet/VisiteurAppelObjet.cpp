@@ -5,8 +5,10 @@
 #include "Compilateur/LLVM/GestionVariable.h"
 #include "Compilateur/AST/Registre/RegistreClass.h"
 #include "Compilateur/Visiteur/CodeGen/Helper/ErrorHelper.h"
+#include "Compilateur/Utils/PrysmaCast.h"
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Instructions.h>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -43,7 +45,10 @@ void VisiteurGeneralGenCode::visiter(NoeudAppelObjet* noeudAppelObjet)
     args.push_back(objet);
 
     const auto& symbolePtr = classInfo->getRegistreFonctionLocale()->recuperer(nomMethode);
-    const auto* symboleFonction = static_cast<const SymboleFonctionLocale*>(symbolePtr.get()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+    if (!prysma::isa<SymboleFonctionLocale>(symbolePtr.get())) {
+        throw std::runtime_error("Erreur : SymboleFonctionLocale attendu");
+    }
+    const auto* symboleFonction = prysma::cast<const SymboleFonctionLocale>(symbolePtr.get());
     llvm::FunctionType* typeFonction = symboleFonction->fonction->getFunctionType();
 
     unsigned int indexParam = 1; // 0 est "this"
