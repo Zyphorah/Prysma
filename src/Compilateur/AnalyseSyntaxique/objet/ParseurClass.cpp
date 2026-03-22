@@ -41,31 +41,31 @@ namespace
       return;
     }
 
-    if (auto* declarationVariable = prysma::dyn_cast<NoeudDeclarationVariable>(noeud)) {
-      if (declarationVariable != nullptr) {
-        noeud = contextParseur.getConstructeurArbreInstruction()->allouer<NoeudDeclarationVariable>(
-            param.visibilite_courante(),
-            declarationVariable->getNom(),
-            declarationVariable->getType(),
-            declarationVariable->getExpression()
-        );
+      if (auto* declarationVariable = prysma::dyn_cast<NoeudDeclarationVariable>(noeud)) {
+        if (declarationVariable != nullptr) {
+          noeud = contextParseur.getConstructeurArbreInstruction()->allouer<NoeudDeclarationVariable>(
+              param.visibilite_courante(),
+              declarationVariable->getNom(),
+              declarationVariable->getType(),
+              declarationVariable->getExpression()
+          );
+          declarationVariable->~NoeudDeclarationVariable();
+        }
+        listMembres.push_back(noeud);
+        return;
       }
-      listMembres.push_back(noeud);
-      return;
-    }
 
-    if (auto* declarationFonction = prysma::dyn_cast<NoeudDeclarationFonction>(noeud)) {
-      if (declarationFonction != nullptr) {
-        noeud = contextParseur.getConstructeurArbreInstruction()->allouer<NoeudDeclarationFonction>(
-            param.visibilite_courante(),
-            declarationFonction->getTypeRetour(),
-            declarationFonction->getNom(),
-            declarationFonction->getArguments(),
-            declarationFonction->getCorps()
-        );
-      }
-      
-      auto* newDeclarationFonction = prysma::cast<NoeudDeclarationFonction>(noeud);
+      if (auto* declarationFonction = prysma::dyn_cast<NoeudDeclarationFonction>(noeud)) {
+        if (declarationFonction != nullptr) {
+          noeud = contextParseur.getConstructeurArbreInstruction()->allouer<NoeudDeclarationFonction>(
+              param.visibilite_courante(),
+              declarationFonction->getTypeRetour(),
+              declarationFonction->getNom(),
+              declarationFonction->getArguments(),
+              declarationFonction->getCorps()
+          );
+          declarationFonction->~NoeudDeclarationFonction();
+        }      auto* newDeclarationFonction = prysma::cast<NoeudDeclarationFonction>(noeud);
       if (newDeclarationFonction != nullptr && newDeclarationFonction->getNom() == param.nomClasseToken().value) {
         constructeurs.push_back(noeud);
         return;
@@ -109,7 +109,7 @@ ParseurClass::~ParseurClass()
 //                  }
 //           }
 
-INoeud* ParseurClass::parser(std::vector<Token>& tokens, int& index)
+auto ParseurClass::parser(std::vector<Token>& tokens, int& index) -> INoeud*
 {
     consommer(tokens, index, TOKEN_CLASS, "Attendu 'class' au début de la déclaration de classe.");
     Token nomClasseToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Attendu un identifiant après 'class' pour le nom de la classe.");

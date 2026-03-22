@@ -45,7 +45,7 @@ fn int32 main()
    dec ptr chien = new Chien(entier, 10);
 
    call chien.crier();
-   //aff chien.valeurPublic = 105;
+
    call print(chien.valeurPublic);
 
    return 0;

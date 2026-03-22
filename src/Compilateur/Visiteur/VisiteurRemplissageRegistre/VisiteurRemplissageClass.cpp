@@ -50,6 +50,8 @@ void VisiteurRemplissageRegistre::visiter(NoeudClass* noeudClass)
     // La VTable sera générée plus tard lors de la résolution des méthodes virtuelles
     infosClasse->setVTable(nullptr);
 
+    Class* infosClassePtr = infosClasse.get();
+
     // 7. Enregistrer la classe dans le registre global du compilateur
     _contextGenCode->getRegistreClass()->enregistrer(nomClasse, std::move(infosClasse));
 
@@ -64,10 +66,10 @@ void VisiteurRemplissageRegistre::visiter(NoeudClass* noeudClass)
         else if (auto* declVar = prysma::dyn_cast<NoeudDeclarationVariable>(membre)) {
             Token token;
             token.value = declVar->getNom();
-            infosClasse->getRegistreVariable()->enregistrer(token, Symbole(nullptr, declVar->getType()));
+            infosClassePtr->getRegistreVariable()->enregistrer(token, Symbole(nullptr, declVar->getType()));
             
             if (declVar->getExpression() != nullptr) {
-                infosClasse->getMemberInitializers()[declVar->getNom()] = declVar->getExpression();
+                infosClassePtr->getMemberInitializers()[declVar->getNom()] = declVar->getExpression();
             }
         }
     }
