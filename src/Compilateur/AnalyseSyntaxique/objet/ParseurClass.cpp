@@ -49,7 +49,6 @@ namespace
               declarationVariable->getType(),
               declarationVariable->getExpression()
           );
-          declarationVariable->~NoeudDeclarationVariable();
         }
         listMembres.push_back(noeud);
         return;
@@ -64,7 +63,6 @@ namespace
               declarationFonction->getArguments(),
               declarationFonction->getCorps()
           );
-          declarationFonction->~NoeudDeclarationFonction();
         }      auto* newDeclarationFonction = prysma::cast<NoeudDeclarationFonction>(noeud);
       if (newDeclarationFonction != nullptr && newDeclarationFonction->getNom() == param.nomClasseToken().value) {
         constructeurs.push_back(noeud);

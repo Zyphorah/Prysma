@@ -18,7 +18,7 @@ void NoeudInstruction::ajouterInstruction(INoeud* enfant)
     }
 }
 
-NoeudTypeGenere NoeudInstruction::getTypeGenere() const
+auto NoeudInstruction::getTypeGenere() const -> NoeudTypeGenere
 {
     return NoeudTypeGenere::AppelFonction; 
 }

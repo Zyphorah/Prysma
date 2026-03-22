@@ -22,7 +22,7 @@ auto ExpressionUnRefVariable::construire(std::vector<Token>& equation) -> INoeud
     if (equation.size() < 2 || equation[1].type != TOKEN_IDENTIFIANT) {
         throw std::runtime_error("Erreur: 'unref' doit être suivi d'un identifiant");
     }
-    return new (_contexteExpression.getArena()->Allocate(sizeof(NoeudUnRefVariable), alignof(NoeudUnRefVariable))) NoeudUnRefVariable(equation[1].value); // NOLINT(cppcoreguidelines-owning-memory)
+    return _contexteExpression.getConstructeurArbreEquation()->allouer<NoeudUnRefVariable>(equation[1].value); 
 }
 
 #endif /* EXPRESSION_UNREFVARIABLE_CPP */

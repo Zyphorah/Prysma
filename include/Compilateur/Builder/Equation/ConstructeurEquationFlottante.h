@@ -48,7 +48,7 @@ public:
 
     ConstructeurEquationFlottante(RegistreExpression* registreExpression, llvm::BumpPtrAllocator& arena);
     
-    ~ConstructeurEquationFlottante() override = default;
+    ~ConstructeurEquationFlottante() override;
 
     ConstructeurEquationFlottante(const ConstructeurEquationFlottante&) = delete;
     auto operator=(const ConstructeurEquationFlottante&) -> ConstructeurEquationFlottante& = delete;

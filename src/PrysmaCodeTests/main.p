@@ -1,52 +1,35 @@
-class Animal
+class testAppelFonction
 {
-   public:
+public: 
 
-      fn void Animal()
-      {
-      }
+   fn void testAppelFonction()
+   {
+      
+   }
 
-      fn void crier(arg string[] crie)
-      {
-         call print(unref crie);
-      }
+   fn int64 test()
+   {
+      return 42;
+   }
 }
 
-class Chien 
-{ 
-   private: 
+fn bool testAppelFonction()
+{
+   dec string[] msg = "Test de l'appel d'une fonction dans une classe.";
+   call print(msg);
 
-   dec int64 _test = 0; 
+   dec ptr test = new testAppelFonction();
 
-   public:
-   dec int32 valeurPublic = 2134;
-
-      fn void Chien(arg int32 test, arg int32 test2)
-      {
-         aff _test = test;
-  
-         call print(_test);
-         call print(test2);
-      }
-
-      fn void crier()
-      {   
-         dec string[] crie = "Woof!";
-         dec int32 test = 42;
-         dec ptr animal = new Animal();
-         call animal.crier(ref crie);
-      }
+   if (test.test() == 42)
+   {
+      return true;
+   }
+   return false;
 }
 
 fn int32 main() 
 {
-   dec int32 entier = 204; 
-
-   dec ptr chien = new Chien(entier, 10);
-
-   call chien.crier();
-
-   call print(chien.valeurPublic);
+   call print(testAppelFonction()); call backSlashN();
 
    return 0;
 }

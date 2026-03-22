@@ -68,7 +68,7 @@ auto ExpressionNew::construire(std::vector<Token>& equation) -> INoeud*
         }
     }
 
-    return new (_contexteExpression.getArena()->Allocate(sizeof(NoeudNew), alignof(NoeudNew))) NoeudNew(arguments,nomType); // NOLINT(cppcoreguidelines-owning-memory)
+    return _contexteExpression.getConstructeurArbreEquation()->allouer<NoeudNew>(arguments, nomType);
 }
 
 #endif /* EXPRESSION_NEW_CPP */

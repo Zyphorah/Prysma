@@ -17,7 +17,7 @@ ExpressionLitteral::~ExpressionLitteral()
 
 auto ExpressionLitteral::construire(std::vector<Token>& equation) -> INoeud*
 {
-    return new (_contexteExpression.getArena()->Allocate(sizeof(NoeudLitteral), alignof(NoeudLitteral))) NoeudLitteral(equation[0]); // NOLINT(cppcoreguidelines-owning-memory)
+    return _contexteExpression.getConstructeurArbreEquation()->allouer<NoeudLitteral>(equation[0]);
 }
 
 #endif /* EXPRESSION_LITTERAL_CPP */

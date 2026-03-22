@@ -11,6 +11,12 @@
 
 class IConstructeurArbre
 {
+private:
+    struct Finalizer {
+        void (*destroy)(void*);
+        void* pointeur;
+    };
+    std::vector<Finalizer> finalizers;
 public:
     IConstructeurArbre() = default;
     IConstructeurArbre(const IConstructeurArbre&) = delete;
@@ -18,7 +24,12 @@ public:
     IConstructeurArbre(IConstructeurArbre&&) = delete;
     auto operator=(IConstructeurArbre&&) -> IConstructeurArbre& = delete;
 
-    virtual ~IConstructeurArbre() = default;
+    virtual ~IConstructeurArbre() {
+        for (auto it = finalizers.rbegin(); it != finalizers.rend(); ++it) {
+            it->destroy(it->pointeur);
+        }
+    }
+    
     virtual auto construire(std::vector<Token>& tokens) -> INoeud* = 0;
     virtual auto construire(std::vector<Token>& tokens, int& index) -> INoeud* = 0;
     virtual auto getArena() -> llvm::BumpPtrAllocator& = 0;
@@ -26,7 +37,9 @@ public:
     template<typename T, typename... Args>
     auto allouer(Args&&... args) -> T* {
         void* mem = getArena().Allocate(sizeof(T), alignof(T));
-        return new (mem) T(std::forward<Args>(args)...); // NOLINT(cppcoreguidelines-owning-memory)
+        T* obj = new (mem) T(std::forward<Args>(args)...); // NOLINT(cppcoreguidelines-owning-memory)
+        finalizers.push_back({[](void* ptr) { static_cast<T*>(ptr)->~T(); }, mem});
+        return obj;
     }
 
     static constexpr std::size_t kArenaAlignment = 8;

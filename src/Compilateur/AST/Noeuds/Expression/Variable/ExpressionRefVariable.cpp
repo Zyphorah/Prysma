@@ -17,12 +17,12 @@ ExpressionRefVariable::ExpressionRefVariable(ContexteExpression& contexteExpress
 ExpressionRefVariable::~ExpressionRefVariable()
 = default;
 
-INoeud* ExpressionRefVariable::construire(std::vector<Token>& equation)
+auto ExpressionRefVariable::construire(std::vector<Token>& equation) -> INoeud*
 {
     if (equation.size() < 2 || equation[1].type != TOKEN_IDENTIFIANT) {
         throw std::runtime_error("Erreur: 'ref' doit être suivi d'un identifiant");
     }
-    return new (_contexteExpression.getArena()->Allocate(sizeof(NoeudRefVariable), alignof(NoeudRefVariable))) NoeudRefVariable(equation[1].value); // NOLINT(cppcoreguidelines-owning-memory)
+    return _contexteExpression.getConstructeurArbreEquation()->allouer<NoeudRefVariable>(equation[1].value); 
 }
 
 #endif /* EXPRESSION_REFVARIABLE_CPP */

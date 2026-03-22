@@ -46,7 +46,7 @@ auto ExpressionString::construire(std::vector<Token>& equation) -> INoeud*
         token.value = std::to_string(ascii);
         token.ligne = chaine.ligne;
         token.colonne = chaine.colonne;
-        elementsString.push_back(new (_contexteExpression.getArena()->Allocate<NoeudLitteral>()) NoeudLitteral(token)); // NOLINT(cppcoreguidelines-owning-memory)
+        elementsString.push_back(_contexteExpression.getConstructeurArbreEquation()->allouer<NoeudLitteral>(token)); 
     }
 
     Token tokenZero;
@@ -54,9 +54,9 @@ auto ExpressionString::construire(std::vector<Token>& equation) -> INoeud*
     tokenZero.value = "0";
     tokenZero.ligne = chaine.ligne;
     tokenZero.colonne = chaine.colonne;
-    elementsString.push_back(new (_contexteExpression.getArena()->Allocate<NoeudLitteral>()) NoeudLitteral(tokenZero)); // NOLINT(cppcoreguidelines-owning-memory)
+    elementsString.push_back(_contexteExpression.getConstructeurArbreEquation()->allouer<NoeudLitteral>(tokenZero)); 
 
-    return new (_contexteExpression.getArena()->Allocate<NoeudTableauInitialisation>()) NoeudTableauInitialisation(elementsString); // NOLINT(cppcoreguidelines-owning-memory)
+    return _contexteExpression.getConstructeurArbreEquation()->allouer<NoeudTableauInitialisation>(elementsString);
 }
 
 #endif /* EXPRESSION_STRING_CPP */

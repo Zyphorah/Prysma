@@ -346,22 +346,22 @@ void FacadeConfigurationEnvironnement::enregistrerInstructions()
     _registreInstruction->enregistrer(TOKEN_CLASS, parsClass);
 }
 
-ContextGenCode* FacadeConfigurationEnvironnement::getContext() const
+auto FacadeConfigurationEnvironnement::getContext() const -> ContextGenCode*
 {
     return _context.get();
 }
 
-llvm::BumpPtrAllocator& FacadeConfigurationEnvironnement::getArena()
+auto FacadeConfigurationEnvironnement::getArena() -> llvm::BumpPtrAllocator&
 {
     return _arena;
 }
 
-ConstructeurArbreInstruction* FacadeConfigurationEnvironnement::getConstructeurArbreInstruction() const
+auto FacadeConfigurationEnvironnement::getConstructeurArbreInstruction() const -> ConstructeurArbreInstruction*
 {
     return _constructeurArbreInstruction;
 }
 
-ConstructeurEquationFlottante* FacadeConfigurationEnvironnement::getConstructeurEquation() const
+auto FacadeConfigurationEnvironnement::getConstructeurEquation() const -> ConstructeurEquationFlottante*
 {
     return _constructeurEquation;
 }

@@ -26,6 +26,7 @@ auto ConstructeurArbreInstruction::construire(std::vector<Token>& tokens, int& i
     }
     IParseur* ParentNoeud = _registreInstructions->recuperer(tokens[static_cast<size_t>(index)].type);
     INoeud* enfant = ParentNoeud->parser(tokens, index);
+   
     return enfant;
 }
 

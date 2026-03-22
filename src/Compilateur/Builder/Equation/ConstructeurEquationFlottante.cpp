@@ -69,46 +69,46 @@ ConstructeurEquationFlottante::ConstructeurEquationFlottante(RegistreExpression*
 void ConstructeurEquationFlottante::initialiserRegistre()
 {
     _registreSymbole->enregistrer(TOKEN_PLUS, [this](Token token) -> IExpression* { 
-        return new (_arena.Allocate(sizeof(NoeudOperation), alignof(NoeudOperation))) NoeudOperation(std::move(token)); // NOLINT(cppcoreguidelines-owning-memory)
+        return this->allouer<NoeudOperation>(std::move(token)); 
     });
 
     _registreSymbole->enregistrer(TOKEN_MOINS, [this](Token token) -> IExpression* { 
-        return new (_arena.Allocate(sizeof(NoeudOperation), alignof(NoeudOperation))) NoeudOperation(std::move(token)); 
+        return this->allouer<NoeudOperation>(std::move(token)); 
     });
 
     _registreSymbole->enregistrer(TOKEN_ETOILE, [this](Token token) -> IExpression* { 
-        return new (_arena.Allocate(sizeof(NoeudOperation), alignof(NoeudOperation))) NoeudOperation(std::move(token)); 
+        return this->allouer<NoeudOperation>(std::move(token)); 
     });
 
     _registreSymbole->enregistrer(TOKEN_SLASH, [this](Token token) -> IExpression* { 
-        return new (_arena.Allocate(sizeof(NoeudOperation), alignof(NoeudOperation))) NoeudOperation(std::move(token)); 
+        return this->allouer<NoeudOperation>(std::move(token)); 
     });
     _registreSymbole->enregistrer(TOKEN_PLUS_PETIT, [this](Token token) -> IExpression* { 
-        return new (_arena.Allocate(sizeof(NoeudOperation), alignof(NoeudOperation))) NoeudOperation(std::move(token)); 
+        return this->allouer<NoeudOperation>(std::move(token)); 
     });
     _registreSymbole->enregistrer(TOKEN_PLUS_GRAND, [this](Token token) -> IExpression* { 
-        return new (_arena.Allocate(sizeof(NoeudOperation), alignof(NoeudOperation))) NoeudOperation(std::move(token)); 
+        return this->allouer<NoeudOperation>(std::move(token)); 
     });
     _registreSymbole->enregistrer(TOKEN_PLUS_GRAND_EGAL, [this](Token token) -> IExpression* { 
-        return new (_arena.Allocate(sizeof(NoeudOperation), alignof(NoeudOperation))) NoeudOperation(std::move(token)); 
+        return this->allouer<NoeudOperation>(std::move(token)); 
     });
     _registreSymbole->enregistrer(TOKEN_PLUS_PETIT_EGAL, [this](Token token) -> IExpression* { 
-        return new (_arena.Allocate(sizeof(NoeudOperation), alignof(NoeudOperation))) NoeudOperation(std::move(token));
+        return this->allouer<NoeudOperation>(std::move(token));
     });
     _registreSymbole->enregistrer(TOKEN_MODULO, [this](Token token) -> IExpression* { 
-        return new (_arena.Allocate(sizeof(NoeudOperation), alignof(NoeudOperation))) NoeudOperation(std::move(token));
+        return this->allouer<NoeudOperation>(std::move(token));
     });
     _registreSymbole->enregistrer(TOKEN_EGAL_EGAL, [this](Token token) -> IExpression* { 
-        return new (_arena.Allocate(sizeof(NoeudOperation), alignof(NoeudOperation))) NoeudOperation(std::move(token));
+        return this->allouer<NoeudOperation>(std::move(token));
     });
     _registreSymbole->enregistrer(TOKEN_DIFFERENT, [this](Token token) -> IExpression* { 
-        return new (_arena.Allocate(sizeof(NoeudOperation), alignof(NoeudOperation))) NoeudOperation(std::move(token));
+        return this->allouer<NoeudOperation>(std::move(token));
     });
     _registreSymbole->enregistrer(TOKEN_ET, [this](Token token) -> IExpression* { 
-        return new (_arena.Allocate(sizeof(NoeudOperation), alignof(NoeudOperation))) NoeudOperation(std::move(token));
+        return this->allouer<NoeudOperation>(std::move(token));
     });
     _registreSymbole->enregistrer(TOKEN_OU, [this](Token token) -> IExpression* { 
-        return new (_arena.Allocate(sizeof(NoeudOperation), alignof(NoeudOperation))) NoeudOperation(std::move(token));
+        return this->allouer<NoeudOperation>(std::move(token));
     });
 }
 
@@ -132,4 +132,11 @@ auto ConstructeurEquationFlottante::construire(std::vector<Token>& tokens, int& 
 llvm::BumpPtrAllocator& ConstructeurEquationFlottante::getArena()
 {
     return _arena;
+}
+
+ConstructeurEquationFlottante::~ConstructeurEquationFlottante()
+{
+    if (_constructeurArbre != nullptr) {
+        _constructeurArbre->~IConstructeurArbre();
+    }
 }

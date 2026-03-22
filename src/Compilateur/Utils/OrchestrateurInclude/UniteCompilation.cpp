@@ -12,7 +12,6 @@
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/Visiteur/VisiteurRemplissageCorpsClass/VisiteurRemplissageCorpsClass.h"
 #include "Compilateur/Visiteur/VisiteurRemplissageRegistre/VisiteurRemplissageRegistre.h"
-#include "Compilateur/Visiteur/VisiteurDestruction.h"
 #include <llvm-18/llvm/IR/DerivedTypes.h>
 #include <llvm-18/llvm/IR/Instructions.h>
 #include <llvm-18/llvm/IR/Value.h>
@@ -37,10 +36,6 @@ UniteCompilation::UniteCompilation(OrchestrateurInclude* orchestrateur, Registre
 
 UniteCompilation::~UniteCompilation() 
 {
-    if (_arbre != nullptr) {
-        VisiteurDestruction destructeur;
-        _arbre->accept(&destructeur);
-    }
     _arbre = nullptr; 
     _context = nullptr; 
 }
