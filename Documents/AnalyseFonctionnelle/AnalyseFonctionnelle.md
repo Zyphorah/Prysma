@@ -72,5 +72,27 @@ Ce cas de test a pour objectif de valider la capacité du compilateur à gérer 
 ### TestTableauInt.p, TestTableauFloat.p, TestTableauBool.p
 Ces trois fichiers de test sont dédiés à la validation de la gestion des tableaux pour chaque type de données de base. Leur objectif est de confirmer que la déclaration, l'affectation, et la lecture des éléments de tableau fonctionnent correctement. Les tests incluent l'utilisation d'index statiques et dynamiques (variables ou expressions), la vérification de l'intégrité de la pile mémoire lors des accès au tableau, et la capacité de passer des tableaux en argument de fonction et de les retourner. Un cas de test important vérifie également que l'accès à un index en dehors des limites du tableau est correctement géré, bien que ce test soit actuellement commenté car il devrait provoquer une erreur de compilation.
 
+# Identification des cas limites
 
+C'est l'analyse des situations extrêmes pour les algorithmes critiques du compilateur Prysma. L'objectif est de garantir la robustesse du système face à des données inattendues et de prévenir les erreurs de segmentation (Segmentation Fault) sur le chemin critique de la compilation.
 
+### 1. Construction de l'arbre d'équation — ConstructeurArbreEquation::construire()
+**Description :** C'est le composant le plus vulnérable aux entrées syntaxiques invalides lors de la résolution mathématique.
+**Cas limite 1 :** Parenthèses vides `()` ou asymétriques dans l'expression.
+**Action/Résolution :** Le `ServiceParenthese` traite le vecteur de tokens. Si l'expression résultante est vide, l'algorithme lance immédiatement une exception. C'est une protection directe contre les accès pointeurs invalides. L'arbre n'est pas construit.
+**Cas limite 2 :** Opérateurs consécutifs sans opérande (ex: `5 + * 3`).
+**Action/Résolution :** La `ChaineResponsabilite` divise l'expression, isolant un opérateur orphelin. La méthode `convertirEnFloat()` échoue sur l'évaluation du cas de base. L'algorithme rejette la syntaxe et lance une exception sémantique au lieu de générer une instruction LLVM IR corrompue.
+
+### 2. Compilation multi-fichier parallèle — OrchestrateurInclude::compilerProjet()
+**Description :** C'est la gestion de la stabilité du multithreading et de l'intégrité de la mémoire lors de la passe d'analyse.
+**Cas limite 1 :** Dépendances circulaires (Le fichier A inclut le fichier B, qui inclut le fichier A).
+**Action/Résolution :** Le `RegistreFichier` valide chaque inclusion via un `std::set` protégé par un `std::mutex`. Si l'empreinte du fichier est présente, le thread ignore l'instruction. Résout le problème de création infinie de threads et prévient le dépassement de la pile (Stack Overflow) et la saturation de la RAM.
+**Cas limite 2 :** Erreur fatale ou exception levée dans un seul thread parmi les N fichiers.
+**Action/Résolution :** Le thread fautif signale l'échec au contexte global. L'orchestrateur maintient la stabilité en appelant `join()` sur les threads restants pour préserver l'intégrité des arènes d'allocation. La seconde passe (génération LLVM) est verrouillée et annulée.
+
+### 3. Analyse lexicale — Lexer::tokenizer()
+**Description :** C'est la porte d'entrée des données brutes, responsable de la sécurité de la lecture en mémoire.
+**Cas limite 1 :** Fichier source vide (0 octet) ou composé uniquement d'espaces.
+**Action/Résolution :** La boucle de lecture atteint la fin du fichier sans générer de symboles. Le `ConstructeurArbreInstruction` reçoit un vecteur vide et ignore la boucle de construction du `Main`. Le compilateur génère un exécutable valide et minimal qui retourne `0`.
+**Cas limite 2 :** Chaîne de caractères non fermée en fin de fichier (ex: `string a = "texte`).
+**Action/Résolution :** La boucle d'extraction de chaîne valide la condition `index < fichier.taille()` à chaque itération. La fin prématurée du fichier force l'interruption de la boucle avant le guillemet fermant. L'erreur lexicale est signalée, ce qui prévient la lecture hors mémoire (Buffer Overread) et les boucles infinies.
