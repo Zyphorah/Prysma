@@ -68,5 +68,13 @@ void VisiteurGeneralGenCode::visiter(NoeudAppelObjet* noeudAppelObjet)
         indexParam++;
     }
 
-    builder.CreateCall(symboleFonction->fonction, args);
+    if (symboleFonction->fonction->getReturnType()->isVoidTy()) {
+        builder.CreateCall(symboleFonction->fonction, args);
+        _contextGenCode->modifierValeurTemporaire(Symbole(nullptr, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+        _contextGenCode->modifierValeurTemporaire(Symbole(_contextGenCode->getValeurTemporaire().getAdresse(), nullptr, _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+    } else {
+        llvm::Value* resultat = builder.CreateCall(symboleFonction->fonction, args, "resultat_appel_objet");
+        _contextGenCode->modifierValeurTemporaire(Symbole(resultat, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+        _contextGenCode->modifierValeurTemporaire(Symbole(_contextGenCode->getValeurTemporaire().getAdresse(), symboleFonction->typeRetour, _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+    }
 }

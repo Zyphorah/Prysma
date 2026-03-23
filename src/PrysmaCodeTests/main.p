@@ -1,13 +1,13 @@
-class testAppelFonction
+class TestAppelFonction
 {
 public: 
 
-   fn void testAppelFonction()
+   fn void TestAppelFonction()
    {
       
    }
 
-   fn int64 test()
+   fn int32 test()
    {
       return 42;
    }
@@ -17,10 +17,9 @@ fn bool testAppelFonction()
 {
    dec string[] msg = "Test de l'appel d'une fonction dans une classe.";
    call print(msg);
+   dec ptr executer = new TestAppelFonction();
 
-   dec ptr test = new testAppelFonction();
-
-   if (test.test() == 42)
+   if (call executer.test() == 42)
    {
       return true;
    }
@@ -29,7 +28,7 @@ fn bool testAppelFonction()
 
 fn int32 main() 
 {
-   call print(testAppelFonction()); call backSlashN();
+   call print(call testAppelFonction()); call backSlashN();
 
    return 0;
 }

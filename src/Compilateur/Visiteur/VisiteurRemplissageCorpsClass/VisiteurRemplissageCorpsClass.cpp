@@ -25,86 +25,6 @@ VisiteurRemplissageCoprsClass::VisiteurRemplissageCoprsClass(ContextGenCode* con
 VisiteurRemplissageCoprsClass::~VisiteurRemplissageCoprsClass()
 = default;
 
-void VisiteurRemplissageCoprsClass::construireVTable(Class* classInfo, const std::string& nomClass, 
-                                                      const std::vector<NoeudDeclarationFonction*>& listMethodeParent)
-{
-    // Construire la vtable en alignant les méthodes du parent aux mêmes positions
-    std::vector<llvm::Constant*> vtableElements;
-    
-    // Ajouter les pointeurs de fonction du parent à la vtable, dans le même ordre
-    for (NoeudDeclarationFonction* declarationMethodeParent : listMethodeParent) {
-        std::string nomMethodeParent = declarationMethodeParent->getNom();
-        
-        // Chercher la méthode correspondante dans la classe courante
-        llvm::Function* functionImpl = nullptr;
-        if (classInfo->getRegistreFonctionLocale()->existe(nomMethodeParent)) {
-            const auto& symbole = classInfo->getRegistreFonctionLocale()->recuperer(nomMethodeParent);
-            if (!prysma::isa<SymboleFonctionLocale>(symbole.get())) {
-                throw std::runtime_error("Erreur : SymboleFonctionLocale attendu");
-            }
-            auto* symboleLocal = prysma::cast<SymboleFonctionLocale>(symbole.get());
-            functionImpl = symboleLocal->fonction;
-        }
-        
-        // Si trouvée, ajouter le pointeur de fonction à la vtable
-        if (functionImpl != nullptr) {
-            vtableElements.push_back(llvm::ConstantExpr::getBitCast(
-                functionImpl,
-                llvm::PointerType::get(llvm::Type::getInt8Ty(_contextGenCode->getBackend()->getContext()), 0)
-            ));
-            classInfo->getMethodIndices()[nomMethodeParent] = static_cast<unsigned int>(vtableElements.size() - 1);
-        }
-    }
-    
-    // Ajouter les méthodes supplémentaires de la classe courante qui ne sont pas dans le parent
-    auto clesMethodes = classInfo->getRegistreFonctionLocale()->obtenirCles();
-    for (const auto& cle : clesMethodes) {
-        const std::string& nomMethode = cle;
-        bool estDansParent = false;
-        
-        // Vérifier si cette méthode est dans le parent
-        for (NoeudDeclarationFonction* declarationMethodeParent : listMethodeParent) {
-            if (declarationMethodeParent->getNom() == nomMethode) {
-                estDansParent = true;
-                break;
-            }
-        }
-        
-        // Si ce n'est pas une méthode du parent, l'ajouter à la fin de la vtable
-        if (!estDansParent) {
-            const auto& symbole = classInfo->getRegistreFonctionLocale()->recuperer(nomMethode);
-            if (!prysma::isa<SymboleFonctionLocale>(symbole.get())) {
-                throw std::runtime_error("Erreur : SymboleFonctionLocale attendu");
-            }
-            auto* symboleLocal = prysma::cast<SymboleFonctionLocale>(symbole.get()); 
-            if (symboleLocal->fonction != nullptr) {
-                vtableElements.push_back(llvm::ConstantExpr::getBitCast(
-                    symboleLocal->fonction,
-                    llvm::PointerType::get(llvm::Type::getInt8Ty(_contextGenCode->getBackend()->getContext()), 0)
-                ));
-                classInfo->getMethodIndices()[nomMethode] = static_cast<unsigned int>(vtableElements.size() - 1);
-            }
-        }
-    }
-    
-    // Créer un array constant pour la vtable
-    llvm::ArrayType* vtableType = llvm::ArrayType::get(
-        llvm::PointerType::get(llvm::Type::getInt8Ty(_contextGenCode->getBackend()->getContext()), 0),
-        vtableElements.size()
-    );
-    llvm::Constant* vtableInitializer = llvm::ConstantArray::get(vtableType, vtableElements);
-    
-    // Créer une variable globale pour la vtable
-    llvm::Module* module = &(_contextGenCode->getBackend()->getModule());
-    classInfo->setVTable(new llvm::GlobalVariable(
-        *module,
-        vtableType,
-        true,  
-        llvm::GlobalValue::LinkageTypes::InternalLinkage,
-        vtableInitializer,
-        "vtable_" + nomClass
-    )); 
-}
 
 void VisiteurRemplissageCoprsClass::visiter(NoeudClass* noeudClass)
 {
@@ -188,15 +108,8 @@ void VisiteurRemplissageCoprsClass::visiter(NoeudClass* noeudClass)
             }
         }
 
-        // Construire la vtable
-        construireVTable(classInfo, nomClass, listMethodeParent);
     }
-    else
-    {
-        // Classe sans parent : construire la VTable avec ses propres méthodes
-        construireVTable(classInfo, nomClass, extracteurClass.getMethodes());
-    }
-    
+   
     // 5. Extraction des variables de l'AST
     // L'index commence à 1 car l'index 0 est réservé au vtable pointer
     unsigned int indexCourant = 1;

@@ -137,8 +137,6 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
  - L' Héritage (La Hiérarchie de Classes) 
  - Le Polymorphisme (La VTable)
 
-
-- Analyse syntaxique abstraite pour la logique du langage Prysma, ce qui évitera les problèmes de logique sémantique exemple : declare int a = "string"; 
 - Écrire une bibliothèque de structures de données (listes chaînées, arbres binaires, piles, files) 
 
 - Utiliser le malloc pour la gestion de la mémoire dynamique et le free libération de la mémoire, depuis la librairie standard de C 
@@ -161,3 +159,5 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
 - La Généricité (Templates / Generics) 
 - méta programmation pour permettre d'exécuter du code au moment de la compilation, ce qui permettrait de faire des optimisations au moment de la compilation.
 - Compilation just in-time (JIT) pour permettre d'exécuter du code directement sans passer par la phase de compilation, ce qui permettrait de faire du scripting avec le langage Prysma.
+
+- Analyse syntaxique abstraite pour la logique du langage Prysma, ce qui évitera les problèmes de logique sémantique exemple : declare int a = "string"; 

@@ -4,10 +4,12 @@
 #include "Compilateur/AST/Registre/ContextGenCode.h"
 #include "Compilateur/AST/Utils/IConstructeurEnvironnementRegistre.h"
 
+
 class ConstructeurEnvironnementRegistreVariable : public IConstructeurEnvironnementRegistre
 {
 private:
     ContextGenCode* _contextGenCode;
+
 
 public:
     explicit ConstructeurEnvironnementRegistreVariable(ContextGenCode* _contextGenCode);
@@ -20,6 +22,7 @@ public:
     auto operator=(ConstructeurEnvironnementRegistreVariable&&) -> ConstructeurEnvironnementRegistreVariable& = delete;
 
     void remplir() override;
+
 };
 
 #endif /* A1014A88_A2B2_4637_B4CD_3709FCBE042F */
