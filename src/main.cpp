@@ -17,7 +17,23 @@
 #include <llvm/Support/TargetSelect.h>
 #include <string>
 #include <vector>
-// llvm::ThreadPool
+
+// Actuellement le compilateur utilise des noeuds contenant des objets de type std::string et std::vector pour stocker les informations de l'AST
+// Le problème est que les types std::string créer un objet dynamiquement avec un new caché 
+// et que les std::vector font la même chose. La destruction des objets std::string et std::vector n'est pas faite par 
+// le bump allocator, nous devons faire un delete manuel pour supprimer chaque objet de façon récursive dans L'AST, ça annule les avantages du bump allocator 
+// et peut causer des problèmes de performances et de fragmentation de mémoire. La solution est d'utiliser des llvm::StringRef et des llvm::ArrayRef qui sont des vues 
+// sur des données contigues en mémoire et qui ne font pas d'allocation dynamique, cela permet de supprimer complètement les std::string et std::vector et permettre de 
+// retirer les fuites de mémoire causé par l'allocation dynamique des std::string et std::vector. 
+
+// Ne pas oblier de faire le système de delete en onion pour les objets de la classe du langage prysma. 
+
+// Actuellement, les méthodes sont appelées de façon statique seulement (objet.methode()) et il n'y a pas de système pour appeler une méthode sur un objet retourné par un autre objet.
+// Exemple : objet.methode().methode() ; l'appel d'une fonction en chaîne est impossible.
+
+// J'utilise actuellement la syntaxe "dec ptr objet = new Classe();". Le problème est que l'objet est opaque, on ne peut pas déterminer son type. Par exemple, si une classe contient un objet et que je fais un get pour faire un call de fonction dessus, je ne peux pas déterminer le type de l'objet pour effectuer ce call.
+// Avec "dec ptr objet2 = objet.getA();", qui fait un get d'un objet d'un autre type, ce type est inconnu au moment d'appeler la méthode.
+// Dans le registre actuel, comme la fonction n'existe pas pour l'objet opaque, le call est impossible. Pour résoudre ce problème, la conception du système de typage dois être revue. 
 
 // Prouver mathématiquement que mon système est infaillible pour la compilation comme Coq, Isabelle/HOL ou TLA+, reécrire le compilateur dans un langage mathématique
 // Moteur de Réflexion LLVM génération automatique du code llvm 

@@ -1,4 +1,5 @@
 #include "Compilateur/AST/ConstructeurArbreEquation.h"
+#include <cstddef>
 #include <llvm/Support/Allocator.h>
 #include <vector>
 #include "Compilateur/AST/Noeuds/Interfaces/IExpression.h"
@@ -57,7 +58,7 @@ auto ConstructeurArbreEquation::construire(std::vector<Token> &equation) -> INoe
     return noeud;
 }
 
-INoeud* ConstructeurArbreEquation::construire(std::vector<Token>& tokens, int& index) {
+auto ConstructeurArbreEquation::construire(std::vector<Token>& tokens, int& index) -> INoeud* {
 
     // Sauvegarder la position du token courant pour les messages d'erreur
     if (index < static_cast<int>(tokens.size())) {

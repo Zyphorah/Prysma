@@ -1,6 +1,9 @@
 #include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
+#include "Compilateur/AST/Registre/Types/IType.h"
 #include "Compilateur/Visiteur/CodeGen/VisiteurGeneralGenCode.h"
 #include "Compilateur/AST/AST_Genere.h"
+#include "Compilateur/AST/Registre/Types/TypeTableau.h"
+#include "Compilateur/Utils/PrysmaCast.h"
 #include <llvm-18/llvm/IR/Value.h>
 #include <llvm/Support/Casting.h>
 #include <vector>
@@ -28,14 +31,35 @@ void VisiteurGeneralGenCode::visiter(NoeudAffectationTableau* noeudAffectationTa
     auto* allocaInst = llvm::dyn_cast<llvm::AllocaInst>(valeur);
     llvm::Type* arrayType = allocaInst->getAllocatedType();
 
-    llvm::Value* ptrCase = _contextGenCode->getBackend()->getBuilder().CreateGEP(
-        arrayType, 
-        valeur, 
-        indices
-    );
+    llvm::Value* ptrCase = nullptr;
+    llvm::Type* typeElement = nullptr;
 
-    // Cast automatique de la valeur vers le type de l'élément du tableau (ex: int -> float)
-    llvm::Type* typeElement = arrayType->getArrayElementType();
+    if (arrayType->isArrayTy()) {
+        ptrCase = _contextGenCode->getBackend()->getBuilder().CreateGEP(
+            arrayType, 
+            valeur, 
+            indices
+        );
+        typeElement = arrayType->getArrayElementType();
+    } else {
+        // C'est un pointeur vers un tableau (référence), on doit charger le pointeur
+        llvm::Value* loadedPtr = _contextGenCode->getBackend()->getBuilder().CreateLoad(arrayType, valeur);
+        
+        IType* astType = symbole.getType();
+        auto* typeTableauDecla = prysma::dyn_cast<TypeTableau>(astType);
+        if (typeTableauDecla != nullptr) {
+            typeElement = typeTableauDecla->getTypeEnfant()->genererTypeLLVM(_contextGenCode->getBackend()->getContext());
+        } else {
+            typeElement = symbole.getTypePointeElement();
+        }
+        
+        ptrCase = _contextGenCode->getBackend()->getBuilder().CreateGEP(
+            typeElement, 
+            loadedPtr, 
+            indexValue
+        );
+    }
+
     llvm::Value* valeurCastee = _contextGenCode->getBackend()->creerAutoCast(expressionResult, typeElement);
     
     _contextGenCode->getBackend()->getBuilder().CreateStore(valeurCastee, ptrCase);

@@ -134,10 +134,8 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
  - Les Contrôles d'Accès (Visibilité)
  - l'Encapsulation et le Pointeur this
  - Le Cycle de Vie (Constructeurs & Destructeurs)
- - L' Héritage (La Hiérarchie de Classes) 
- - Le Polymorphisme (La VTable)
-
-- Écrire une bibliothèque de structures de données (listes chaînées, arbres binaires, piles, files) 
+ - L' Héritage (La Hiérarchie par interface) ex: interface Animal { fn void manger();}
+ - Le Polymorphisme (La VTable) (bonus)
 
 - Utiliser le malloc pour la gestion de la mémoire dynamique et le free libération de la mémoire, depuis la librairie standard de C 
 - Faire un système d'import pour permettre d'importer des bibliothèques externes du langage C dans le langage Prysma, c'est une automatisation au lieu de le faire manuellement. 
@@ -145,6 +143,7 @@ code généré en sortie du compilateur Prysma pour cette équation : 2.0*3.0-(2
 
 ### Fonctionnalités Bonus (Si le temps le permet)
 
+- Écrire une bibliothèque de structures de données (listes chaînées, arbres binaires, piles, files) 
 - Ajouter la gestion manuelle de la mémoire avec les pointeurs pour un contrôle bas niveau
 - Fournir des fonctions natives pour les calculs avancés (puissance, PGCD, vérification de nombres premiers)
 - Supporter la (Factorielle, Fibonacci) avec une gestion appropriée de la pile d'exécution
