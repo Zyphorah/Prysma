@@ -26,6 +26,8 @@ fn bool testAppelFonction()
    return false;
 }
 
+
+
 fn int32 main() 
 {
    call print(call testAppelFonction()); call backSlashN();

@@ -191,7 +191,14 @@ void ConstructeurEnvironnementRegistreFonction::remplir()
                 classInfo->getParentHeritage()->accept(&extracteurParent);
                 listMethodeParent = extracteurParent.getMethodes();
             }
-            construireVTable(classInfo.get(), nomClasse, listMethodeParent);
+            if(nomMethode != nomClasse) // Si la méthode n'est pas le constructeur, on le met dans la vtable, sinon on ne le met pas dans la vtable et on l'appelle directement par son nom manglé
+            {
+                construireVTable(classInfo.get(), nomClasse, listMethodeParent);
+            }
+            // On vérifi si la classe contient un constructeur, sinon la classe n'est pas valide. 
+            if (!classInfo->getRegistreFonctionLocale()->existe(nomClasse)) {
+                throw std::runtime_error("Erreur : La classe '" + nomClasse + "' doit avoir un constructeur du même nom");
+            }
         }
     }
 }

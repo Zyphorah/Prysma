@@ -74,6 +74,14 @@ public:
     [[nodiscard]] auto getMemberIndices() -> std::map<std::string, unsigned int>& { return memberIndices; }
     [[nodiscard]] auto getMemberInitializers() -> std::map<std::string, INoeud*>& { return memberInitializers; }
     [[nodiscard]] auto getMethodIndices() -> std::map<std::string, unsigned int>& { return methodIndices; }
+    
+    [[nodiscard]] auto getIndexMethode(const std::string& nomMethode) const -> int {
+        auto iterator = methodIndices.find(nomMethode);
+        if (iterator != methodIndices.end()) {
+            return static_cast<int>(iterator->second);
+        }
+        return -1;
+    }
 };
 // TODO : supporter les mutex multi thread pour les classes Sinon le multi fichier n'est pas possible
 

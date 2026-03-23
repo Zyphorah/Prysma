@@ -5,9 +5,11 @@
 #include "Compilateur/AST/Registre/Pile/RegistreVariable.h"
 #include "Compilateur/AST/Registre/Types/TypeComplexe.h"
 #include "Compilateur/Utils/PrysmaCast.h"
+#include <cstddef>
 #include <llvm/ADT/StringRef.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/DerivedTypes.h>
+#include <llvm/Support/Casting.h>
 #include <string>
 
 VisiteurGeneralGenCode::VisiteurGeneralGenCode(ContextGenCode* contextGenCode, OrchestrateurInclude* orchestrateurInclude) 
@@ -15,7 +17,7 @@ VisiteurGeneralGenCode::VisiteurGeneralGenCode(ContextGenCode* contextGenCode, O
 {}
 
 VisiteurGeneralGenCode::~VisiteurGeneralGenCode()
-{}
+= default;
 
 void VisiteurGeneralGenCode::parcourirEnfant(NoeudInstruction* noeud)
 {
@@ -24,7 +26,7 @@ void VisiteurGeneralGenCode::parcourirEnfant(NoeudInstruction* noeud)
     }
 }
 
-Symbole VisiteurGeneralGenCode::evaluerExpression(INoeud* expression) {
+auto VisiteurGeneralGenCode::evaluerExpression(INoeud* expression) -> Symbole {
     if (expression != nullptr) {
         expression->accept(this);
         return _contextGenCode->getValeurTemporaire();
@@ -35,7 +37,7 @@ Symbole VisiteurGeneralGenCode::evaluerExpression(INoeud* expression) {
     return vide;
 }
 
-std::string VisiteurGeneralGenCode::obtenirNomClasseDepuisSymbole(const Symbole& objetSymbole) {
+auto VisiteurGeneralGenCode::obtenirNomClasseDepuisSymbole(const Symbole& objetSymbole) -> std::string {
     std::string nomClasse;
     if (objetSymbole.getType() != nullptr) {
         if (auto* typeComplexe = prysma::dyn_cast<TypeComplexe>(objetSymbole.getType())) {
@@ -43,11 +45,12 @@ std::string VisiteurGeneralGenCode::obtenirNomClasseDepuisSymbole(const Symbole&
         }
     }
 
+    constexpr size_t CLASS_PREFIX_LENGTH = 6;
     if (nomClasse.empty() && objetSymbole.getTypePointeElement() != nullptr) {
         if (auto* structType = llvm::dyn_cast<llvm::StructType>(objetSymbole.getTypePointeElement())) {
             llvm::StringRef structName = structType->getName();
             if (structName.starts_with("Class_")) {
-                nomClasse = structName.drop_front(6).str();
+                nomClasse = structName.drop_front(CLASS_PREFIX_LENGTH).str();
             } else {
                 nomClasse = structName.str();
             }
