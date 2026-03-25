@@ -46,7 +46,7 @@ uv pip install -r requirements.txt
  
 ## 5. Configuration de VS Code (tasks.json)
 
-Incluez cette tâche dans votre `tasks.json` pour activer la vérification des errors lors de `Ctrl+Shift+B` :
+Incluez cette tâche dans votre `tasks.json` pour activer la vérification des erreurs lors de `Ctrl+Shift+B` :
 
 ```json
 {
@@ -82,7 +82,7 @@ Incluez cette tâche dans votre `tasks.json` pour activer la vérification des e
 ```
 
 Cette configuration permet à VS Code de :
-- Souligner les errors et avertissements dans l'éditeur
+- Souligner les erreurs et avertissements dans l'éditeur
 - Naviguer rapidement vers les errors
 - Afficher les messages diagnostiques pertinents
 

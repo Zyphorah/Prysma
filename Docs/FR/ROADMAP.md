@@ -28,7 +28,7 @@ Ce document détaille les capacités actuelles du langage Prysma ainsi que les a
 
 * **Compilation Multi-threadée :** Orchestration de la compilation via `llvm::ThreadPool` pour le traitement parallèle des fichiers sources.
 * **Gestion des Dépendances :** Système d'inclusion de fichiers (`#include`) pour la modularité du code.
-* **Diagnostics :** Analyseur syntaxique précis rapportant les errors par ligne et colonne.
+* **Diagnostics :** Analyseur syntaxique précis rapportant les erreurs par ligne et colonne.
 * **Visualisation :** Export de l'Tree Syntaxique Abstrait (AST) aux formats texte et graphique (Graphviz/DOT).
 * **Écosystème IDE :** Extension VS Code pour la coloration syntaxique native du Prysma.
 
@@ -43,7 +43,7 @@ Ce document détaille les capacités actuelles du langage Prysma ainsi que les a
 * **Gestion Mémoire Avancée :** Introduction des pointeurs pour un contrôle bas niveau granulaire.
 * **Namespaces & Modules :** Organisation du code en unités de compilation isolées pour éviter les conflits de noms.
 * **Generics :** Support de la programmation générique (templates) pour les functions et les classes.
-* **Analyse Sémantique Étendue :** Renforcement de la vérification des types pour prévenir les errors de logique à la compilation.
+* **Analyse Sémantique Étendue :** Renforcement de la vérification des types pour prévenir les erreurs de logique à la compilation.
 
 ### Long Terme (Vision)
 * **Compilation JIT (Just-In-Time) :** Mode exécution immédiate pour le scripting.

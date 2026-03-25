@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Ce document détaille les mesures de sécurité et de robustesse implémentées dans le compiler Prysma pour anticiper et gérer les cas limites, les errors de mémoire, et les conditions de concurrence.
+Ce document détaille les mesures de sécurité et de robustesse implémentées dans le compiler Prysma pour anticiper et gérer les cas limites, les erreurs de mémoire, et les conditions de concurrence.
 
 ## 1. Construction de l'Tree d'Équation - Gestion des Cas Invalides
 
@@ -47,11 +47,11 @@ dec int bad = 10 / / 2;
 - Isole un opérateur orphelin (ex: `*` sans gauche/droite)
 - Call à `convertirEnFloat()` échoue sur le token invalide
 - **Exception sémantique lancée** plutôt que génération d'IR LLVM corrompue
-- Error signalée à l'utilisateur avec ligne et contexte
+- Erreur signalée à l'utilisateur avec ligne et contexte
 
-**Exemple d'error :**
+**Exemple d'erreur :**
 ```
-Syntax Error at line 5: Invalid operand after operator '+' 
+Syntax Erreur at line 5: Invalid operand after operator '+' 
 Expected expression, got operator '*'
 ```
 
@@ -117,17 +117,17 @@ bool RegistryFile::estDejaCompile(const std::string& nomFile) {
 ```
 Passe 1 (Analyse) : 5 fichiers en parallèle
 File 1 : ✓ Succès
-File 2 : ✗ Error de syntaxe à la ligne 42
+File 2 : ✗ Erreur de syntaxe à la ligne 42
 File 3 : ✓ Succès
 File 4 : En cours...
 File 5 : En cours...
 ```
 
 **Protection Implémentée :**
-- Le thread fautif capture l'exception et signale l'error au contexte global
-- Flag d'error stocké dans `ContextGenCode`
-- Après la première passe, vérification du flag d'error
-- Si error détectée → passe 2 (génération LLVM) verrouillée et annulée
+- Le thread fautif capture l'exception et signale l'erreur au contexte global
+- Flag d'erreur stocké dans `ContextGenCode`
+- Après la première passe, vérification du flag d'erreur
+- Si erreur détectée → passe 2 (génération LLVM) verrouillée et annulée
 - Call `join()` sur tous les threads pour préserver l'intégrité des arènes allocation
 
 **Code Simplifié :**
@@ -160,7 +160,7 @@ void OrchestratorInclude::compilerPasse1() {
 - Pas de comportement indéfini
 - Tous les threads se terminent proprement
 - Ressources libérées correctement
-- Message d'error précis à l'utilisateur
+- Message d'erreur précis à l'utilisateur
 
 ### Cas Limite 3 : Race Condition sur Registrys Partagés
 
@@ -233,7 +233,7 @@ main {
 **Protection Implémentée :**
 - Loop d'extraction de chaîne valide condition `i < source.length()` à chaque itération
 - Fin prématurée du fichier force l'interruption avant guillemet fermant
-- **Error lexicale signalée** avec numéro de ligne
+- **Erreur lexicale signalée** avec numéro de ligne
 - Prévient :
   - Buffer Overread (reading hors mémoire)
   - Loop infinie
@@ -294,13 +294,13 @@ Alignement mémoire incompatible : segmentation fault silencieux
 
 **Bug Historique Documenté :**
 Tentative d'assigner une valeur 64-bit dans un registry 32-bit causait :
-- Segmentation fault sans message d'error
-- Error invisible : code machine généré était syntaxiquement valide
+- Segmentation fault sans message d'erreur
+- Erreur invisible : code machine généré était syntaxiquement valide
 - Symptôme : le programme crash aléatoirement
 
 **Protection Implémentée :**
 - Système de **casting dynamique explicite** avant assignation
-- Vérification des alignements en LLVM IR (attributes `align`)
+- Vérification des alignements en LLVM IR (attributs `align`)
 - AddressSanitizer (ASAN) avec flags `-fsanitize=address`
 - Détection immédiate au runtime :
   ```
@@ -334,7 +334,7 @@ llvm::Value* ContextGenCode::creerAutoCast(
 
 ## 5. Passage d'Arguments - Gestion de Portée
 
-**Composant :** `RegistryArgument`, calls de function  
+**Composant :** `RegistryArgument`, calls de fonction  
 **Criticité :** Haute (corruption mémoire en contextes imbriqués)
 
 ### Cas Limite : Calls Imbriqués avec Registry Partagé
@@ -351,13 +351,13 @@ dec int testArgDanIf(int param) {
 
 **Bug Historique :**
 - Function interne vidait le `RegistryArgument` partagé
-- Valeur de return attendue par function parente était corrompue
+- Valeur de return attendue par fonction parente était corrompue
 - Résultat : nombre aléatoire au lieu de la valeur calculée
 
 **Protection Implémentée :**
 - **Pile de contexte** (`std::stack<ContextLocal>`)
-- Chaque call de function crée un contexte local isolé
-- Variables privées par function garanties
+- Chaque call de fonction crée un contexte local isolé
+- Variables privées par fonction garanties
 - Vidange stricte des registrys après chaque call
 - Portée garantie par scope RAII
 
@@ -440,9 +440,9 @@ public:
 | Composant | Cas Limite | Mécanisme de Protection | Résultat |
 |-----------|-----------|------------------------|----------|
 | BuilderTreeEquation | Parenthèses vides | Exception immédiate | AST non corrompu |
-| BuilderTreeEquation | Opérateurs orphelins | Validation sémantique | Error précise à l'utilisateur |
+| BuilderTreeEquation | Opérateurs orphelins | Validation sémantique | Erreur précise à l'utilisateur |
 | OrchestratorInclude | Dépendances circulaires | Set + mutex | Pas de boucle infinie |
-| OrchestratorInclude | Exception dans thread | Flag d'error global | Passe 2 annulée |
+| OrchestratorInclude | Exception dans thread | Flag d'erreur global | Passe 2 annulée |
 | Lexer | File vide | Gestion vecteur vide | Exécutable valide |
 | Lexer | Chaîne non fermée | Vérification limite | Buffer overread évité |
 | Conversion Types | Alignement mémoire | Auto-cast + ASAN | Segfault détecté |

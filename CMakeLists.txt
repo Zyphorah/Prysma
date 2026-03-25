@@ -10,7 +10,7 @@ project(Prysma)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# pour que mon éditeur comprenne le code et souligne les errors direct 
+# pour que mon éditeur comprenne le code et souligne les erreurs direct 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # par défaut on compile en Debug pour voir ce qu'on fait
@@ -67,7 +67,7 @@ target_compile_options(Prysma PRIVATE
     $<$<CONFIG:Debug>:-g;-O0;-fno-omit-frame-pointer;-fstandalone-debug>
     $<$<NOT:$<CONFIG:Debug>>:-O2>
     
-    # pour lire les errors sans avoir mal au crâne (couleurs, 3 errors max, petit curseur)
+    # pour lire les erreurs sans avoir mal au crâne (couleurs, 3 erreurs max, petit curseur)
     -fcolor-diagnostics     
     -ferror-limit=3        
     -fshow-column            

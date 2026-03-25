@@ -28,7 +28,7 @@ Exemple de LLVM IR cible :
 3. **Table des symboles et Adressage :** Implique la gestion manuelle des adresses et des offsets de cadre (stack frame).
 4. **Conventions d'call (ABI) :** Implémentation manuelle du passage des arguments, de l'alignement de la pile et du return de valeur (System V AMD64).
 5. **Encapsulation et visibilité :** Nécessite des conventions (préfixes, sections) pour contrôler la visibilité des symboles à la liaison.
-6. **Complexité :** Écrire et maintenir un backend assembleur est plus long et sujet aux errors qu'utiliser un backend établi.
+6. **Complexité :** Écrire et maintenir un backend assembleur est plus long et sujet aux erreurs qu'utiliser un backend établi.
 
 ### Avantages de l'infrastructure LLVM
 

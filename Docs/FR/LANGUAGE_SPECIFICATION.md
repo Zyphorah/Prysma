@@ -22,7 +22,7 @@ Prysma est un langage système compilé via LLVM, offrant un contrôle de bas ni
 | `float` | Nombre à virgule flottante 32/64 bits |
 | `bool` | Valeur logique (`true`, `false`) |
 | `string` | Chaîne de caractères native |
-| `void` | Absence de type (return de function uniquement) |
+| `void` | Absence de type (return de fonction uniquement) |
 | `T[]` | Array de type `T` (ex: `int32[]`) |
 
 -----

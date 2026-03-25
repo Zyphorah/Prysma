@@ -57,7 +57,7 @@ Code Source Prysma (.prysma)
 ### Contrainte Architecturale
 
 L'AST généré est renvoyé au Main **uniquement s'il est complet**. Cette isolation stricte applique le principe de **Fail-Fast** :
-- Error détectée par Lexer ou BuilderTreeInstruction → compilation arrêtée immédiatement
+- Erreur détectée par Lexer ou BuilderTreeInstruction → compilation arrêtée immédiatement
 - Prévient la corruption mémoire
 - Garantit que LLVM reçoit un tree syntaxique 100% valide
 
@@ -178,8 +178,8 @@ fin function
 
 ### CMake et Clang
 - Remplace les Makefile obsolètes
-- Intégration de la function `glob` pour l'ajout automatique des chemins
-- Meilleure précision des errors avec Clang
+- Intégration de la fonction `glob` pour l'ajout automatique des chemins
+- Meilleure précision des erreurs avec Clang
 
 ### Multithreading avec LLVM::ThreadPool
 - Migré de `std::thread` à `llvm::ThreadPool`
@@ -202,8 +202,8 @@ fin function
 - Export AST Graphviz (visualisation)
 - Code IR LLVM en console
 
-**Gestion d'error :**
-- Messages précis avec numéro de ligne et type d'error
+**Gestion d'erreur :**
+- Messages précis avec numéro de ligne et type d'erreur
 - Compilation arrêtée en cas de syntaxe invalide
 
 ## Futures Améliorations

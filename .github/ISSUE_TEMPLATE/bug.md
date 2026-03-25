@@ -14,7 +14,7 @@ Description claire et concise du bug.
 1. Aller à "..."
 2. Cliquer sur '...'
 3. Descendre jusqu'à "..."
-4. Constater l'error
+4. Constater l'erreur
 
 **Résultat attendu**
 Description claire et concise du comportement attendu.

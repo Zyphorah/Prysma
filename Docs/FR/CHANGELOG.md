@@ -2,27 +2,27 @@
 
 ## 1. Refonte de l'Tree Syntaxique Abstrait (AST) et des Visitors
 * **Injection de dépendances (Visitor Général) :** Le passage du contexte par builder exigeait des modifications sur plus de 30 emplacements distincts pour une seule functionnalité, générant des bugs liés à des objects manquants ou non initialisés. L'injection directe du `ContextGenCode` dans le visitor général centralise la boîte à outils. Cette architecture élimine la transmission fastidieuse par les parsers et réduit le temps de débogage.
-* **Récursion Mutuelle :** L'ancien algorithme d'extraction d'équations, basé sur le balayage manuel des virgules et des parenthèses, était inefficace et provoquait des plantages (ex. : intégration d'un call de function dans une addition). Son remplacement par un système de récursion mutuelle input `BuilderTreeEquation` et `BuilderTreeInstruction` délègue naturellement la logique d'arrêt et la résolution des expressions imbriquées.
+* **Récursion Mutuelle :** L'ancien algorithme d'extraction d'équations, basé sur le balayage manuel des virgules et des parenthèses, était inefficace et provoquait des plantages (ex. : intégration d'un call de fonction dans une addition). Son remplacement par un système de récursion mutuelle entre `BuilderTreeEquation` et `BuilderTreeInstruction` délègue naturellement la logique d'arrêt et la résolution des expressions imbriquées.
 * **Typage et Abstraction :** L'utilisation de LLVM et de la réflexion pour deviner les types a été supprimée. Le système de registry encapsule désormais `llvm::Value*` avec une abstraction `IType*`. Le compiler connaît exactement le type et l'adresse mémoire, éliminant la rigidité du typage.
 * **Génération dynamique des nœuds :** Le remplacement des nœuds manuels par une usine automatique utilisant un fichier YAML abstrait accélère l'ajout de nœuds. La déduction des labels par types a été automatisée dans le script Python, nettoyant le `ast.yaml`.
 * **Remplacement des Dynamic Casts :** Les `dynamic_cast` ont été retirés au profit d'une génération dynamique de code AST via des enums générés automatiquement, augmentant la vitesse d'identification des nœuds.
 
 ## 2. Gestion de la Mémoire et LLVM
 * **Arena Allocator (Bump Pointer) :** La gestion de la mémoire a migré des `std::shared_ptr` vers un système d'allocation par aréna fourni par LLVM. La conversion vers des pointeurs bruts (`INode*`) rend la mémoire contiguë. Les performances des caches L1/L2 sont optimisées, la fragmentation est réduite, et le risque de fuite de mémoire est limité. 
-* **Sauts mémoire redondants :** La correction d'une error d'architecture sur le loadment des pointeurs a résolu des errors de segmentation. Lors du passage de valeurs en arguments de function, le système copie désormais uniquement le pointeur (8 octets) plutôt que la structure complète.
+* **Sauts mémoire redondants :** La correction d'une erreur d'architecture sur le chargement des pointeurs a résolu des erreurs de segmentation. Lors du passage de valeurs en arguments de fonction, le système copie désormais uniquement le pointeur (8 octets) plutôt que la structure complète.
 * **Arrayx par composition :** L'architecture des arrayx a été modifiée pour utiliser la composition au lieu de l'héritage. L'utilisation de tailles dynamiques plutôt que de valeurs codées en dur (ex. : `constValue`) offre une flexibilité totale pour le stockage de variables.
 * **Décompilation LLVM :** L'analyse du code machine LLVM intermédiaire via décompilation a servi de base documentaire principale pour l'implémentation de structures complexes (ex. : logique de branchement `if/else`, alignement des octets, comportement des arrayx en mémoire).
 
 ## 3. Optimisations et Flux de travail
-* **CMake et Compiler Clang :** L'abandon des fichiers `Makefile` obsolètes (qui nécessitaient deux passes `cmake` puis `make` causant des conflits) et la configuration exclusive sous Clang ont amélioré la précision des errors. L'intégration de la function `glob` dans le `CMakeLists.txt` a supprimé l'ajout manuel des chemins d'inclusion, permettant un gain de temps direct.
+* **CMake et Compiler Clang :** L'abandon des fichiers `Makefile` obsolètes (qui nécessitaient deux passes `cmake` puis `make` causant des conflits) et la configuration exclusive sous Clang ont amélioré la précision des erreurs. L'intégration de la fonction `glob` dans le `CMakeLists.txt` a supprimé l'ajout manuel des chemins d'inclusion, permettant un gain de temps direct.
 * **Multithreading et LLVM::ThreadPool :** L'utilisation initiale de `std::thread` provoquait la création incontrôlée de threads (ex. : 2000 threads pour 2000 fichiers). La migration vers `llvm::ThreadPool` délègue la gestion de l'instanciation au pool, stabilisant la compilation de masse. La séparation de l'orchestrator en deux passes prévient les conflits d'accès.
 * **Thread Safety des Registrys :** L'extraction des objects LLVM (`llvm::Value`, `llvm::Function`, `llvm::AllocaInst`) de la construction des registrys a réglé les problèmes de *thread safety*. Un polymorphisme statique a été implémenté pour l'application conditionnelle de `std::mutex`.
 * **Sanitizer (ASAN) :** L'implémentation d'AddressSanitizer ajoute des drapeaux d'allocation permettant l'affichage immédiat des fuites de mémoire au *runtime*. 
-* **VTable et Classes :** Le builder de *vtable* a été déplacé à la passe 2 dans `builderEnvironnementFunction.cpp`. Lors de la première passe, les pointeurs de function n'existent pas encore en mémoire, ce qui entraînait le remplissage d'un registry vide.
+* **VTable et Classes :** Le builder de *vtable* a été déplacé à la passe 2 dans `builderEnvironnementFunction.cpp`. Lors de la première passe, les pointeurs de fonction n'existent pas encore en mémoire, ce qui entraînait le remplissage d'un registry vide.
 
 ## 4. Corrections de Bugs Majeurs Documentés
-* **Bug de l'assignation Float :** L'error de segmentation lors de l'assignation d'un float 64 bits à un float 32 bits a été identifiée grâce aux attributes d'alignement de LLVM IR. Un système de *casting* dynamique a été implémenté.
-* **Bug de portée d'argument (If) :** L'call imbriqué `call testArgDanIf(param)` provoquait une corruption de la mémoire. La function interne vidait le `RegistryArgument` partagé et corrompait la valeur de return attendue par la function parente. Corrigé par la gestion stricte de la vidange des registrys.
+* **Bug de l'assignation Float :** L'erreur de segmentation lors de l'assignation d'un float 64 bits à un float 32 bits a été identifiée grâce aux attributs d'alignement de LLVM IR. Un système de *casting* dynamique a été implémenté.
+* **Bug de portée d'argument (If) :** L'call imbriqué `call testArgDanIf(param)` provoquait une corruption de la mémoire. La fonction interne vidait le `RegistryArgument` partagé et corrompait la valeur de return attendue par la fonction parente. Corrigé par la gestion stricte de la vidange des registrys.
 * **Bug de synchronisation des variables :** Les readings ont été descendues au niveau du nœud plutôt que dans le parser pour régler les désynchronisations lors des recherches dans le `RegistryVariable`.
 * **Bug des identifiants (GraphViz) :** Le remplacement des identifiants (ID) de nœuds statiques par une pile (`std::stack`) dans le visitor GraphViz a corrigé un bug où l'ancien système écrasait les ID dans les trees profonds, faussant la représentation visuelle.
 
@@ -35,11 +35,11 @@
 
 * **Decompilation LLVM IR pour la documentation :** J'ai adopté une technique de compilation du code C++ pour en extraire le code LLVM généré par la version 18 exactement. Cela me permet de mieux comprendre les subtilités de LLVM et d'éviter les hallucinations des IA qui généralisent souvent avec des exemples provenant de versions antérieures (LLVM 14 par exemple) qui ne functionnent pas avec ma version actuelle.
 
-* **Sanitizers pour le débogage invisible :** Les errors de segmentation provoquées par des alignements mémoire incorrect (float 64-bit vs 32-bit) étaient invisibles. L'implémentation d'AddressSanitizer (--sanitize de clang) a permis d'identifier immédiatement les fuites et corruptions mémoire au runtime.
+* **Sanitizers pour le débogage invisible :** Les erreurs de segmentation provoquées par des alignements mémoire incorrect (float 64-bit vs 32-bit) étaient invisibles. L'implémentation d'AddressSanitizer (--sanitize de clang) a permis d'identifier immédiatement les fuites et corruptions mémoire au runtime.
 
 ## 7. Prochaines priorités pour les itérations suivantes
 
-* **Permetter le stockage des returns de function :** Je dois implémenter la capacité à stocker le résultat d'un call de function dans une variable. C'est un manque majeur pour la prochaine itération.
+* **Permetter le stockage des returns de fonction :** Je dois implémenter la capacité à stocker le résultat d'un call de fonction dans une variable. C'est un manque majeur pour la prochaine itération.
 
 * **Passage de nombres bruts en arguments :** Le bug sur les calls `call(1,1)` reste à corriger. Actuellement, seules les variables passent correctement ; les constantes numériques bloquent.
 
