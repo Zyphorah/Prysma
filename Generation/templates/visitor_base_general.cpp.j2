@@ -1,0 +1,24 @@
+#include "Compiler/Visitor/VisitorBaseGenerale.h"
+#include "Compiler/AST/AST_Genere.h"
+
+{% for nom, champs_traversables in methodes.items() %}
+void VisitorBaseGenerale::visiter(Node{{ nom }}* node{{ nom }}{{ ' [[maybe_unused]]' if not champs_traversables else '' }})
+{
+{%- if champs_traversables %}
+{%- for getter, type_champ in champs_traversables %}
+{%- if type_champ == 'std::vector<INode*>' %}
+    for (auto* element : node{{ nom }}->{{ getter }}())
+    {
+        element->accept(this);
+    }
+{%- else %}
+    if (node{{ nom }}->{{ getter }}() != nullptr)
+    {
+        node{{ nom }}->{{ getter }}()->accept(this);
+    }
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+}
+
+{% endfor %}

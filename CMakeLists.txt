@@ -10,7 +10,7 @@ project(Prysma)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# pour que mon éditeur comprenne le code et souligne les erreurs direct 
+# pour que mon éditeur comprenne le code et souligne les errors direct 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # par défaut on compile en Debug pour voir ce qu'on fait
@@ -32,15 +32,15 @@ llvm_map_components_to_libnames(llvm_libs
 
 # mes fichiers source 
 # on récupère tous mes .cpp (le CONFIGURE_DEPENDS c'est pour plus devoir raser le dossier build quand j'ajoute un fichier)
-file(GLOB_RECURSE SOURCES_LOCALES CONFIGURE_DEPENDS "src/*.cpp")
+file(GLOB_RECURSE SOURCES_LOCALES CONFIGURE_DEPENDS "Src/*.cpp")
 file(GLOB_RECURSE SOURCES_GENEREES CONFIGURE_DEPENDS "build/generationCode/src/*.cpp")
 
 # on fusionne tout ça 
 set(SOURCES ${SOURCES_LOCALES} ${SOURCES_GENEREES})
 
 # au cas où le main.cpp passe à la trappe
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
-    list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Src/main.cpp")
+    list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/Src/main.cpp")
 endif()
 
 # on crée l'exécutable
@@ -51,7 +51,7 @@ target_compile_definitions(Prysma PRIVATE ${LLVM_DEFINITIONS})
 
 # mes dossiers include
 target_include_directories(Prysma PRIVATE 
-    ${CMAKE_SOURCE_DIR}/include 
+    ${CMAKE_SOURCE_DIR}/Include 
     ${CMAKE_SOURCE_DIR}/build/generationCode/include
 )
 
@@ -67,7 +67,7 @@ target_compile_options(Prysma PRIVATE
     $<$<CONFIG:Debug>:-g;-O0;-fno-omit-frame-pointer;-fstandalone-debug>
     $<$<NOT:$<CONFIG:Debug>>:-O2>
     
-    # pour lire les erreurs sans avoir mal au crâne (couleurs, 3 erreurs max, petit curseur)
+    # pour lire les errors sans avoir mal au crâne (couleurs, 3 errors max, petit curseur)
     -fcolor-diagnostics     
     -ferror-limit=3        
     -fshow-column            

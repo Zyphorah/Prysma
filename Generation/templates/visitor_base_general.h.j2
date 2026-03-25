@@ -1,0 +1,19 @@
+#ifndef VISITEUR_BASE_GENERALE_H
+#define VISITEUR_BASE_GENERALE_H
+
+#include "Compiler/Visitor/Interfaces/IVisitor.h"
+
+{% for nom in nodes %}
+class Node{{ nom }};
+{% endfor %}
+
+class VisitorBaseGenerale : public IVisitor
+{
+public:
+
+{% for nom in nodes %}
+    void visiter(Node{{ nom }}* node{{ nom }}) override;
+{% endfor %}
+};
+
+#endif

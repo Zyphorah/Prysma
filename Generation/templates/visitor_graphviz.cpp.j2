@@ -1,0 +1,58 @@
+#include "Compiler/Visitor/ASTGraphViz/GeneralVisitorGraphViz.h"
+#include "Compiler/VisualGraph/OutputVisualGraphText.h"
+#include "Compiler/Visitor/VisitorBaseGenerale.h"
+#include "Compiler/AST/AST_Genere.h"
+#include "Compiler/AST/Nodes/NodeInstruction.h"
+
+GeneralVisitorGraphViz::GeneralVisitorGraphViz(OutputVisualGraphText outputVisualGraph)
+    : _outputVisualGraph(std::move(outputVisualGraph))
+{}
+
+GeneralVisitorGraphViz::~GeneralVisitorGraphViz()
+{}
+
+void GeneralVisitorGraphViz::generatedr()
+{
+    _outputVisualGraph.generatedr();
+}
+
+{% for nom, label, traversables in methodes %}
+void GeneralVisitorGraphViz::visiter(Node{{ nom }}* node)
+{
+    (void)node;
+    int idNode = _outputVisualGraph.ajouterNode({{ label }});
+{% for getter, type_champ in traversables %}
+{% if type_champ == 'std::vector<INode*>' %}
+    for (auto* element : node->{{ getter }}())
+    {
+        element->accept(this);
+        int idChild = _pileIds.top();
+        _pileIds.pop();
+        _outputVisualGraph.ajouterArete(idNode, idChild);
+    }
+{% else %}
+    if (node->{{ getter }}() != nullptr)
+    {
+        node->{{ getter }}()->accept(this);
+        int idChild = _pileIds.top();
+        _pileIds.pop();
+        _outputVisualGraph.ajouterArete(idNode, idChild);
+    }
+{% endif %}
+{% endfor %}
+    _pileIds.push(idNode);
+}
+{% endfor %}
+void GeneralVisitorGraphViz::visiter(NodeInstruction* node)
+{
+    int idNode = _outputVisualGraph.ajouterNode("Instruction");
+
+    for (INode* child : node->getChilds())
+    {
+        child->accept(this);
+        int idChild = _pileIds.top();
+        _pileIds.pop();
+        _outputVisualGraph.ajouterArete(idNode, idChild);
+    }
+    _pileIds.push(idNode);
+}

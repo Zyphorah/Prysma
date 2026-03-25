@@ -31,22 +31,22 @@ source .venv/bin/activate
 ```
 
 ## 3. Prérequis Python
-Assurez-vous d'avoir Python 3 installé, ainsi que les dépendances nécessaires pour le projet
+Assurez-vous d'avoir Python 3 installé, ainsi que les dépendances nécessaires pour le project
 
 ```bash
 uv pip install -r requirements.txt
 ```
 
-## 4. Configuration du projet
+## 4. Configuration du project
 
-### Compilation du projet 
+### Compilation du project 
  ```bash
  python3 build.py
  ```
  
 ## 5. Configuration de VS Code (tasks.json)
 
-Incluez cette tâche dans votre `tasks.json` pour activer la vérification des erreurs lors de `Ctrl+Shift+B` :
+Incluez cette tâche dans votre `tasks.json` pour activer la vérification des errors lors de `Ctrl+Shift+B` :
 
 ```json
 {
@@ -71,7 +71,7 @@ Incluez cette tâche dans votre `tasks.json` pour activer la vérification des e
     "owner": "prysma_language",
     "fileLocation": ["absolute"],
     "pattern": {
-      "regexp": "^([^:]+):(\\d+):(\\d+):\\s+(?:Erreur|error|warning):\\s+(.*)$",
+      "regexp": "^([^:]+):(\\d+):(\\d+):\\s+(?:Error|error|warning):\\s+(.*)$",
       "file": 1,
       "line": 2,
       "column": 3,
@@ -82,8 +82,8 @@ Incluez cette tâche dans votre `tasks.json` pour activer la vérification des e
 ```
 
 Cette configuration permet à VS Code de :
-- Souligner les erreurs et avertissements dans l'éditeur
-- Naviguer rapidement vers les erreurs
+- Souligner les errors et avertissements dans l'éditeur
+- Naviguer rapidement vers les errors
 - Afficher les messages diagnostiques pertinents
 
 ## 6. Configuration de la coloration syntaxique Prysma
@@ -108,7 +108,7 @@ Dans vscode bleu click droit sur le fichier généré clicker en bas sur `Instal
 ### Appliquer la coloration aux fichiers .p
 Une fois compilée, la grammaire Prysma s'applique **automatiquement** à tous les fichiers avec l'extension `.p`.
 
-Pour vérifier que la coloration fonctionne :
+Pour vérifier que la coloration functionne :
 1. Ouvrez un fichier `.p` dans VS Code
 2. Les éléments du langage devraient s'afficher avec des couleurs
-3. Si nécessaire, rechargez la fenêtre : `Ctrl+Shift+P` → "Developer: Reload Window"
+3. Si nécessaire, reloadz la fenêtre : `Ctrl+Shift+P` → "Developer: Reload Window"

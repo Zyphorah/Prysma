@@ -17,5 +17,5 @@ class BuildManager:
         result = subprocess.run(commande, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
         if result.returncode != 0:
-            print(f"Erreur lors de l'exécution : {result.stderr}")
+            print(f"Error lors de l'exécution : {result.stderr}")
         return result

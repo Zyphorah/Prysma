@@ -1,0 +1,147 @@
+Node:
+  Function:
+    CallFunction:
+      engine: [parser, expression]
+      parent: "NodeInstruction"
+      champs:
+        nomFunction: "Token"
+    ArgFunction:
+      engine: [parser]
+      champs:
+        type: "IType*"
+        nom: "std::string"
+    DeclarationFunction:
+      engine: [parser]
+      champs:
+        visibilite: "Token"
+        typeReturn: "IType*"
+        nom: "std::string"
+        arguments: "std::vector<INode*>"
+        body: "INode*"
+    Return:
+      engine: [parser]
+      champs:
+        valeurReturn: "INode*"
+
+  Variable:
+    AssignmentVariable:
+      engine: [parser]
+      champs:
+        nom: "std::string"
+        expression: "INode*"
+        token: "Token"
+    DeclarationVariable:
+      engine: [parser]
+      champs:
+        visibilite: "Token"
+        nom: "std::string"
+        type: "IType*"
+        expression: "INode*"  
+    RefVariable:
+      engine: [parser, expression]
+      champs:
+        nomVariable: "std::string"
+    UnRefVariable:
+      engine: [parser, expression]
+      champs:
+        nomVariable: "std::string"
+    Identifiant:
+      engine: [expression]
+      champs: {}
+
+  Array:
+    AssignmentArray:
+      engine: []
+      champs:
+        nom: "std::string"
+        expressionIndex: "INode*"
+        expression: "INode*"
+        token: "Token"
+    ArrayInitialization:
+      engine: [expression]
+      champs:
+        elements: "std::vector<INode*>"
+    ReadingArray:
+      engine: []
+      champs:
+        indexEquation: "INode*"
+        nomArray: "Token"
+
+  Object:
+    Class:
+      engine: [parser]
+      champs: 
+        Heritage: "std::vector<INode*>"
+        listMembers: "std::vector<INode*>"
+        builder: "std::vector<INode*>"
+        nomClass: "Token"
+    CallObject:
+      engine: [parser, expression]
+      parent: "NodeInstruction"
+      champs:
+        nomObject: "Token"
+        nomMethode: "Token"
+    AccesAttribute:
+      engine: []
+      champs:
+        nomObject: "Token"
+        nomAttribute: "Token"
+    DeclarationObject:
+      engine: []
+      champs:
+        nomObject: "Token"
+        typeObject: "IType*"
+        
+  Instruction:
+    If:
+      engine: [parser]
+      parent: "NodeInstruction"
+      champs:
+        nodeCondition: "INode*"
+        nodeBlocIf: "INode*"
+        nodeBlocElse: "INode*"
+        nodeBlocEndif: "INode*"
+
+    While:
+      engine: [parser]
+      parent: "NodeInstruction"
+      champs:
+        nodeCondition: "INode*"
+        nodeBlocWhile: "INode*"
+        nodeBlocFinWhile: "INode*"
+    New:
+      engine: [expression]
+      champs:
+        arguments: "std::vector<INode*>"
+        nomType: "Token"
+    Delete:
+      engine: [parser]
+      champs:
+        nomType: "Token"
+    Include:
+      engine: [parser]
+      champs:
+        path: "std::string"
+    
+  Math:
+    Operation:
+      engine: []
+      parent: "IExpression"
+      champs:
+        token: "Token"
+        gauche: "INode*"
+        droite: "INode*"
+
+    Literal:
+      engine: [expression]
+      champs:
+        token: "Token"
+
+    Negation:
+      engine: [expression]
+      champs:
+        operateur: "Token"
+        operande: "INode*"
+    String:
+      engine: [expression]
+      champs: {}

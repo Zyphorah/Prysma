@@ -1,0 +1,8 @@
+labels_speciaux:
+  ArrayInitialization: '"[...]"'
+  Negation: '"!"'
+
+childs_herites:
+  CallFunction:
+    - getter: "getChilds"
+      type: "std::vector<INode*>"

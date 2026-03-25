@@ -1,8 +1,0 @@
-labels_speciaux:
-  TableauInitialisation: '"[...]"'
-  Negation: '"!"'
-
-enfants_herites:
-  AppelFonction:
-    - getter: "getEnfants"
-      type: "std::vector<INoeud*>"

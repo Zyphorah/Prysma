@@ -1,12 +1,12 @@
-# Robustesse et Sécurité - Compilateur Prysma
+# Robustesse et Sécurité - Compiler Prysma
 
 ## Vue d'ensemble
 
-Ce document détaille les mesures de sécurité et de robustesse implémentées dans le compilateur Prysma pour anticiper et gérer les cas limites, les erreurs de mémoire, et les conditions de concurrence.
+Ce document détaille les mesures de sécurité et de robustesse implémentées dans le compiler Prysma pour anticiper et gérer les cas limites, les errors de mémoire, et les conditions de concurrence.
 
-## 1. Construction de l'Arbre d'Équation - Gestion des Cas Invalides
+## 1. Construction de l'Tree d'Équation - Gestion des Cas Invalides
 
-**Composant :** `ConstructeurArbreEquation::construire()`  
+**Composant :** `BuilderTreeEquation::construire()`  
 **Criticité :** Haute (composant le plus vulnérable aux entrées syntaxiques invalides)
 
 ### Cas Limite 1 : Parenthèses Vides ou Asymétriques
@@ -43,19 +43,19 @@ dec int bad = 10 / / 2;
 ```
 
 **Protection Implémentée :**
-- `ChaineResponsabilite` divise l'expression à chaque opérateur trouvé
+- `ChainOfResponsibility` divise l'expression à chaque opérateur trouvé
 - Isole un opérateur orphelin (ex: `*` sans gauche/droite)
-- Appel à `convertirEnFloat()` échoue sur le token invalide
+- Call à `convertirEnFloat()` échoue sur le token invalide
 - **Exception sémantique lancée** plutôt que génération d'IR LLVM corrompue
-- Erreur signalée à l'utilisateur avec ligne et contexte
+- Error signalée à l'utilisateur avec ligne et contexte
 
-**Exemple d'erreur :**
+**Exemple d'error :**
 ```
 Syntax Error at line 5: Invalid operand after operator '+' 
 Expected expression, got operator '*'
 ```
 
-### Cas Limite 3 : Débordement de Pile (Stack Overflow) sur Expressions Complexes
+### Cas Limite 3 : Débordement de Pile (Stack Overflow) sur Expressions Complexs
 
 **Scenario :**
 ```rust
@@ -64,15 +64,15 @@ dec int x = ((((((((((a + b) + c) + d) + e) + f) + g) + h) + i) + j)));
 ```
 
 **Protection Implémentée :**
-- `ConstructeurArbreEquation` utilise la récursion mutuelle contrôlée
-- Chaque appel divise l'expression en deux parties (gauche/droite)
-- Profondeur de récursion ≤ nombre d'opérateurs = O(e) borné
+- `BuilderTreeEquation` utilise la récursion mutuelle contrôlée
+- Chaque call divise l'expression en deux parties (gauche/droite)
+- Depth de récursion ≤ nombre d'opérateurs = O(e) borné
 - Pas de limite artificielle, mais la structure de l'équation force une division équilibrée
 - Débordement mémoire peu probable en pratique pour code lisible
 
-## 2. Compilation Multi-Fichier Parallèle - Gestion de la Concurrence
+## 2. Compilation Multi-File Parallèle - Gestion de la Concurrence
 
-**Composant :** `OrchestrateurInclude::compilerProjet()`  
+**Composant :** `OrchestratorInclude::compilerProject()`  
 **Criticité :** Critique (synchronisation multi-thread, intégrité mémoire)
 
 ### Cas Limite 1 : Dépendances Circulaires
@@ -85,9 +85,9 @@ file_c.prysma includes file_a.prysma  ← boucle infinie sans protection
 ```
 
 **Protection Implémentée :**
-- `RegistreFichier` maintient un `std::set<std::string>` des fichiers compilés
+- `RegistryFile` maintient un `std::set<std::string>` des fichiers compilés
 - Protégé par `std::mutex` pour la thread-safety
-- À chaque appel `inclureFichier()` :
+- À chaque call `inclureFile()` :
   1. Vérifie si le fichier est déjà présent dans le set
   2. Si présent → ignore l'inclusion (prévient la boucle infinie)
   3. Si absent → ajoute à la liste et déclenche la compilation
@@ -95,12 +95,12 @@ file_c.prysma includes file_a.prysma  ← boucle infinie sans protection
 
 **Code Simplifié :**
 ```cpp
-bool RegistreFichier::estDejaCompile(const std::string& nomFichier) {
-    std::lock_guard<std::mutex> lock(mutexFichiers);
-    if (fichiers.find(nomFichier) != fichiers.end()) {
+bool RegistryFile::estDejaCompile(const std::string& nomFile) {
+    std::lock_guard<std::mutex> lock(mutexFiles);
+    if (fichiers.find(nomFile) != fichiers.end()) {
         return true;  // Déjà compilé, ignore
     }
-    fichiers.insert(nomFichier);
+    fichiers.insert(nomFile);
     return false;  // Nouveau, doit être compilé
 }
 ```
@@ -117,22 +117,22 @@ bool RegistreFichier::estDejaCompile(const std::string& nomFichier) {
 ```
 Passe 1 (Analyse) : 5 fichiers en parallèle
 File 1 : ✓ Succès
-File 2 : ✗ Erreur de syntaxe à la ligne 42
+File 2 : ✗ Error de syntaxe à la ligne 42
 File 3 : ✓ Succès
 File 4 : En cours...
 File 5 : En cours...
 ```
 
 **Protection Implémentée :**
-- Le thread fautif capture l'exception et signale l'erreur au contexte global
-- Flag d'erreur stocké dans `ContextGenCode`
-- Après la première passe, vérification du flag d'erreur
-- Si erreur détectée → passe 2 (génération LLVM) verrouillée et annulée
-- Appel `join()` sur tous les threads pour préserver l'intégrité des arènes allocation
+- Le thread fautif capture l'exception et signale l'error au contexte global
+- Flag d'error stocké dans `ContextGenCode`
+- Après la première passe, vérification du flag d'error
+- Si error détectée → passe 2 (génération LLVM) verrouillée et annulée
+- Call `join()` sur tous les threads pour préserver l'intégrité des arènes allocation
 
 **Code Simplifié :**
 ```cpp
-void OrchestrateurInclude::compilerPasse1() {
+void OrchestratorInclude::compilerPasse1() {
     for (auto& thread : threads) {
         try {
             // Compilation parallèle
@@ -140,8 +140,8 @@ void OrchestrateurInclude::compilerPasse1() {
                 compilerfichier(); 
             });
         } catch (const std::exception& e) {
-            contextGenCode.setErreur(true);
-            contextGenCode.setMessageErreur(e.what());
+            contextGenCode.setError(true);
+            contextGenCode.setMessageError(e.what());
         }
     }
     
@@ -150,7 +150,7 @@ void OrchestrateurInclude::compilerPasse1() {
         thread.join();  // Sûr : préserve arènes
     }
     
-    if (contextGenCode.hasErreur()) {
+    if (contextGenCode.hasError()) {
         return;  // Passe 2 annulée
     }
 }
@@ -160,19 +160,19 @@ void OrchestrateurInclude::compilerPasse1() {
 - Pas de comportement indéfini
 - Tous les threads se terminent proprement
 - Ressources libérées correctement
-- Message d'erreur précis à l'utilisateur
+- Message d'error précis à l'utilisateur
 
-### Cas Limite 3 : Race Condition sur Registres Partagés
+### Cas Limite 3 : Race Condition sur Registrys Partagés
 
 **Scenario :**
 ```
-Thread 1 : Écrit dans RegistreVariable
-Thread 2 : Lit depuis RegistreVariable
-→ Lecture d'état incohérent
+Thread 1 : Écrit dans RegistryVariable
+Thread 2 : Lit depuis RegistryVariable
+→ Reading d'état incohérent
 ```
 
 **Protection Implémentée :**
-- Registres protégés par `std::mutex` pour accès exclusif
+- Registrys protégés par `std::mutex` pour accès exclusif
 - Polymorphisme statique pour application conditionnelle des locks
 - Passe 1 (analyse) : accès concurrent protégé
 - Passe 2 (génération LLVM) : peut être rendue single-threaded si nécessaire
@@ -182,25 +182,25 @@ Thread 2 : Lit depuis RegistreVariable
 - État cohérent garanti
 - Petite latence de synchronisation acceptable
 
-## 3. Analyse Lexicale - Sécurité de Lecture Mémoire
+## 3. Analyse Lexicale - Sécurité de Reading Mémoire
 
 **Composant :** `Lexer::tokenizer()`  
 **Criticité :** Haute (porte d'entrée des données non validées)
 
-### Cas Limite 1 : Fichier Source Vide ou Espaces Seuls
+### Cas Limite 1 : File Source Vide ou Espaces Seuls
 
 **Scenario :**
 ```
 file.prysma → 0 octets (fichier vide)
 ou
-file.prysma → "     \n\n    " (espaces et retours à la ligne)
+file.prysma → "     \n\n    " (espaces et returns à la ligne)
 ```
 
 **Protection Implémentée :**
-- Boucle de tokenisation atteint la fin du fichier sans générer de symboles
-- Vecteur de tokens retourné est vide
-- `ConstructeurArbreInstruction` reçoit vecteur vide, ignore la boucle de construction du Main
-- Compilateur génère **exécutable valide et minimal** qui retourne `0`
+- Loop de tokenisation atteint la fin du fichier sans générer de symboles
+- Vecteur de tokens returnné est vide
+- `BuilderTreeInstruction` reçoit vecteur vide, ignore la boucle de construction du Main
+- Compiler génère **exécutable valide et minimal** qui returnne `0`
 - Pas de segfault, pas de comportement indéfini
 
 **Code :**
@@ -221,7 +221,7 @@ std::vector<Token> Lexer::tokenizer(const std::string& source) {
 }
 ```
 
-### Cas Limite 2 : Chaîne de Caractères Non Fermée en Fin de Fichier
+### Cas Limite 2 : Chaîne de Caractères Non Fermée en Fin de File
 
 **Scenario :**
 ```rust
@@ -231,12 +231,12 @@ main {
 ```
 
 **Protection Implémentée :**
-- Boucle d'extraction de chaîne valide condition `i < source.length()` à chaque itération
+- Loop d'extraction de chaîne valide condition `i < source.length()` à chaque itération
 - Fin prématurée du fichier force l'interruption avant guillemet fermant
-- **Erreur lexicale signalée** avec numéro de ligne
+- **Error lexicale signalée** avec numéro de ligne
 - Prévient :
-  - Buffer Overread (lecture hors mémoire)
-  - Boucle infinie
+  - Buffer Overread (reading hors mémoire)
+  - Loop infinie
   - Token corrompu
 
 **Code :**
@@ -281,8 +281,8 @@ file.prysma → données binaires corrompues
 
 ## 4. Conversion de Types - Sécurité des Alignements Mémoire
 
-**Composant :** `ConstructeurArbreEquation`, génération LLVM  
-**Criticité :** Critique (erreurs invisibles : segmentation fault sans trace)
+**Composant :** `BuilderTreeEquation`, génération LLVM  
+**Criticité :** Critique (errors invisibles : segmentation fault sans trace)
 
 ### Cas Limite : Float 64-bit assigné à Float 32-bit
 
@@ -293,14 +293,14 @@ Alignement mémoire incompatible : segmentation fault silencieux
 ```
 
 **Bug Historique Documenté :**
-Tentative d'assigner une valeur 64-bit dans un registre 32-bit causait :
-- Segmentation fault sans message d'erreur
-- Erreur invisible : code machine généré était syntaxiquement valide
+Tentative d'assigner une valeur 64-bit dans un registry 32-bit causait :
+- Segmentation fault sans message d'error
+- Error invisible : code machine généré était syntaxiquement valide
 - Symptôme : le programme crash aléatoirement
 
 **Protection Implémentée :**
 - Système de **casting dynamique explicite** avant assignation
-- Vérification des alignements en LLVM IR (attributs `align`)
+- Vérification des alignements en LLVM IR (attributes `align`)
 - AddressSanitizer (ASAN) avec flags `-fsanitize=address`
 - Détection immédiate au runtime :
   ```
@@ -334,10 +334,10 @@ llvm::Value* ContextGenCode::creerAutoCast(
 
 ## 5. Passage d'Arguments - Gestion de Portée
 
-**Composant :** `RegistreArgument`, appels de fonction  
+**Composant :** `RegistryArgument`, calls de function  
 **Criticité :** Haute (corruption mémoire en contextes imbriqués)
 
-### Cas Limite : Appels Imbriqués avec Registre Partagé
+### Cas Limite : Calls Imbriqués avec Registry Partagé
 
 **Scenario :**
 ```rust
@@ -350,25 +350,25 @@ dec int testArgDanIf(int param) {
 ```
 
 **Bug Historique :**
-- Fonction interne vidait le `RegistreArgument` partagé
-- Valeur de retour attendue par fonction parente était corrompue
+- Function interne vidait le `RegistryArgument` partagé
+- Valeur de return attendue par function parente était corrompue
 - Résultat : nombre aléatoire au lieu de la valeur calculée
 
 **Protection Implémentée :**
-- **Pile de contexte** (`std::stack<ContexteLocal>`)
-- Chaque appel de fonction crée un contexte local isolé
-- Variables privées par fonction garanties
-- Vidange stricte des registres après chaque appel
+- **Pile de contexte** (`std::stack<ContextLocal>`)
+- Chaque call de function crée un contexte local isolé
+- Variables privées par function garanties
+- Vidange stricte des registrys après chaque call
 - Portée garantie par scope RAII
 
 **Code Simplifié :**
 ```cpp
-class RegistreArgument {
+class RegistryArgument {
 private:
     std::stack<std::vector<llvm::Value*>> pile_contexte;
     
 public:
-    void entrerFonction() {
+    void inputrFunction() {
         pile_contexte.push({});  // Nouveau contexte vide
     }
     
@@ -376,8 +376,8 @@ public:
         pile_contexte.top().push_back(val);
     }
     
-    void sortirFonction() {
-        pile_contexte.pop();  // Contexte détruit proprement
+    void sortirFunction() {
+        pile_contexte.pop();  // Context détruit proprement
     }
 };
 ```
@@ -385,45 +385,45 @@ public:
 **Résultat :**
 - Pas de corruption mémoire
 - Récursion correctement gérée
-- Valeurs de retour intactes
+- Valeurs de return intactes
 
 ## 6. Identifiants GraphViz - Prévention d'Écrasement d'ID
 
-**Composant :** `VisiteurGeneralGraphViz`  
+**Composant :** `GeneralVisitorGraphViz`  
 **Criticité :** Moyenne (affecte le débogage, pas l'exécution)
 
-### Cas Limite : Arbre Profond avec ID Statiques
+### Cas Limite : Tree Profond avec ID Statiques
 
 **Scenario :**
 ```
-Arbre très profond (100+ niveaux)
+Tree très profond (100+ niveaux)
 Identifiants statiques réutilisés → collision
 Représentation visuelle faussée : nœuds fusionnés à tort
 ```
 
 **Bug Historique :**
-Ancien système d'ID statiques écrasait les IDs dans les arbres profonds, faussant la représentation Graphviz.
+Ancien système d'ID statiques écrasait les IDs dans les trees profonds, faussant la représentation Graphviz.
 
 **Protection Implémentée :**
 - Remplacement par `std::stack<int>` de compteurs d'ID
 - Chaque nœud visité incrémente le compteur du contexte
-- ID unique garantie : stack de profondeur = profondeur du nœud
-- Pas de collision même pour arbres très profonds
+- ID unique garantie : stack de depth = depth du nœud
+- Pas de collision même pour trees très profonds
 
 **Code :**
 ```cpp
-class VisiteurGeneralGraphViz {
+class GeneralVisitorGraphViz {
 private:
     std::stack<int> pile_id;
     int compteur_global = 0;
     
 public:
-    void visit(INoeud* noeud) {
+    void visit(INode* node) {
         int id_courant = compteur_global++;
         pile_id.push(id_courant);
         
         // ... traitement du nœud
-        // ID unique : (profondeur, compteur_global)
+        // ID unique : (depth, compteur_global)
         
         pile_id.pop();
     }
@@ -439,15 +439,15 @@ public:
 
 | Composant | Cas Limite | Mécanisme de Protection | Résultat |
 |-----------|-----------|------------------------|----------|
-| ConstructeurArbreEquation | Parenthèses vides | Exception immédiate | AST non corrompu |
-| ConstructeurArbreEquation | Opérateurs orphelins | Validation sémantique | Erreur précise à l'utilisateur |
-| OrchestrateurInclude | Dépendances circulaires | Set + mutex | Pas de boucle infinie |
-| OrchestrateurInclude | Exception dans thread | Flag d'erreur global | Passe 2 annulée |
-| Lexer | Fichier vide | Gestion vecteur vide | Exécutable valide |
+| BuilderTreeEquation | Parenthèses vides | Exception immédiate | AST non corrompu |
+| BuilderTreeEquation | Opérateurs orphelins | Validation sémantique | Error précise à l'utilisateur |
+| OrchestratorInclude | Dépendances circulaires | Set + mutex | Pas de boucle infinie |
+| OrchestratorInclude | Exception dans thread | Flag d'error global | Passe 2 annulée |
+| Lexer | File vide | Gestion vecteur vide | Exécutable valide |
 | Lexer | Chaîne non fermée | Vérification limite | Buffer overread évité |
 | Conversion Types | Alignement mémoire | Auto-cast + ASAN | Segfault détecté |
-| RegistreArgument | Appels imbriqués | Pile de contexte | Pas de corruption |
-| VisiteurGraphViz | ID statiques | Stack d'ID unique | Pas de collision |
+| RegistryArgument | Calls imbriqués | Pile de contexte | Pas de corruption |
+| VisitorGraphViz | ID statiques | Stack d'ID unique | Pas de collision |
 
 ## Futures
 

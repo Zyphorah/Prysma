@@ -14,7 +14,7 @@ class TestCppUnittest:
     def executer_tests(self):  
 
         if not os.path.exists(self.test_executable_path):
-            print(f" Erreur: L'exécutable de test n'existe pas: {self.test_executable_path}")
+            print(f" Error: L'exécutable de test n'existe pas: {self.test_executable_path}")
             return False
         
         try:
@@ -29,7 +29,7 @@ class TestCppUnittest:
             return result.returncode == 0
             
         except Exception as e:
-            print(f" Erreur lors de l'exécution des tests: {str(e)}")
+            print(f" Error lors de l'exécution des tests: {str(e)}")
             return False
 
     def __afficher_resultats(self, result):
@@ -44,17 +44,17 @@ class TestCppUnittest:
             print(f"{VERT}{BOLD}Tests unitaires C++ réussis{RESET}")
         else:
             print(f"{ROUGE}{BOLD}Certains tests ont échoué{RESET}")
-            print(f"{ROUGE}Code de retour: {result.returncode}{RESET}")
+            print(f"{ROUGE}Code de return: {result.returncode}{RESET}")
             
             if result.stderr:
-                print(f"\n{ROUGE}Détails des erreurs:{RESET}")
-                # Afficher les erreurs ligne par ligne
+                print(f"\n{ROUGE}Détails des errors:{RESET}")
+                # Afficher les errors ligne par ligne
                 for ligne in result.stderr.split('\n'):
                     if ligne.strip():
                         print(f"{ROUGE}{ligne}{RESET}")
             
             if result.stdout:
-                print(f"\n{ROUGE}Sortie du test:{RESET}")
+                print(f"\n{ROUGE}Output du test:{RESET}")
                 # Afficher les résultats des tests échoués
                 for ligne in result.stdout.split('\n'):
                     if 'FAILED' in ligne or 'Error' in ligne or 'error' in ligne:

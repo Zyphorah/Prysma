@@ -1,7 +1,7 @@
 # Version 3.12 minimum (pour que CMake détecte les nouveaux fichiers automatiquement)
 cmake_minimum_required(VERSION 3.12)
 
-# Définition de Clang comme compilateur AVANT la déclaration du projet
+# Définition de Clang comme compiler AVANT la déclaration du project
 set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_C_COMPILER clang)
 
@@ -28,11 +28,11 @@ llvm_map_components_to_libnames(llvm_libs
 
 # Gestion automatique des fichiers sources 
 
-# 1. Récupération des sources du projet principal
-file(GLOB_RECURSE SOURCES_MAIN CONFIGURE_DEPENDS "../src/*.cpp")
+# 1. Récupération des sources du project principal
+file(GLOB_RECURSE SOURCES_MAIN CONFIGURE_DEPENDS "../Src/*.cpp")
 
-# IMPORTANT : Exclusion du main.cpp du projet principal pour éviter les conflits (double fonction main)
-list(REMOVE_ITEM SOURCES_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/../src/main.cpp")
+# IMPORTANT : Exclusion du main.cpp du project principal pour éviter les conflits (double function main)
+list(REMOVE_ITEM SOURCES_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/../Src/main.cpp")
 
 # 2. Récupération du code généré
 file(GLOB_RECURSE SOURCES_GENEREES CONFIGURE_DEPENDS "../build/generationCode/src/*.cpp")
@@ -59,7 +59,7 @@ target_compile_definitions(PrysmaTests PRIVATE ${LLVM_DEFINITIONS})
 # Définition des dossiers d'en-tête (include)
 target_include_directories(PrysmaTests PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/include 
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include 
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Include 
     ${CMAKE_CURRENT_SOURCE_DIR}/../build/generationCode/include
 )
 

@@ -2,14 +2,14 @@
 
 ## Introduction
 
-Prysma est un langage système compilé via LLVM, offrant un contrôle de bas niveau avec une syntaxe moderne. Il supporte le paradigme procédural et l'orienté objet avec une gestion déterministe de la mémoire.
+Prysma est un langage système compilé via LLVM, offrant un contrôle de bas niveau avec une syntaxe moderne. Il supporte le paradigme procédural et l'orienté object avec une gestion déterministe de la mémoire.
 
 -----
 
 ## Syntaxe et blocs
 
   * **Fin d'instruction :** Chaque ligne de code doit se terminer par un point-virgule (`;`).
-  * **Délimitation :** Les blocs de code (fonctions, classes, boucles) utilisent des accolades `{ }`.
+  * **Délimitation :** Les blocs de code (functions, classes, boucles) utilisent des accolades `{ }`.
   * **Identifiants :** Sensible à la casse (case-sensitive).
 
 -----
@@ -18,12 +18,12 @@ Prysma est un langage système compilé via LLVM, offrant un contrôle de bas ni
 
 | Type | Description |
 | :--- | :--- |
-| `int32` | Entier signé 32 bits |
+| `int32` | Integer signé 32 bits |
 | `float` | Nombre à virgule flottante 32/64 bits |
 | `bool` | Valeur logique (`true`, `false`) |
 | `string` | Chaîne de caractères native |
-| `void` | Absence de type (retour de fonction uniquement) |
-| `T[]` | Tableau de type `T` (ex: `int32[]`) |
+| `void` | Absence de type (return de function uniquement) |
+| `T[]` | Array de type `T` (ex: `int32[]`) |
 
 -----
 
@@ -33,13 +33,13 @@ Prysma utilise une gestion **manuelle** de la mémoire sur le tas (*Heap*).
 
 ### Allocation et Libération
 
-  * **`new` :** Alloue de la mémoire pour un objet ou un tableau.
+  * **`new` :** Alloue de la mémoire pour un object ou un array.
   * **`delete` :** Libère la mémoire précédemment allouée.
 
 <!-- end list -->
 
 ```rust
-// Allocation d'un objet
+// Allocation d'un object
 dec MaClasse instance = new MaClasse();
 
 // Libération
@@ -48,12 +48,12 @@ delete instance;
 
 -----
 
-## Fonctions
+## Functions
 
-Déclarées avec `fn` et appelées via `call`.
+Déclarées avec `fn` et callées via `call`.
 
-  * **Syntaxe :** `fn typeRetour nom(arg type nomArg)`
-  * **Appel :** `call nomFonction(arguments)`
+  * **Syntaxe :** `fn typeReturn nom(arg type nomArg)`
+  * **Call :** `call nomFunction(arguments)`
 
 ### Récursivité (Correction Factorielle)
 
@@ -81,7 +81,7 @@ if (a > b) {
 }
 ```
 
-### Boucle `while`
+### Loop `while`
 
 La condition est évaluée avant chaque itération.
 
@@ -99,7 +99,7 @@ while (i < 10) {
 | Catégorie | Opérateurs |
 | :--- | :--- |
 | **Arithmétique** | `+`, `-`, `*`, `/`, `%` |
-| **Comparaison** | `==`, `!=`, `<`, `>`, `<=`, `>=` |
+| **Comparison** | `==`, `!=`, `<`, `>`, `<=`, `>=` |
 | **Logique** | `&&`, `||`, `!` |
 | **Assignation** | `aff variable = valeur;` |
 | **Référence** | `ref` (accès à l'adresse mémoire) |
@@ -108,11 +108,11 @@ while (i < 10) {
 
 ## Exemples de référence
 
-### Création et manipulation d'un tableau dynamique
+### Création et manipulation d'un array dynamique
 
 ```rust
-fn void test_tableau() {
-    // Déclaration d'un tableau de 5 entiers sur la pile
+fn void test_array() {
+    // Déclaration d'un array de 5 entiers sur la pile
     dec int32[5] notes = [10, 15, 20, 12, 18];
     
     // Modification
@@ -138,4 +138,4 @@ fn void main() {
 
 -----
 
-**Note technique :** Le compilateur Prysma effectue une analyse en deux passes pour résoudre les dépendances de symboles dans les classes avant la génération du code LLVM IR. L'utilisation de `ref` est recommandée lors du passage de structures lourdes ou de chaînes de caractères aux fonctions pour éviter les copies inutiles.
+**Note technique :** Le compiler Prysma effectue une analyse en deux passes pour résoudre les dépendances de symboles dans les classes avant la génération du code LLVM IR. L'utilisation de `ref` est recommandée lors du passage de structures lourdes ou de chaînes de caractères aux functions pour éviter les copies inutiles.

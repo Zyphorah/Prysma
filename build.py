@@ -1,32 +1,32 @@
 import os
 import shutil
 from Tests.Orchestration.build_manager import BuildManager
-from generation.generateur_ast import GenerateurAST
-from generation.generateur_interface_visiteur import GenerateurInterfaceVisiteur
-from generation.generateur_visiteur_base_generale import GenerateurVisiteurBaseGenerale
-from generation.generateur_visiteur_destruction import GenerateurVisiteurDestruction
-from generation.generateur_graphe_viz import GenerateurGrapheViz
-from generation.generateur_expression import GenerateurExpression
-from generation.generateur_parseur import GenerateurParseur
+from Generation.generator_ast import GenerateurAST
+from Generation.generator_interface_visitor import GenerateurInterfaceVisitor
+from Generation.generator_visitor_base_general import GenerateurVisitorBaseGenerale
+from Generation.generator_visitor_destruction import GenerateurVisitorDestruction
+from Generation.generator_graphe_viz import GenerateurGraphViz
+from Generation.generator_expression import GenerateurExpression
+from Generation.generator_parser import GenerateurParser
 
 def main():
     dossier_script = os.path.dirname(os.path.abspath(__file__))
     os.chdir(dossier_script)
 
-    GenerateurAST(dossier_script).generer()
-    GenerateurInterfaceVisiteur(dossier_script).generer()
-    GenerateurVisiteurBaseGenerale(dossier_script).generer()
-    GenerateurVisiteurDestruction(dossier_script).generer()
-    GenerateurGrapheViz(dossier_script).generer()
-    GenerateurExpression(dossier_script).generer()
-    GenerateurParseur(dossier_script).generer()
+    GenerateurAST(dossier_script).generatedr()
+    GenerateurInterfaceVisitor(dossier_script).generatedr()
+    GenerateurVisitorBaseGenerale(dossier_script).generatedr()
+    GenerateurVisitorDestruction(dossier_script).generatedr()
+    GenerateurGraphViz(dossier_script).generatedr()
+    GenerateurExpression(dossier_script).generatedr()
+    GenerateurParser(dossier_script).generatedr()
 
     cxxflags_list = [
             "-O3",                  # Vitesse brute (optimisation maximale)
             "-march=native",        # Exploitation totale des instructions de ton CPU
             "-ffast-math",          # Calculs mathématiques agressifs
             "-fno-rtti",            # Zéro métadonnée d'exécution (RTTI off)
-            "-fomit-frame-pointer", # Libération d'un registre CPU
+            "-fomit-frame-pointer", # Libération d'un registry CPU
             "-flto",                # Fusion et optimisation globale au linkage (LTO)
             "-DNDEBUG"              # Désactivation absolue des assertions
     ]

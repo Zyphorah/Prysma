@@ -1,0 +1,158 @@
+
+// 1. Test de base : Supériorité Integer
+fn bool testIntSup()
+{
+    dec string[] functionnalite = "1.testIntSup : ";
+    call print(ref functionnalite);
+    dec int32 a = 5; 
+    if (a > 3) {
+        return true;
+    } else {
+        return false;
+    }
+    return false;
+}
+
+// 2. Test de base : Infériorité Float
+fn bool testFloatInf()
+{
+    dec string[] functionnalite = "2.testFloatInf : ";
+    call print(ref functionnalite);
+    dec float a = 2.5;
+    if (a < 5.0) {
+        return true;
+    } else {
+        return false;
+    }
+    return false;
+}
+
+// 3. Test d'Égalité Integer
+fn bool testIntEgal()
+{
+    dec string[] functionnalite = "3.testIntEgal : ";
+    call print(ref functionnalite);
+    dec int32 a = 10;
+    if (a == 10) {
+        return true;
+    } else {
+        return false;
+    }
+    return false;
+}
+
+// 4. Test d'Égalité Float (Vérifie la précision)
+fn bool testFloatEgal()
+{
+    dec string[] functionnalite = "4.testFloatEgal : ";
+    call print(ref functionnalite);
+    dec float a = 25.5;
+    if (a == 25.5) {
+        return true;
+    } else {
+        return false;
+    }
+    return false;
+}
+
+// 5. Test Logique ET (&&) sans parenthèses externes
+fn bool testAndSimple()
+{
+    dec string[] functionnalite = "5.testAndSimple : ";
+    call print(ref functionnalite);
+    dec int32 a = 1;
+    dec int32 b = 1;
+    
+    if (a == 1 && b == 1) {
+        return true;
+    } else {
+        return false;
+    }
+    return false;
+}
+
+// 6. Test Logique OU (||)
+fn bool testOrSimple()
+{
+    dec string[] functionnalite = "6.testOrSimple : ";
+    call print(ref functionnalite);
+    dec int32 a = 0;
+    dec int32 b = 1;
+    
+    if (a == 1 || b == 1) {
+        return true;
+    } else {
+        return false;
+    }
+    return false;
+}
+
+// 7. Test Complex : Parenthèses imbriquées (Le cas qui plantait)
+// Vérifie si le parser gère ((A) && (B))
+fn bool testParentheses()
+{
+    dec string[] functionnalite = "7.testParentheses : ";
+    call print(ref functionnalite);
+    dec int32 a = 10;
+    dec float b = 25.5;
+
+    if ((a == 10) && (b == 25.5)) {
+        return true;
+    } else {
+        return false;
+    }
+    return false;
+}
+
+// 8. Test Condition sur Arguments (Vérifie la portée des args dans le if)
+fn bool testArgDansIf(arg int32 val)
+{
+    dec string[] functionnalite = "8.testArgDansIf : ";
+    call print(ref functionnalite);
+    if (val == 100) {
+        return true;
+    } else {
+        return false;
+    }
+    return false;
+}
+
+// 9. Test If Imbriqué (Nested)
+fn bool testImbrique_cond()
+{
+    dec string[] functionnalite = "9.testImbrique : ";
+    call print(ref functionnalite);
+    dec int32 x = 50;
+    
+    if (x > 10) {
+        if (x < 100) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+    return false;
+}
+
+fn int32 testCondition()
+{
+    call print(call testIntSup());   call backSlashN();   // true 
+    call print(call testFloatInf());    call backSlashN(); // true
+    call print(call testIntEgal());     call backSlashN(); // true
+    call print(call testFloatEgal());   call backSlashN(); // true
+    
+    call print(call testAndSimple());   call backSlashN(); // true
+    call print(call testOrSimple());    call backSlashN(); // true
+    
+    call print(call testParentheses()); call backSlashN(); // true 
+    
+    dec int32 param = 100;
+    call print(call testArgDansIf(param)); call backSlashN(); // true
+
+    call print(call testImbrique_cond());    call backSlashN(); // true
+
+    return 1; 
+}
+

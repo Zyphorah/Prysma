@@ -96,7 +96,7 @@
                 "owner": "prysma_language",
                 "fileLocation": ["absolute"],
                 "pattern": {
-                    "regexp": "^([^:]+):(\\d+):(\\d+):\\s+(?:Erreur|error|warning):\\s+(.*)$",
+                    "regexp": "^([^:]+):(\\d+):(\\d+):\\s+(?:Error|error|warning):\\s+(.*)$",
                     "file": 1,
                     "line": 2,
                     "column": 3,

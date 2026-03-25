@@ -111,7 +111,7 @@ while (i < 10) {
 ### Creating and Manipulating a Dynamic Array
 
 ```rust
-fn void test_tableau() {
+fn void test_array() {
     // Declaration of a 5-integer array on the stack
     dec int32[5] notes = [10, 15, 20, 12, 18];
     

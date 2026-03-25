@@ -1,0 +1,29 @@
+#ifndef PARSEUR_{{nom | upper}}_H
+#define PARSEUR_{{nom | upper}}_H
+
+#include "Compiler/AST/Registry/ContextParser.h"
+#include "Compiler/Lexer/Lexer.h"
+#include "Compiler/Parser/Interfaces/IParser.h"
+#include "Compiler/Parser/ParserBase.h"
+
+
+class Parser{{nom}} : public IParser, public ParserBase
+{
+private:
+    ContextParser& _contextParser;
+    
+public: 
+
+    Parser{{nom}}(ContextParser& contextParser);
+    ~Parser{{nom}}();
+    
+    INode* parser(std::vector<Token>& tokens, int& index) override;
+};
+
+
+#endif /* PARSEUR_{{nom | upper}}_H */
+
+
+
+
+

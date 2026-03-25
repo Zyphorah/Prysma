@@ -1,0 +1,18 @@
+#ifndef IVISITEUR_H
+#define IVISITEUR_H
+
+{% for nom in nodes %}
+class Node{{ nom }};
+{% endfor %}
+
+class IVisitor
+{
+public:
+    virtual ~IVisitor() = default;
+
+{% for nom in nodes %}
+    virtual void visiter(Node{{ nom }}* node{{ nom }}) = 0;
+{% endfor %}
+};
+
+#endif

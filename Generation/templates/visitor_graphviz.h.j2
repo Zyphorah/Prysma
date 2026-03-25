@@ -1,0 +1,25 @@
+#ifndef VISITEUR_GENERAL_GRAPHVIZ_H
+#define VISITEUR_GENERAL_GRAPHVIZ_H
+
+#include "Compiler/VisualGraph/OutputVisualGraphText.h"
+#include "Compiler/Visitor/VisitorBaseGenerale.h"
+#include <stack>
+#include <vector>
+
+class GeneralVisitorGraphViz : public VisitorBaseGenerale
+{
+private:
+    OutputVisualGraphText _outputVisualGraph;
+    std::stack<int, std::vector<int>> _pileIds;
+
+public:
+    GeneralVisitorGraphViz(OutputVisualGraphText outputVisualGraph);
+    ~GeneralVisitorGraphViz() override;
+    void generatedr();
+
+{% for nom in nodes %}
+    void visiter(Node{{ nom }}* node{{ nom }}) override;
+{% endfor %}
+};
+
+#endif
