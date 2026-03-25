@@ -37,7 +37,6 @@ public:
     UniteCompilation(OrchestrateurInclude* orchestrateur, RegistreFichier* registre, std::string cheminFichier, RegistreFonctionGlobale* registreFonctionGlobale);
     ~UniteCompilation();
 
-    // Delete copy and move constructors and assignment operators
     UniteCompilation(const UniteCompilation&) = delete;
     auto operator=(const UniteCompilation&) -> UniteCompilation& = delete;
     UniteCompilation(UniteCompilation&&) = delete;
