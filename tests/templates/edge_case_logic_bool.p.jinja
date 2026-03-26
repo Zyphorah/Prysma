@@ -1,0 +1,42 @@
+// This tests boolean logic operators and simple expressions
+
+fn bool test_logic() {
+    dec bool a = true;
+    dec bool b = false;
+
+    // Direct Evaluation
+    if ((a && b) == true) {
+        return false;
+    }
+
+    if ((a || b) == false) {
+        return false;
+    }
+
+    // Complex Parenthesis combinations
+    if ((a || false) && (b || true)) {
+        return true;
+    }
+
+    return false;
+}
+
+fn int32 main() {
+    dec string[] intro = "==== Edge Cases Logical Bool ({{ type_name }}) ====";
+    
+    // Only run the test if bool
+    {% if type_name == "bool" %}
+    call print(ref intro); call backSlashN();
+
+    if (call test_logic() == false) {
+        dec string[] failMsg = "FAIL: Logical operators failed to resolve correctly.";
+        call print(ref failMsg); call backSlashN();
+        return 1;
+    }
+
+    dec string[] success = "==== SUCCESS ====";
+    call print(ref success); call backSlashN();
+    {% endif %}
+    
+    return 0;
+}

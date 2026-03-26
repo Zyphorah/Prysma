@@ -1,0 +1,27 @@
+{% for eq in equations %}
+fn bool test_eq_{{ eq.id }}() {
+    dec {{ type_name }} res = {{ eq.expression }};
+    if (res != {{ eq.expected }}) {
+        return false;
+    }
+    return true;
+}
+
+{% endfor %}
+
+fn int32 main() {
+    dec string[] intro = "==== Random Equations ({{ type_name }}) ====";
+    call print(ref intro); call backSlashN();
+
+    {% for eq in equations %}
+    if (call test_eq_{{ eq.id }}() == false) {
+        dec string[] failMsg_{{ eq.id }} = "FAIL: eq_{{ eq.id }} -> {{ eq.expression }} != {{ eq.expected }}";
+        call print(ref failMsg_{{ eq.id }}); call backSlashN();
+        return 1;
+    }
+    {% endfor %}
+
+    dec string[] success = "==== SUCCESS ====";
+    call print(ref success); call backSlashN();
+    return 0;
+}

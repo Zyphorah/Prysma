@@ -1,4 +1,5 @@
 #include "compiler/ast/ast_genere.h"
+#include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
@@ -31,13 +32,16 @@ void GeneralVisitorGenCode::visiter(NodeLiteral* nodeLiteral)
         llvmValue = llvm::ConstantInt::get(llvmType, value ? 1 : 0);
     }
     else if (token.type == TOKEN_LIT_BOOL) {
-        int value = std::stoi(token.value);
+        long long value = std::stoll(token.value);
         llvmType = llvm::Type::getInt1Ty(context);
         llvmValue = llvm::ConstantInt::get(llvmType, value != 0 ? 1 : 0);
     }
     else if (token.type == TOKEN_LIT_INT) { 
-        int value = std::stoi(token.value); 
-        llvmType = llvm::Type::getInt32Ty(context);
+        long long value = std::stoll(token.value); 
+        // By default, if it exceeds 32 bits, we could allocate it as 64-bit,
+        // but for now we allocate at least 64 bits or follow the original code with 'stoll' instead of 'stoi'
+        // to avoid crashing in C++. The type will be adapted later during the operator (createAutoCast handles this).
+        llvmType = llvm::Type::getInt64Ty(context);
         llvmValue = llvm::ConstantInt::get(llvmType, static_cast<uint64_t>(value), true);
     }
     else if (token.type == TOKEN_LIT_FLOAT) { 
