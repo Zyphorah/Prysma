@@ -49,10 +49,3 @@ Hover:
 
 Completion:
   AllScopes: true
-
----
-# Configuration spécifique pour les Tests
-If:
-  PathMatch: Tests/.*
-CompileFlags:
-  CompilationDatabase: Tests/build
