@@ -1,0 +1,29 @@
+fn bool arrayInjectionArgument_{{ type_name }}(arg {{ type_name }}[3] array)
+{
+    dec string[] feature = "9.array_injection_argument : ";
+    call print(ref feature);
+    if (array[0] != {{ val1 }}) {
+        return false;
+    }
+    if (array[1] != {{ val2 }}) {
+        return false;  
+    }
+    if (array[2] != {{ val1 }}) {
+        return false;  
+    }
+    return true;
+}
+
+fn bool arrayTestArgument_{{ type_name }}()
+{
+    dec string[] feature = "10.array_test_argument : ";
+    call print(ref feature);
+    dec {{ type_name }}[3] array = [{{ val1 }}, {{ val2 }}, {{ val1 }}];
+    return call arrayInjectionArgument_{{ type_name }}(array);
+}
+
+fn int32 main()
+{
+    call print(call arrayTestArgument_{{ type_name }}());
+    return 0;
+}

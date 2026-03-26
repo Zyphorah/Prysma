@@ -1,0 +1,31 @@
+fn bool arrayTestAssignment_{{ type_name }}()
+{
+    dec string[] feature = "2.array_test_assignment : ";
+    call print(ref feature);
+    dec {{ type_name }}[4] array = [{{ val2 }}, {{ val2 }}, {{ val2 }}, {{ val2 }}];
+
+    aff array[0] = {{ val1 }};
+    aff array[1] = {{ val1 }};
+    aff array[2] = {{ val2 }};
+    aff array[3] = {{ val1 }};
+
+    if (array[0] != {{ val1 }}) {
+        return false;
+    }
+    if (array[1] != {{ val1 }}) {
+        return false;  
+    }
+    if (array[2] != {{ val2 }}) {
+        return false;  
+    }
+    if (array[3] != {{ val1 }}) {
+        return false;  
+    }
+    return true;
+}
+
+fn int32 main()
+{
+    call print(call arrayTestAssignment_{{ type_name }}());
+    return 0;
+}

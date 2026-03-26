@@ -1,0 +1,18 @@
+fn bool testPassArgFunction_{{ type_name }}(arg {{ type_name }} a, arg float b)
+{  
+   dec string[] feature = "4.test_pass_arg_function : ";
+   call print(ref feature);
+   if ((a == {{ val_10 }}) && (b == 25.5)) {
+      return true;
+   } else {
+      return false;
+   }
+
+   return false;
+}
+
+fn int32 main()
+{
+    call print(call testPassArgFunction_{{ type_name }}({{ val_10 }}, 25.5));
+    return 0;
+}

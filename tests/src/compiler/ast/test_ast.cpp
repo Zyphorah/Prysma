@@ -1,11 +1,13 @@
 #include <memory>
 #include <string>
 #include <iostream>
+#include <tuple>
 #include <utility>
 #include <vector>
 #include <llvm-18/llvm/Support/Allocator.h>
 #include <llvm/Support/TargetSelect.h>
 #include "compiler/ast/nodes/node_instruction.h"
+#include "compiler/ast/registry/registry_type.h"
 #include "compiler/lexer/token_type.h"
 #include "catch.hpp"
 #include "compiler/lexer/lexer.h"
@@ -21,6 +23,7 @@
 
 // Expressions
 #include "compiler/math/expression_literal.h"
+#include "compiler/parser/parser_type.h"
 #include "compiler/variable/expression_identifiant.h"
 #include "compiler/variable/expression_ref_variable.h"
 #include "compiler/variable/expression_un_ref_variable.h"
@@ -43,9 +46,6 @@
 #include "compiler/instruction/parser_include.h"
 
 using namespace std;
-
-
-
 
 struct EnvironnementAST {
     llvm::BumpPtrAllocator arena;
@@ -301,7 +301,7 @@ struct matcherCombine {
 
 TEST_CASE("Construction Tree Equation Simple", "[AST]")
 {
-    cout<< "\nTest 1 - Construction d'un tree pour l'equation '1 + 10 * 50'" << endl;
+    cout<< "\nTest 1 - Building a tree for the equation '1 + 10 * 50'" << endl;
     
     EnvironnementAST env;
     INode* tree = construireEquationDepuisString(env, "1 + 10 * 50");
@@ -321,7 +321,7 @@ TEST_CASE("Construction Tree Equation Simple", "[AST]")
 
 TEST_CASE("Builder Tree equation priorite", "[AST]")
 {
-    cout << "\nTest 2 - Construction d'un tree avec les regles Prysma" << endl;
+    cout << "\nTest 2 - Building a tree with Prysma rules" << endl;
     EnvironnementAST env;
     INode* tree = construireEquationDepuisString(env, "40 / 2 + 10 - 5 * 3");
     
@@ -348,7 +348,7 @@ TEST_CASE("Builder Tree equation priorite", "[AST]")
 
 TEST_CASE("Builder Tree equation depth parenthèse", "[AST]")
 {
-    cout << "\nTest 3 - Construction d'un tree avec des parenthèses" << endl;
+    cout << "\nTest 3 - Building a tree with parentheses" << endl;
     EnvironnementAST env;
     INode* tree = construireEquationDepuisString(env, "(((40/2 +10)+ 5 * 3)+10)");
 
@@ -383,7 +383,7 @@ TEST_CASE("Builder Tree equation depth parenthèse", "[AST]")
 // Test de branchement if simple avec else
 TEST_CASE("Construction Tree If simple avec else", "[AST][Branch]")
 {
-    cout << "\nTest 4 - Tree if/else simple" << endl;
+    cout << "\nTest 4 - Simple if/else tree" << endl;
     EnvironnementAST env;
 
     // Code Prysma : if avec condition et deux branches
@@ -427,7 +427,7 @@ TEST_CASE("Construction Tree If simple avec else", "[AST][Branch]")
 // Test if sans else
 TEST_CASE("Construction Tree If sans else", "[AST][Branch]")
 {
-    cout << "\nTest 5 - Tree if sans else" << endl;
+    cout << "\nTest 5 - If tree without else" << endl;
     EnvironnementAST env;
 
     INode* tree = construireTreeDepuisString(env,
@@ -463,7 +463,7 @@ TEST_CASE("Construction Tree If sans else", "[AST][Branch]")
 // Test if avec condition logique && 
 TEST_CASE("Construction Tree If condition logique ET", "[AST][Branch]")
 {
-    cout << "\nTest 6 - Tree if avec &&" << endl;
+    cout << "\nTest 6 - If tree with &&" << endl;
     EnvironnementAST env;
 
     INode* tree = construireTreeDepuisString(env,
@@ -497,7 +497,7 @@ TEST_CASE("Construction Tree If condition logique ET", "[AST][Branch]")
 // Test while simple
 TEST_CASE("Construction Tree While simple", "[AST][Branch]")
 {
-    cout << "\nTest 7 - Tree while simple" << endl;
+    cout << "\nTest 7 - Simple while tree" << endl;
     EnvironnementAST env;
 
     INode* tree = construireTreeDepuisString(env,
@@ -531,7 +531,7 @@ TEST_CASE("Construction Tree While simple", "[AST][Branch]")
 // Test while avec condition logique ||
 TEST_CASE("Construction Tree While condition OU", "[AST][Branch]")
 {
-    cout << "\nTest 8 - Tree while avec ||" << endl;
+    cout << "\nTest 8 - While tree with ||" << endl;
     EnvironnementAST env;
 
     INode* tree = construireTreeDepuisString(env,
@@ -565,7 +565,7 @@ TEST_CASE("Construction Tree While condition OU", "[AST][Branch]")
 // Test while avec plusieurs instructions dans le body
 TEST_CASE("Construction Tree While plusieurs instructions", "[AST][Branch]")
 {
-    cout << "\nTest 9 - Tree while avec plusieurs instructions" << endl;
+    cout << "\nTest 9 - While tree with multiple instructions" << endl;
     EnvironnementAST env;
 
     INode* tree = construireTreeDepuisString(env,

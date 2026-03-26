@@ -1,0 +1,34 @@
+fn {{ type_name }}[4] arrayTestReturnFunction_{{ type_name }}()
+{
+    dec string[] feature = "7.array_test_return : ";
+    call print(ref feature);
+    dec {{ type_name }}[4] array = [{{ val1 }}, {{ val2 }}, {{ val1 }}, {{ val2 }}];
+    return array;
+}
+
+fn bool arrayTestReturnReading_{{ type_name }}()
+{
+    dec string[] feature = "8.array_test_return_reading : ";
+    call print(ref feature);
+    dec {{ type_name }}[4] array = call arrayTestReturnFunction_{{ type_name }}();
+
+    if (array[0] != {{ val1 }}) {
+        return false;
+    }
+    if (array[1] != {{ val2 }}) {
+        return false;  
+    }
+    if (array[2] != {{ val1 }}) {
+        return false;  
+    }
+    if (array[3] != {{ val2 }}) {
+        return false;  
+    }
+    return true;
+}
+
+fn int32 main()
+{
+    call print(call arrayTestReturnReading_{{ type_name }}());
+    return 0;
+}

@@ -1,0 +1,29 @@
+fn bool arrayTestIteration_{{ type_name }}()
+{
+    dec string[] feature = "6.array_test_iteration : ";
+    call print(ref feature);
+    dec {{ type_name }}[3] t = [{{ val2 }}, {{ val2 }}, {{ val2 }}];
+    dec int32 i = 0;
+
+    while (i < 3) {
+        aff t[i] = {{ val1 }};
+        aff i = i + 1;
+    }
+
+    aff i = 0;
+    while (i < 3) {
+        if(t[i] != {{ val1 }})
+        {
+            return false;
+        }
+        aff i = i + 1;
+    }
+
+    return true;
+}
+
+fn int32 main()
+{
+    call print(call arrayTestIteration_{{ type_name }}());
+    return 0;
+}

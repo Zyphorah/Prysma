@@ -52,8 +52,19 @@ void GeneralVisitorGenCode::visiter(NodeOperation* node)
         }
     } 
     else {
-        llvm::Type* intTy = llvm::Type::getInt32Ty(_contextGenCode->getBackend()->getContext());
-        resultType = intTy;
+        llvm::Type* targetIntTy = nullptr;
+        if (leftVal->getType()->isIntegerTy() && rightVal->getType()->isIntegerTy()) {
+            unsigned leftBits = leftVal->getType()->getIntegerBitWidth();
+            unsigned rightBits = rightVal->getType()->getIntegerBitWidth();
+            targetIntTy = (leftBits > rightBits) ? leftVal->getType() : rightVal->getType();
+        } else {
+            targetIntTy = llvm::Type::getInt32Ty(_contextGenCode->getBackend()->getContext());
+        }
+
+        leftVal = _contextGenCode->getBackend()->createAutoCast(leftVal, targetIntTy);
+        rightVal = _contextGenCode->getBackend()->createAutoCast(rightVal, targetIntTy);
+        
+        resultType = targetIntTy;
 
         switch (node->getToken().type) {
             case TOKEN_PLUS:  result = builder.CreateAdd(leftVal, rightVal, "iadd"); break;

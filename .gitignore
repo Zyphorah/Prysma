@@ -46,8 +46,8 @@
 /build-*/ 
 /Documents/LLVMDoc/build-*/ 
 /Documents/LLVMDoc/build/ 
-/Tests/build/ 
-/Tests/build-*/
+/tests/build/ 
+/tests/build-*/
 
 # Cache clangd 
 
@@ -67,7 +67,4 @@ __pycache__/
 .Python
 .venv/
 venv/
-
-# Code généré automatiquement
-/build/generationCode/
 

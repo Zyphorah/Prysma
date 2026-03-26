@@ -1,0 +1,19 @@
+fn bool testNewDeleteZero_{{ type_name }}()
+{
+   dec string[] feature = "2.test_new_delete_zero : ";
+   call print(ref feature);
+   dec ptr p = new {{ type_name }};
+   aff p = {{ val_0 }};
+   dec {{ type_name }} value = unref p;
+   delete p;
+   if (value == {{ val_0 }}) {
+      return true;
+   } else {
+      return false;
+   }
+   return false;
+}
+fn int32 main() {
+    call print(call testNewDeleteZero_{{ type_name }}());
+    return 0;
+}

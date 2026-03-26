@@ -1,6 +1,6 @@
 import os
 import shutil
-from tests.orchestration.build_manager import BuildManager
+import subprocess
 from generation.generator_ast import GenerateurAST
 from generation.generator_interface_visitor import GenerateurInterfaceVisitor
 from generation.generator_visitor_base_general import GenerateurVisitorBaseGenerale
@@ -37,7 +37,7 @@ def main():
     # 2. Les sanitizers doivent aussi être passés au Linker
     ldflags = "-fsanitize=address -fsanitize=undefined"
 
-    BuildManager.executer_commande([
+    subprocess.run([
         "cmake", "-S", ".", "-B", "build", 
         "-DCMAKE_BUILD_TYPE=Debug",
         f"-DCMAKE_CXX_FLAGS={cxxflags}",
@@ -45,16 +45,16 @@ def main():
         f"-DCMAKE_MODULE_LINKER_FLAGS={ldflags}",
         f"-DCMAKE_SHARED_LINKER_FLAGS={ldflags}",
         "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
-    ])
+    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     os.makedirs("build", exist_ok=True)
     shutil.rmtree(os.path.join("build", "obj"), ignore_errors=True)
 
     nb_coeurs = str(os.cpu_count() or 1)
 
-    BuildManager.executer_commande([
+    subprocess.run([
         "cmake", "--build", "build", "--parallel", nb_coeurs
-    ])
+    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     
 if __name__ == "__main__":
     main()

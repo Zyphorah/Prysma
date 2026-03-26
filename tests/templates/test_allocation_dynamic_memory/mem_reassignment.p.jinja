@@ -1,0 +1,20 @@
+fn bool testNewDeleteReassignment_{{ type_name }}()
+{
+   dec string[] feature = "5.test_new_delete_reassignment : ";
+   call print(ref feature);
+   dec ptr p = new {{ type_name }};
+   aff p = {{ val_10 }};
+   aff p = {{ val_99 }};
+   dec {{ type_name }} value = unref p;
+   delete p;
+   if (value == {{ val_99 }}) {
+      return true;
+   } else {
+      return false;
+   }
+   return false;
+}
+fn int32 main() {
+    call print(call testNewDeleteReassignment_{{ type_name }}());
+    return 0;
+}

@@ -1,0 +1,19 @@
+fn bool testNewDeleteBasic_{{ type_name }}()
+{
+   dec string[] feature = "1.test_new_delete_basic : ";
+   call print(ref feature);
+   dec ptr p = new {{ type_name }};
+   aff p = {{ val_42 }};
+   dec {{ type_name }} value = unref p;
+   delete p;
+   if (value == {{ val_42 }}) {
+      return true;
+   } else {
+      return false;
+   }
+   return false;
+}
+fn int32 main() {
+    call print(call testNewDeleteBasic_{{ type_name }}());
+    return 0;
+}

@@ -1,0 +1,19 @@
+fn bool testNewDeleteExtreme_{{ type_name }}()
+{
+   dec string[] feature = "4.test_new_delete_extreme_value : ";
+   call print(ref feature);
+   dec ptr p = new {{ type_name }};
+   aff p = {{ val_extreme }};
+   dec {{ type_name }} value = unref p;
+   delete p;
+   if (value == {{ val_extreme }}) {
+      return true;
+   } else {
+      return false;
+   }
+   return false;
+}
+fn int32 main() {
+    call print(call testNewDeleteExtreme_{{ type_name }}());
+    return 0;
+}

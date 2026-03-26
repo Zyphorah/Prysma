@@ -1,0 +1,26 @@
+fn bool arrayTestReading_{{ type_name }}()
+{
+    dec string[] feature = "1.array_test_reading : ";
+    call print(ref feature);
+    dec {{ type_name }}[4] array = [{{ val1 }}, {{ val2 }}, {{ val1 }}, {{ val2 }}];
+
+    if (array[0] != {{ val1 }}) {
+        return false;
+    }
+    if (array[1] != {{ val2 }}) {
+        return false;  
+    }
+    if (array[2] != {{ val1 }}) {
+        return false;  
+    }
+    if (array[3] != {{ val2 }}) {
+        return false;  
+    }
+    return true;
+}
+
+fn int32 main()
+{
+    call print(call arrayTestReading_{{ type_name }}());
+    return 0;
+}

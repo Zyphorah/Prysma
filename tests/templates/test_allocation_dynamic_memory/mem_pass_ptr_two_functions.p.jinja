@@ -1,0 +1,37 @@
+fn {{ type_name }} readAndReturn_{{ type_name }}(arg ptr pointer)
+{
+   dec {{ type_name }} value = unref pointer;
+   return value;
+}
+
+fn bool verifyReturn_{{ type_name }}(arg ptr pointer)
+{
+   dec {{ type_name }} value = call readAndReturn_{{ type_name }}(pointer);
+   if (value == {{ val_999 }}) {
+      return true;
+   } else {
+      return false;
+   }
+   return false;
+}
+
+fn bool testPassPtrToTwoFunctions_{{ type_name }}()
+{
+   dec string[] feature = "3.test_pass_ptr_to_two_functions : ";
+   call print(ref feature);
+   dec ptr p = new {{ type_name }};
+   aff p = {{ val_999 }};
+   dec bool result = call verifyReturn_{{ type_name }}(p);
+   delete p;
+   if (result == true) {
+      return true;
+   } else {
+      return false;
+   }
+   return false;
+}
+
+fn int32 main() {
+    call print(call testPassPtrToTwoFunctions_{{ type_name }}());
+    return 0;
+}

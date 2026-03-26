@@ -1,73 +1,38 @@
 import sys
 import os
+import subprocess
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from tests.orchestration import build_manager
 from generation.generator_ast import GenerateurAST
 from generation.generator_interface_visitor import GenerateurInterfaceVisitor
 from generation.generator_visitor_base_general import GenerateurVisitorBaseGenerale
 from generation.generator_graphe_viz import GenerateurGraphViz
-import orchestration.test_project_prysma
-import orchestration.test_cpp_unittest
 
 def main():
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    array_tests_prysma = []
-    racine = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    GenerateurAST(root_dir).generatedr()
+    GenerateurInterfaceVisitor(root_dir).generatedr()
+    GenerateurVisitorBaseGenerale(root_dir).generatedr()
+    GenerateurGraphViz(root_dir).generatedr()
 
-    GenerateurAST(racine).generatedr()
-    GenerateurInterfaceVisitor(racine).generatedr()
-    GenerateurVisitorBaseGenerale(racine).generatedr()
-    GenerateurGraphViz(racine).generatedr()
+    subprocess.run(["python3", "debug.py"], cwd=root_dir, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(["cmake", "-S", ".", "-B", "build"], cwd=root_dir, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(["cmake", "--build", "build", "-j", str(max(1, os.cpu_count() or 1))], cwd=root_dir, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    build_manager.BuildManager.executer_commande(["python3", "../debug.py"])
+    test_exe = Path(root_dir) / "tests" / "build" / "PrysmaTests"
+    if test_exe.exists():
+        subprocess.run([str(test_exe)], cwd=root_dir, check=True)
 
-    # Compilation des tests 
-    build_manager.BuildManager.executer_commande(["cmake", "-S", ".", "-B", "build"])
-    build_manager.BuildManager.executer_commande(["cmake", "--build", "build", "-j", str(os.cpu_count() or 1)])
-
-    test_cpp = orchestration.test_cpp_unittest.TestCppUnittest()
-    ok_cpp = test_cpp.executer_tests()
-
-    # Test 1: project_test_edge_case
-    print("project_test_edge_case/main.p")
-    test_prysma_1 = orchestration.test_project_prysma.TestProjectPrysma(
-        build_dirname="build", 
-        compiler_name="Prysma", 
-        executable_name="main", 
-        file="tests/prysma_code_tests/project_test_edge_case/main.p"
-    )
-    array_tests_prysma.append(test_prysma_1.executer_project())
-
-    # Test 2: ProjectTestMultiThreadEdgeCaseFile - TestInclude
-    print("\nproject_test_multi_thread_edge_case_file/test_include/main.p")
-    test_prysma_2 = orchestration.test_project_prysma.TestProjectPrysma(
-        build_dirname="build", 
-        compiler_name="Prysma", 
-        executable_name="main", 
-        file="tests/prysma_code_tests/project_test_multi_thread_edge_case_file/test_include/main.p"
-    )
-    array_tests_prysma.append(test_prysma_2.executer_project())
-
-    # Test 3: ProjectTestMultiThreadEdgeCaseFile - TestDepth
-    print("\nproject_test_multi_thread_edge_case_file/test_depth/main.p")
-    test_prysma_3 = orchestration.test_project_prysma.TestProjectPrysma(
-        build_dirname="build", 
-        compiler_name="Prysma", 
-        executable_name="main", 
-        file="tests/prysma_code_tests/project_test_multi_thread_edge_case_file/test_depth/main.p"
-    )
-    array_tests_prysma.append(test_prysma_3.executer_project())
-
-    all_ok = ok_cpp and all(array_tests_prysma)
+    subprocess.run(["python3", "tests/generate_tests.py"], cwd=root_dir, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     
-    if not all_ok:
-        print("\nArrêt du pipeline : Échec d'une étape.")
+    # We let the orchestrator print its output so we see the failing tests.
+    try:
+        subprocess.run(["python3", "tests/orchestrator_test.py"], cwd=root_dir, check=True)
+    except subprocess.CalledProcessError:
         sys.exit(1)
-
-    print("\nTests terminés")
-    sys.exit(0)
 
 if __name__ == "__main__":
     main()

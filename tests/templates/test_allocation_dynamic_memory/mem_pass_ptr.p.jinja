@@ -1,0 +1,31 @@
+fn bool verify_{{ type_name }}(arg ptr pointer)
+{
+   dec {{ type_name }} value = unref pointer;
+   if (value == {{ val_50 }}) {
+      return true;
+   } else {
+      return false;
+   }
+   return false;
+}
+
+fn bool testPassPtrByArgument_{{ type_name }}()
+{
+   dec string[] feature = "1.test_pass_ptr_by_argument : ";
+   call print(ref feature);
+   dec ptr p = new {{ type_name }};
+   aff p = {{ val_50 }};
+   dec bool result = call verify_{{ type_name }}(p);
+   delete p;
+   if (result == true) {
+      return true;
+   } else {
+      return false;
+   }
+   return false;
+}
+
+fn int32 main() {
+    call print(call testPassPtrByArgument_{{ type_name }}());
+    return 0;
+}

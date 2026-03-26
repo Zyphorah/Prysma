@@ -1,0 +1,20 @@
+fn bool testNewDeleteNegative_{{ type_name }}()
+{
+   dec string[] feature = "3.test_new_delete_negative : ";
+   call print(ref feature);
+   dec ptr p = new {{ type_name }};
+   dec {{ type_name }} valueToAssign = {{ val_0 }} - {{ val_100 }};
+   aff p = valueToAssign;
+   dec {{ type_name }} value = unref p;
+   delete p;
+   if (value == valueToAssign) {
+      return true;
+   } else {
+      return false;
+   }
+   return false;
+}
+fn int32 main() {
+    call print(call testNewDeleteNegative_{{ type_name }}());
+    return 0;
+}

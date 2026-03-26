@@ -1,0 +1,24 @@
+fn bool testStateUpdate_{{ type_name }}()
+{
+   dec string[] feature = "3.test_state_update : ";
+   call print(ref feature);
+   dec {{ type_name }} a = {{ val_1 }};
+   dec {{ type_name }} b = {{ val_5 }};
+   
+   aff a = {{ val_10 }}; 
+   
+   dec {{ type_name }} c = a + b;
+   if (c == {{ val_15 }}) {
+      return true;
+   } else {
+      return false;
+   }
+   
+   return false;
+}
+
+fn int32 main()
+{
+    call print(call testStateUpdate_{{ type_name }}());
+    return 0;
+}

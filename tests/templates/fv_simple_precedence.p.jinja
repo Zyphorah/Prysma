@@ -1,0 +1,21 @@
+fn bool testSimplePrecedence_{{ type_name }}()
+{
+   dec string[] feature = "1.test_simple_precedence : ";
+   call print(ref feature);
+   dec {{ type_name }} a = {{ val_10 }};
+   dec {{ type_name }} b = {{ val_2 }};
+   dec {{ type_name }} c = {{ val_5 }};
+   dec {{ type_name }} d = a + b * c; 
+   if (d == {{ val_20 }}) {
+      return true;
+   } else {
+      return false;
+   }
+   return false;
+}
+
+fn int32 main()
+{
+    call print(call testSimplePrecedence_{{ type_name }}());
+    return 0;
+}
