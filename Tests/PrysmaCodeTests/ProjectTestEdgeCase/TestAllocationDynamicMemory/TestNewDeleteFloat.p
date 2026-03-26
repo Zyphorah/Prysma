@@ -1,13 +1,12 @@
-
-fn bool testNewDeleteFloatBasique()
+fn bool testNewDeleteFloatBasic()
 {
-   dec string[] functionnalite = "1.testNewDeleteFloatBasique : ";
-   call print(ref functionnalite);
+   dec string[] feature = "1.testNewDeleteFloatBasic : ";
+   call print(ref feature);
    dec ptr p = new float;
    aff p = 3.14;
-   dec float val = unref p;
+   dec float value = unref p;
    delete p;
-   if (val == 3.14) {
+   if (value == 3.14) {
       return true;
    } else {
       return false;
@@ -17,13 +16,13 @@ fn bool testNewDeleteFloatBasique()
 
 fn bool testNewDeleteFloatZero()
 {
-   dec string[] functionnalite = "2.testNewDeleteFloatZero : ";
-   call print(ref functionnalite);
+   dec string[] feature = "2.testNewDeleteFloatZero : ";
+   call print(ref feature);
    dec ptr p = new float;
    aff p = 0.0;
-   dec float val = unref p;
+   dec float value = unref p;
    delete p;
-   if (val == 0.0) {
+   if (value == 0.0) {
       return true;
    } else {
       return false;
@@ -31,16 +30,16 @@ fn bool testNewDeleteFloatZero()
    return false;
 }
 
-fn bool testNewDeleteFloatNegatif()
+fn bool testNewDeleteFloatNegative()
 {
-   dec string[] functionnalite = "3.testNewDeleteFloatNegatif : ";
-   call print(ref functionnalite);
+   dec string[] feature = "3.testNewDeleteFloatNegative : ";
+   call print(ref feature);
    dec ptr p = new float;
-   dec float valeur = 0.0 - 99.9;
-   aff p = valeur;
-   dec float val = unref p;
+   dec float valueToAssign = 0.0 - 99.9;
+   aff p = valueToAssign;
+   dec float value = unref p;
    delete p;
-   if (val == valeur) {
+   if (value == valueToAssign) {
       return true;
    } else {
       return false;
@@ -48,15 +47,15 @@ fn bool testNewDeleteFloatNegatif()
    return false;
 }
 
-fn bool testNewDeleteFloatPetiteValeur()
+fn bool testNewDeleteFloatSmallValue()
 {
-   dec string[] functionnalite = "4.testNewDeleteFloatPetiteValeur : ";
-   call print(ref functionnalite);
+   dec string[] feature = "4.testNewDeleteFloatSmallValue : ";
+   call print(ref feature);
    dec ptr p = new float;
    aff p = 0.001;
-   dec float val = unref p;
+   dec float value = unref p;
    delete p;
-   if (val == 0.001) {
+   if (value == 0.001) {
       return true;
    } else {
       return false;
@@ -66,14 +65,14 @@ fn bool testNewDeleteFloatPetiteValeur()
 
 fn bool testNewDeleteFloatReassignment()
 {
-   dec string[] functionnalite = "5.testNewDeleteFloatReassignment : ";
-   call print(ref functionnalite);
+   dec string[] feature = "5.testNewDeleteFloatReassignment : ";
+   call print(ref feature);
    dec ptr p = new float;
    aff p = 1.1;
    aff p = 55.5;
-   dec float val = unref p;
+   dec float value = unref p;
    delete p;
-   if (val == 55.5) {
+   if (value == 55.5) {
       return true;
    } else {
       return false;
@@ -83,10 +82,10 @@ fn bool testNewDeleteFloatReassignment()
 
 fn int32 testNewDeleteFloat()
 {
-   call print(call testNewDeleteFloatBasique()); call backSlashN();
+   call print(call testNewDeleteFloatBasic()); call backSlashN();
    call print(call testNewDeleteFloatZero()); call backSlashN();
-   call print(call testNewDeleteFloatNegatif()); call backSlashN();
-   call print(call testNewDeleteFloatPetiteValeur()); call backSlashN();
+   call print(call testNewDeleteFloatNegative()); call backSlashN();
+   call print(call testNewDeleteFloatSmallValue()); call backSlashN();
    call print(call testNewDeleteFloatReassignment()); call backSlashN();
 
    return 1;

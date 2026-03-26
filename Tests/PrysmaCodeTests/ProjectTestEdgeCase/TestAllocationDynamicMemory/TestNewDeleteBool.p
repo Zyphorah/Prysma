@@ -1,13 +1,12 @@
-
-fn bool testNewDeleteBoolVrai()
+fn bool testNewDeleteBoolTrue()
 {
-   dec string[] functionnalite = "1.testNewDeleteBoolVrai : ";
-   call print(ref functionnalite);
+   dec string[] feature = "1.testNewDeleteBoolTrue : ";
+   call print(ref feature);
    dec ptr p = new bool;
    aff p = true;
-   dec bool val = unref p;
+   dec bool value = unref p;
    delete p;
-   if (val == true) {
+   if (value == true) {
       return true;
    } else {
       return false;
@@ -15,15 +14,15 @@ fn bool testNewDeleteBoolVrai()
    return false;
 }
 
-fn bool testNewDeleteBoolFaux()
+fn bool testNewDeleteBoolFalse()
 {
-   dec string[] functionnalite = "2.testNewDeleteBoolFaux : ";
-   call print(ref functionnalite);
+   dec string[] feature = "2.testNewDeleteBoolFa/lse : ";
+   call print(ref feature);
    dec ptr p = new bool;
    aff p = false;
-   dec bool val = unref p;
+   dec bool value = unref p;
    delete p;
-   if (val == false) {
+   if (value == false) {
       return true;
    } else {
       return false;
@@ -33,14 +32,14 @@ fn bool testNewDeleteBoolFaux()
 
 fn bool testNewDeleteBoolReassignment()
 {
-   dec string[] functionnalite = "3.testNewDeleteBoolReassignment : ";
-   call print(ref functionnalite);
+   dec string[] feature = "3.testNewDeleteBoolReassignment : ";
+   call print(ref feature);
    dec ptr p = new bool;
    aff p = true;
    aff p = false;
-   dec bool val = unref p;
+   dec bool value = unref p;
    delete p;
-   if (val == false) {
+   if (value == false) {
       return true;
    } else {
       return false;
@@ -50,14 +49,14 @@ fn bool testNewDeleteBoolReassignment()
 
 fn bool testNewDeleteBoolReassignmentInverse()
 {
-   dec string[] functionnalite = "4.testNewDeleteBoolReassignmentInverse : ";
-   call print(ref functionnalite);
+   dec string[] feature = "4.testNewDeleteBoolReassignmentInverse : ";
+   call print(ref feature);
    dec ptr p = new bool;
    aff p = false;
    aff p = true;
-   dec bool val = unref p;
+   dec bool value = unref p;
    delete p;
-   if (val == true) {
+   if (value == true) {
       return true;
    } else {
       return false;
@@ -67,8 +66,8 @@ fn bool testNewDeleteBoolReassignmentInverse()
 
 fn int32 testNewDeleteBool()
 {
-   call print(call testNewDeleteBoolVrai()); call backSlashN();
-   call print(call testNewDeleteBoolFaux()); call backSlashN();
+   call print(call testNewDeleteBoolTrue()); call backSlashN();
+   call print(call testNewDeleteBoolFalse()); call backSlashN();
    call print(call testNewDeleteBoolReassignment()); call backSlashN();
    call print(call testNewDeleteBoolReassignmentInverse()); call backSlashN();
 

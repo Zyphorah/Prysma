@@ -6,18 +6,18 @@ fn bool testAddition()
 {
     dec string[] msg = "1.testAddition : ";
     call print(ref msg);
-    dec int32 r = call additionner(10, 20);
+    dec int32 r = call add(10, 20);
     if (r == 30) {
         return true;
     }
     return false;
 }
 
-fn bool testSoustraction()
+fn bool testSubtraction()
 {
-    dec string[] msg = "2.testSoustraction : ";
+    dec string[] msg = "2.testSubtraction : ";
     call print(ref msg);
-    dec int32 r = call soustraire(50, 25);
+    dec int32 r = call subtract(50, 25);
     if (r == 25) {
         return true;
     }
@@ -28,7 +28,7 @@ fn bool testMultiplication()
 {
     dec string[] msg = "3.testMultiplication : ";
     call print(ref msg);
-    dec int32 r = call multiplier(6, 7);
+    dec int32 r = call multiply(6, 7);
     if (r == 42) {
         return true;
     }
@@ -39,18 +39,18 @@ fn bool testAdditionFloat()
 {
     dec string[] msg = "4.testAdditionFloat : ";
     call print(ref msg);
-    dec float r = call additionnerFloat(1.5, 2.5);
+    dec float r = call addFloat(1.5, 2.5);
     if (r == 4.0) {
         return true;
     }
     return false;
 }
 
-fn bool testSoustractionFloat()
+fn bool testSubtractionFloat()
 {
-    dec string[] msg = "5.testSoustractionFloat : ";
+    dec string[] msg = "5.testSubtractionFloat : ";
     call print(ref msg);
-    dec float r = call soustraireFloat(10.0, 3.5);
+    dec float r = call subtractFloat(10.0, 3.5);
     if (r == 6.5) {
         return true;
     }
@@ -61,33 +61,33 @@ fn bool testMultiplicationFloat()
 {
     dec string[] msg = "6.testMultiplicationFloat : ";
     call print(ref msg);
-    dec float r = call multiplierFloat(2.5, 4.0);
+    dec float r = call multiplyFloat(2.5, 4.0);
     if (r == 10.0) {
         return true;
     }
     return false;
 }
 
-fn bool testExpressionCombinee()
+fn bool testCombinedExpression()
 {
-    dec string[] msg = "7.testExpressionCombinee : ";
+    dec string[] msg = "7.testCombinedExpression : ";
     call print(ref msg);
-    dec int32 a = call additionner(5, 3);
-    dec int32 b = call multiplier(a, 2);
-    dec int32 c = call soustraire(b, 6);
+    dec int32 a = call add(5, 3);
+    dec int32 b = call multiply(a, 2);
+    dec int32 c = call subtract(b, 6);
     if (c == 10) {
         return true;
     }
     return false;
 }
 
-fn void executerTestsMath()
+fn void runMathTests()
 {
     call print(call testAddition()); call backSlashN();
-    call print(call testSoustraction()); call backSlashN();
+    call print(call testSubtraction()); call backSlashN();
     call print(call testMultiplication()); call backSlashN();
     call print(call testAdditionFloat()); call backSlashN();
-    call print(call testSoustractionFloat()); call backSlashN();
+    call print(call testSubtractionFloat()); call backSlashN();
     call print(call testMultiplicationFloat()); call backSlashN();
-    call print(call testExpressionCombinee()); call backSlashN();
+    call print(call testCombinedExpression()); call backSlashN();
 }

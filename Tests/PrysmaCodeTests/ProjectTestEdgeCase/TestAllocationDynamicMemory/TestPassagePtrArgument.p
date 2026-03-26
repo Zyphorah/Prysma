@@ -1,8 +1,7 @@
-
-fn bool verifierInt32(arg ptr pointeur)
+fn bool verifyInt32(arg ptr pointer)
 {
-   dec int32 val = unref pointeur;
-   if (val == 50) {
+   dec int32 value = unref pointer;
+   if (value == 50) {
       return true;
    } else {
       return false;
@@ -10,15 +9,15 @@ fn bool verifierInt32(arg ptr pointeur)
    return false;
 }
 
-fn bool testPasserPtrInt32ParArgument()
+fn bool testPassPtrInt32ByArgument()
 {
-   dec string[] functionnalite = "1.testPasserPtrInt32ParArgument : ";
-   call print(ref functionnalite);
+   dec string[] feature = "1.testPassPtrInt32ByArgument : ";
+   call print(ref feature);
    dec ptr p = new int32;
    aff p = 50;
-   dec bool resultat = call verifierInt32(p);
+   dec bool result = call verifyInt32(p);
    delete p;
-   if (resultat == true) {
+   if (result == true) {
       return true;
    } else {
       return false;
@@ -26,10 +25,10 @@ fn bool testPasserPtrInt32ParArgument()
    return false;
 }
 
-fn bool verifierValeurZero(arg ptr pointeur)
+fn bool verifyValueZero(arg ptr pointer)
 {
-   dec int32 val = unref pointeur;
-   if (val == 0) {
+   dec int32 value = unref pointer;
+   if (value == 0) {
       return true;
    } else {
       return false;
@@ -37,15 +36,15 @@ fn bool verifierValeurZero(arg ptr pointeur)
    return false;
 }
 
-fn bool testPasserPtrValeurZeroParArgument()
+fn bool testPassPtrValueZeroByArgument()
 {
-   dec string[] functionnalite = "2.testPasserPtrValeurZeroParArgument : ";
-   call print(ref functionnalite);
+   dec string[] feature = "2.testPassPtrValueZeroByArgument : ";
+   call print(ref feature);
    dec ptr p = new int32;
    aff p = 0;
-   dec bool resultat = call verifierValeurZero(p);
+   dec bool result = call verifyValueZero(p);
    delete p;
-   if (resultat == true) {
+   if (result == true) {
       return true;
    } else {
       return false;
@@ -53,10 +52,10 @@ fn bool testPasserPtrValeurZeroParArgument()
    return false;
 }
 
-fn bool verifierBool(arg ptr pointeur)
+fn bool verifyBool(arg ptr pointer)
 {
-   dec bool val = unref pointeur;
-   if (val == true) {
+   dec bool value = unref pointer;
+   if (value == true) {
       return true;
    } else {
       return false;
@@ -64,15 +63,15 @@ fn bool verifierBool(arg ptr pointeur)
    return false;
 }
 
-fn bool testPasserPtrBoolParArgument()
+fn bool testPassPtrBoolByArgument()
 {
-   dec string[] functionnalite = "3.testPasserPtrBoolParArgument : ";
-   call print(ref functionnalite);
+   dec string[] feature = "3.testPassPtrBoolByArgument : ";
+   call print(ref feature);
    dec ptr p = new bool;
    aff p = true;
-   dec bool resultat = call verifierBool(p);
+   dec bool result = call verifyBool(p);
    delete p;
-   if (resultat == true) {
+   if (result == true) {
       return true;
    } else {
       return false;
@@ -80,26 +79,26 @@ fn bool testPasserPtrBoolParArgument()
    return false;
 }
 
-fn int32 lireEtAdditionner(arg ptr ptrA, arg ptr ptrB)
+fn int32 readAndAdd(arg ptr ptrA, arg ptr ptrB)
 {
    dec int32 a = unref ptrA;
    dec int32 b = unref ptrB;
-   dec int32 somme = a + b;
-   return somme;
+   dec int32 sum = a + b;
+   return sum;
 }
 
-fn bool testPasserDeuxPtrParArgument()
+fn bool testPassTwoPtrByArgument()
 {
-   dec string[] functionnalite = "4.testPasserDeuxPtrParArgument : ";
-   call print(ref functionnalite);
+   dec string[] feature = "4.testPassTwoPtrByArgument : ";
+   call print(ref feature);
    dec ptr p1 = new int32;
    dec ptr p2 = new int32;
    aff p1 = 30;
    aff p2 = 70;
-   dec int32 resultat = call lireEtAdditionner(p1, p2);
+   dec int32 result = call readAndAdd(p1, p2);
    delete p1;
    delete p2;
-   if (resultat == 100) {
+   if (result == 100) {
       return true;
    } else {
       return false;
@@ -107,16 +106,16 @@ fn bool testPasserDeuxPtrParArgument()
    return false;
 }
 
-fn int32 lireEtReturnner(arg ptr pointeur)
+fn int32 readAndReturn(arg ptr pointer)
 {
-   dec int32 val = unref pointeur;
-   return val;
+   dec int32 value = unref pointer;
+   return value;
 }
 
-fn bool verifierReturn(arg ptr pointeur)
+fn bool verifyReturn(arg ptr pointer)
 {
-   dec int32 val = call lireEtReturnner(pointeur);
-   if (val == 999) {
+   dec int32 value = call readAndReturn(pointer);
+   if (value == 999) {
       return true;
    } else {
       return false;
@@ -124,15 +123,15 @@ fn bool verifierReturn(arg ptr pointeur)
    return false;
 }
 
-fn bool testPasserPtrADeuxFunctions()
+fn bool testPassPtrToTwoFunctions()
 {
-   dec string[] functionnalite = "5.testPasserPtrADeuxFunctions : ";
-   call print(ref functionnalite);
+   dec string[] feature = "5.testPassPtrToTwoFunctions : ";
+   call print(ref feature);
    dec ptr p = new int32;
    aff p = 999;
-   dec bool resultat = call verifierReturn(p);
+   dec bool result = call verifyReturn(p);
    delete p;
-   if (resultat == true) {
+   if (result == true) {
       return true;
    } else {
       return false;
@@ -140,13 +139,13 @@ fn bool testPasserPtrADeuxFunctions()
    return false;
 }
 
-fn int32 testPassagePtrArgument()
+fn int32 testPassPtrArgument()
 {
-   call print(call testPasserPtrInt32ParArgument()); call backSlashN();
-   call print(call testPasserPtrValeurZeroParArgument()); call backSlashN();
-   call print(call testPasserPtrBoolParArgument()); call backSlashN();
-   call print(call testPasserDeuxPtrParArgument()); call backSlashN();
-   call print(call testPasserPtrADeuxFunctions()); call backSlashN();
+   call print(call testPassPtrInt32ByArgument()); call backSlashN();
+   call print(call testPassPtrValueZeroByArgument()); call backSlashN();
+   call print(call testPassPtrBoolByArgument()); call backSlashN();
+   call print(call testPassTwoPtrByArgument()); call backSlashN();
+   call print(call testPassPtrToTwoFunctions()); call backSlashN();
 
    return 1;
 }

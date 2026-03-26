@@ -1,23 +1,22 @@
-
-// Test 1 : Factorielle (5! = 120) - Récursion simple
-fn int32 fact(arg int32 n)
+// Test 1: Factorial (5! = 120) - Simple recursion
+fn int32 factorial(arg int32 n)
 {
-   dec string[] functionnalite = "1.fact : ";
-   call print(ref functionnalite);
+   dec string[] feature = "1.factorial : ";
+   call print(ref feature);
    if (n <= 1) {
       return 1;
    }
    dec int32 m = n - 1;
-   dec int32 r = call fact(m);
+   dec int32 r = call factorial(m);
    return n * r;
 }
 
-fn bool testFact()
+fn bool testFactorial()
 {
-   dec string[] functionnalite = "2.testFact : ";
-   call print(ref functionnalite);
-   dec int32 fib = call fact(5);
-   if (fib == 120) {
+   dec string[] feature = "2.testFactorial : ";
+   call print(ref feature);
+   dec int32 result = call factorial(5);
+   if (result == 120) {
       return true;
    } else {
       return false;
@@ -25,27 +24,27 @@ fn bool testFact()
    return false;
 }
 
-// Test 2 : fibonaci (fib(7) = 13) - Récursion multiple
-fn int32 fib(arg int32 n) {
-   dec string[] functionnalite = "3.fib : ";
-   call print(ref functionnalite);
+// Test 2: Fibonacci (fib(7) = 13) - Multiple recursion
+fn int32 fibonacci(arg int32 n) {
+   dec string[] feature = "3.fibonacci : ";
+   call print(ref feature);
    if (n <= 1) {
       return n;
    }
-   dec int32 un = n - 1;
-   dec int32 deux = n - 2;
-   dec int32 fib_un = call fib(un);
-   dec int32 fib_deux = call fib(deux);
-   return fib_un + fib_deux;
+   dec int32 one = n - 1;
+   dec int32 two = n - 2;
+   dec int32 fib_one = call fibonacci(one);
+   dec int32 fib_two = call fibonacci(two);
+   return fib_one + fib_two;
 }
 
 
-fn bool testFib()
+fn bool testFibonacci()
 {
-   dec string[] functionnalite = "4.testFib : ";
-   call print(ref functionnalite);
-   dec int32 fib = call fib(7);
-   if (fib == 13) {
+   dec string[] feature = "4.testFibonacci : ";
+   call print(ref feature);
+   dec int32 result = call fibonacci(7);
+   if (result == 13) {
       return true;
    } else {
       return false;
@@ -53,12 +52,12 @@ fn bool testFib()
    return false;
 }
 
-fn bool testRecursiviteSimple()
+fn bool testSimpleRecursion()
 {
-   dec string[] functionnalite = "5.testRecursiviteSimple : ";
-   call print(ref functionnalite);
-   dec int32 fact = call fact(5);
-   dec int32 fib = call fib(7);
+   dec string[] feature = "5.testSimpleRecursion : ";
+   call print(ref feature);
+   dec int32 fact = call factorial(5);
+   dec int32 fib = call fibonacci(7);
    if ((fact == 120) && (fib == 13)) {
       return true;
    } else {
@@ -67,11 +66,11 @@ fn bool testRecursiviteSimple()
    return false;
 }
 
-fn int32 testRecursivite()
+fn int32 testRecursion()
 {
-   call print(call testFact()); call backSlashN();
-   call print(call testFib()); call backSlashN();
-   call print(call testRecursiviteSimple()); call backSlashN();
+   call print(call testFactorial()); call backSlashN();
+   call print(call testFibonacci()); call backSlashN();
+   call print(call testSimpleRecursion()); call backSlashN();
 
    return 1;
 }

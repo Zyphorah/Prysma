@@ -1,9 +1,8 @@
-
-// 1. Test de base : Supériorité Integer
-fn bool testIntSup()
+// 1. Basic Test: Integer Greater Than
+fn bool testIntGreater()
 {
-    dec string[] functionnalite = "1.testIntSup : ";
-    call print(ref functionnalite);
+    dec string[] feature = "1.testIntGreater : ";
+    call print(ref feature);
     dec int32 a = 5; 
     if (a > 3) {
         return true;
@@ -13,11 +12,11 @@ fn bool testIntSup()
     return false;
 }
 
-// 2. Test de base : Infériorité Float
-fn bool testFloatInf()
+// 2. Basic Test: Float Less Than
+fn bool testFloatLess()
 {
-    dec string[] functionnalite = "2.testFloatInf : ";
-    call print(ref functionnalite);
+    dec string[] feature = "2.testFloatLess : ";
+    call print(ref feature);
     dec float a = 2.5;
     if (a < 5.0) {
         return true;
@@ -27,11 +26,11 @@ fn bool testFloatInf()
     return false;
 }
 
-// 3. Test d'Égalité Integer
-fn bool testIntEgal()
+// 3. Integer Equality Test
+fn bool testIntEqual()
 {
-    dec string[] functionnalite = "3.testIntEgal : ";
-    call print(ref functionnalite);
+    dec string[] feature = "3.testIntEqual : ";
+    call print(ref feature);
     dec int32 a = 10;
     if (a == 10) {
         return true;
@@ -41,11 +40,11 @@ fn bool testIntEgal()
     return false;
 }
 
-// 4. Test d'Égalité Float (Vérifie la précision)
-fn bool testFloatEgal()
+// 4. Float Equality Test (Checks precision)
+fn bool testFloatEqual()
 {
-    dec string[] functionnalite = "4.testFloatEgal : ";
-    call print(ref functionnalite);
+    dec string[] feature = "4.testFloatEqual : ";
+    call print(ref feature);
     dec float a = 25.5;
     if (a == 25.5) {
         return true;
@@ -55,11 +54,11 @@ fn bool testFloatEgal()
     return false;
 }
 
-// 5. Test Logique ET (&&) sans parenthèses externes
+// 5. Logical AND (&&) Test without external parentheses
 fn bool testAndSimple()
 {
-    dec string[] functionnalite = "5.testAndSimple : ";
-    call print(ref functionnalite);
+    dec string[] feature = "5.testAndSimple : ";
+    call print(ref feature);
     dec int32 a = 1;
     dec int32 b = 1;
     
@@ -71,11 +70,11 @@ fn bool testAndSimple()
     return false;
 }
 
-// 6. Test Logique OU (||)
+// 6. Logical OR (||) Test
 fn bool testOrSimple()
 {
-    dec string[] functionnalite = "6.testOrSimple : ";
-    call print(ref functionnalite);
+    dec string[] feature = "6.testOrSimple : ";
+    call print(ref feature);
     dec int32 a = 0;
     dec int32 b = 1;
     
@@ -87,12 +86,12 @@ fn bool testOrSimple()
     return false;
 }
 
-// 7. Test Complex : Parenthèses imbriquées (Le cas qui plantait)
-// Vérifie si le parser gère ((A) && (B))
+// 7. Complex Test: Nested Parentheses (The case that failed)
+// Checks if the parser handles ((A) && (B))
 fn bool testParentheses()
 {
-    dec string[] functionnalite = "7.testParentheses : ";
-    call print(ref functionnalite);
+    dec string[] feature = "7.testParentheses : ";
+    call print(ref feature);
     dec int32 a = 10;
     dec float b = 25.5;
 
@@ -104,12 +103,12 @@ fn bool testParentheses()
     return false;
 }
 
-// 8. Test Condition sur Arguments (Vérifie la portée des args dans le if)
-fn bool testArgDansIf(arg int32 val)
+// 8. Test condition on Arguments (Checks argument scope in if)
+fn bool testArgInIf(arg int32 value)
 {
-    dec string[] functionnalite = "8.testArgDansIf : ";
-    call print(ref functionnalite);
-    if (val == 100) {
+    dec string[] feature = "8.testArgInIf : ";
+    call print(ref feature);
+    if (value == 100) {
         return true;
     } else {
         return false;
@@ -117,11 +116,11 @@ fn bool testArgDansIf(arg int32 val)
     return false;
 }
 
-// 9. Test If Imbriqué (Nested)
-fn bool testImbrique_cond()
+// 9. Nested If Test
+fn bool testNestedIf()
 {
-    dec string[] functionnalite = "9.testImbrique : ";
-    call print(ref functionnalite);
+    dec string[] feature = "9.testNestedIf : ";
+    call print(ref feature);
     dec int32 x = 50;
     
     if (x > 10) {
@@ -138,10 +137,10 @@ fn bool testImbrique_cond()
 
 fn int32 testCondition()
 {
-    call print(call testIntSup());   call backSlashN();   // true 
-    call print(call testFloatInf());    call backSlashN(); // true
-    call print(call testIntEgal());     call backSlashN(); // true
-    call print(call testFloatEgal());   call backSlashN(); // true
+    call print(call testIntGreater());   call backSlashN();   // true 
+    call print(call testFloatLess());    call backSlashN(); // true
+    call print(call testIntEqual());     call backSlashN(); // true
+    call print(call testFloatEqual());   call backSlashN(); // true
     
     call print(call testAndSimple());   call backSlashN(); // true
     call print(call testOrSimple());    call backSlashN(); // true
@@ -149,9 +148,9 @@ fn int32 testCondition()
     call print(call testParentheses()); call backSlashN(); // true 
     
     dec int32 param = 100;
-    call print(call testArgDansIf(param)); call backSlashN(); // true
+    call print(call testArgInIf(param)); call backSlashN(); // true
 
-    call print(call testImbrique_cond());    call backSlashN(); // true
+    call print(call testNestedIf());    call backSlashN(); // true
 
     return 1; 
 }

@@ -3,18 +3,18 @@ include "Validation/Validation.p";
 
 fn int32 main()
 {
-    dec string[] titre = "=== Tests Include ===";
-    call print(ref titre); call backSlashN();
+    dec string[] title = "=== Tests Include ===";
+    call print(ref title); call backSlashN();
 
-    dec string[] titreMath = "--- Math ---";
-    call print(ref titreMath); call backSlashN();
-    call executerTestsMath();
+    dec string[] titleMath = "--- Math ---";
+    call print(ref titleMath); call backSlashN();
+    call runMathTests();
 
-    dec string[] titreValidation = "--- Validation ---";
-    call print(ref titreValidation); call backSlashN();
-    call executerTestsValidation();
+    dec string[] titleValidation = "--- Validation ---";
+    call print(ref titleValidation); call backSlashN();
+    call runValidationTests();
 
-    dec string[] msgFin = "=== Fin ===";
-    call print(ref msgFin); call backSlashN();
+    dec string[] msgEnd = "=== End ===";
+    call print(ref msgEnd); call backSlashN();
     return 0;
 }

@@ -1,57 +1,57 @@
-fn bool testEgaliteFloat()
+fn bool testEqualFloat()
 {
-    dec string[] msg = "15.testEgaliteFloat : ";
+    dec string[] msg = "15.testEqualFloat : ";
     call print(ref msg);
-    dec bool r = call estEgalFloat(3.14, 3.14);
+    dec bool r = call isEqualFloat(3.14, 3.14);
     if (r == true) {
         return true;
     }
     return false;
 }
 
-fn bool testInegaliteFloat()
+fn bool testNotEqualFloat()
 {
-    dec string[] msg = "16.testInegaliteFloat : ";
+    dec string[] msg = "16.testNotEqualFloat : ";
     call print(ref msg);
-    dec bool r = call estEgalFloat(1.0, 2.0);
+    dec bool r = call isEqualFloat(1.0, 2.0);
     if (r == false) {
         return true;
     }
     return false;
 }
 
-fn bool testPlusGrandFloat()
+fn bool testGreaterFloat()
 {
-    dec string[] msg = "17.testPlusGrandFloat : ";
+    dec string[] msg = "17.testGreaterFloat : ";
     call print(ref msg);
-    dec bool r = call estPlusGrandFloat(9.5, 2.3);
+    dec bool r = call isGreaterFloat(9.5, 2.3);
     if (r == true) {
         return true;
     }
     return false;
 }
 
-fn bool testPlusPetitFloat()
+fn bool testLessFloat()
 {
-    dec string[] msg = "18.testPlusPetitFloat : ";
+    dec string[] msg = "18.testLessFloat : ";
     call print(ref msg);
-    dec bool r = call estPlusPetitFloat(0.5, 1.0);
+    dec bool r = call isLessFloat(0.5, 1.0);
     if (r == true) {
         return true;
     }
     return false;
 }
 
-fn bool testComparisonChaineFloat()
+fn bool testFloatComparisonChain()
 {
-    dec string[] msg = "19.testComparisonChaineFloat : ";
+    dec string[] msg = "19.testFloatComparisonChain : ";
     call print(ref msg);
     dec float a = 5.0;
     dec float b = 10.0;
     dec float c = 5.0;
-    dec bool ab = call estPlusPetitFloat(a, b);
-    dec bool bc = call estPlusGrandFloat(b, c);
-    dec bool ac = call estEgalFloat(a, c);
+    dec bool ab = call isLessFloat(a, b);
+    dec bool bc = call isGreaterFloat(b, c);
+    dec bool ac = call isEqualFloat(a, c);
     if (ab == true) {
         if (bc == true) {
             if (ac == true) {
@@ -62,11 +62,11 @@ fn bool testComparisonChaineFloat()
     return false;
 }
 
-fn void executerTestsFloat()
+fn void runFloatTests()
 {
-    call print(call testEgaliteFloat()); call backSlashN();
-    call print(call testInegaliteFloat()); call backSlashN();
-    call print(call testPlusGrandFloat()); call backSlashN();
-    call print(call testPlusPetitFloat()); call backSlashN();
-    call print(call testComparisonChaineFloat()); call backSlashN();
+    call print(call testEqualFloat()); call backSlashN();
+    call print(call testNotEqualFloat()); call backSlashN();
+    call print(call testGreaterFloat()); call backSlashN();
+    call print(call testLessFloat()); call backSlashN();
+    call print(call testFloatComparisonChain()); call backSlashN();
 }

@@ -10,7 +10,6 @@ include "TestArrayInt.p";
 include "TestMemoryDynamic.p";
 
 
-
 fn int64 main() 
 {
     call testLoop();
@@ -18,7 +17,7 @@ fn int64 main()
     call testFunctionalVariableBool();
     call testFunctionalVariableFloat();
     call testFunctionalVariableInt();
-    call testRecursivite();
+    call testRecursion();
     call testArrayBool();
     call testArrayFloat();
     call testArrayInt();

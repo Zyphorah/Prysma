@@ -1,11 +1,10 @@
-
-// Test 1 : Priorité standard (* gagne sur +)
-// Calcul : 10 + (2 * 5) = 20
-// Si la priorité est fausse (gauche vers droite) : (10 + 2) * 5 = 60
-fn bool testPrioriteSimple_int()
+// Test 1: Standard priority (* wins over +)
+// Calculation: 10 + (2 * 5) = 20
+// If priority is wrong (left to right): (10 + 2) * 5 = 60
+fn bool testSimplePriority_int()
 {
-   dec string[] functionnalite = "1.testPrioriteSimple : ";
-   call print(ref functionnalite);
+   dec string[] feature = "1.testSimplePriority_int : ";
+   call print(ref feature);
    dec int32 a = 10;
    dec int32 b = 2;
    dec int32 c = 5;
@@ -18,21 +17,21 @@ fn bool testPrioriteSimple_int()
    return false;
 }
 
-// Test 2 : Priorité complexe avec 4 variables
-// Calcul : (2 * 3) + (4 * 5) = 6 + 20 = 26
-// Si faux : 2 * 3 + 4 = 10, puis 10 * 5 = 50
-fn bool testPrioriteComplex_int()
+// Test 2: Complex priority with 4 variables
+// Calculation: (2 * 3) + (4 * 5) = 6 + 20 = 26
+// If false: 2 * 3 + 4 = 10, then 10 * 5 = 50
+fn bool testComplexPriority_int()
 {
-   dec string[] functionnalite = "2.testPrioriteComplex : ";
-   call print(ref functionnalite);
+   dec string[] feature = "2.testComplexPriority_int : ";
+   call print(ref feature);
    dec int32 a = 2;
    dec int32 b = 3;
    dec int32 c = 4;
    dec int32 d = 5;
-   dec int32 resultat = a * b + c * d;
+   dec int32 result = a * b + c * d;
 
 
-   if (resultat == 26) {
+   if (result == 26) {
       return true;
    } else {
       return false;
@@ -40,13 +39,13 @@ fn bool testPrioriteComplex_int()
    return false;
 }
 
-// Test 3 : Vérification de la mise à jour d'état (aff) avant calcul
-// On initialise a à 1, puis on le change à 10 avant le calcul
-// Calcul : 10 + 5 = 15
-fn bool testMiseAJourEtat_int()
+// Test 3: Verification of state update (aff) before calculation
+// We initialize a to 1, then change it to 10 before calculation
+// Calculation: 10 + 5 = 15
+fn bool testStateUpdate_int()
 {
-   dec string[] functionnalite = "3.testMiseAJourEtat : ";
-   call print(ref functionnalite);
+   dec string[] feature = "3.testStateUpdate_int : ";
+   call print(ref feature);
    dec int32 a = 1;
    dec int32 b = 5;
    
@@ -62,11 +61,11 @@ fn bool testMiseAJourEtat_int()
    return false;
 }
 
-// Test 4 : Vérifier que les arguments peuvent passer dans une function 
+// Test 4: Check that arguments can be passed to a function 
 fn bool testPassArgFunction_int(arg int32 a, arg float b)
 {  
-   dec string[] functionnalite = "4.testPassArgFunction : ";
-   call print(ref functionnalite);
+   dec string[] feature = "4.testPassArgFunction : ";
+   call print(ref feature);
    if ((a == 10) && (b == 25.5)) {
       return true;
    } else {
@@ -76,11 +75,11 @@ fn bool testPassArgFunction_int(arg int32 a, arg float b)
    return false;
 }
 
-// Test 5 : Vérifier que les parenthèses sont respectées dans une expression complexe
+// Test 5: Check that parentheses are respected in a complex expression
 fn bool testDepthEquation_int()
 {
-   dec string[] functionnalite = "5.testDepthEquation : ";
-   call print(ref functionnalite);
+   dec string[] feature = "5.testDepthEquation : ";
+   call print(ref feature);
    dec float equation = ((1.0+2.0)*(3.0+4.0))/(5.0-6.0-7.0*(8.0-9.0));
    if (equation == 3.5) {
       return true;
@@ -92,8 +91,8 @@ fn bool testDepthEquation_int()
 
 fn bool testAssignment_int()
 {
-   dec string[] functionnalite = "6.testAssignment : ";
-   call print(ref functionnalite);
+   dec string[] feature = "6.testAssignment : ";
+   call print(ref feature);
    dec int32 a = 5;
    aff a = 10; 
    if (a == 10) {
@@ -104,14 +103,14 @@ fn bool testAssignment_int()
    return false;
 }
 
-// Test critique : Auto-référence (a = a + 1)
-// Vérifie que le compiler load 'a' avant d'écraser 'a'
+// Critical test: Self-reference (a = a + 1)
+// Checks that the compiler loads 'a' before overwriting 'a'
 fn bool testAutoIncrement_int()
 {
-   dec string[] functionnalite = "7.testAutoIncrement : ";
-   call print(ref functionnalite);
+   dec string[] feature = "7.testAutoIncrement : ";
+   call print(ref feature);
    dec int32 a = 10;
-   aff a = a + 1; // Si le load/store est mal ordonné, ça plante ou donne 1
+   aff a = a + 1; // If load/store is badly ordered, it crashes or gives 1
 
    if (a == 11) {
       return true;
@@ -121,16 +120,16 @@ fn bool testAutoIncrement_int()
    return false;
 }
 
-// Test critique : Variable vers Variable
-// Vérifie que la valeur est bien copiée, pas juste liée
-fn bool testCopieVariable_int()
+// Critical test: variable to variable
+// Checks that the value is correctly copied, not just linked
+fn bool testVariableCopy_int()
 {
-      dec string[] functionnalite = "8.testCopieVariable : ";
-      call print(ref functionnalite);
+      dec string[] feature = "8.testVariableCopy_int : ";
+      call print(ref feature);
    dec int32 a = 50;
-   dec int32 b = a; // Doit copier 50 dans b
+   dec int32 b = a; // Must copy 50 into b
    
-   aff a = 0; // On modifie a, b ne doit pas changer
+   aff a = 0; // We modify a, b must not change
 
    if (b == 50) {
       return true;
@@ -140,16 +139,16 @@ fn bool testCopieVariable_int()
    return false;
 }
 
-fn bool testImbrication_int()
+fn bool testNesting_int()
 {
-      dec string[] functionnalite = "9.testImbrication : ";
-      call print(ref functionnalite);
+      dec string[] feature = "9.testNesting_int : ";
+      call print(ref feature);
    dec int32 a = 1;
    dec int32 b = 2;
 
    if (a == 1) {
       if (b == 2) {
-            return true; // Doit arriver ici
+            return true; // Must arrive here
       } else {
             return false;
       }
@@ -161,22 +160,22 @@ fn bool testImbrication_int()
 
 fn int32 testFunctionalVariableInt()
 {
-   call print(call testPrioriteSimple_int()); call backSlashN();
-   call print(call testPrioriteComplex_int()); call backSlashN();
-   call print(call testMiseAJourEtat_int()); call backSlashN();
+   call print(call testSimplePriority_int()); call backSlashN();
+   call print(call testComplexPriority_int()); call backSlashN();
+   call print(call testStateUpdate_int()); call backSlashN();
 
    call print(call testPassArgFunction_int(10,25.5)); call backSlashN();
    
-   // Caller la méthode de nouveau pour voir si le contexte n'a pas changé
+   // Call the method again to see if the context hasn't changed
    call print(call testPassArgFunction_int(10,25.5)); call backSlashN();
    call print(call testDepthEquation_int()); call backSlashN();
 
    call print(call testAssignment_int()); call backSlashN();
 
    call print(call testAutoIncrement_int()); call backSlashN();
-   call print(call testCopieVariable_int()); call backSlashN();
+   call print(call testVariableCopy_int()); call backSlashN();
 
-   call print(call testImbrication_int()); call backSlashN();
+   call print(call testNesting_int()); call backSlashN();
 
    return 1;
 }

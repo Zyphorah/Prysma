@@ -1,11 +1,11 @@
-fn int32 multiplier(arg int32 a, arg int32 b)
+fn int32 multiply(arg int32 a, arg int32 b)
 {
-    dec int32 resultat = a * b;
-    return resultat;
+    dec int32 result = a * b;
+    return result;
 }
 
-fn float multiplierFloat(arg float a, arg float b)
+fn float multiplyFloat(arg float a, arg float b)
 {
-    dec float resultat = a * b;
-    return resultat;
+    dec float result = a * b;
+    return result;
 }

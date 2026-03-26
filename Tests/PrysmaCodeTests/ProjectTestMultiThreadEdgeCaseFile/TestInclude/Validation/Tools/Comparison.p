@@ -1,4 +1,4 @@
-fn bool estEgalInt(arg int32 a, arg int32 b)
+fn bool isEqualInt(arg int32 a, arg int32 b)
 {
     if (a == b) {
         return true;
@@ -6,7 +6,7 @@ fn bool estEgalInt(arg int32 a, arg int32 b)
     return false;
 }
 
-fn bool estPlusGrandInt(arg int32 a, arg int32 b)
+fn bool isGreaterInt(arg int32 a, arg int32 b)
 {
     if (a > b) {
         return true;
@@ -14,7 +14,7 @@ fn bool estPlusGrandInt(arg int32 a, arg int32 b)
     return false;
 }
 
-fn bool estPlusPetitInt(arg int32 a, arg int32 b)
+fn bool isLessInt(arg int32 a, arg int32 b)
 {
     if (a < b) {
         return true;
@@ -22,7 +22,7 @@ fn bool estPlusPetitInt(arg int32 a, arg int32 b)
     return false;
 }
 
-fn bool estEgalFloat(arg float a, arg float b)
+fn bool isEqualFloat(arg float a, arg float b)
 {
     if (a == b) {
         return true;
@@ -30,7 +30,7 @@ fn bool estEgalFloat(arg float a, arg float b)
     return false;
 }
 
-fn bool estPlusGrandFloat(arg float a, arg float b)
+fn bool isGreaterFloat(arg float a, arg float b)
 {
     if (a > b) {
         return true;
@@ -38,7 +38,7 @@ fn bool estPlusGrandFloat(arg float a, arg float b)
     return false;
 }
 
-fn bool estPlusPetitFloat(arg float a, arg float b)
+fn bool isLessFloat(arg float a, arg float b)
 {
     if (a < b) {
         return true;

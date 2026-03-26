@@ -1,7 +1,7 @@
-fn bool testLoopConditionExtern()
+fn bool testLoopConditionExternal()
 {
-    dec string[] functionnalite = "1.testLoopConditionExtern : ";
-    call print(ref functionnalite);
+    dec string[] feature = "1.testLoopConditionExternal : ";
+    call print(ref feature);
     dec int32 i = 0; 
 
     dec bool condition = i < 5;
@@ -18,14 +18,14 @@ fn bool testLoopConditionExtern()
     return false;
 }
 
-fn bool testLoopNesPasEgale()
+fn bool testLoopNotEqual()
 {
-    dec string[] functionnalite = "2.testLoopNesPasEgale : ";
-    call print(ref functionnalite);
+    dec string[] feature = "2.testLoopNotEqual : ";
+    call print(ref feature);
     dec int32 i = 0; 
     while(i != 5)
     {
-        aff i = i +1; 
+        aff i = i + 1; 
     }
     if (i == 5)
     {
@@ -36,8 +36,8 @@ fn bool testLoopNesPasEgale()
 
 fn bool testLoopSimple()
 {
-    dec string[] functionnalite = "3.testLoop : ";
-    call print(ref functionnalite);
+    dec string[] feature = "3.testLoop : ";
+    call print(ref feature);
     dec int32 i = 0;
 
     while (i < 5) {
@@ -50,10 +50,10 @@ fn bool testLoopSimple()
 }
 
 
-fn bool testLoopImbrique()
+fn bool testLoopNested()
 {
-    dec string[] functionnalite = "4.testLoopImbrique : ";
-    call print(ref functionnalite);
+    dec string[] feature = "4.testLoopNested : ";
+    call print(ref feature);
     dec int32 i = 0;
     dec int32 j = 0;
     dec int32 total = 0;
@@ -76,8 +76,8 @@ fn bool testLoopImbrique()
 
 fn bool testLoopConditionComplex()
 {
-    dec string[] functionnalite = "5.testLoopConditionComplex : ";
-    call print(ref functionnalite);
+    dec string[] feature = "5.testLoopConditionComplex : ";
+    call print(ref feature);
     dec int32 i = 0;
     dec int32 j = 10;
     while(i < 5 && j > 5)
@@ -92,10 +92,10 @@ fn bool testLoopConditionComplex()
     return false;
 }
 
-fn bool testLoopNonExecute()
+fn bool testLoopNotExecuted()
 {
-    dec string[] functionnalite = "6.testLoopNonExecute : ";
-    call print(ref functionnalite);
+    dec string[] feature = "6.testLoopNotExecuted : ";
+    call print(ref feature);
     dec int32 i = 5;
     while(i < 5)
     {
@@ -111,11 +111,11 @@ fn bool testLoopNonExecute()
 fn int32 testLoop()
 {
     call print(call testLoopSimple()); call backSlashN();
-    call print(call testLoopNesPasEgale()); call backSlashN();
-    call print(call testLoopConditionExtern()); call backSlashN();
-    call print(call testLoopImbrique()); call backSlashN();
+    call print(call testLoopNotEqual()); call backSlashN();
+    call print(call testLoopConditionExternal()); call backSlashN();
+    call print(call testLoopNested()); call backSlashN();
     call print(call testLoopConditionComplex()); call backSlashN();
-    call print(call testLoopNonExecute()); call backSlashN();
+    call print(call testLoopNotExecuted()); call backSlashN();
 
     return 1;
 }

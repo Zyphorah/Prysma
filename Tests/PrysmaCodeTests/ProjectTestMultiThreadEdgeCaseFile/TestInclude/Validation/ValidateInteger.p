@@ -1,53 +1,53 @@
-fn bool testEgaliteInteger()
+fn bool testEqualInteger()
 {
-    dec string[] msg = "8.testEgaliteInteger : ";
+    dec string[] msg = "8.testEqualInteger : ";
     call print(ref msg);
-    dec bool r = call estEgalInt(42, 42);
+    dec bool r = call isEqualInt(42, 42);
     if (r == true) {
         return true;
     }
     return false;
 }
 
-fn bool testInegaliteInteger()
+fn bool testNotEqualInteger()
 {
-    dec string[] msg = "9.testInegaliteInteger : ";
+    dec string[] msg = "9.testNotEqualInteger : ";
     call print(ref msg);
-    dec bool r = call estEgalInt(10, 20);
+    dec bool r = call isEqualInt(10, 20);
     if (r == false) {
         return true;
     }
     return false;
 }
 
-fn bool testPlusGrandInteger()
+fn bool testGreaterInteger()
 {
-    dec string[] msg = "10.testPlusGrandInteger : ";
+    dec string[] msg = "10.testGreaterInteger : ";
     call print(ref msg);
-    dec bool r = call estPlusGrandInt(100, 50);
+    dec bool r = call isGreaterInt(100, 50);
     if (r == true) {
         return true;
     }
     return false;
 }
 
-fn bool testPlusPetitInteger()
+fn bool testLessInteger()
 {
-    dec string[] msg = "11.testPlusPetitInteger : ";
+    dec string[] msg = "11.testLessInteger : ";
     call print(ref msg);
-    dec bool r = call estPlusPetitInt(3, 99);
+    dec bool r = call isLessInt(3, 99);
     if (r == true) {
         return true;
     }
     return false;
 }
 
-fn bool testValeurAbsolue()
+fn bool testAbsoluteValue()
 {
-    dec string[] msg = "12.testValeurAbsolue : ";
+    dec string[] msg = "12.testAbsoluteValue : ";
     call print(ref msg);
     dec int32 neg = 0 - 42;
-    dec int32 r = call valeurAbsolue(neg);
+    dec int32 r = call absoluteValue(neg);
     if (r == 42) {
         return true;
     }
@@ -76,13 +76,13 @@ fn bool testMinimum()
     return false;
 }
 
-fn void executerTestsInteger()
+fn void runIntegerTests()
 {
-    call print(call testEgaliteInteger()); call backSlashN();
-    call print(call testInegaliteInteger()); call backSlashN();
-    call print(call testPlusGrandInteger()); call backSlashN();
-    call print(call testPlusPetitInteger()); call backSlashN();
-    call print(call testValeurAbsolue()); call backSlashN();
+    call print(call testEqualInteger()); call backSlashN();
+    call print(call testNotEqualInteger()); call backSlashN();
+    call print(call testGreaterInteger()); call backSlashN();
+    call print(call testLessInteger()); call backSlashN();
+    call print(call testAbsoluteValue()); call backSlashN();
     call print(call testMaximum()); call backSlashN();
     call print(call testMinimum()); call backSlashN();
 }

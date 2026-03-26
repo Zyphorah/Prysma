@@ -2,8 +2,8 @@ include "Tools/Tools.p";
 include "ValidateInteger.p";
 include "ValidateFloat.p";
 
-fn void executerTestsValidation()
+fn void runValidationTests()
 {
-    call executerTestsInteger();
-    call executerTestsFloat();
+    call runIntegerTests();
+    call runFloatTests();
 }

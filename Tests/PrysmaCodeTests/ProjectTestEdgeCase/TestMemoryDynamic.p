@@ -10,7 +10,7 @@ fn int32 testMemoryDynamic()
    call testNewDeleteInt64();
    call testNewDeleteFloat();
    call testNewDeleteBool();
-   call testPassagePtrArgument();
+   call testPassPtrArgument();
 
    return 1;
 }

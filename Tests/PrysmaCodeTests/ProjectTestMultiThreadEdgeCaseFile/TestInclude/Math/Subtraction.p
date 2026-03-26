@@ -1,11 +1,11 @@
-fn int32 soustraire(arg int32 a, arg int32 b)
+fn int32 subtract(arg int32 a, arg int32 b)
 {
-    dec int32 resultat = a - b;
-    return resultat;
+    dec int32 result = a - b;
+    return result;
 }
 
-fn float soustraireFloat(arg float a, arg float b)
+fn float subtractFloat(arg float a, arg float b)
 {
-    dec float resultat = a - b;
-    return resultat;
+    dec float result = a - b;
+    return result;
 }
