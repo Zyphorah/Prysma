@@ -6,7 +6,7 @@
 <br>
 
 [![CI](https://github.com/Zyphorah/Prysma/actions/workflows/ci.yml/badge.svg)](https://github.com/Zyphorah/Prysma/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![C++](https://img.shields.io/badge/C++-17-blue.svg)](https://isocpp.org/)
 [![LLVM](https://img.shields.io/badge/LLVM-18-red.svg)](https://llvm.org/)
 </div>
@@ -56,4 +56,4 @@ In accordance with the project's modular structure, all technical documentation 
 
 ## License
 
-This project is distributed under the **MIT** license. Consult the `LICENSE` file for legal details.
+This project is distributed under the **GPL v3** license. Consult the `LICENSE` file for legal details.

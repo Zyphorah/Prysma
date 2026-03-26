@@ -3,7 +3,7 @@
 ![Prysma Logo](Img/prysma.svg)
 
 [![CI](https://github.com/Zyphorah/Prysma/actions/workflows/ci.yml/badge.svg)](https://github.com/Zyphorah/Prysma/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![C++](https://img.shields.io/badge/C++-17-blue.svg)](https://isocpp.org/)
 [![LLVM](https://img.shields.io/badge/LLVM-18-red.svg)](https://llvm.org/)
 
@@ -52,4 +52,4 @@ Conformément à la structure modulaire du project, l'intégralité de la docume
 
 ## Licence
 
-Ce project est distribué sous licence **MIT**. Consulter le fichier `LICENSE` pour les détails juridiques.
+Ce project est distribué sous licence **GPL v3**. Consulter le fichier `LICENSE` pour les détails juridiques.
