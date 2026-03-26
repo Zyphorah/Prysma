@@ -11,64 +11,61 @@
 #include <cstddef>
 #include <vector>
 
-ExpressionNew::ExpressionNew(ContextExpression& contexteExpression)
-    : _contexteExpression(contexteExpression)
+ExpressionNew::ExpressionNew(ContextExpression& expressionContext)
+    : _context(expressionContext)
 {}
 
 ExpressionNew::~ExpressionNew()
 = default;
 
-auto ExpressionNew::construire(std::vector<Token>& equation) -> INode*
+auto ExpressionNew::build(std::vector<Token>& equation) -> INode*
 {
     int index = 0;
     if (equation.empty() || equation[0].type != TOKEN_NEW) {
-        throw ErrorCompilation("Error: le token 'new' est attendu", Ligne(0), Colonne(0));
+        throw CompilationError("Error: the 'new' token is expected", Line(0), Column(0));
     }
     index++;
 
     if (index >= static_cast<int>(equation.size())) {
-        throw ErrorCompilation("Error: aucun type valide pour l'object créé avec 'new'", Ligne(equation[0].ligne), Colonne(equation[0].colonne));
+        throw CompilationError("Error: no valid type for the object created with 'new'", Line(equation[0].line), Column(equation[0].column));
     }
 
-    Token nomType = equation[static_cast<size_t>(index)];
+    Token typeName = equation[static_cast<size_t>(index)];
 
-    if (nomType.type != TOKEN_TYPE_INT32 &&
-        nomType.type != TOKEN_TYPE_INT64 &&
-        nomType.type != TOKEN_TYPE_FLOAT &&
-        nomType.type != TOKEN_TYPE_BOOL &&
-        nomType.type != TOKEN_TYPE_CHAR &&
-        nomType.type != TOKEN_TYPE_STRING &&
-        nomType.type != TOKEN_TYPE_VOID &&
-        nomType.type != TOKEN_TYPE_PTR &&
-        nomType.type != TOKEN_IDENTIFIANT) {
-        throw ErrorCompilation("Error: aucun type valide pour l'object créé avec 'new'", Ligne(nomType.ligne), Colonne(nomType.colonne));
+    if (typeName.type != TOKEN_TYPE_INT32 &&
+        typeName.type != TOKEN_TYPE_INT64 &&
+        typeName.type != TOKEN_TYPE_FLOAT &&
+        typeName.type != TOKEN_TYPE_BOOL &&
+        typeName.type != TOKEN_TYPE_CHAR &&
+        typeName.type != TOKEN_TYPE_STRING &&
+        typeName.type != TOKEN_TYPE_VOID &&
+        typeName.type != TOKEN_TYPE_PTR &&
+        typeName.type != TOKEN_IDENTIFIER) {
+        throw CompilationError("Error: no valid type for the object created with 'new'", Line(typeName.line), Column(typeName.column));
     }
 
-    
-
-    // Nous devons remplir les arguments du new (ex: new MaClasse(arg1, arg2)) en ajoutant les childs du nodeNew
+    // We need to fill the arguments of new (e.g., new MyClass(arg1, arg2)) by adding the childs of nodeNew
     std::vector<INode*> arguments;
-    if (nomType.type == TOKEN_IDENTIFIANT) {
-        index++; // Passer le nom du type
+    if (typeName.type == TOKEN_IDENTIFIER) {
+        index++; // Skip the type name
         
-        if (index < static_cast<int>(equation.size()) && equation[static_cast<size_t>(index)].type == TOKEN_PAREN_OUVERTE) {
-            index++; // Passer '('
+        if (index < static_cast<int>(equation.size()) && equation[static_cast<size_t>(index)].type == TOKEN_PAREN_OPEN) {
+            index++; // Skip '('
 
-            while(index < static_cast<int>(equation.size()) && equation[static_cast<size_t>(index)].type != TOKEN_PAREN_FERMEE) {
-                
-                arguments.push_back(_contexteExpression.getContextParser()->getBuilderTreeEquation()->construire(equation, index));
+            while(index < static_cast<int>(equation.size()) && equation[static_cast<size_t>(index)].type != TOKEN_PAREN_CLOSE) {
+                arguments.push_back(_context.getContextParser()->getBuilderTreeEquation()->build(equation, index));
 
-                if (index < static_cast<int>(equation.size()) && equation[static_cast<size_t>(index)].type == TOKEN_VIRGULE) {
-                    index++; // Passer la virgule
+                if (index < static_cast<int>(equation.size()) && equation[static_cast<size_t>(index)].type == TOKEN_COMMA) {
+                    index++; // Skip the comma
                 }
             }
-            if (index < static_cast<int>(equation.size()) && equation[static_cast<size_t>(index)].type == TOKEN_PAREN_FERMEE) {
-                index++; // Passer ')'
+            if (index < static_cast<int>(equation.size()) && equation[static_cast<size_t>(index)].type == TOKEN_PAREN_CLOSE) {
+                index++; // Skip ')'
             }
         }
     }
 
-    return _contexteExpression.getBuilderTreeEquation()->allouer<NodeNew>(arguments, nomType);
+    return _context.getBuilderTreeEquation()->allocate<NodeNew>(arguments, typeName);
 }
 
 #endif /* EXPRESSION_NEW_CPP */

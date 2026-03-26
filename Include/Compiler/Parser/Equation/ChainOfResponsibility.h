@@ -6,29 +6,28 @@
 #include "Compiler/Lexer/Lexer.h"
 #include <vector>
 
-
-class ManagerOperateur;
+class OperatorManager;
 
 /**
  * @class ChainOfResponsibility
- * @brief Gère la chaîne de responsabilité pour la détection des opérateurs
- * Détermine la priorité des opérateurs
+ * @brief Manages the chain of responsibility for operator detection
+ * Determines operator precedence
  */
 class ChainOfResponsibility {
 private:
-    IManagerOperateur* _debut;
-    IManagerParenthese* _managerParenthese;
-    std::vector<ManagerOperateur*> _operateurs;
+    IOperatorManager* _start;
+    IManagerParenthesis* _parenthesisManager;
+    std::vector<OperatorManager*> _operators;
 
 public:
     /**
-     * @brief Builder
-     * @param managerParenthese Manager de gestion des parenthèses
-     * @param operateurs Vecteur des managers d'opérateurs en ordre de priorité
+     * @brief Constructor
+     * @param parenthesisManager Parenthesis management manager
+     * @param operators Vector of operator managers in priority order
      */
     ChainOfResponsibility(
-        IManagerParenthese* managerParenthese, 
-        std::vector<ManagerOperateur*> operateurs
+        IManagerParenthesis* parenthesisManager, 
+        std::vector<OperatorManager*> operators
     );
     
     /**
@@ -42,12 +41,11 @@ public:
     auto operator=(ChainOfResponsibility&&) -> ChainOfResponsibility& = delete;
     
     /**
-     * @brief Trouve le prochain opérateur à traiter selon la priorité
-     * @param equation L'équation à analyser
-     * @return L'index de l'opérateur, ou -1 si aucun trouvé
+     * @brief Finds the next operator to process according to priority
+     * @param equation The equation to analyze
+     * @return The index of the operator, or -1 if none found
      */
-    [[nodiscard]] auto trouverOperateur(const std::vector<Token>& equation) const -> int;
+    [[nodiscard]] auto findOperator(const std::vector<Token>& equation) const -> int;
 };
-
 
 #endif /* A58A7095_E8A1_4CAC_A3A8_3136BE3D2B27 */

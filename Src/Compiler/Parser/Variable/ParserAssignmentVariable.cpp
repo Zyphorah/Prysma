@@ -1,5 +1,5 @@
-#ifndef PARSEUR_AFFECTATIONVARIABLE_CPP
-#define PARSEUR_AFFECTATIONVARIABLE_CPP
+#ifndef PARSER_ASSIGNMENTVARIABLE_CPP
+#define PARSER_ASSIGNMENTVARIABLE_CPP
 
 #include "Compiler/Variable/ParserAssignmentVariable.h"
 #include "Compiler/AST/AST_Genere.h"
@@ -19,40 +19,39 @@ ParserAssignmentVariable::ParserAssignmentVariable(ContextParser& contextParser)
 ParserAssignmentVariable::~ParserAssignmentVariable()
 = default;
 
-auto ParserAssignmentVariable::parser(std::vector<Token>& tokens, int& index) -> INode*
+auto ParserAssignmentVariable::parse(std::vector<Token>& tokens, int& index) -> INode*
 {
-    consommer(tokens, index, TOKEN_AFF, "Error : 'aff' attendu");
-    Token nomToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Error : nom variable attendu");
-    std::string nomVariable = nomToken.value;
+    consume(tokens, index, TOKEN_ASSIGN, "Error: 'aff' expected");
+    Token nameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Error: variable name expected");
+    std::string variableName = nameToken.value;
 
-    if (tokens[static_cast<size_t>(index)].type == TOKEN_POINT) {
-        consommer(tokens, index, TOKEN_POINT, "Error '.'");
-        Token attributeToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Error : attribute attendu");
-        nomVariable += "." + attributeToken.value;
-        nomToken.value = nomVariable;
+    if (tokens[static_cast<size_t>(index)].type == TOKEN_DOT) {
+        consume(tokens, index, TOKEN_DOT, "Error '.'");
+        Token attributeToken = consume(tokens, index, TOKEN_IDENTIFIER, "Error: attribute expected");
+        variableName += "." + attributeToken.value;
+        nameToken.value = variableName;
     }
 
-    INode* expressionIndex = nullptr;
+    INode* indexExpression = nullptr;
 
-    if (tokens[static_cast<size_t>(index)].type == TOKEN_CROCHET_OUVERT) {
- 
-        consommer(tokens, index, TOKEN_CROCHET_OUVERT, "Error '['");
-        expressionIndex = _contextParser.getBuilderTreeEquation()->construire(tokens, index);
-        consommer(tokens, index, TOKEN_CROCHET_FERME, "Error : ']' attendu après l'index");
+    if (tokens[static_cast<size_t>(index)].type == TOKEN_BRACKET_OPEN) {
+        consume(tokens, index, TOKEN_BRACKET_OPEN, "Error '['");
+        indexExpression = _contextParser.getBuilderTreeEquation()->build(tokens, index);
+        consume(tokens, index, TOKEN_BRACKET_CLOSE, "Error: ']' expected after index");
     }
 
-    consommer(tokens, index, TOKEN_EGAL, "Error : '=' attendu");
-    INode* expression = _contextParser.getBuilderTreeEquation()->construire(tokens, index);
-    consommer(tokens, index, TOKEN_POINT_VIRGULE, "Error : ';' attendu");
+    consume(tokens, index, TOKEN_EQUAL, "Error: '=' expected");
+    INode* expression = _contextParser.getBuilderTreeEquation()->build(tokens, index);
+    consume(tokens, index, TOKEN_SEMICOLON, "Error: ';' expected");
 
-    if (expressionIndex != nullptr) {
-        return _contextParser.getBuilderTreeEquation()->allouer<NodeAssignmentArray>(nomVariable, expressionIndex, expression, nomToken);
+    if (indexExpression != nullptr) {
+        return _contextParser.getBuilderTreeEquation()->allocate<NodeAssignmentArray>(variableName, indexExpression, expression, nameToken);
     }
     
-    return _contextParser.getBuilderTreeEquation()->allouer<NodeAssignmentVariable>(nomVariable, expression, nomToken);
+    return _contextParser.getBuilderTreeEquation()->allocate<NodeAssignmentVariable>(variableName, expression, nameToken);
 }
 
-#endif /* PARSEUR_AFFECTATIONVARIABLE_CPP */
+#endif /* PARSER_ASSIGNMENTVARIABLE_CPP */
 
 
 

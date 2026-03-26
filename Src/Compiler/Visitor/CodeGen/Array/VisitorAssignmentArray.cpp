@@ -15,93 +15,93 @@
 
 void GeneralVisitorGenCode::visiter(NodeAssignmentArray* nodeAssignmentArray)
 {
-    // Évaluer l'expression de l'index
-    llvm::Value* indexValue = evaluerExpression(nodeAssignmentArray->getExpressionIndex()).getAdresse();
+    // Evaluate the index expression
+    llvm::Value* indexValue = evaluateExpression(nodeAssignmentArray->getExpressionIndex()).getAddress();
   
-    // Évaluer l'expression à affecter
-    llvm::Value* expressionResult = evaluerExpression(nodeAssignmentArray->getExpression()).getAdresse();
+    // Evaluate the expression to assign
+    llvm::Value* expressionResult = evaluateExpression(nodeAssignmentArray->getExpression()).getAddress();
 
-    // Récupérer le array
-    std::string nomArrayStr = nodeAssignmentArray->getToken().value;
-    Symbole symbole;
-    llvm::Value* valeur = nullptr;
+    // Retrieve the array
+    std::string arrayNameStr = nodeAssignmentArray->getToken().value;
+    Symbol symbol;
+    llvm::Value* value = nullptr;
 
-    if (nomArrayStr.find('.') != std::string::npos) {
-        size_t pos = nomArrayStr.find('.');
-        std::string nomObject = nomArrayStr.substr(0, pos);
-        std::string nomAttribute = nomArrayStr.substr(pos + 1);
+    if (arrayNameStr.find('.') != std::string::npos) {
+        size_t pos = arrayNameStr.find('.');
+        std::string objectName = arrayNameStr.substr(0, pos);
+        std::string attributeName = arrayNameStr.substr(pos + 1);
 
-        LoadurVariable loadur(_contextGenCode);
-        Symbole objectSymbole = loadur.loadr(nomObject);
-        llvm::Value* object = objectSymbole.getAdresse();
+        VariableLoader loader(_contextGenCode);
+        Symbol objectSymbol = loader.load(objectName);
+        llvm::Value* object = objectSymbol.getAddress();
 
-        std::string nomClasse = obtenirNomClasseDepuisSymbole(objectSymbole);
-        auto* classInfo = _contextGenCode->getRegistryClass()->recuperer(nomClasse).get();
-        auto iterator = classInfo->getMemberIndices().find(nomAttribute);
+        std::string className = getClassNameFromSymbol(objectSymbol);
+        auto* classInfo = _contextGenCode->getRegistryClass()->get(className).get();
+        auto iterator = classInfo->getMemberIndices().find(attributeName);
         unsigned int indexObj = iterator->second;
 
-        Token tokenAttribute; tokenAttribute.value = nomAttribute; tokenAttribute.type = TOKEN_IDENTIFIANT;
-        symbole = classInfo->getRegistryVariable()->recupererVariables(tokenAttribute);
+        Token tokenAttribute; tokenAttribute.value = attributeName; tokenAttribute.type = TOKEN_IDENTIFIER;
+        symbol = classInfo->getRegistryVariable()->getVariable(tokenAttribute);
         
-        llvm::Type* typeDuStruct = classInfo->getStructType();
-        valeur = _contextGenCode->getBackend()->getBuilder().CreateStructGEP(typeDuStruct, object, indexObj, nomObject + "_" + nomAttribute + "_ptr");
+        llvm::Type* structType = classInfo->getStructType();
+        value = _contextGenCode->getBackend()->getBuilder().CreateStructGEP(structType, object, indexObj, objectName + "_" + attributeName + "_ptr");
     } else {
-        AdresseurVariable adresseur(_contextGenCode);
-        symbole = adresseur.recupererAdresse(nomArrayStr);
-        valeur = symbole.getAdresse();
+        VariableAddressor addressor(_contextGenCode);
+        symbol = addressor.getAddress(arrayNameStr);
+        value = symbol.getAddress();
     }
 
-    // Assignment à un élément du array avec l'index
+    // Assignment to an array element with the index
     std::vector<llvm::Value*> indices = { 
         _contextGenCode->getBackend()->getBuilder().getInt32(0), 
         indexValue 
     };
     
-    // On ne peut pas récupérer la taille du array à la compilation si l'index est une variable.
-    // On doit donc récupérer le type du array directement depuis l'instruction d'allocation.
+    // Cannot retrieve the array size at compile time if the index is a variable.
+    // Must retrieve the array type directly from the allocation instruction.
     llvm::Type* arrayType = nullptr;
-    if (symbole.getType() != nullptr) {
-        arrayType = symbole.getType()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
+    if (symbol.getType() != nullptr) {
+        arrayType = symbol.getType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
     } else {
-        auto* allocaInst = llvm::dyn_cast<llvm::AllocaInst>(valeur);
+        auto* allocaInst = llvm::dyn_cast<llvm::AllocaInst>(value);
         if (allocaInst != nullptr) {
             arrayType = allocaInst->getAllocatedType();
         }
     }
 
-    llvm::Value* ptrCase = nullptr;
-    llvm::Type* typeElement = nullptr;
+    llvm::Value* ptrElement = nullptr;
+    llvm::Type* elementType = nullptr;
 
     if (arrayType->isArrayTy()) {
-        ptrCase = _contextGenCode->getBackend()->getBuilder().CreateGEP(
+        ptrElement = _contextGenCode->getBackend()->getBuilder().CreateGEP(
             arrayType, 
-            valeur, 
+            value, 
             indices
         );
-        typeElement = arrayType->getArrayElementType();
+        elementType = arrayType->getArrayElementType();
     } else {
-        // C'est un pointeur vers un array (référence), on doit loadr le pointeur
-        llvm::Value* loadedPtr = _contextGenCode->getBackend()->getBuilder().CreateLoad(arrayType, valeur);
+        // It's a pointer to an array (reference), must load the pointer
+        llvm::Value* loadedPtr = _contextGenCode->getBackend()->getBuilder().CreateLoad(arrayType, value);
         
-        IType* astType = symbole.getType();
-        auto* typeArrayDecla = prysma::dyn_cast<TypeArray>(astType);
-        if (typeArrayDecla != nullptr) {
-            typeElement = typeArrayDecla->getTypeChild()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
+        IType* astType = symbol.getType();
+        auto* declaredArrayType = prysma::dyn_cast<TypeArray>(astType);
+        if (declaredArrayType != nullptr) {
+            elementType = declaredArrayType->getChildType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
         } else {
-            typeElement = symbole.getTypePointeElement();
+            elementType = symbol.getPointedElementType();
         }
         
-        ptrCase = _contextGenCode->getBackend()->getBuilder().CreateGEP(
-            typeElement, 
+        ptrElement = _contextGenCode->getBackend()->getBuilder().CreateGEP(
+            elementType, 
             loadedPtr, 
             indexValue
         );
     }
 
-    llvm::Value* valeurCastee = _contextGenCode->getBackend()->creerAutoCast(expressionResult, typeElement);
+    llvm::Value* castedValue = _contextGenCode->getBackend()->createAutoCast(expressionResult, elementType);
     
-    _contextGenCode->getBackend()->getBuilder().CreateStore(valeurCastee, ptrCase);
+    _contextGenCode->getBackend()->getBuilder().CreateStore(castedValue, ptrElement);
     
-    // Reset la valeur pour éviter des problèmes
-    _contextGenCode->modifierValeurTemporaire(Symbole(nullptr, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+    // Reset the value to avoid problems
+    _contextGenCode->setTemporaryValue(Symbol(nullptr, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
 }

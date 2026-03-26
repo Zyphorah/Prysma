@@ -6,6 +6,6 @@
 
 void GeneralVisitorGenCode::visiter(NodeDeclarationFunction* nodeDeclarationFunction) 
 {
-    auto generator = GenerateurDeclarationFunction::creer(_contextGenCode, nodeDeclarationFunction, this);
-    generator->declarerFunction();
+    auto generator = FunctionDeclarationGenerator::create(_contextGenCode, nodeDeclarationFunction, this);
+    generator->declareFunction();
 }

@@ -4,14 +4,14 @@
 
 class IInput 
 {
-    public: 
+public: 
     IInput(const IInput&) = delete;
     auto operator=(const IInput&) -> IInput& = delete;
     IInput(IInput&&) = delete;
     auto operator=(IInput&&) -> IInput& = delete;
-        IInput() = default;
+    IInput() = default;
     virtual ~IInput() = default;
-    virtual auto inputr() -> std::string = 0 ;
+    virtual auto getInput() -> std::string = 0;
 };
 
 #endif /* BB090689_06EE_4A0F_92F1_0614195D6776 */

@@ -9,46 +9,46 @@
 #include <stdexcept>
 #include <string>
 
-TypeArray::TypeArray(IType* typeChild, INode* taille)
-    : _typeChild(typeChild), _taille(taille)
+TypeArray::TypeArray(IType* childType, INode* size)
+    : _childType(childType), _size(size)
 {
 }
 
-auto TypeArray::generatedrTypeLLVM(llvm::LLVMContext& context) -> llvm::Type*
+auto TypeArray::generateLLVMType(llvm::LLVMContext& context) -> llvm::Type*
 {
-    llvm::Type* typeElement = _typeChild->generatedrTypeLLVM(context);
+    llvm::Type* elementType = _childType->generateLLVMType(context);
 
-    // Si la taille est nullptr (array à taille dynamique), on returnne un pointeur
-    // car en paramètre ou allocation dynamique, ça représente une adresse.
-    if (_taille == nullptr) {
+    // If the size is nullptr (dynamic size array), return a pointer
+    // because as a parameter or dynamic allocation, it represents an address.
+    if (_size == nullptr) {
         return llvm::PointerType::getUnqual(context);
     }
 
     NodeLiteral* literal = nullptr;
 
-    if (prysma::isa<NodeLiteral>(_taille)) {
-        literal = prysma::cast<NodeLiteral>(_taille);
+    if (prysma::isa<NodeLiteral>(_size)) {
+        literal = prysma::cast<NodeLiteral>(_size);
     }
     
     if (literal == nullptr) {
-        throw std::runtime_error("Error : la taille du array doit être un littéral entier");
+        throw std::runtime_error("Error: the array size must be an integer literal");
     }
 
-    auto taille = static_cast<uint64_t>(std::stoi(literal->getToken().value));
-    return llvm::ArrayType::get(typeElement, taille);
+    auto size = static_cast<uint64_t>(std::stoi(literal->getToken().value));
+    return llvm::ArrayType::get(elementType, size);
 }
 
-auto TypeArray::estFlottant() const -> bool
+auto TypeArray::isFloating() const -> bool
 {
     return false;
 }
 
-auto TypeArray::estBooleen() const -> bool
+auto TypeArray::isBoolean() const -> bool
 {
     return false;
 }
 
-auto TypeArray::estChaine() const -> bool
+auto TypeArray::isString() const -> bool
 {
-    return _typeChild->estChaine();
+    return _childType->isString();
 }

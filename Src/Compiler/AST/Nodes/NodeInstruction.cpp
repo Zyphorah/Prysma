@@ -11,14 +11,14 @@ void NodeInstruction::accept(IVisitor* visitor)
     visitor->visiter(this);
 }
 
-void NodeInstruction::ajouterInstruction(INode* child)
+void NodeInstruction::addInstruction(INode* child)
 {
     if (child != nullptr) {
-        childs.push_back(child);
+        children.push_back(child);
     }
 }
 
-auto NodeInstruction::getTypeGenere() const -> NodeTypeGenere
+auto NodeInstruction::getGeneratedType() const -> NodeTypeGenerated
 {
-    return NodeTypeGenere::CallFunction; 
+    return NodeTypeGenerated::CallFunction; 
 }

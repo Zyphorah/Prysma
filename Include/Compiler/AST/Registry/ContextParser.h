@@ -12,7 +12,7 @@ struct ContextParser
 private:
     IBuilderTree* builderTreeEquation;
     IBuilderTree* builderTreeInstruction;
-    ParserType* parserType;
+    TypeParser* parserType;
     RegistryVariable* registryVariable;
     RegistryType* registryType;
 
@@ -20,7 +20,7 @@ public:
     struct Dependencies {
         IBuilderTree* builderTreeEquation;
         IBuilderTree* builderTreeInstruction;
-        ParserType* parserType;
+        TypeParser* parserType;
         RegistryVariable* registryVariable;
         RegistryType* registryType;
     };
@@ -34,33 +34,33 @@ public:
     {
         if(builderTreeEquation == nullptr)
         {
-            throw std::invalid_argument("builderTreeEquation ne peut pas être nul");
+            throw std::invalid_argument("builderTreeEquation cannot be null");
         }
 
         if(builderTreeInstruction == nullptr)
         {
-            throw std::invalid_argument("builderTreeInstruction ne peut pas être nul");
+            throw std::invalid_argument("builderTreeInstruction cannot be null");
         }
 
         if(parserType == nullptr)
         {
-            throw std::invalid_argument("parserType ne peut pas être nul");
+            throw std::invalid_argument("parserType cannot be null");
         }
 
         if(registryVariable == nullptr)
         {
-            throw std::invalid_argument("registryVariable ne peut pas être nul");
+            throw std::invalid_argument("registryVariable cannot be null");
         }
 
         if(registryType == nullptr)
         {
-            throw std::invalid_argument("registryType ne peut pas être nul");
+            throw std::invalid_argument("registryType cannot be null");
         }
     }    
 
     [[nodiscard]] auto getBuilderTreeEquation() const -> IBuilderTree* { return builderTreeEquation; }
     [[nodiscard]] auto getBuilderTreeInstruction() const -> IBuilderTree* { return builderTreeInstruction; }
-    [[nodiscard]] auto getParserType() const -> ParserType* { return parserType; }
+    [[nodiscard]] auto getTypeParser() const -> TypeParser* { return parserType; }
     [[nodiscard]] auto getRegistryVariable() const -> RegistryVariable* { return registryVariable; }
     [[nodiscard]] auto getRegistryType() const -> RegistryType* { return registryType; }
 };

@@ -7,48 +7,48 @@
 #include <llvm/IR/Instructions.h>
 #include <string>
 
-void GeneralVisitorGenCode::visiter(NodeAccesAttribute* nodeAccesAttribute)
+void GeneralVisitorGenCode::visiter(NodeAccesAttribute* nodeAccessAttribute)
 {
-    std::string nomObject = nodeAccesAttribute->getNomObject().value;
-    std::string nomAttribute = nodeAccesAttribute->getNomAttribute().value;
+    std::string objectName = nodeAccessAttribute->getNomObject().value;
+    std::string attributeName = nodeAccessAttribute->getNomAttribute().value;
 
-    LoadurVariable loadur(_contextGenCode);
-    Symbole objectSymbole = loadur.loadr(nomObject);
-    llvm::Value* object = objectSymbole.getAdresse();
+    VariableLoader loader(_contextGenCode);
+    Symbol objectSymbol = loader.load(objectName);
+    llvm::Value* object = objectSymbol.getAddress();
 
-    std::string nomClasse = obtenirNomClasseDepuisSymbole(objectSymbole);
+    std::string className = getClassNameFromSymbol(objectSymbol);
 
-    if (nomClasse.empty()) {
-        ErrorHelper::errorCompilation("Impossible de déterminer la classe de l'object '" + nomObject + "'");
+    if (className.empty()) {
+        ErrorHelper::compilationError("Unable to determine the class of object '" + objectName + "'");
     }
 
-    auto* classInfo = _contextGenCode->getRegistryClass()->recuperer(nomClasse).get();
-    classInfo = ErrorHelper::verifierNonNull(classInfo, "Classe '" + nomClasse + "' non trouvée dans le registry");
+    auto* classInfo = _contextGenCode->getRegistryClass()->get(className).get();
+    classInfo = ErrorHelper::verifyNotNull(classInfo, "Class '" + className + "' not found in the registry");
 
-    if (!classInfo->getRegistryVariable()->existeVariable(nomAttribute)) {
-        ErrorHelper::errorCompilation("Attribute '" + nomAttribute + "' inexistant dans la classe '" + nomClasse + "'");
+    if (!classInfo->getRegistryVariable()->variableExists(attributeName)) {
+        ErrorHelper::compilationError("Attribute '" + attributeName + "' does not exist in class '" + className + "'");
     }
 
-    auto iterator = classInfo->getMemberIndices().find(nomAttribute);
+    auto iterator = classInfo->getMemberIndices().find(attributeName);
     if (iterator == classInfo->getMemberIndices().end()) {
-        ErrorHelper::errorCompilation("Attribute '" + nomAttribute + "' n'a pas d'index dans " + nomClasse);
+        ErrorHelper::compilationError("Attribute '" + attributeName + "' has no index in " + className);
     }
     
     unsigned int index = iterator->second;
 
     auto& builder = _contextGenCode->getBackend()->getBuilder();
 
-    Symbole symboleVar = classInfo->getRegistryVariable()->recupererVariables(nodeAccesAttribute->getNomAttribute());
+    Symbol varSymbol = classInfo->getRegistryVariable()->getVariable(nodeAccessAttribute->getNomAttribute());
     
-    llvm::Type* typeDuStruct = classInfo->getStructType();
+    llvm::Type* structType = classInfo->getStructType();
 
-    llvm::Value* attributePtr = builder.CreateStructGEP(typeDuStruct, object, index, nomObject + "_" + nomAttribute + "_ptr");
+    llvm::Value* attributePtr = builder.CreateStructGEP(structType, object, index, objectName + "_" + attributeName + "_ptr");
 
-    llvm::Value* valeurAttribute = builder.CreateLoad(
-        symboleVar.getType()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext()), 
+    llvm::Value* attributeValue = builder.CreateLoad(
+        varSymbol.getType()->generateLLVMType(_contextGenCode->getBackend()->getContext()), 
         attributePtr, 
-        nomObject + "_" + nomAttribute
+        objectName + "_" + attributeName
     );
 
-    _contextGenCode->modifierValeurTemporaire(Symbole(valeurAttribute, symboleVar.getType(), nullptr));
+    _contextGenCode->setTemporaryValue(Symbol(attributeValue, varSymbol.getType(), nullptr));
 }

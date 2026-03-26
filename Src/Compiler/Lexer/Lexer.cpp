@@ -6,25 +6,25 @@
 #include <string>
 #include <vector>
 
-auto Lexer::estContextNombreNegatif(const vector<Token>& tokens) -> bool {
+auto Lexer::isNegativeNumberContext(const vector<Token>& tokens) -> bool {
     if (tokens.empty()) {
         return true;
     }
     
     TokenType lastType = tokens.back().type;
     
-    // Les contextes où +/- sont des opérateurs unaires
-    static const set<TokenType> operateurUnaire = {
-        TOKEN_EGAL, TOKEN_PAREN_OUVERTE, TOKEN_VIRGULE, TOKEN_CROCHET_OUVERT,
-        TOKEN_PLUS, TOKEN_MOINS, TOKEN_ETOILE, TOKEN_SLASH, TOKEN_MODULO,
-        TOKEN_EGAL_EGAL, TOKEN_DIFFERENT, TOKEN_PLUS_PETIT, TOKEN_PLUS_GRAND,
-        TOKEN_PLUS_PETIT_EGAL, TOKEN_PLUS_GRAND_EGAL, TOKEN_ET, TOKEN_OU
+    // Contexts where +/- are unary operators
+    static const set<TokenType> unaryOperators = {
+        TOKEN_EQUAL, TOKEN_PAREN_OPEN, TOKEN_COMMA, TOKEN_BRACKET_OPEN,
+        TOKEN_PLUS, TOKEN_MINUS, TOKEN_STAR, TOKEN_SLASH, TOKEN_MODULO,
+        TOKEN_EQUAL_EQUAL, TOKEN_NOT_EQUAL, TOKEN_LESS, TOKEN_GREATER,
+        TOKEN_LESS_EQUAL, TOKEN_GREATER_EQUAL, TOKEN_AND, TOKEN_OR
     };
     
-    return operateurUnaire.count(lastType) > 0;
+    return unaryOperators.count(lastType) > 0;
 }
 
-void Lexer::traiterCommentaires(const string& sourceCode, size_t& pos) {
+void Lexer::handleComments(const string& sourceCode, size_t& pos) {
     if (pos + 1 < sourceCode.length() && sourceCode[pos] == '/' && sourceCode[pos + 1] == '/') {
         while (pos < sourceCode.length() && sourceCode[pos] != '\n') {
             pos++;
@@ -45,276 +45,276 @@ void Lexer::traiterCommentaires(const string& sourceCode, size_t& pos) {
     }
 }
 
-void Lexer::traiterNombre(const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne) {
-    int colonneDebut = colonne;
-    string nombre;
-    bool estFlottant = false;
+void Lexer::handleNumber(const string& sourceCode, size_t& pos, vector<Token>& tokens, int line, int& column) {
+    int columnStart = column;
+    string number;
+    bool isFloat = false;
     
     if ((sourceCode[pos] == '-' || sourceCode[pos] == '+') && 
         pos + 1 < sourceCode.length() && isdigit(sourceCode[pos + 1]) != 0) {
-        nombre += sourceCode[pos];
+        number += sourceCode[pos];
         pos++;
-        colonne++;
+        column++;
     }
     
     while (pos < sourceCode.length() && isdigit(sourceCode[pos]) != 0) {
-        nombre += sourceCode[pos];
+        number += sourceCode[pos];
         pos++;
-        colonne++;
+        column++;
     }
     
     if (pos < sourceCode.length() && sourceCode[pos] == '.') {
-        estFlottant = true;
-        nombre += sourceCode[pos];
+        isFloat = true;
+        number += sourceCode[pos];
         pos++;
-        colonne++;
+        column++;
         
         while (pos < sourceCode.length() && isdigit(sourceCode[pos]) != 0) {
-            nombre += sourceCode[pos];
+            number += sourceCode[pos];
             pos++;
-            colonne++;
+            column++;
         }
     }
     
-    if (estFlottant) {
-        tokens.push_back({TOKEN_LIT_FLOAT, nombre, ligne, colonneDebut});
+    if (isFloat) {
+        tokens.push_back({TOKEN_LIT_FLOAT, number, line, columnStart});
     } else {
-        tokens.push_back({TOKEN_LIT_INT, nombre, ligne, colonneDebut});
+        tokens.push_back({TOKEN_LIT_INT, number, line, columnStart});
     }
 }
 
-void Lexer::traiterLitteraux(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne) {
+void Lexer::handleLiterals(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int line, int& column) {
     if (isdigit(current) != 0) {
-        traiterNombre(sourceCode, pos, tokens, ligne, colonne);
+        handleNumber(sourceCode, pos, tokens, line, column);
     }
 }
 
-void Lexer::ajouterMotCourant(const string& motCourant, vector<Token>& tokens
-    , int ligne 
-    , int colonne 
+void Lexer::addCurrentWord(const string& currentWord, vector<Token>& tokens
+    , int line 
+    , int column 
     )
 {
 
-    if (motCourant.empty()) {
+    if (currentWord.empty()) {
         return;
     }
 
-    TokenType type = TOKEN_IDENTIFIANT;
-    for (const auto& [keyword, tokenType] : motsClesArray) {
-        if (keyword == motCourant) {
+    TokenType type = TOKEN_IDENTIFIER;
+    for (const auto& [keyword, tokenType] : keywordsArray) {
+        if (keyword == currentWord) {
             type = tokenType;
             break;
         }
     }
     Token token;
     
-    // Convertir les booléens true/false en littéraux numériques
-    if (type == TOKEN_VRAI) {
-        token.type = TOKEN_LIT_BOLEEN;
+    // Convert booleans true/false to numeric literals
+    if (type == TOKEN_TRUE) {
+        token.type = TOKEN_LIT_BOOL;
         token.value = "1";
-    } else if (type == TOKEN_FAUX) {
-        token.type = TOKEN_LIT_BOLEEN;
+    } else if (type == TOKEN_FALSE) {
+        token.type = TOKEN_LIT_BOOL;
         token.value = "0";
     } else {
         token.type = type;
-        token.value = motCourant;
+        token.value = currentWord;
     }
     
-    token.ligne = ligne;
-    token.colonne = colonne;
+    token.line = line;
+    token.column = column;
     
     tokens.push_back(token);
 }
 
-void Lexer::traiterOperateursMathematiques(char current, vector<Token>& tokens, int ligne, int colonne) {
+void Lexer::handleMathOperators(char current, vector<Token>& tokens, int line, int column) {
     switch (current) {
         case '+': 
-            tokens.push_back({TOKEN_PLUS, "+", ligne, colonne}); 
+            tokens.push_back({TOKEN_PLUS, "+", line, column}); 
             break;
         case '-': 
-            tokens.push_back({TOKEN_MOINS, "-", ligne, colonne}); 
+            tokens.push_back({TOKEN_MINUS, "-", line, column}); 
             break;
         case '*': 
-            tokens.push_back({TOKEN_ETOILE, "*", ligne, colonne}); 
+            tokens.push_back({TOKEN_STAR, "*", line, column}); 
             break;
         case '/': 
-            tokens.push_back({TOKEN_SLASH, "/", ligne, colonne}); 
+            tokens.push_back({TOKEN_SLASH, "/", line, column}); 
             break;
         case '%':
-            tokens.push_back({TOKEN_MODULO, "%", ligne, colonne});
+            tokens.push_back({TOKEN_MODULO, "%", line, column});
             break;
         default:
-            // Aucun opérateur mathématique reconnu, ne rien faire
+            // No recognized math operator, do nothing
             break;
     }
 }
 
-void Lexer::traiterDelimiteurs(char current, vector<Token>& tokens, int ligne, int colonne) {
+void Lexer::handleDelimiters(char current, vector<Token>& tokens, int line, int column) {
     switch (current) {
         case '(': 
-            tokens.push_back({TOKEN_PAREN_OUVERTE, "(", ligne, colonne}); 
+            tokens.push_back({TOKEN_PAREN_OPEN, "(", line, column}); 
             break;
         case ')': 
-            tokens.push_back({TOKEN_PAREN_FERMEE, ")", ligne, colonne}); 
+            tokens.push_back({TOKEN_PAREN_CLOSE, ")", line, column}); 
             break;
         case '{': 
-            tokens.push_back({TOKEN_ACCOLADE_OUVERTE, "{", ligne, colonne}); 
+            tokens.push_back({TOKEN_BRACE_OPEN, "{", line, column}); 
             break;
         case '}': 
-            tokens.push_back({TOKEN_ACCOLADE_FERMEE, "}", ligne, colonne}); 
+            tokens.push_back({TOKEN_BRACE_CLOSE, "}", line, column}); 
             break;
         case '[': 
-            tokens.push_back({TOKEN_CROCHET_OUVERT, "[", ligne, colonne}); 
+            tokens.push_back({TOKEN_BRACKET_OPEN, "[", line, column}); 
             break;
         case ']': 
-            tokens.push_back({TOKEN_CROCHET_FERME, "]", ligne, colonne}); 
+            tokens.push_back({TOKEN_BRACKET_CLOSE, "]", line, column}); 
             break;
         case '.':
-            tokens.push_back({TOKEN_POINT, ".", ligne, colonne});
+            tokens.push_back({TOKEN_DOT, ".", line, column});
             break;
         case ';': 
-            tokens.push_back({TOKEN_POINT_VIRGULE, ";", ligne, colonne}); 
+            tokens.push_back({TOKEN_SEMICOLON, ";", line, column}); 
             break;
         case ',': 
-            tokens.push_back({TOKEN_VIRGULE, ",", ligne, colonne}); 
+            tokens.push_back({TOKEN_COMMA, ",", line, column}); 
         default:
-            // Aucun délimiteur reconnu, ne rien faire
+            // No recognized delimiter, do nothing
             break;
     }
 }
 
-void Lexer::traiterOperateursComplexs(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne) {
+void Lexer::handleComplexOperators(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int line, int& column) {
     switch (current) {
         case '=': 
             if (pos + 1 < sourceCode.length() && sourceCode[pos + 1] == '=') {
-                tokens.push_back({TOKEN_EGAL_EGAL, "==", ligne, colonne});
+                tokens.push_back({TOKEN_EQUAL_EQUAL, "==", line, column});
                 pos++;
-                colonne++;
+                column++;
             } else {
-                tokens.push_back({TOKEN_EGAL, "=", ligne, colonne});
+                tokens.push_back({TOKEN_EQUAL, "=", line, column});
             }
             break;
 
         case '<':
             if (pos + 1 < sourceCode.length() && sourceCode[pos + 1] == '=') {
-                tokens.push_back({TOKEN_PLUS_PETIT_EGAL, "<=", ligne, colonne});
+                tokens.push_back({TOKEN_LESS_EQUAL, "<=", line, column});
                 pos++;
-                colonne++;
+                column++;
             } else {
-                tokens.push_back({TOKEN_PLUS_PETIT, "<", ligne, colonne});
+                tokens.push_back({TOKEN_LESS, "<", line, column});
             }
             break;
 
         case '>':
             if (pos + 1 < sourceCode.length() && sourceCode[pos + 1] == '=') {
-                tokens.push_back({TOKEN_PLUS_GRAND_EGAL, ">=", ligne, colonne});
+                tokens.push_back({TOKEN_GREATER_EQUAL, ">=", line, column});
                 pos++;
-                colonne++;
+                column++;
             } else {
-                tokens.push_back({TOKEN_PLUS_GRAND, ">", ligne, colonne});
+                tokens.push_back({TOKEN_GREATER, ">", line, column});
             }
             break;
 
         case '!':
             if (pos + 1 < sourceCode.length() && sourceCode[pos + 1] == '=') {
-                tokens.push_back({TOKEN_DIFFERENT, "!=", ligne, colonne});
+                tokens.push_back({TOKEN_NOT_EQUAL, "!=", line, column});
                 pos++;
-                colonne++;
+                column++;
             } else {
-                tokens.push_back({TOKEN_NON, "!", ligne, colonne});
+                tokens.push_back({TOKEN_NOT, "!", line, column});
             }
             break;
 
         case '&':
             if (pos + 1 < sourceCode.length() && sourceCode[pos + 1] == '&') {
-                tokens.push_back({TOKEN_ET, "&&", ligne, colonne});
+                tokens.push_back({TOKEN_AND, "&&", line, column});
                 pos++;
-                colonne++;
+                column++;
             }
             break;
 
         case '|':
             if (pos + 1 < sourceCode.length() && sourceCode[pos + 1] == '|') {
-                tokens.push_back({TOKEN_OU, "||", ligne, colonne});
+                tokens.push_back({TOKEN_OR, "||", line, column});
                 pos++;
-                colonne++;
+                column++;
             }
             break;
 
         case ':':
             if (pos + 1 < sourceCode.length() && sourceCode[pos + 1] == ':') {
-                tokens.push_back({TOKEN_DEUX_POINTS, "::", ligne, colonne});
+                tokens.push_back({TOKEN_COLON, "::", line, column});
                 pos++;
-                colonne++;
+                column++;
             } else {
-                tokens.push_back({TOKEN_DEUX_POINTS, ":", ligne, colonne});
+                tokens.push_back({TOKEN_COLON, ":", line, column});
             }
         default:
             break;
     }
 }
 
-void Lexer::traiterOperateursEtDelimiteurs(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne) {
+void Lexer::handleOperatorsAndDelimiters(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int line, int& column) {
     if (current == '+' || current == '-' || current == '*' || current == '/' || current == '%') {
-        traiterOperateursMathematiques(current, tokens, ligne, colonne);
+        handleMathOperators(current, tokens, line, column);
     }
     else if (current == '(' || current == ')' || current == '{' || current == '}' || 
              current == '[' || current == ']' || current == '.' || current == ';' || current == ',') {
-        traiterDelimiteurs(current, tokens, ligne, colonne);
+        handleDelimiters(current, tokens, line, column);
     }
     else if (current == '=' || current == '<' || current == '>' || current == '!' || current == '&' || current == '|' || current == ':') {
-        traiterOperateursComplexs(current, sourceCode, pos, tokens, ligne, colonne);
+        handleComplexOperators(current, sourceCode, pos, tokens, line, column);
     }
 }
 
-auto Lexer::traiterNombreNegatifOuPositif(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, 
-                                           string& motCourant, int ligne, int& colonne, int& colonneMotCourant) -> bool {
-    // Vérifie si c'est un signe (+/-) suivi d'un chiffre en contexte valide
-    if (motCourant.empty() && (current == '-' || current == '+') && 
+auto Lexer::handleNegativeOrPositiveNumber(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, 
+                                           string& currentWord, int line, int& column, int& columnCurrentWord) -> bool {
+    // Checks if it's a sign (+/-) followed by a digit in a valid context
+    if (currentWord.empty() && (current == '-' || current == '+') && 
         pos + 1 < sourceCode.length() && isdigit(sourceCode[pos + 1]) != 0 &&
-        estContextNombreNegatif(tokens)) {
+        isNegativeNumberContext(tokens)) {
         
-        ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
-        motCourant = "";
-        colonneMotCourant = colonne;
-        traiterNombre(sourceCode, pos, tokens, ligne, colonne);
-        colonneMotCourant = colonne;
+        addCurrentWord(currentWord, tokens, line, columnCurrentWord);
+        currentWord = "";
+        columnCurrentWord = column;
+        handleNumber(sourceCode, pos, tokens, line, column);
+        columnCurrentWord = column;
         return true;
     }
     return false;
 }
 
-auto Lexer::tokenizer(const string& sourceCode) -> vector<Token> 
+auto Lexer::tokenize(const string& sourceCode) -> vector<Token> 
 {
     vector<Token> tokens;
-    string motCourant;
+    string currentWord;
     
     size_t pos = 0;
-    int ligne = 1;
-    int colonne = 1;
-    int colonneMotCourant = 1;
+    int line = 1;
+    int column = 1;
+    int columnCurrentWord = 1;
     
     while (pos < sourceCode.length()) {
         char current = sourceCode[pos];
 
         if (current == '/' && pos + 1 < sourceCode.length() && 
             (sourceCode[pos + 1] == '/' || sourceCode[pos + 1] == '*')) {
-            ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
-            motCourant = "";
-            colonneMotCourant = colonne;
-            traiterCommentaires(sourceCode, pos);
+            addCurrentWord(currentWord, tokens, line, columnCurrentWord);
+            currentWord = "";
+            columnCurrentWord = column;
+            handleComments(sourceCode, pos);
             
-            // Compter les nouvelles lignes dans le commentaire
+            // Count new lines in the comment
             for (size_t i = pos; i < sourceCode.length(); i++) {
                 if (sourceCode[i] == '\n') {
-                    ligne++;
-                    colonne = 1;
+                    line++;
+                    column = 1;
                 } else if (sourceCode[i] != '\r') {
-                    colonne++;
+                    column++;
                 }
                 if (sourceCode[i] == '/' && i > 0 && sourceCode[i-1] == '*') {
                     pos = i + 1;
-                    colonneMotCourant = colonne;
+                    columnCurrentWord = column;
                     break;
                 }
             }
@@ -322,100 +322,100 @@ auto Lexer::tokenizer(const string& sourceCode) -> vector<Token>
         }
 
         if (current == '"') {
-            ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
-            motCourant = "";
-            colonneMotCourant = colonne;
+            addCurrentWord(currentWord, tokens, line, columnCurrentWord);
+            currentWord = "";
+            columnCurrentWord = column;
             
-            tokens.push_back({TOKEN_GUILLEMET, "\"", ligne, colonne});
+            tokens.push_back({TOKEN_QUOTE, "\"", line, column});
             pos++;
-            colonne++;
+            column++;
 
             string stringContent;
-            int colonneDebutChaine = colonne;
+            int columnStartString = column;
             while (pos < sourceCode.length() && sourceCode[pos] != '"') {
                 if (sourceCode[pos] == '\\' && pos + 1 < sourceCode.length()) {
                     stringContent += sourceCode[pos];
                     pos++;
-                    colonne++;
+                    column++;
                 }
                 stringContent += sourceCode[pos];
                 pos++;
-                colonne++;
+                column++;
             }
 
             if (!stringContent.empty()) {
-                tokens.push_back({TOKEN_IDENTIFIANT, stringContent, ligne, colonneDebutChaine});
+                tokens.push_back({TOKEN_IDENTIFIER, stringContent, line, columnStartString});
             }
 
             if (pos < sourceCode.length() && sourceCode[pos] == '"') {
-                tokens.push_back({TOKEN_GUILLEMET, "\"", ligne, colonne});
+                tokens.push_back({TOKEN_QUOTE, "\"", line, column});
                 pos++;
-                colonne++;
+                column++;
             }
-            colonneMotCourant = colonne;
+            columnCurrentWord = column;
             continue;
         }
 
-        if (motCourant.empty() && isdigit(current) != 0) {
-            ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
-            motCourant = "";
-            colonneMotCourant = colonne;
-            traiterNombre(sourceCode, pos, tokens, ligne, colonne);
-            colonneMotCourant = colonne;
+        if (currentWord.empty() && isdigit(current) != 0) {
+            addCurrentWord(currentWord, tokens, line, columnCurrentWord);
+            currentWord = "";
+            columnCurrentWord = column;
+            handleNumber(sourceCode, pos, tokens, line, column);
+            columnCurrentWord = column;
             continue;
         }
 
-        // Gérer les nombres négatifs ou positifs
-        if (motCourant.empty() && (current == '-' || current == '+') && 
+        // Handle negative or positive numbers
+        if (currentWord.empty() && (current == '-' || current == '+') && 
             pos + 1 < sourceCode.length() && isdigit(sourceCode[pos + 1]) != 0 &&
-            estContextNombreNegatif(tokens)) {
-            ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
-            motCourant = "";
-            colonneMotCourant = colonne;
-            traiterNombre(sourceCode, pos, tokens, ligne, colonne);
-            colonneMotCourant = colonne;
+            isNegativeNumberContext(tokens)) {
+            addCurrentWord(currentWord, tokens, line, columnCurrentWord);
+            currentWord = "";
+            columnCurrentWord = column;
+            handleNumber(sourceCode, pos, tokens, line, column);
+            columnCurrentWord = column;
             continue;
         }
 
         if (isspace(current) != 0) {
-            ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
-            motCourant = "";
-            colonneMotCourant = colonne;
+            addCurrentWord(currentWord, tokens, line, columnCurrentWord);
+            currentWord = "";
+            columnCurrentWord = column;
             
             if (current == '\n') {
-                ligne++;
-                colonne = 1;
-                colonneMotCourant = 1;
+                line++;
+                column = 1;
+                columnCurrentWord = 1;
             } else if (current != '\r') {
-                colonne++;
+                column++;
             }
             pos++;
             continue;
         }
 
-        if (!motCourant.empty() && isalnum(current) == 0 && current != '_') {
-            ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
-            motCourant = "";
-            colonneMotCourant = colonne;
+        if (!currentWord.empty() && isalnum(current) == 0 && current != '_') {
+            addCurrentWord(currentWord, tokens, line, columnCurrentWord);
+            currentWord = "";
+            columnCurrentWord = column;
         }
 
         if (isalnum(current) != 0 || current == '_') {
-            if (motCourant.empty()) {
-                colonneMotCourant = colonne;
+            if (currentWord.empty()) {
+                columnCurrentWord = column;
             }
-            motCourant += current;
+            currentWord += current;
             pos++;
-            colonne++;
+            column++;
             continue;
         }
 
-        traiterOperateursEtDelimiteurs(current, sourceCode, pos, tokens, ligne, colonne);
+        handleOperatorsAndDelimiters(current, sourceCode, pos, tokens, line, column);
         pos++;
-        colonne++;
+        column++;
     }
 
-    ajouterMotCourant(motCourant, tokens, ligne, colonneMotCourant);
-    tokens.push_back({TOKEN_EOF, "", ligne, colonne});
+    addCurrentWord(currentWord, tokens, line, columnCurrentWord);
+    tokens.push_back({TOKEN_EOF, "", line, column});
 
     return tokens;
 }

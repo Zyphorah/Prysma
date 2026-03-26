@@ -5,12 +5,12 @@
 
 void GeneralVisitorGenCode::visiter(NodeClass* nodeClass)
 {
-    std::string ancienneClasse = _contextGenCode->getNomClasseCourante();
-    _contextGenCode->modifierNomClasseCourante( nodeClass->getNomClass().value);
+    std::string previousClassName = _contextGenCode->getCurrentClassName();
+    _contextGenCode->setCurrentClassName(nodeClass->getNomClass().value);
 
-    for (auto* membre : nodeClass->getListMembers()) {
-        if (prysma::isa<NodeDeclarationFunction>(membre)) {
-            membre->accept(this);
+    for (auto* member : nodeClass->getListMembers()) {
+        if (prysma::isa<NodeDeclarationFunction>(member)) {
+            member->accept(this);
         }
     }
 
@@ -18,5 +18,5 @@ void GeneralVisitorGenCode::visiter(NodeClass* nodeClass)
         builder->accept(this);
     }
 
-    _contextGenCode->modifierNomClasseCourante( ancienneClasse);
+    _contextGenCode->setCurrentClassName(previousClassName);
 }

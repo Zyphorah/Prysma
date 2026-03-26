@@ -6,21 +6,21 @@
 
 class FileWriting : public IOutput
 {
-    private: 
-        std::string _path;
-        std::ofstream _fichier;
+private: 
+    std::string _path;
+    std::ofstream _file;
 
-    public:
-        void sort(const std::string& data) override; 
+public:
+    void output(const std::string& data) override; 
 
-        explicit FileWriting(const std::string& path);
+    explicit FileWriting(const std::string& path);
 
-        ~FileWriting() override;
+    ~FileWriting() override;
 
-        FileWriting(const FileWriting&) = delete;
-        auto operator=(const FileWriting&) -> FileWriting& = delete;
-        FileWriting(FileWriting&&) = delete;
-        auto operator=(FileWriting&&) -> FileWriting& = delete;
+    FileWriting(const FileWriting&) = delete;
+    auto operator=(const FileWriting&) -> FileWriting& = delete;
+    FileWriting(FileWriting&&) = delete;
+    auto operator=(FileWriting&&) -> FileWriting& = delete;
 };
 
 #endif /* D554AA27_6112_4847_8679_9DF99DA76B4A */

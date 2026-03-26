@@ -2,51 +2,51 @@
 #define DA3AD58B_D7B7_44D3_AC56_E1DDCD78F54F
 
 #include "Compiler/Parser/Equation/Interfaces/IManagerParenthesis.h"
+#include "Compiler/AST/Registry/RegistrySymbole.h"
 #include "Compiler/Lexer/Lexer.h"
 #include <vector>
 
-class RegistrySymbole;
+class RegistrySymbol;
 
-class ServiceParenthese : public IManagerParenthese {
+class ParenthesisService : public IManagerParenthesis {
 private:
-    RegistrySymbole* _registrySymbole;  
+    RegistrySymbol* _registrySymbol;  
     /**
-     * @brief Vérifie si une paire de parenthèses est englobante
-     * @param equation L'équation à vérifier
-     * @return true si les parenthèses englobent toute l'expression
+     * @brief Checks if a pair of parentheses is wrapping
+     * @param equation The equation to check
+     * @return true if the parentheses wrap the entire expression
      */
-    static auto estEnglobante(const vector<Token>& equation) -> bool;
+    static auto isWrapping(const std::vector<Token>& equation) -> bool;
     
     /**
-     * @brief Vérifie si un opérateur à une position donnée est unaire
-     * @param equation L'équation
-     * @param indice L'indice de l'opérateur
-     * @return true si c'est un signe unaire
+     * @brief Checks if an operator at a given position is unary
+     * @param equation The equation
+     * @param index The index of the operator
+     * @return true if it is a unary sign
      */
-    [[nodiscard]] auto estSigneUnaire(const vector<Token>& equation, int indice) const -> bool;
+    [[nodiscard]] auto isUnarySign(const std::vector<Token>& equation, int index) const -> bool;
 
 public:
     /**
-     * @brief Builder
-     * @param registrySymbole Registry des opérateurs
+     * @brief Constructor
+     * @param symbolRegistry Operator registry
      */
-    explicit ServiceParenthese(RegistrySymbole* registrySymbole);
+    explicit ParenthesisService(RegistrySymbol* symbolRegistry);
     
     /**
-     * @brief Enlève les parenthèses qui englobent toute l'expression
-     * @param equation L'équation à traiter
-     * @return L'équation sans parenthèses englobantes
+     * @brief Removes parentheses that wrap the entire expression
+     * @param equation The equation to process
+     * @return The equation without wrapping parentheses
      */
-    auto enleverParenthesesEnglobantes(const std::vector<Token>& equation) -> std::vector<Token> override;
+    auto removeWrappingParentheses(const std::vector<Token>& equation) -> std::vector<Token> override;
     
     /**
-     * @brief Trouve le dernier opérateur au niveau de parenthèses zéro
-     * @param equation L'équation à analyser
-     * @param operateur Le caractère opérateur à chercher
-     * @return L'index de l'opérateur, ou -1 si non trouvé
+     * @brief Finds the last operator at parenthesis level zero
+     * @param equation The equation to analyze
+     * @param op The operator token to search for
+     * @return The index of the operator, or -1 if not found
      */
-    auto trouverDernierAuNiveauZero(const vector<Token>& equation, Token operateur) -> int override;
+    auto findLastAtLevelZero(const std::vector<Token>& equation, Token op) -> int override;
 };
-
 
 #endif /* DA3AD58B_D7B7_44D3_AC56_E1DDCD78F54F */

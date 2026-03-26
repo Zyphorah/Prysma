@@ -1,5 +1,5 @@
-#ifndef PARSEUR_CLASS_CPP
-#define PARSEUR_CLASS_CPP
+#ifndef PARSER_CLASS_CPP
+#define PARSER_CLASS_CPP
 
 #include "Compiler/ManagerError.h"
 #include <cstddef>
@@ -15,26 +15,26 @@
 
 namespace
 {
-  struct TokenNomClasse { Token t; };
-  struct TokenVisibilite { Token t; };
+  struct TokenClassName { Token t; };
+  struct TokenVisibility { Token t; };
 
-  class ParametresClasse {
+  class ClassParameters {
   public:
-    ParametresClasse(const TokenNomClasse& nomClasseToken, const TokenVisibilite& visibiliteCourante)
-        : nomClasseToken_(nomClasseToken.t), visibilite_courante_(visibiliteCourante.t) {}
+    ClassParameters(const TokenClassName& classNameToken, const TokenVisibility& currentVisibility)
+        : classNameToken_(classNameToken.t), current_visibility_(currentVisibility.t) {}
 
-    [[nodiscard]] auto nomClasseToken() const -> const Token& { return nomClasseToken_; }
-    [[nodiscard]] auto visibilite_courante() const -> const Token& { return visibilite_courante_; }
+    [[nodiscard]] auto classNameToken() const -> const Token& { return classNameToken_; }
+    [[nodiscard]] auto current_visibility() const -> const Token& { return current_visibility_; }
 
   private:
-    Token nomClasseToken_;
-    Token visibilite_courante_;
+    Token classNameToken_;
+    Token current_visibility_;
   };
 
-  void classerNodeClasse(INode* node,
-              const ParametresClasse& param, 
+  void classifyClassNode(INode* node,
+              const ClassParameters& param, 
               ContextParser& contextParser,
-              std::vector<INode*>& listMembers,
+              std::vector<INode*>& memberList,
               std::vector<INode*>& builders)
   {
     if (node == nullptr) {
@@ -43,36 +43,36 @@ namespace
 
       if (auto* declarationVariable = prysma::dyn_cast<NodeDeclarationVariable>(node)) {
         if (declarationVariable != nullptr) {
-          node = contextParser.getBuilderTreeInstruction()->allouer<NodeDeclarationVariable>(
-              param.visibilite_courante(),
+          node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationVariable>(
+              param.current_visibility(),
               declarationVariable->getNom(),
               declarationVariable->getType(),
               declarationVariable->getExpression()
           );
         }
-        listMembers.push_back(node);
+        memberList.push_back(node);
         return;
       }
 
       if (auto* declarationFunction = prysma::dyn_cast<NodeDeclarationFunction>(node)) {
         if (declarationFunction != nullptr) {
-          node = contextParser.getBuilderTreeInstruction()->allouer<NodeDeclarationFunction>(
-              param.visibilite_courante(),
+          node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(
+              param.current_visibility(),
               declarationFunction->getTypeReturn(),
               declarationFunction->getNom(),
               declarationFunction->getArguments(),
               declarationFunction->getBody()
           );
         }      auto* newDeclarationFunction = prysma::cast<NodeDeclarationFunction>(node);
-      if (newDeclarationFunction != nullptr && newDeclarationFunction->getNom() == param.nomClasseToken().value) {
+      if (newDeclarationFunction != nullptr && newDeclarationFunction->getNom() == param.classNameToken().value) {
         builders.push_back(node);
         return;
       }
-      listMembers.push_back(node);
+      memberList.push_back(node);
       return;
     }
 
-    throw ErrorCompilation("Membre de classe invalide : '" + param.nomClasseToken().value + "'", Ligne(param.nomClasseToken().ligne), Colonne(param.nomClasseToken().colonne));
+    throw CompilationError("Invalid class member: '" + param.classNameToken().value + "'", Line(param.classNameToken().line), Column(param.classNameToken().column));
   }
 }
 
@@ -84,87 +84,87 @@ ParserClass::ParserClass(ContextParser& contextParser)
 ParserClass::~ParserClass()
 = default;
 
-// Exemple: class NomClasse : parent
+// Example: class ClassName : parent
 //          { 
 //              private: 
-//                  dec int64 attributePrive;
-//                  dec string attributePrive2;
-//                  fn void methode(arg int64 parametre, arg string parametre2)
+//                  dec int64 privateAttribute;
+//                  dec string privateAttribute2;
+//                  fn void method(arg int64 param, arg string param2)
 //                  {
-//                      aff attributePrive = parametre;
-//                      aff attributePrive2 = parametre2;
+//                      aff privateAttribute = param;
+//                      aff privateAttribute2 = param2;
 //                  }
 //              public:
-//                  fn void NomClasse(arg int64 parametre, arg string parametre2)
+//                  fn void ClassName(arg int64 param, arg string param2)
 //                  {
-//                      aff attributePrive = parametre;
-//                      aff attributePrive2 = parametre2;
+//                      aff privateAttribute = param;
+//                      aff privateAttribute2 = param2;
 //                  }
-//                  fn void methode(arg int64 parametre, arg string[] parametre2)
+//                  fn void method(arg int64 param, arg string[] param2)
 //                  {
-//                      aff attributePrive = parametre;
-//                      aff attributePrive2 = parametre2;
+//                      aff privateAttribute = param;
+//                      aff privateAttribute2 = param2;
 //                  }
 //           }
 
-auto ParserClass::parser(std::vector<Token>& tokens, int& index) -> INode*
+auto ParserClass::parse(std::vector<Token>& tokens, int& index) -> INode*
 {
-    consommer(tokens, index, TOKEN_CLASS, "Attendu 'class' au début de la déclaration de classe.");
-    Token nomClasseToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Attendu un identifiant après 'class' pour le nom de la classe.");
+    consume(tokens, index, TOKEN_CLASS, "Expected 'class' at the beginning of the class declaration.");
+    Token classNameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Expected an identifier after 'class' for the class name.");
     
-    // Gestion de l'héritage : class NomClasse : Parent
+    // Inheritance management: class ClassName : Parent
     Token parentToken;
-    std::vector<INode*> heritage; // TODO : gérer plusieurs héritages 
+    std::vector<INode*> inheritance; // TODO: handle multiple inheritance 
     
     
-    consommer(tokens, index, TOKEN_ACCOLADE_OUVERTE, "Attendu '{' après le nom de la classe.");
-    std::vector<INode*> listMembers;
+    consume(tokens, index, TOKEN_BRACE_OPEN, "Expected '{' after the class name.");
+    std::vector<INode*> memberList;
     std::vector<INode*> builders;
     
-    // Par défaut, on commence en section PRIVATE si pas de mot-clé de visibilité
-    Token visibilite_courante;
-    visibilite_courante.type = TOKEN_PRIVATE;
-    visibilite_courante.value = "private";
+    // By default, start in PRIVATE section if no visibility keyword
+    Token current_visibility;
+    current_visibility.type = TOKEN_PRIVATE;
+    current_visibility.value = "private";
 
-    while (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != TOKEN_ACCOLADE_FERMEE) {
+    while (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != TOKEN_BRACE_CLOSE) {
         TokenType tokenType = tokens[static_cast<size_t>(index)].type;
 
         if (tokenType == TOKEN_PUBLIC) {
-            visibilite_courante = tokens[static_cast<size_t>(index)];
-            consommer(tokens, index, TOKEN_PUBLIC, "Attendu 'public' pour la section publique de la classe.");
-            consommer(tokens, index, TOKEN_DEUX_POINTS, "Attendu ':' après 'public'.");
+            current_visibility = tokens[static_cast<size_t>(index)];
+            consume(tokens, index, TOKEN_PUBLIC, "Expected 'public' for the public section of the class.");
+            consume(tokens, index, TOKEN_COLON, "Expected ':' after 'public'.");
             continue;
         }
 
         if (tokenType == TOKEN_PRIVATE) {
-            visibilite_courante = tokens[static_cast<size_t>(index)];
-            consommer(tokens, index, TOKEN_PRIVATE, "Attendu 'private' pour la section privée de la classe.");
-            consommer(tokens, index, TOKEN_DEUX_POINTS, "Attendu ':' après 'private'.");
+            current_visibility = tokens[static_cast<size_t>(index)];
+            consume(tokens, index, TOKEN_PRIVATE, "Expected 'private' for the private section of the class.");
+            consume(tokens, index, TOKEN_COLON, "Expected ':' after 'private'.");
             continue;
         }
 
         if (tokenType == TOKEN_PROTECTED) {
-          visibilite_courante = tokens[static_cast<size_t>(index)];
-          consommer(tokens, index, TOKEN_PROTECTED, "Attendu 'protected' pour la section protégée de la classe.");
-          consommer(tokens, index, TOKEN_DEUX_POINTS, "Attendu ':' après 'protected'.");
+          current_visibility = tokens[static_cast<size_t>(index)];
+          consume(tokens, index, TOKEN_PROTECTED, "Expected 'protected' for the protected section of the class.");
+          consume(tokens, index, TOKEN_COLON, "Expected ':' after 'protected'.");
           continue;
         }
 
-        // Si aucun mot-clé de visibilité, on parse les membres dans la section courante (private par défaut)
-        INode* node = _contextParser.getBuilderTreeInstruction()->construire(tokens, index);
-        classerNodeClasse(node, ParametresClasse{TokenNomClasse{nomClasseToken}, TokenVisibilite{visibilite_courante}}, _contextParser, listMembers, builders);
+        // If no visibility keyword, parse members in the current section (private by default)
+        INode* node = _contextParser.getBuilderTreeInstruction()->build(tokens, index);
+        classifyClassNode(node, ClassParameters{TokenClassName{classNameToken}, TokenVisibility{current_visibility}}, _contextParser, memberList, builders);
     }
 
-    consommer(tokens, index, TOKEN_ACCOLADE_FERMEE, "Attendu '}' à la fin de la déclaration de classe.");
+    consume(tokens, index, TOKEN_BRACE_CLOSE, "Expected '}' at the end of the class declaration.");
 
-    return _contextParser.getBuilderTreeInstruction()->allouer<NodeClass>(heritage,
-                                                                              listMembers,
+    return _contextParser.getBuilderTreeInstruction()->allocate<NodeClass>(inheritance,
+                                                                              memberList,
                                                                               builders,
-                                                                              nomClasseToken);
+                                                                              classNameToken);
 
 }
 
-#endif /* PARSEUR_CLASS_CPP */
+#endif /* PARSER_CLASS_CPP */
 
 
 

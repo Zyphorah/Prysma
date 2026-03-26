@@ -11,16 +11,16 @@ GeneralVisitorGraphViz::GeneralVisitorGraphViz(OutputVisualGraphText outputVisua
 GeneralVisitorGraphViz::~GeneralVisitorGraphViz()
 {}
 
-void GeneralVisitorGraphViz::generatedr()
+void GeneralVisitorGraphViz::generate()
 {
-    _outputVisualGraph.generatedr();
+    _outputVisualGraph.generate();
 }
 
 {% for nom, label, traversables in methodes %}
 void GeneralVisitorGraphViz::visiter(Node{{ nom }}* node)
 {
     (void)node;
-    int idNode = _outputVisualGraph.ajouterNode({{ label }});
+    int idNode = _outputVisualGraph.addNode({{ label }});
 {% for getter, type_champ in traversables %}
 {% if type_champ == 'std::vector<INode*>' %}
     for (auto* element : node->{{ getter }}())
@@ -28,7 +28,7 @@ void GeneralVisitorGraphViz::visiter(Node{{ nom }}* node)
         element->accept(this);
         int idChild = _pileIds.top();
         _pileIds.pop();
-        _outputVisualGraph.ajouterArete(idNode, idChild);
+        _outputVisualGraph.addEdge(idNode, idChild);
     }
 {% else %}
     if (node->{{ getter }}() != nullptr)
@@ -36,7 +36,7 @@ void GeneralVisitorGraphViz::visiter(Node{{ nom }}* node)
         node->{{ getter }}()->accept(this);
         int idChild = _pileIds.top();
         _pileIds.pop();
-        _outputVisualGraph.ajouterArete(idNode, idChild);
+        _outputVisualGraph.addEdge(idNode, idChild);
     }
 {% endif %}
 {% endfor %}
@@ -45,14 +45,14 @@ void GeneralVisitorGraphViz::visiter(Node{{ nom }}* node)
 {% endfor %}
 void GeneralVisitorGraphViz::visiter(NodeInstruction* node)
 {
-    int idNode = _outputVisualGraph.ajouterNode("Instruction");
+    int idNode = _outputVisualGraph.addNode("Instruction");
 
-    for (INode* child : node->getChilds())
+    for (INode* child : node->getChildren())
     {
         child->accept(this);
         int idChild = _pileIds.top();
         _pileIds.pop();
-        _outputVisualGraph.ajouterArete(idNode, idChild);
+        _outputVisualGraph.addEdge(idNode, idChild);
     }
     _pileIds.push(idNode);
 }

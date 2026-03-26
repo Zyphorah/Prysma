@@ -4,14 +4,14 @@
 #include "Compiler/AST/Registry/Types/IType.h"
 #include "Compiler/Lexer/Lexer.h"
 
-// Actuellement inutilisée, c'est pour le future 
+// Currently unused, for the future
 
-// Cette classe a pour but de remplir le registry de variable global ce trouvant à l'extérieur d'une function 
+// This class is intended to fill the global variable registry located outside a function
 void FillingVisitorRegistry::visiter(NodeDeclarationVariable* nodeDeclarationVariable)
 {
     Token token; 
     IType* type = nodeDeclarationVariable->getType();
     token.value = nodeDeclarationVariable->getNom();
    
-    _contextGenCode->getRegistryVariable()->enregistryr(token, Symbole(nullptr, type));
+    _contextGenCode->getRegistryVariable()->registerVariable(token, Symbol(nullptr, type));
 }

@@ -3,11 +3,11 @@
 
 #include "Compiler/Lexer/TokenType.h"
 
-constexpr auto estOperateur(TokenType type) noexcept -> bool {
+constexpr auto isOperator(TokenType type) noexcept -> bool {
     switch (type) {
         case TOKEN_PLUS:
-        case TOKEN_MOINS:
-        case TOKEN_ETOILE:
+        case TOKEN_MINUS:
+        case TOKEN_STAR:
         case TOKEN_SLASH:
         case TOKEN_MODULO:
             return true;
@@ -16,12 +16,12 @@ constexpr auto estOperateur(TokenType type) noexcept -> bool {
     }
 }
 
-constexpr auto estOperande(TokenType type) noexcept -> bool {
+constexpr auto isOperand(TokenType type) noexcept -> bool {
     switch (type) {
         case TOKEN_LIT_INT:
         case TOKEN_LIT_FLOAT:
-        case TOKEN_LIT_BOLEEN:
-        case TOKEN_IDENTIFIANT:
+        case TOKEN_LIT_BOOL:
+        case TOKEN_IDENTIFIER:
         case TOKEN_UNREF:
         case TOKEN_REF:
             return true;
@@ -30,21 +30,21 @@ constexpr auto estOperande(TokenType type) noexcept -> bool {
     }
 }
 
-constexpr auto estOperateurComparison(TokenType type) noexcept -> bool {
+constexpr auto isComparisonOperator(TokenType type) noexcept -> bool {
     switch (type) {
-        case TOKEN_PLUS_PETIT:
-        case TOKEN_PLUS_GRAND:
-        case TOKEN_PLUS_PETIT_EGAL:
-        case TOKEN_PLUS_GRAND_EGAL:
-        case TOKEN_EGAL_EGAL:
-        case TOKEN_DIFFERENT:
+        case TOKEN_LESS:
+        case TOKEN_GREATER:
+        case TOKEN_LESS_EQUAL:
+        case TOKEN_GREATER_EQUAL:
+        case TOKEN_EQUAL_EQUAL:
+        case TOKEN_NOT_EQUAL:
             return true;
         default:
             return false;
     }
 }
 
-constexpr auto estType(TokenType type) noexcept -> bool {
+constexpr auto isType(TokenType type) noexcept -> bool {
     switch (type) {
         case TOKEN_TYPE_FLOAT:
         case TOKEN_TYPE_STRING:
@@ -54,41 +54,41 @@ constexpr auto estType(TokenType type) noexcept -> bool {
         case TOKEN_TYPE_INT64:
         case TOKEN_TYPE_INT32:
         case TOKEN_TYPE_PTR:
-        case TOKEN_IDENTIFIANT:
+        case TOKEN_IDENTIFIER:
             return true;
         default:
             return false;
     }
 }
 
-constexpr auto estMotCle(TokenType type) noexcept -> bool {
+constexpr auto isKeyword(TokenType type) noexcept -> bool {
     switch (type) {
-        case TOKEN_FONCTION:
-        case TOKEN_SI:
-        case TOKEN_SINON:
-        case TOKEN_TANT_QUE:
-        case TOKEN_POUR:
-        case TOKEN_RETOUR:
+        case TOKEN_FUNCTION:
+        case TOKEN_IF:
+        case TOKEN_ELSE:
+        case TOKEN_WHILE:
+        case TOKEN_FOR:
+        case TOKEN_RETURN:
         case TOKEN_SCOPE:
-        case TOKEN_AFF:
-        case TOKEN_DEC:
+        case TOKEN_ASSIGN:
+        case TOKEN_DECL:
             return true;
         default:
             return false;
     }
 }
 
-constexpr auto estStructure(TokenType type) noexcept -> bool {
+constexpr auto isStructure(TokenType type) noexcept -> bool {
     switch (type) {
-        case TOKEN_PAREN_OUVERTE:
-        case TOKEN_PAREN_FERMEE:
-        case TOKEN_ACCOLADE_OUVERTE:
-        case TOKEN_ACCOLADE_FERMEE:
-        case TOKEN_CROCHET_OUVERT:
-        case TOKEN_CROCHET_FERME:
-        case TOKEN_POINT:
-        case TOKEN_POINT_VIRGULE:
-        case TOKEN_VIRGULE:
+        case TOKEN_PAREN_OPEN:
+        case TOKEN_PAREN_CLOSE:
+        case TOKEN_BRACE_OPEN:
+        case TOKEN_BRACE_CLOSE:
+        case TOKEN_BRACKET_OPEN:
+        case TOKEN_BRACKET_CLOSE:
+        case TOKEN_DOT:
+        case TOKEN_SEMICOLON:
+        case TOKEN_COMMA:
             return true;
         default:
             return false;

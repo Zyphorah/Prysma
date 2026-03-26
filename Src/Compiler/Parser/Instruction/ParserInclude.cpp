@@ -1,5 +1,5 @@
-#ifndef PARSEUR_INCLUDE_CPP
-#define PARSEUR_INCLUDE_CPP
+#ifndef PARSER_INCLUDE_CPP
+#define PARSER_INCLUDE_CPP
 
 #include "Compiler/Instruction/ParserInclude.h"
 #include "Compiler/AST/AST_Genere.h"
@@ -17,19 +17,19 @@ ParserInclude::ParserInclude(ContextParser& contextParser)
 ParserInclude::~ParserInclude()
 = default;
 
-// Exemple : include "path"
-auto ParserInclude::parser(std::vector<Token>& tokens, int& index) -> INode*
+// Example: include "path"
+auto ParserInclude::parse(std::vector<Token>& tokens, int& index) -> INode*
 {
-    consommer(tokens,index,TOKEN_INCLUDE, "Error : Instruction include doit commencer par le mot-clé 'include'");
-    consommer(tokens,index,TOKEN_GUILLEMET, "Error : Instruction include doit être suivie d'une chaîne de caractères input guillemets");
-    Token tokenPath = consommer(tokens,index,TOKEN_IDENTIFIANT, "Error : Instruction include doit contenir un chemin de fichier");
-    consommer(tokens,index,TOKEN_GUILLEMET, "Error : Instruction include doit être suivie d'une chaîne de caractères input guillemets");
-    consommer(tokens,index,TOKEN_POINT_VIRGULE, "Error : Instruction include doit se terminer par un point-virgule");
+    consume(tokens, index, TOKEN_INCLUDE, "Error: Include instruction must start with the 'include' keyword");
+    consume(tokens, index, TOKEN_QUOTE, "Error: Include instruction must be followed by a string in quotes");
+    Token tokenPath = consume(tokens, index, TOKEN_IDENTIFIER, "Error: Include instruction must contain a file path");
+    consume(tokens, index, TOKEN_QUOTE, "Error: Include instruction must be followed by a string in quotes");
+    consume(tokens, index, TOKEN_SEMICOLON, "Error: Include instruction must end with a semicolon");
 
-    return _contextParser.getBuilderTreeEquation()->allouer<NodeInclude>(tokenPath.value);
+    return _contextParser.getBuilderTreeEquation()->allocate<NodeInclude>(tokenPath.value);
 }
 
-#endif /* PARSEUR_INCLUDE_CPP */
+#endif /* PARSER_INCLUDE_CPP */
 
 
 

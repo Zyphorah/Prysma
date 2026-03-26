@@ -13,40 +13,40 @@ BuilderEnvironmentRegistryVariable::BuilderEnvironmentRegistryVariable(ContextGe
 
 BuilderEnvironmentRegistryVariable::~BuilderEnvironmentRegistryVariable() {}
 
-// Actuellement inutilisée, c'est pour le future, un autre ittération de développement, elle existe pour le moment mais elle n'est pas encore testé
-// Une functionnalité bonus 
-// Cette classe a pour but de remplir le registry de variable global ce trouvant à l'extérieur d'une function 
-// exemple : 
+// Currently unused, for the future, another development iteration, it exists for now but is not yet tested
+// A bonus feature
+// This class is intended to fill the global variable registry located outside a function
+// example : 
 // scope {
 //     dec int64 a = 10;
 //     dec string b = "string";
-//     fn void teste()
+//     fn void test()
 //     {
 //     }
 // }
 
-void BuilderEnvironmentRegistryVariable::remplir()
+void BuilderEnvironmentRegistryVariable::fill()
 {   
-    auto variablesGlobalesPasse1 = _contextGenCode->getRegistryVariable()->getGlobalVariables();
+    auto globalVariablesPass1 = _contextGenCode->getRegistryVariable()->getGlobalVariables();
 
-    _contextGenCode->getRegistryVariable()->viderTop(); 
+    _contextGenCode->getRegistryVariable()->clearTop(); 
 
-    for(auto const& [nom, symbole] : variablesGlobalesPasse1)
+    for(auto const& [name, symbol] : globalVariablesPass1)
     {
-        llvm::Type* typeLLVM = symbole.getType()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
+        llvm::Type* llvmType = symbol.getType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
         
-        auto* variableGlobale = new llvm::GlobalVariable(
+        auto* globalVariable = new llvm::GlobalVariable(
             _contextGenCode->getBackend()->getModule(),
-            typeLLVM,
+            llvmType,
             false,
             llvm::GlobalValue::ExternalLinkage,
             nullptr,
-            nom
+            name
         );
 
         Token token;
-        token.value = nom;
+        token.value = name;
         
-        _contextGenCode->getRegistryVariable()->enregistryr(token, Symbole(variableGlobale, symbole.getType()));
+        _contextGenCode->getRegistryVariable()->registerVariable(token, Symbol(globalVariable, symbol.getType()));
     }
 }

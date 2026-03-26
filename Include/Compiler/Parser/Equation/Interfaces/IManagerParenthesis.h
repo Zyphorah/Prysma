@@ -4,31 +4,31 @@
 #include <vector>
 
 /**
- * @interface IManagerParenthese
- * @brief Gère la détection et suppression des parenthèses
+ * @interface IManagerParenthesis
+ * @brief Manages detection and removal of parentheses
  */
-class IManagerParenthese {
+class IManagerParenthesis {
 public:
-    IManagerParenthese() = default;
-    virtual ~IManagerParenthese() = default;
-    IManagerParenthese(const IManagerParenthese&) = delete;
-    auto operator=(const IManagerParenthese&) -> IManagerParenthese& = delete;
-    IManagerParenthese(IManagerParenthese&&) = delete;
-    auto operator=(IManagerParenthese&&) -> IManagerParenthese& = delete;
+    IManagerParenthesis() = default;
+    virtual ~IManagerParenthesis() = default;
+    IManagerParenthesis(const IManagerParenthesis&) = delete;
+    auto operator=(const IManagerParenthesis&) -> IManagerParenthesis& = delete;
+    IManagerParenthesis(IManagerParenthesis&&) = delete;
+    auto operator=(IManagerParenthesis&&) -> IManagerParenthesis& = delete;
     
     /**
-     * @brief Enlève les parenthèses qui englobent toute l'expression
-     * Ex: "(1+2)" -> "1+2", "(1+2)*(3+4)" reste inchangé
-     * @param equation L'équation à traiter
-     * @return L'équation sans parenthèses englobantes
+     * @brief Removes parentheses that wrap the entire expression
+     * Ex: "(1+2)" -> "1+2", "(1+2)*(3+4)" remains unchanged
+     * @param equation The equation to process
+     * @return The equation without wrapping parentheses
      */
-    virtual auto enleverParenthesesEnglobantes(const std::vector<Token>& equation) -> std::vector<Token> = 0;
+    virtual auto removeWrappingParentheses(const std::vector<Token>& equation) -> std::vector<Token> = 0;
     
     /**
-     * @brief Trouve le dernier opérateur au niveau de parenthèses zéro
-     * @param equation L'équation à analyser
-     * @param operateur Le caractère opérateur à chercher
-     * @return L'index de l'opérateur, ou -1 si non trouvé
+     * @brief Finds the last operator at parenthesis level zero
+     * @param equation The equation to analyze
+     * @param op The operator token to search for
+     * @return The index of the operator, or -1 if not found
      */
-    virtual auto trouverDernierAuNiveauZero(const vector<Token>& equation, Token operateur) -> int = 0;
+    virtual auto findLastAtLevelZero(const std::vector<Token>& equation, Token op) -> int = 0;
 };

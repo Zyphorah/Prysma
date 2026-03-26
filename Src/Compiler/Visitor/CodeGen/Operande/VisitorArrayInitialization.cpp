@@ -4,12 +4,12 @@
 
 void GeneralVisitorGenCode::visiter(NodeArrayInitialization* nodeInitialization [[maybe_unused]])
 {
-    // On ne peut pas vraiment initialiser un array en tant que "constante temporaire"
-    // car les arrayx ont besoin d'être alloués. Ce visitor sera callé lors
-    // de l'évaluation d'une expression qui contient [1, 2, 3, ...].
-    // Pour l'instant, returnner nullptr - le vrai traitement doit se faire
-    // dans VisitorDeclarationVariable qui connaît le type du array.
+    // Cannot really initialize an array as a "temporary constant"
+    // because arrays need to be allocated. This visitor will be called during
+    // the evaluation of an expression containing [1, 2, 3, ...].
+    // For now, return nullptr - the real handling must be done
+    // in VisitorDeclarationVariable which knows the array type.
     
-    _contextGenCode->modifierValeurTemporaire(Symbole(nullptr, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
-    _contextGenCode->modifierValeurTemporaire(Symbole(_contextGenCode->getValeurTemporaire().getAdresse(), nullptr, _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+    _contextGenCode->setTemporaryValue(Symbol(nullptr, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
+    _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), nullptr, _contextGenCode->getTemporaryValue().getPointedElementType()));
 }

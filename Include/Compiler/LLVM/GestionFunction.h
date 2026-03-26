@@ -20,96 +20,96 @@ struct ArgumentsCodeGen {
     std::vector<NodeArgFunction*> arguments;
 };
 
-// Génération de la Déclaration
+// Generation of the Declaration
 
-class GenerateurDeclarationFunction {
+class FunctionDeclarationGenerator {
 private:
     ContextGenCode* _contextGenCode;
     NodeDeclarationFunction* _nodeDeclarationFunction;
     IVisitor* _visitorGeneralCodeGen;
 
-    virtual auto creerFunction() -> llvm::Function* = 0;
-    virtual void traiterArgumentsConstruit(llvm::Function* function, const ArgumentsCodeGen& args) = 0;
+    virtual auto createFunction() -> llvm::Function* = 0;
+    virtual void handleConstructedArguments(llvm::Function* function, const ArgumentsCodeGen& args) = 0;
 
 public:
-    GenerateurDeclarationFunction(ContextGenCode* context, NodeDeclarationFunction* node, IVisitor* visitor);
-    virtual ~GenerateurDeclarationFunction() = default;
+    FunctionDeclarationGenerator(ContextGenCode* context, NodeDeclarationFunction* node, IVisitor* visitor);
+    virtual ~FunctionDeclarationGenerator() = default;
 
     [[nodiscard]] auto getContextGenCode() const -> ContextGenCode* { return _contextGenCode; }
     [[nodiscard]] auto getNodeDeclarationFunction() const -> NodeDeclarationFunction* { return _nodeDeclarationFunction; }
     [[nodiscard]] auto getGeneralVisitorCodeGen() const -> IVisitor* { return _visitorGeneralCodeGen; }
 
-    GenerateurDeclarationFunction(const GenerateurDeclarationFunction&) = delete;
-    auto operator=(const GenerateurDeclarationFunction&) -> GenerateurDeclarationFunction& = delete;
-    GenerateurDeclarationFunction(GenerateurDeclarationFunction&&) = delete;
-    auto operator=(GenerateurDeclarationFunction&&) -> GenerateurDeclarationFunction& = delete;
+    FunctionDeclarationGenerator(const FunctionDeclarationGenerator&) = delete;
+    auto operator=(const FunctionDeclarationGenerator&) -> FunctionDeclarationGenerator& = delete;
+    FunctionDeclarationGenerator(FunctionDeclarationGenerator&&) = delete;
+    auto operator=(FunctionDeclarationGenerator&&) -> FunctionDeclarationGenerator& = delete;
 
-    void declarerFunction();
+    void declareFunction();
     
-    static auto creer(ContextGenCode* context, NodeDeclarationFunction* node, IVisitor* visitor) -> std::unique_ptr<GenerateurDeclarationFunction>;
+    static auto create(ContextGenCode* context, NodeDeclarationFunction* node, IVisitor* visitor) -> std::unique_ptr<FunctionDeclarationGenerator>;
 };
 
-class GenerateurDeclarationStandard : public GenerateurDeclarationFunction {
+class StandardFunctionDeclarationGenerator : public FunctionDeclarationGenerator {
 private:
-    auto creerFunction() -> llvm::Function* override;
-    void traiterArgumentsConstruit(llvm::Function* function, const ArgumentsCodeGen& args) override;
+    auto createFunction() -> llvm::Function* override;
+    void handleConstructedArguments(llvm::Function* function, const ArgumentsCodeGen& args) override;
 public:
-    using GenerateurDeclarationFunction::GenerateurDeclarationFunction;
+    using FunctionDeclarationGenerator::FunctionDeclarationGenerator;
 };
 
-class GenerateurDeclarationMethode : public GenerateurDeclarationFunction {
+class MethodFunctionDeclarationGenerator : public FunctionDeclarationGenerator {
 private:
-    auto creerFunction() -> llvm::Function* override;
-    void traiterArgumentsConstruit(llvm::Function* function, const ArgumentsCodeGen& args) override;
+    auto createFunction() -> llvm::Function* override;
+    void handleConstructedArguments(llvm::Function* function, const ArgumentsCodeGen& args) override;
 public:
-    using GenerateurDeclarationFunction::GenerateurDeclarationFunction;
+    using FunctionDeclarationGenerator::FunctionDeclarationGenerator;
 };
 
 
-// Génération de l'Call
-class GenerateurCallFunction {
+// Generation of the Call
+class FunctionCallGenerator {
 private:
     ContextGenCode* _contextGenCode;
     IVisitor* _visitorGeneralCodeGen;
 
-    virtual auto obtenirFunctionLocale(const std::string& nomFunction) -> const SymboleFunctionLocale* = 0;
+    virtual auto getLocalFunction(const std::string& functionName) -> const SymbolFunctionLocal* = 0;
 
 public:
-    GenerateurCallFunction(ContextGenCode* context, IVisitor* visitor);
-    virtual ~GenerateurCallFunction() = default;
+    FunctionCallGenerator(ContextGenCode* context, IVisitor* visitor);
+    virtual ~FunctionCallGenerator() = default;
 
     [[nodiscard]] auto getContextGenCode() const -> ContextGenCode* { return _contextGenCode; }
     [[nodiscard]] auto getGeneralVisitorCodeGen() const -> IVisitor* { return _visitorGeneralCodeGen; }
 
-    GenerateurCallFunction(const GenerateurCallFunction&) = delete;
-    auto operator=(const GenerateurCallFunction&) -> GenerateurCallFunction& = delete;
-    GenerateurCallFunction(GenerateurCallFunction&&) = delete;
-    auto operator=(GenerateurCallFunction&&) -> GenerateurCallFunction& = delete;
+    FunctionCallGenerator(const FunctionCallGenerator&) = delete;
+    auto operator=(const FunctionCallGenerator&) -> FunctionCallGenerator& = delete;
+    FunctionCallGenerator(FunctionCallGenerator&&) = delete;
+    auto operator=(FunctionCallGenerator&&) -> FunctionCallGenerator& = delete;
 
-    void generatedrCallFunction(NodeCallFunction* node);
-    static auto creer(ContextGenCode* context, IVisitor* visitor) -> std::unique_ptr<GenerateurCallFunction>;
+    void generateCallFunction(NodeCallFunction* node);
+    static auto create(ContextGenCode* context, IVisitor* visitor) -> std::unique_ptr<FunctionCallGenerator>;
 };
 
-class GenerateurCallStandard : public GenerateurCallFunction {
+class StandardFunctionCallGenerator : public FunctionCallGenerator {
 private:
-    const SymboleFunctionLocale* obtenirFunctionLocale(const std::string& nomFunction) override;
+    auto getLocalFunction(const std::string& functionName) -> const SymbolFunctionLocal* override;
 public:
-    using GenerateurCallFunction::GenerateurCallFunction;
+    using FunctionCallGenerator::FunctionCallGenerator;
 };
 
-class GenerateurCallMethode : public GenerateurCallFunction {
+class MethodFunctionCallGenerator : public FunctionCallGenerator {
 private:
-    const SymboleFunctionLocale* obtenirFunctionLocale(const std::string& nomFunction) override;
+    auto getLocalFunction(const std::string& functionName) -> const SymbolFunctionLocal* override;
 public:
-    using GenerateurCallFunction::GenerateurCallFunction;
+    using FunctionCallGenerator::FunctionCallGenerator;
 };
 
-// Gestion des functions Natives (Built-ins)
+// Management of Native (Built-in) functions
 
 class RegistryBuiltIns {
 public:
-    static auto estBuiltIn(const std::string& nom) -> bool;
-    static void generatedrCall(const std::string& nom, NodeCallFunction* node, ContextGenCode* context, IVisitor* visitor);
+    static auto isBuiltIn(const std::string& name) -> bool;
+    static void generateCall(const std::string& name, NodeCallFunction* node, ContextGenCode* context, IVisitor* visitor);
 };
 
 #endif /* D2944365_C1DD_41F8_A211_BFF33402A958 */

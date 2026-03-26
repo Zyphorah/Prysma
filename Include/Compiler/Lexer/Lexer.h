@@ -8,35 +8,35 @@
 #include <vector>
 
 using namespace std;
-// lexer utilisé pour la tokenization du code source prysma
-// filtre le code source en une liste de tokens identifiés 
+// lexer used for tokenizing the prysma source code
+// filters the source code into a list of identified tokens
 
 struct Token {
     TokenType type;
     string value;
-    int ligne;      
-    int colonne;    
+    int line;
+    int column;
 };
 
 class Lexer {
-    private: 
+    private:
 
-    // Dictionnaire pour les mots réservés du langage de programmation prysma
-    // Permet de différencier les identifiants des mots-clés
-    static constexpr std::array<std::pair<const char*, TokenType>, 31> motsClesArray = {{
+    // Dictionary for reserved keywords of the prysma programming language
+    // Allows to differentiate identifiers from keywords
+    static constexpr std::array<std::pair<const char*, TokenType>, 31> keywordsArray = {{
         {"char", TOKEN_TYPE_CHAR},
         {"arg", TOKEN_ARG},
-        {"fn", TOKEN_FONCTION},
-        {"if", TOKEN_SI},
-        {"else", TOKEN_SINON},
-        {"while", TOKEN_TANT_QUE},
-        {"for", TOKEN_POUR},
-        {"return", TOKEN_RETOUR},
-        {"true", TOKEN_VRAI},
-        {"false", TOKEN_FAUX},
+        {"fn", TOKEN_FUNCTION},
+        {"if", TOKEN_IF},
+        {"else", TOKEN_ELSE},
+        {"while", TOKEN_WHILE},
+        {"for", TOKEN_FOR},
+        {"return", TOKEN_RETURN},
+        {"true", TOKEN_TRUE},
+        {"false", TOKEN_FALSE},
         {"scope", TOKEN_SCOPE},
-        {"aff", TOKEN_AFF},
-        {"dec", TOKEN_DEC},
+        {"aff", TOKEN_ASSIGN},
+        {"dec", TOKEN_DECL},
         {"int64", TOKEN_TYPE_INT64},
         {"int32", TOKEN_TYPE_INT32},
         {"float", TOKEN_TYPE_FLOAT},
@@ -57,21 +57,21 @@ class Lexer {
         {"protected",TOKEN_PROTECTED},
     }};
 
-    // Functions privées pour la tokenization
-    static void ajouterMotCourant(const string& motCourant, vector<Token>& tokens, int ligne, int colonne);
-    static void traiterOperateursEtDelimiteurs(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne);
-    static void traiterOperateursMathematiques(char current, vector<Token>& tokens, int ligne, int colonne);
-    static void traiterDelimiteurs(char current, vector<Token>& tokens, int ligne, int colonne);
-    static void traiterOperateursComplexs(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne);
-    static void traiterLitteraux(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne);
-    static void traiterCommentaires(const string& sourceCode, size_t& pos);
-    static void traiterNombre(const string& sourceCode, size_t& pos, vector<Token>& tokens, int ligne, int& colonne);
-    static auto estContextNombreNegatif(const vector<Token>& tokens) -> bool;
-    static auto traiterNombreNegatifOuPositif(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, 
-                                        string& motCourant, int ligne, int& colonne, int& colonneMotCourant) -> bool;
-    
-    public: 
-    static auto tokenizer(const string& sourceCode) -> vector<Token>;
+    // Private functions for tokenization
+    static void addCurrentWord(const string& currentWord, vector<Token>& tokens, int line, int column);
+    static void handleOperatorsAndDelimiters(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int line, int& column);
+    static void handleMathOperators(char current, vector<Token>& tokens, int line, int column);
+    static void handleDelimiters(char current, vector<Token>& tokens, int line, int column);
+    static void handleComplexOperators(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int line, int& column);
+    static void handleLiterals(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int line, int& column);
+    static void handleComments(const string& sourceCode, size_t& pos);
+    static void handleNumber(const string& sourceCode, size_t& pos, vector<Token>& tokens, int line, int& column);
+    static auto isNegativeNumberContext(const vector<Token>& tokens) -> bool;
+    static auto handleNegativeOrPositiveNumber(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens,
+                                        string& currentWord, int line, int& column, int& columnCurrentWord) -> bool;
+
+    public:
+    static auto tokenize(const string& sourceCode) -> vector<Token>;
 };
 
 #endif /* F2D02E97_AF62_409B_84AD_90905E9BE240 */

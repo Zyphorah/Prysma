@@ -10,29 +10,29 @@
 
 namespace llvm { class AllocaInst; }
 
-struct Symbole {
+struct Symbol {
 private:
-    llvm::Value* adresse;
+    llvm::Value* address;
     IType* type;
-    llvm::Type* typePointeElement;
+    llvm::Type* pointedElementType;
 
 public:
-    Symbole() : adresse(nullptr), type(nullptr), typePointeElement(nullptr) {}
+    Symbol() : address(nullptr), type(nullptr), pointedElementType(nullptr) {}
 
-    Symbole(llvm::Value* pAdresse, IType* pType) : adresse(pAdresse), type(pType), typePointeElement(nullptr) {}
+    Symbol(llvm::Value* pAddress, IType* pType) : address(pAddress), type(pType), pointedElementType(nullptr) {}
 
-    Symbole(llvm::Value* pAdresse, IType* pType, llvm::Type* pTypePointeElement)
-        : adresse(pAdresse), type(pType), typePointeElement(pTypePointeElement) {}
+    Symbol(llvm::Value* pAddress, IType* pType, llvm::Type* pPointedElementType)
+        : address(pAddress), type(pType), pointedElementType(pPointedElementType) {}
 
-    [[nodiscard]] auto getAdresse() const -> llvm::Value* { return adresse; }
+    [[nodiscard]] auto getAddress() const -> llvm::Value* { return address; }
     [[nodiscard]] auto getType() const -> IType* { return type; }
-    [[nodiscard]] auto getTypePointeElement() const -> llvm::Type* { return typePointeElement; }
+    [[nodiscard]] auto getPointedElementType() const -> llvm::Type* { return pointedElementType; }
 };
 
 class RegistryVariable 
 {
 private: 
-    std::stack<std::map<std::string, Symbole >>  _variables; 
+    std::stack<std::map<std::string, Symbol >>  _variables; 
 
 public:
     RegistryVariable();
@@ -44,20 +44,20 @@ public:
     RegistryVariable(RegistryVariable&&) = delete;
     auto operator=(RegistryVariable&&) -> RegistryVariable& = delete;
     
-    auto recupererVariables(const Token& token) -> Symbole;
+    auto getVariable(const Token& token) -> Symbol;
 
-    void enregistryr(
+    void registerVariable(
         const Token& token,
-        Symbole symbole
+        Symbol symbol
     );
     
-    void piler();
-    void depiler();
-    void viderTop();
+    void push();
+    void pop();
+    void clearTop();
 
-    auto existeVariable(const std::string& nom) -> bool;
+    auto variableExists(const std::string& name) -> bool;
 
-    auto getGlobalVariables() -> std::map<std::string, Symbole>& {
+    auto getGlobalVariables() -> std::map<std::string, Symbol>& {
         return _variables.top();
     }
 };

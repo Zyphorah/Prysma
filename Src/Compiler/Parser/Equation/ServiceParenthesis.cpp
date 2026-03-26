@@ -5,15 +5,15 @@
 #include <cstddef>
 #include <vector>
 
-ServiceParenthese::ServiceParenthese(RegistrySymbole* registrySymbole)
-    : _registrySymbole(registrySymbole) {
+ParenthesisService::ParenthesisService(RegistrySymbol* _registrySymbol)
+    : _registrySymbol(_registrySymbol) {
 }
 
-// TODO: OPTIMISATION utilisation de int debut et int fin pour éviter la copie du vecteur de token et ne rien returnner
-auto ServiceParenthese::enleverParenthesesEnglobantes(const vector<Token>& equation) -> std::vector<Token> {
+// TODO: OPTIMIZATION use int start and int end to avoid copying the token vector and not return anything
+auto ParenthesisService::removeWrappingParentheses(const std::vector<Token>& equation) -> std::vector<Token> {
     std::vector<Token> result = equation;
     
-    // Enlever les tokens EOF au début et à la fin
+    // Remove EOF tokens at the beginning and end
     while (!result.empty() && result.front().type == TOKEN_EOF) {
         result.erase(result.begin());
     }
@@ -22,34 +22,34 @@ auto ServiceParenthese::enleverParenthesesEnglobantes(const vector<Token>& equat
     }
     
     while (result.size() >= 2 && 
-           result.front().type == TOKEN_PAREN_OUVERTE && 
-           result.back().type == TOKEN_PAREN_FERMEE && 
-           estEnglobante(result)) {
+           result.front().type == TOKEN_PAREN_OPEN && 
+           result.back().type == TOKEN_PAREN_CLOSE && 
+           isWrapping(result)) {
         result.erase(result.begin());
         result.erase(result.end() - 1);
     }
     return result;
 }
 
-auto ServiceParenthese::estEnglobante(const vector<Token>& equation) -> bool {
+auto ParenthesisService::isWrapping(const std::vector<Token>& equation) -> bool {
     if (equation.size() < 2) {
         return false;
     }
     
-    if (equation.front().type != TOKEN_PAREN_OUVERTE) {
+    if (equation.front().type != TOKEN_PAREN_OPEN) {
         return false;
     }
 
-    if (equation.back().type != TOKEN_PAREN_FERMEE) {
+    if (equation.back().type != TOKEN_PAREN_CLOSE) {
         return false;
     }
     
-    // Vérifier que la depth ne retombe pas à 0 avant le dernier token
+    // Check that the depth does not return to 0 before the last token
     int depth = 0;
     for (size_t i = 0; i < equation.size(); i++) {
         Token token = equation[i];
-        depth += (token.type == TOKEN_PAREN_OUVERTE ? 1 : token.type == TOKEN_PAREN_FERMEE ? -1 : 0);
-        // Si on atteint depth 0 avant le dernier token, ce n'est pas englobant
+        depth += (token.type == TOKEN_PAREN_OPEN ? 1 : token.type == TOKEN_PAREN_CLOSE ? -1 : 0);
+        // If we reach depth 0 before the last token, it's not wrapping
         if (depth == 0 && i < equation.size() - 1) {
             return false;
         }
@@ -58,16 +58,16 @@ auto ServiceParenthese::estEnglobante(const vector<Token>& equation) -> bool {
     return depth == 0;
 }
 
-auto ServiceParenthese::trouverDernierAuNiveauZero(const vector<Token>& equation, Token operateur) -> int {
+auto ParenthesisService::findLastAtLevelZero(const std::vector<Token>& equation, Token op) -> int {
     int depthParen = 0;
-    int depthCrochet = 0;
+    int depthBracket = 0;
     for (int i = static_cast<int>(equation.size()) - 1; i >= 0; i--) {
         Token token = equation[static_cast<size_t>(i)];
-        depthParen += (token.type == TOKEN_PAREN_FERMEE ? 1 : token.type == TOKEN_PAREN_OUVERTE ? -1 : 0);
-        depthCrochet += (token.type == TOKEN_CROCHET_FERME ? 1 : token.type == TOKEN_CROCHET_OUVERT ? -1 : 0);
+        depthParen += (token.type == TOKEN_PAREN_CLOSE ? 1 : token.type == TOKEN_PAREN_OPEN ? -1 : 0);
+        depthBracket += (token.type == TOKEN_BRACKET_CLOSE ? 1 : token.type == TOKEN_BRACKET_OPEN ? -1 : 0);
         
-        if (token.type == operateur.type && depthParen == 0 && depthCrochet == 0 && !estSigneUnaire(equation, i)) {
-            if (i > 0 && operateur.type == equation[static_cast<size_t>(i - 1)].type) {
+        if (token.type == op.type && depthParen == 0 && depthBracket == 0 && !isUnarySign(equation, i)) {
+            if (i > 0 && op.type == equation[static_cast<size_t>(i - 1)].type) {
                 return i - 1;
             }
             return i;
@@ -76,10 +76,10 @@ auto ServiceParenthese::trouverDernierAuNiveauZero(const vector<Token>& equation
     return -1;
 }
 
-auto ServiceParenthese::estSigneUnaire(const vector<Token>& equation, int indice) const -> bool {
-    if (indice == 0) {
+auto ParenthesisService::isUnarySign(const std::vector<Token>& equation, int index) const -> bool {
+    if (index == 0) {
         return true;
     }
-    Token precedent = equation[static_cast<size_t>(indice - 1)];
-    return _registrySymbole->estOperateur(precedent.type) || precedent.type == TOKEN_PAREN_OUVERTE;
+    Token previous = equation[static_cast<size_t>(index - 1)];
+    return _registrySymbol->isOperator(previous.type) || previous.type == TOKEN_PAREN_OPEN;
 }

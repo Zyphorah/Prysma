@@ -14,127 +14,126 @@
 #include <utility>
 #include <vector>
 
-BuilderEquationFlottante::BuilderEquationFlottante(RegistryExpression* registryExpression, llvm::BumpPtrAllocator& arena)
-    : _registryExpression(registryExpression), _arena(arena)
+// Floating-point equation builder
+BuilderFloatEquation::BuilderFloatEquation(RegistryExpression* registryExpression, llvm::BumpPtrAllocator& arena)
+    : _expressionRegistry(registryExpression), _arena(arena)
 {
-    _registrySymbole = std::make_unique<RegistrySymbole>();
+    _symbolRegistry = std::make_unique<RegistrySymbol>();
 
-    _serviceParenthese = std::make_unique<ServiceParenthese>(_registrySymbole.get());
+    _parenthesisService = std::make_unique<ParenthesisService>(_symbolRegistry.get());
 
-    _managerAddition = std::make_unique<ManagerOperateur>(TOKEN_PLUS);
-    _managerSoustraction = std::make_unique<ManagerOperateur>(TOKEN_MOINS);
-    _managerMultiplication = std::make_unique<ManagerOperateur>(TOKEN_ETOILE);
-    _managerDivision = std::make_unique<ManagerOperateur>(TOKEN_SLASH);
-    _managerModulo = std::make_unique<ManagerOperateur>(TOKEN_MODULO);
-    _managerPlusPetit = std::make_unique<ManagerOperateur>(TOKEN_PLUS_PETIT);
-    _managerPlusGrand = std::make_unique<ManagerOperateur>(TOKEN_PLUS_GRAND);
-    _managerPlusPetitEgal = std::make_unique<ManagerOperateur>(TOKEN_PLUS_PETIT_EGAL);
-    _managerPlusGrandEgal = std::make_unique<ManagerOperateur>(TOKEN_PLUS_GRAND_EGAL);
-    _managerEgal = std::make_unique<ManagerOperateur>(TOKEN_EGAL_EGAL);
-    _managerDifferent = std::make_unique<ManagerOperateur>(TOKEN_DIFFERENT);
-    _managerEt = std::make_unique<ManagerOperateur>(TOKEN_ET);
-    _managerOu = std::make_unique<ManagerOperateur>(TOKEN_OU);
+    _additionManager = std::make_unique<OperatorManager>(TOKEN_PLUS);
+    _subtractionManager = std::make_unique<OperatorManager>(TOKEN_MINUS);
+    _multiplicationManager = std::make_unique<OperatorManager>(TOKEN_STAR);
+    _divisionManager = std::make_unique<OperatorManager>(TOKEN_SLASH);
+    _moduloManager = std::make_unique<OperatorManager>(TOKEN_MODULO);
+    _lessThanManager = std::make_unique<OperatorManager>(TOKEN_LESS);
+    _greaterThanManager = std::make_unique<OperatorManager>(TOKEN_GREATER);
+    _lessThanOrEqualManager = std::make_unique<OperatorManager>(TOKEN_LESS_EQUAL);
+    _greaterThanOrEqualManager = std::make_unique<OperatorManager>(TOKEN_GREATER_EQUAL);
+    _equalManager = std::make_unique<OperatorManager>(TOKEN_EQUAL_EQUAL);
+    _notEqualManager = std::make_unique<OperatorManager>(TOKEN_NOT_EQUAL);
+    _andManager = std::make_unique<OperatorManager>(TOKEN_AND);
+    _orManager = std::make_unique<OperatorManager>(TOKEN_OR);
 
-    std::vector<ManagerOperateur*> operateurs = {
-        _managerOu.get(),
-        _managerEt.get(),
-        _managerEgal.get(),
-        _managerDifferent.get(),
-        _managerPlusPetit.get(),
-        _managerPlusGrand.get(),
-        _managerPlusPetitEgal.get(),
-        _managerPlusGrandEgal.get(),
-        _managerAddition.get(), 
-        _managerSoustraction.get(), 
-        _managerMultiplication.get(), 
-        _managerDivision.get(),
-        _managerModulo.get()
+    std::vector<OperatorManager*> operators = {
+        _orManager.get(),
+        _andManager.get(),
+        _equalManager.get(),
+        _notEqualManager.get(),
+        _lessThanManager.get(),
+        _greaterThanManager.get(),
+        _lessThanOrEqualManager.get(),
+        _greaterThanOrEqualManager.get(),
+        _additionManager.get(), 
+        _subtractionManager.get(), 
+        _multiplicationManager.get(), 
+        _divisionManager.get(),
+        _moduloManager.get()
     };
             
-    _chaineResponsabilite = std::make_unique<ChainOfResponsibility>(_serviceParenthese.get(), operateurs);
+    _chainOfResponsibility = std::make_unique<ChainOfResponsibility>(_parenthesisService.get(), operators);
                     
     _builderTree = std::unique_ptr<IBuilderTree>(
         new (_arena) BuilderTreeEquation(
-            _chaineResponsabilite.get(), 
-            _registrySymbole.get(), 
-            _registryExpression,
-            _serviceParenthese.get(),
+            _chainOfResponsibility.get(), 
+            _symbolRegistry.get(), 
+            _expressionRegistry,
+            _parenthesisService.get(),
             _arena
         )
     ).release();
 
-    initialiserRegistry();
+    initializeRegistry();
 }
 
-void BuilderEquationFlottante::initialiserRegistry()
+void BuilderFloatEquation::initializeRegistry()
 {
-    _registrySymbole->enregistryr(TOKEN_PLUS, [this](Token token) -> IExpression* { 
-        return this->allouer<NodeOperation>(std::move(token)); 
+    _symbolRegistry->registerSymbol(TOKEN_PLUS, [this](Token token) -> IExpression* { 
+        return this->allocate<NodeOperation>(std::move(token)); 
     });
 
-    _registrySymbole->enregistryr(TOKEN_MOINS, [this](Token token) -> IExpression* { 
-        return this->allouer<NodeOperation>(std::move(token)); 
+    _symbolRegistry->registerSymbol(TOKEN_MINUS, [this](Token token) -> IExpression* { 
+        return this->allocate<NodeOperation>(std::move(token)); 
     });
 
-    _registrySymbole->enregistryr(TOKEN_ETOILE, [this](Token token) -> IExpression* { 
-        return this->allouer<NodeOperation>(std::move(token)); 
+    _symbolRegistry->registerSymbol(TOKEN_STAR, [this](Token token) -> IExpression* { 
+        return this->allocate<NodeOperation>(std::move(token)); 
     });
 
-    _registrySymbole->enregistryr(TOKEN_SLASH, [this](Token token) -> IExpression* { 
-        return this->allouer<NodeOperation>(std::move(token)); 
+    _symbolRegistry->registerSymbol(TOKEN_SLASH, [this](Token token) -> IExpression* { 
+        return this->allocate<NodeOperation>(std::move(token)); 
     });
-    _registrySymbole->enregistryr(TOKEN_PLUS_PETIT, [this](Token token) -> IExpression* { 
-        return this->allouer<NodeOperation>(std::move(token)); 
+    _symbolRegistry->registerSymbol(TOKEN_LESS, [this](Token token) -> IExpression* { 
+        return this->allocate<NodeOperation>(std::move(token)); 
     });
-    _registrySymbole->enregistryr(TOKEN_PLUS_GRAND, [this](Token token) -> IExpression* { 
-        return this->allouer<NodeOperation>(std::move(token)); 
+    _symbolRegistry->registerSymbol(TOKEN_GREATER, [this](Token token) -> IExpression* { 
+        return this->allocate<NodeOperation>(std::move(token)); 
     });
-    _registrySymbole->enregistryr(TOKEN_PLUS_GRAND_EGAL, [this](Token token) -> IExpression* { 
-        return this->allouer<NodeOperation>(std::move(token)); 
+    _symbolRegistry->registerSymbol(TOKEN_GREATER_EQUAL, [this](Token token) -> IExpression* { 
+        return this->allocate<NodeOperation>(std::move(token)); 
     });
-    _registrySymbole->enregistryr(TOKEN_PLUS_PETIT_EGAL, [this](Token token) -> IExpression* { 
-        return this->allouer<NodeOperation>(std::move(token));
+    _symbolRegistry->registerSymbol(TOKEN_LESS_EQUAL, [this](Token token) -> IExpression* { 
+        return this->allocate<NodeOperation>(std::move(token));
     });
-    _registrySymbole->enregistryr(TOKEN_MODULO, [this](Token token) -> IExpression* { 
-        return this->allouer<NodeOperation>(std::move(token));
+    _symbolRegistry->registerSymbol(TOKEN_MODULO, [this](Token token) -> IExpression* { 
+        return this->allocate<NodeOperation>(std::move(token));
     });
-    _registrySymbole->enregistryr(TOKEN_EGAL_EGAL, [this](Token token) -> IExpression* { 
-        return this->allouer<NodeOperation>(std::move(token));
+    _symbolRegistry->registerSymbol(TOKEN_EQUAL_EQUAL, [this](Token token) -> IExpression* { 
+        return this->allocate<NodeOperation>(std::move(token));
     });
-    _registrySymbole->enregistryr(TOKEN_DIFFERENT, [this](Token token) -> IExpression* { 
-        return this->allouer<NodeOperation>(std::move(token));
+    _symbolRegistry->registerSymbol(TOKEN_NOT_EQUAL, [this](Token token) -> IExpression* { 
+        return this->allocate<NodeOperation>(std::move(token));
     });
-    _registrySymbole->enregistryr(TOKEN_ET, [this](Token token) -> IExpression* { 
-        return this->allouer<NodeOperation>(std::move(token));
+    _symbolRegistry->registerSymbol(TOKEN_AND, [this](Token token) -> IExpression* { 
+        return this->allocate<NodeOperation>(std::move(token));
     });
-    _registrySymbole->enregistryr(TOKEN_OU, [this](Token token) -> IExpression* { 
-        return this->allouer<NodeOperation>(std::move(token));
+    _symbolRegistry->registerSymbol(TOKEN_OR, [this](Token token) -> IExpression* { 
+        return this->allocate<NodeOperation>(std::move(token));
     });
 }
 
-
-
-auto BuilderEquationFlottante::construire(std::vector<Token> &tokens) -> INode*
+auto BuilderFloatEquation::build(std::vector<Token> &tokens) -> INode*
 {
-    return _builderTree->construire(tokens);
+    return _builderTree->build(tokens);
 }
 
-auto BuilderEquationFlottante::recupererBuilderTree() const -> IBuilderTree*
+auto BuilderFloatEquation::getBuilderTree() const -> IBuilderTree*
 {
     return _builderTree;
 }
 
-auto BuilderEquationFlottante::construire(std::vector<Token>& tokens, int& index) -> INode*
+auto BuilderFloatEquation::build(std::vector<Token>& tokens, int& index) -> INode*
 {
-    return _builderTree->construire(tokens, index);
+    return _builderTree->build(tokens, index);
 }
 
-llvm::BumpPtrAllocator& BuilderEquationFlottante::getArena()
+llvm::BumpPtrAllocator& BuilderFloatEquation::getArena()
 {
     return _arena;
 }
 
-BuilderEquationFlottante::~BuilderEquationFlottante()
+BuilderFloatEquation::~BuilderFloatEquation()
 {
     if (_builderTree != nullptr) {
         _builderTree->~IBuilderTree();

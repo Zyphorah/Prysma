@@ -12,45 +12,46 @@
 #include <spawn.h>
 #include <sys/wait.h>
 
-
 namespace fs = std::filesystem;
 
-BuilderSysteme::BuilderSysteme(BuilderParams params)
-    : _pathLib(std::move(params.pathLib)), 
+BuilderSystem::BuilderSystem(BuilderParams params)
+    : _libPath(std::move(params.libPath)), 
       _libObjDir(std::move(params.libObjDir)),
       _buildDir(std::move(params.buildDir)), 
       _outputLL(std::move(params.outputLL)), 
       _executable(std::move(params.executable)) 
 {}
 
-BuilderSysteme::~BuilderSysteme() = default;
+BuilderSystem::~BuilderSystem() = default;
 
-auto BuilderSysteme::parcourirEtCollecterFiles(const std::filesystem::path& repertoire, const std::string& extension) -> std::vector<std::string>
+// Traverse and collect files with a given extension
+auto BuilderSystem::traverseAndCollectFiles(const std::filesystem::path& directory, const std::string& extension) -> std::vector<std::string>
 {
-    std::vector<std::string> fichiers;
-    if (!fs::exists(repertoire)) {
-        return fichiers;
+    std::vector<std::string> files;
+    if (!fs::exists(directory)) {
+        return files;
     }
-    for (const auto& entry : fs::directory_iterator(repertoire)) {
+    for (const auto& entry : fs::directory_iterator(directory)) {
         if (entry.is_regular_file() && entry.path().extension() == extension) {
-            fichiers.push_back(entry.path().string());
+            files.push_back(entry.path().string());
         }
     }
-    return fichiers;
+    return files;
 }
 
-void BuilderSysteme::compilerLib()
+// Compile the library
+void BuilderSystem::compileLib()
 {
     if (!fs::exists(_libObjDir)) {
         fs::create_directories(_libObjDir);
     }
 
-    std::vector<std::string> fichiersCpp = BuilderSysteme::parcourirEtCollecterFiles(_pathLib, ".cpp");
-    for (const auto& fichier : fichiersCpp) {
-        const fs::path filePath(fichier);
+    std::vector<std::string> cppFiles = BuilderSystem::traverseAndCollectFiles(_libPath, ".cpp");
+    for (const auto& file : cppFiles) {
+        const fs::path filePath(file);
         std::string objectFile = (fs::path(_libObjDir) / filePath.filename()).replace_extension(".o").string();
         
-        std::vector<std::string> cmdArgs = {"clang++", "-c", fichier, "-o", objectFile};
+        std::vector<std::string> cmdArgs = {"clang++", "-c", file, "-o", objectFile};
         std::vector<char*> argv;
         argv.reserve(cmdArgs.size() + 1);
         for (auto& arg : cmdArgs) {
@@ -63,17 +64,18 @@ void BuilderSysteme::compilerLib()
         if (posix_spawnp(&pid, "clang++", nullptr, nullptr, argv.data(), environ) == 0) {
             waitpid(pid, &status, 0);
             if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-                std::cerr << "Error lors de la compilation de la lib." << std::endl;
+                std::cerr << "Error during library compilation." << std::endl;
             }
         } else {
-            std::cerr << "Error lors de l'exécution de clang++." << std::endl;
+            std::cerr << "Error during execution of clang++." << std::endl;
         }
     }
 }
 
-void BuilderSysteme::lierLibExecutable()
+// Link the library to the executable
+void BuilderSystem::linkLibExecutable()
 {
-    std::vector<std::string> objectFilesVec = BuilderSysteme::parcourirEtCollecterFiles(_libObjDir, ".o");
+    std::vector<std::string> objectFilesVec = BuilderSystem::traverseAndCollectFiles(_libObjDir, ".o");
 
     std::vector<std::string> args = {"clang++"};
     for (const auto& llFile : _outputLL) {
@@ -98,9 +100,9 @@ void BuilderSysteme::lierLibExecutable()
     if (posix_spawnp(&pid, "clang++", nullptr, nullptr, argv.data(), environ) == 0) {
         waitpid(pid, &status, 0);
         if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-            std::cerr << "Error lors de la liaison de la lib à l'exécutable." << std::endl;
+            std::cerr << "Error during linking library to executable." << std::endl;
         }
     } else {
-        std::cerr << "Error lors de l'exécution de clang++." << std::endl;
+        std::cerr << "Error during execution of clang++." << std::endl;
     }
 }

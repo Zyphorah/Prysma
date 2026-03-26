@@ -15,51 +15,50 @@
 
 struct Token;
 
-class BuilderEquationFlottante : public IBuilderTree
+class BuilderFloatEquation : public IBuilderTree
 {
 private:
-    std::unique_ptr<RegistrySymbole> _registrySymbole;
+    RegistryExpression* _expressionRegistry;
+    llvm::BumpPtrAllocator& _arena;
+    std::unique_ptr<RegistrySymbol> _symbolRegistry;
     
-    std::unique_ptr<ManagerOperateur> _managerAddition;
-    std::unique_ptr<ManagerOperateur> _managerSoustraction;
-    std::unique_ptr<ManagerOperateur> _managerMultiplication;
-    std::unique_ptr<ManagerOperateur> _managerDivision;
-    std::unique_ptr<ManagerOperateur> _managerModulo;
-    std::unique_ptr<ManagerOperateur> _managerPlusPetit;
-    std::unique_ptr<ManagerOperateur> _managerPlusGrand;
-    std::unique_ptr<ManagerOperateur> _managerPlusPetitEgal;
-    std::unique_ptr<ManagerOperateur> _managerPlusGrandEgal;
-    std::unique_ptr<ManagerOperateur> _managerEgal;
-    std::unique_ptr<ManagerOperateur> _managerDifferent;
-    std::unique_ptr<ManagerOperateur> _managerEt;
-    std::unique_ptr<ManagerOperateur> _managerOu;
+    std::unique_ptr<OperatorManager> _additionManager;
+    std::unique_ptr<OperatorManager> _subtractionManager;
+    std::unique_ptr<OperatorManager> _multiplicationManager;
+    std::unique_ptr<OperatorManager> _divisionManager;
+    std::unique_ptr<OperatorManager> _moduloManager;
+    std::unique_ptr<OperatorManager> _lessThanManager;
+    std::unique_ptr<OperatorManager> _greaterThanManager;
+    std::unique_ptr<OperatorManager> _lessThanOrEqualManager;
+    std::unique_ptr<OperatorManager> _greaterThanOrEqualManager;
+    std::unique_ptr<OperatorManager> _equalManager;
+    std::unique_ptr<OperatorManager> _notEqualManager;
+    std::unique_ptr<OperatorManager> _andManager;
+    std::unique_ptr<OperatorManager> _orManager;
 
-    std::unique_ptr<ServiceParenthese> _serviceParenthese;
-    std::unique_ptr<ChainOfResponsibility> _chaineResponsabilite;
+    std::unique_ptr<ParenthesisService> _parenthesisService;
+    std::unique_ptr<ChainOfResponsibility> _chainOfResponsibility;
         
     IBuilderTree* _builderTree;
-    RegistryExpression* _registryExpression;
-    llvm::BumpPtrAllocator& _arena;
 
-
-    void initialiserRegistry();
+    void initializeRegistry();
 
 public: 
 
-    BuilderEquationFlottante(RegistryExpression* registryExpression, llvm::BumpPtrAllocator& arena);
+    BuilderFloatEquation(RegistryExpression* expressionRegistry, llvm::BumpPtrAllocator& arena);
     
-    ~BuilderEquationFlottante() override;
+    ~BuilderFloatEquation() override;
 
-    BuilderEquationFlottante(const BuilderEquationFlottante&) = delete;
-    auto operator=(const BuilderEquationFlottante&) -> BuilderEquationFlottante& = delete;
-    BuilderEquationFlottante(BuilderEquationFlottante&&) = delete;
-    auto operator=(BuilderEquationFlottante&&) -> BuilderEquationFlottante& = delete;
+    BuilderFloatEquation(const BuilderFloatEquation&) = delete;
+    auto operator=(const BuilderFloatEquation&) -> BuilderFloatEquation& = delete;
+    BuilderFloatEquation(BuilderFloatEquation&&) = delete;
+    auto operator=(BuilderFloatEquation&&) -> BuilderFloatEquation& = delete;
 
-    auto construire(std::vector<Token>& tokens) -> INode* override;
-    auto construire(std::vector<Token>& tokens, int& index) -> INode* override;
+    auto build(std::vector<Token>& tokens) -> INode* override;
+    auto build(std::vector<Token>& tokens, int& index) -> INode* override;
     auto getArena() -> llvm::BumpPtrAllocator& override;
     
-    [[nodiscard]] auto recupererBuilderTree() const -> IBuilderTree*;
+    [[nodiscard]] auto getBuilderTree() const -> IBuilderTree*;
 };
 
 #endif /* FLOATEQUATIONBUILDER_H */

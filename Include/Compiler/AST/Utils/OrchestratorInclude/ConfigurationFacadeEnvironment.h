@@ -21,18 +21,19 @@
 #include <memory>
 #include <string>
 
-class ConfigurationFacadeEnvironnement
+class BuilderFloatEquation;
+class TypeParser;
+class ConfigurationFacadeEnvironment
 {
 private:
-    RegistryFunctionGlobale* _registryFunctionGlobale;
-    RegistryFile* _registryFile;
+    RegistryFunctionGlobal* _registryFunctionGlobal;
 
     llvm::BumpPtrAllocator _arena;
 
     std::unique_ptr<LlvmBackend> _backend;
     std::unique_ptr<RegistryInstruction> _registryInstruction;
     std::unique_ptr<RegistryVariable> _registryVariable;
-    std::unique_ptr<RegistryFunctionLocale> _registryFunctionLocale;
+    std::unique_ptr<RegistryFunctionLocal> _registryFunctionLocal;
     std::unique_ptr<RegistryType> _registryType;
     std::unique_ptr<ReturnContextCompilation> _returnContextCompilation;
     std::unique_ptr<RegistryArgument> _registryArgument;
@@ -41,35 +42,35 @@ private:
 
     RegistryExpression* _registryExpression;
     BuilderTreeInstruction* _builderTreeInstruction;
-    BuilderEquationFlottante* _builderEquation;
-    ParserType* _parserType;
+    BuilderFloatEquation* _builderEquation;
+    TypeParser* _parserType;
     ContextParser* _contextParser;
-    ContextExpression* _contexteExpression;
+    ContextExpression* _contextExpression;
 
-    void creerRegistrys();
-    void creerContext(const std::string& cheminFile);
-    void creerContextParser();
-    void enregistryrFunctionsExternes();
-    void enregistryrTypesDeBase();
-    void enregistryrExpressions();
-    void enregistryrInstructions();
+    void createRegistries();
+    void createContext(const std::string& filePath);
+    void createContextParser();
+    void registerExternalFunctions();
+    void registerBaseTypes();
+    void registerExpressions();
+    void registerInstructions();
 
 public:
-    explicit ConfigurationFacadeEnvironnement(RegistryFunctionGlobale* registryFunctionGlobale, RegistryFile* registryFile);
-    ~ConfigurationFacadeEnvironnement();
+    explicit ConfigurationFacadeEnvironment(RegistryFunctionGlobal* registryFunctionGlobal, [[maybe_unused]] FileRegistry* registryFile);
+    ~ConfigurationFacadeEnvironment();
 
-    ConfigurationFacadeEnvironnement(const ConfigurationFacadeEnvironnement&) = delete;
-    auto operator=(const ConfigurationFacadeEnvironnement&) -> ConfigurationFacadeEnvironnement& = delete;
-    ConfigurationFacadeEnvironnement(ConfigurationFacadeEnvironnement&&) = delete;
-    auto operator=(ConfigurationFacadeEnvironnement&&) -> ConfigurationFacadeEnvironnement& = delete;
+    ConfigurationFacadeEnvironment(const ConfigurationFacadeEnvironment&) = delete;
+    auto operator=(const ConfigurationFacadeEnvironment&) -> ConfigurationFacadeEnvironment& = delete;
+    ConfigurationFacadeEnvironment(ConfigurationFacadeEnvironment&&) = delete;
+    auto operator=(ConfigurationFacadeEnvironment&&) -> ConfigurationFacadeEnvironment& = delete;
 
-    /// Initialise tout l'environnement de compilation en une seule étape
-    void initialiser(const std::string& cheminFile);
+    /// Initializes the entire compilation environment in a single step
+    void initialize(const std::string& filePath);
     
     [[nodiscard]] auto getContext() const -> ContextGenCode*;
     auto getArena() -> llvm::BumpPtrAllocator&;
     [[nodiscard]] auto getBuilderTreeInstruction() const -> BuilderTreeInstruction*;
-    [[nodiscard]] auto getBuilderEquation() const -> BuilderEquationFlottante*;
+    [[nodiscard]] auto getBuilderEquation() const -> BuilderFloatEquation*;
 };
 
 #endif /* D8FAA486_F5BA_43FB_BFFC_AB9990B46458 */

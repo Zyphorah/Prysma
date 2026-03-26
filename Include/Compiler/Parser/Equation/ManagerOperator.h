@@ -8,49 +8,48 @@
 #include <vector>
 
 /**
- * @class ManagerOperateur
- * @brief Maillon de la chaîne de responsabilité pour les opérateurs
- * Implémente le pattern Chain of Responsibility
+ * @class OperatorManager
+ * @brief Link in the chain of responsibility for operators
+ * Implements the Chain of Responsibility pattern
  */
-class ManagerOperateur : public IManagerOperateur {
+class OperatorManager : public IOperatorManager {
 private:
-    IManagerOperateur* _suivant;
-    IManagerParenthese* _managerParenthese;
+    IOperatorManager* _next;
+    IManagerParenthesis* _parenthesisManager;
     TokenType _tokenType;
 
 public:
     /**
-     * @brief Builder
-     * @param tokenType Le type de token représentant cet opérateur
+     * @brief Constructor
+     * @param tokenType The token type representing this operator
      */
-    explicit ManagerOperateur(TokenType tokenType);
+    explicit OperatorManager(TokenType tokenType);
     
     /**
-     * @brief Définit le manager de gestion des parenthèses
-     * @param managerParenthese Manager de parenthèses
+     * @brief Sets the parenthesis manager
+     * @param parenthesisManager Parenthesis manager
      */
-    void definirManagerParenthese(IManagerParenthese* managerParenthese);
+    void setParenthesisManager(IManagerParenthesis* parenthesisManager);
     
     /**
-     * @brief Définit le prochain maillon de la chaîne
-     * @param suivant Le prochain manager
+     * @brief Sets the next link in the chain
+     * @param next The next manager
      */
-    void definirSuivant(IManagerOperateur* suivant) override;
+    void setNext(IOperatorManager* next) override;
     
     /**
-     * @brief Trouve cet opérateur dans l'équation
-     * @param equation L'équation à analyser
-     * @return L'index de l'opérateur, ou -1
+     * @brief Finds this operator in the equation
+     * @param equation The equation to analyze
+     * @return The index of the operator, or -1
      */
-    [[nodiscard]] virtual int chercherOperateur(const std::vector<Token>& equation) const;
+    [[nodiscard]] virtual int findOperator(const std::vector<Token>& equation) const;
     
     /**
-     * @brief Traite la recherche de cet opérateur ou délègue au suivant
-     * @param equation L'équation à traiter
-     * @return L'index de l'opérateur trouvé, ou -1
+     * @brief Handles the search for this operator or delegates to the next
+     * @param equation The equation to process
+     * @return The index of the found operator, or -1
      */
-    auto traiter(const std::vector<Token>& equation) -> int override;
+    auto handle(const std::vector<Token>& equation) -> int override;
 };
-
 
 #endif /* FF112DD1_03F3_41D3_8B8F_5E7E64C5467A */

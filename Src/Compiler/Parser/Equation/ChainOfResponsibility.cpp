@@ -7,28 +7,28 @@
 #include <vector>
 
 ChainOfResponsibility::ChainOfResponsibility(
-    IManagerParenthese* managerParenthese, 
-    std::vector<ManagerOperateur*> operateurs)
-    : _debut(nullptr), _managerParenthese(managerParenthese), _operateurs(std::move(operateurs)) {
+    IManagerParenthesis* parenthesisManager, 
+    std::vector<OperatorManager*> operators)
+    : _start(nullptr), _parenthesisManager(parenthesisManager), _operators(std::move(operators)) {
     
-    // Chaîner les managers
-    for (size_t i = 0; i < _operateurs.size(); i++) {
-        _operateurs[i]->definirManagerParenthese(_managerParenthese);
-        if (i < _operateurs.size() - 1) {
-            _operateurs[i]->definirSuivant(_operateurs[i + 1]);
+    // Chain the managers
+    for (size_t i = 0; i < _operators.size(); i++) {
+        _operators[i]->setParenthesisManager(_parenthesisManager);
+        if (i < _operators.size() - 1) {
+            _operators[i]->setNext(_operators[i + 1]);
         }
     }
     
-    if (!_operateurs.empty()) {
-        _debut = _operateurs[0];
+    if (!_operators.empty()) {
+        _start = _operators[0];
     }
 }
 
 ChainOfResponsibility::~ChainOfResponsibility() = default;
 
-auto ChainOfResponsibility::trouverOperateur(const std::vector<Token>& equation) const -> int {
-    if (_debut == nullptr) {
+auto ChainOfResponsibility::findOperator(const std::vector<Token>& equation) const -> int {
+    if (_start == nullptr) {
         return -1;
     }
-    return _debut->traiter(equation);
+    return _start->handle(equation);
 }

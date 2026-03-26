@@ -8,11 +8,11 @@
 
 class TypeArray : public IType {
 private:
-    IType* _typeChild;
-    INode* _taille; 
+    IType* _childType;
+    INode* _size; 
 
 public:
-    TypeArray(IType* typeChild, INode* taille);
+    TypeArray(IType* childType, INode* size);
     ~TypeArray() override = default;
 
     TypeArray(const TypeArray&) = delete;
@@ -20,17 +20,17 @@ public:
     TypeArray(TypeArray&&) = delete;
     auto operator=(TypeArray&&) -> TypeArray& = delete;
 
-    auto generatedrTypeLLVM(llvm::LLVMContext& context) -> llvm::Type* override;
+    auto generateLLVMType(llvm::LLVMContext& context) -> llvm::Type* override;
     
-    [[nodiscard]] auto estFlottant() const -> bool override;
-    [[nodiscard]] auto estBooleen() const -> bool override;
-    [[nodiscard]] auto estChaine() const -> bool override;
-    [[nodiscard]] auto estArray() const -> bool override { return true; }
+    [[nodiscard]] auto isFloating() const -> bool override;
+    [[nodiscard]] auto isBoolean() const -> bool override;
+    [[nodiscard]] auto isString() const -> bool override;
+    [[nodiscard]] auto isArray() const -> bool override { return true; }
 
-    [[nodiscard]] static bool classof(const IType* type) { return type->estArray(); }
+    [[nodiscard]] static bool classof(const IType* type) { return type->isArray(); }
 
-    [[nodiscard]] auto getTypeChild() const -> IType* { return _typeChild; }
-    [[nodiscard]] auto getTaille() const -> INode* { return _taille; }
+    [[nodiscard]] auto getChildType() const -> IType* { return _childType; }
+    [[nodiscard]] auto getSize() const -> INode* { return _size; }
 };
 
 #endif /* B05A551C_2519_458F_BB1D_8E5EF8DB9B83 */

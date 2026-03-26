@@ -19,43 +19,42 @@ GeneralVisitorGenCode::GeneralVisitorGenCode(ContextGenCode* contextGenCode, Orc
 GeneralVisitorGenCode::~GeneralVisitorGenCode()
 = default;
 
-void GeneralVisitorGenCode::parcourirChild(NodeInstruction* node)
+void GeneralVisitorGenCode::traverseChild(NodeInstruction* node)
 {
-       for (const auto& child : node->getChilds()) {
+    for (const auto& child : node->getChildren()) {
         child->accept(this);
     }
 }
 
-auto GeneralVisitorGenCode::evaluerExpression(INode* expression) -> Symbole {
+auto GeneralVisitorGenCode::evaluateExpression(INode* expression) -> Symbol {
     if (expression != nullptr) {
         expression->accept(this);
-        return _contextGenCode->getValeurTemporaire();
+        return _contextGenCode->getTemporaryValue();
     }
-    Symbole vide;
-    vide = Symbole(nullptr, nullptr, nullptr);
-    
-    return vide;
+    Symbol empty;
+    empty = Symbol(nullptr, nullptr, nullptr);
+    return empty;
 }
 
-auto GeneralVisitorGenCode::obtenirNomClasseDepuisSymbole(const Symbole& objectSymbole) -> std::string {
-    std::string nomClasse;
-    if (objectSymbole.getType() != nullptr) {
-        if (auto* typeComplex = prysma::dyn_cast<TypeComplex>(objectSymbole.getType())) {
-            nomClasse = typeComplex->getNomClasse();
+auto GeneralVisitorGenCode::getClassNameFromSymbol(const Symbol& objectSymbol) -> std::string {
+    std::string className;
+    if (objectSymbol.getType() != nullptr) {
+        if (auto* typeComplex = prysma::dyn_cast<TypeComplex>(objectSymbol.getType())) {
+            className = typeComplex->getClassName();
         }
     }
 
     constexpr size_t CLASS_PREFIX_LENGTH = 6;
-    if (nomClasse.empty() && objectSymbole.getTypePointeElement() != nullptr) {
-        if (auto* structType = llvm::dyn_cast<llvm::StructType>(objectSymbole.getTypePointeElement())) {
+    if (className.empty() && objectSymbol.getPointedElementType() != nullptr) {
+        if (auto* structType = llvm::dyn_cast<llvm::StructType>(objectSymbol.getPointedElementType())) {
             llvm::StringRef structName = structType->getName();
             if (structName.starts_with("Class_")) {
-                nomClasse = structName.drop_front(CLASS_PREFIX_LENGTH).str();
+                className = structName.drop_front(CLASS_PREFIX_LENGTH).str();
             } else {
-                nomClasse = structName.str();
+                className = structName.str();
             }
         }
     }
-    return nomClasse;
+    return className;
 }
 

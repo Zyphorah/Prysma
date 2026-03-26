@@ -19,75 +19,75 @@ BuilderEnvironmentRegistryFunction::BuilderEnvironmentRegistryFunction(ContextGe
 
 BuilderEnvironmentRegistryFunction::~BuilderEnvironmentRegistryFunction() = default;
 
-void BuilderEnvironmentRegistryFunction::construireVTable(Class* classInfo, const std::string& nomClass, const std::vector<NodeDeclarationFunction*>& listMethodeParent)
+void BuilderEnvironmentRegistryFunction::buildVTable(Class* classInfo, const std::string& className, const std::vector<NodeDeclarationFunction*>& parentMethodList)
 {
-    // Construire la vtable en alignant les méthodes du parent aux mêmes positions
+    // Build the vtable by aligning the parent's methods at the same positions
     std::vector<llvm::Constant*> vtableElements;
     
-    // Ajouter les pointeurs de function du parent à la vtable, dans le même ordre
-    for (NodeDeclarationFunction* declarationMethodeParent : listMethodeParent) {
-        std::string nomMethodeParent = declarationMethodeParent->getNom();
+    // Add the parent's function pointers to the vtable, in the same order
+    for (NodeDeclarationFunction* parentMethodDecl : parentMethodList) {
+        std::string parentMethodName = parentMethodDecl->getNom();
         
-        // Chercher la méthode correspondante dans la classe courante
+        // Search for the corresponding method in the current class
         llvm::Function* functionImpl = nullptr;
-        if (classInfo->getRegistryFunctionLocale()->existe(nomMethodeParent)) {
-            const auto& symbole = classInfo->getRegistryFunctionLocale()->recuperer(nomMethodeParent);
-            if (!prysma::isa<SymboleFunctionLocale>(symbole.get())) {
-                throw std::runtime_error("Error : SymboleFunctionLocale attendu");
+        if (classInfo->getRegistryFunctionLocal()->exists(parentMethodName)) {
+            const auto& symbol = classInfo->getRegistryFunctionLocal()->get(parentMethodName);
+            if (!prysma::isa<SymbolFunctionLocal>(symbol.get())) {
+                throw std::runtime_error("Error: Expected SymbolFunctionLocal");
             }
-            auto* symboleLocal = prysma::cast<SymboleFunctionLocale>(symbole.get());
-            functionImpl = symboleLocal->function;
+            auto* localSymbol = prysma::cast<SymbolFunctionLocal>(symbol.get());
+            functionImpl = localSymbol->function;
         }
         
-        // Si trouvée, ajouter le pointeur de function à la vtable
+        // If found, add the function pointer to the vtable
         if (functionImpl != nullptr) {
             vtableElements.push_back(llvm::ConstantExpr::getBitCast(
                 functionImpl,
                 llvm::PointerType::get(llvm::Type::getInt8Ty(_contextGenCode->getBackend()->getContext()), 0)
             ));
-            classInfo->getMethodIndices()[nomMethodeParent] = static_cast<unsigned int>(vtableElements.size() - 1);
+            classInfo->getMethodIndices()[parentMethodName] = static_cast<unsigned int>(vtableElements.size() - 1);
         }
     }
     
-    // Ajouter les méthodes supplémentaires de la classe courante qui ne sont pas dans le parent
-    auto clesMethodes = classInfo->getRegistryFunctionLocale()->obtenirCles();
-    for (const auto& cle : clesMethodes) {
-        const std::string& nomMethode = cle;
-        bool estDansParent = false;
+    // Add additional methods from the current class that are not in the parent
+    auto methodKeys = classInfo->getRegistryFunctionLocal()->getKeys();
+    for (const auto& key : methodKeys) {
+        const std::string& methodName = key;
+        bool isInParent = false;
         
-        // Vérifier si cette méthode est dans le parent
-        for (NodeDeclarationFunction* declarationMethodeParent : listMethodeParent) {
-            if (declarationMethodeParent->getNom() == nomMethode) {
-                estDansParent = true;
+        // Check if this method is in the parent
+        for (NodeDeclarationFunction* parentMethodDecl : parentMethodList) {
+            if (parentMethodDecl->getNom() == methodName) {
+                isInParent = true;
                 break;
             }
         }
         
-        // Si ce n'est pas une méthode du parent, l'ajouter à la fin de la vtable
-        if (!estDansParent) {
-            const auto& symbole = classInfo->getRegistryFunctionLocale()->recuperer(nomMethode);
-            if (!prysma::isa<SymboleFunctionLocale>(symbole.get())) {
-                throw std::runtime_error("Error : SymboleFunctionLocale attendu");
+        // If not a parent method, add it at the end of the vtable
+        if (!isInParent) {
+            const auto& symbol = classInfo->getRegistryFunctionLocal()->get(methodName);
+            if (!prysma::isa<SymbolFunctionLocal>(symbol.get())) {
+                throw std::runtime_error("Error: Expected SymbolFunctionLocal");
             }
-            auto* symboleLocal = prysma::cast<SymboleFunctionLocale>(symbole.get()); 
-            if (symboleLocal->function != nullptr) {
+            auto* localSymbol = prysma::cast<SymbolFunctionLocal>(symbol.get()); 
+            if (localSymbol->function != nullptr) {
                 vtableElements.push_back(llvm::ConstantExpr::getBitCast(
-                    symboleLocal->function,
+                    localSymbol->function,
                     llvm::PointerType::get(llvm::Type::getInt8Ty(_contextGenCode->getBackend()->getContext()), 0)
                 ));
-                classInfo->getMethodIndices()[nomMethode] = static_cast<unsigned int>(vtableElements.size() - 1);
+                classInfo->getMethodIndices()[methodName] = static_cast<unsigned int>(vtableElements.size() - 1);
             }
         }
     }
     
-    // Créer un array constant pour la vtable
+    // Create a constant array for the vtable
     llvm::ArrayType* vtableType = llvm::ArrayType::get(
         llvm::PointerType::get(llvm::Type::getInt8Ty(_contextGenCode->getBackend()->getContext()), 0),
         vtableElements.size()
     );
     llvm::Constant* vtableInitializer = llvm::ConstantArray::get(vtableType, vtableElements);
     
-    // Créer une variable globale pour la vtable
+    // Create a global variable for the vtable
     llvm::Module* module = &(_contextGenCode->getBackend()->getModule());
     classInfo->setVTable(new llvm::GlobalVariable(
         *module,
@@ -95,109 +95,109 @@ void BuilderEnvironmentRegistryFunction::construireVTable(Class* classInfo, cons
         true,  
         llvm::GlobalValue::LinkageTypes::InternalLinkage,
         vtableInitializer,
-        "vtable_" + nomClass
+        "vtable_" + className
     )); 
 }
 
 
-void BuilderEnvironmentRegistryFunction::remplir()
+void BuilderEnvironmentRegistryFunction::fill()
 {   
-    // 1. Filling des functions globales
-    for(const auto& cle : _contextGenCode->getRegistryFunctionGlobale()->obtenirCles())
+    // 1. Fill global functions
+    for(const auto& key : _contextGenCode->getRegistryFunctionGlobal()->getKeys())
     {
-        const auto& ancienSymboleUniquePtr = _contextGenCode->getRegistryFunctionGlobale()->recuperer(cle);
-        const auto* ancienSymbole = prysma::cast<const SymboleFunctionGlobale>(ancienSymboleUniquePtr.get());
+        const auto& oldSymbolUniquePtr = _contextGenCode->getRegistryFunctionGlobal()->get(key);
+        const auto* oldSymbol = prysma::cast<const SymbolFunctionGlobal>(oldSymbolUniquePtr.get());
         
-        if (ancienSymbole->node == nullptr) { continue;}
+        if (oldSymbol->node == nullptr) { continue;}
 
-        llvm::Type* retType = ancienSymbole->typeReturn->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
+        llvm::Type* retType = oldSymbol->returnType->generateLLVMType(_contextGenCode->getBackend()->getContext());
         
         std::vector<llvm::Type*> paramTypes;
-        for (auto* arg : ancienSymbole->node->getArguments()) {
+        for (auto* arg : oldSymbol->node->getArguments()) {
             auto* argFunction = prysma::cast<NodeArgFunction>(arg);
-            paramTypes.push_back(argFunction->getType()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext()));
+            paramTypes.push_back(argFunction->getType()->generateLLVMType(_contextGenCode->getBackend()->getContext()));
         }
 
         llvm::FunctionType* funcType = llvm::FunctionType::get(retType, paramTypes, false);
         
-        llvm::Function* vraieFunction = llvm::Function::Create(
+        llvm::Function* realFunction = llvm::Function::Create(
             funcType, 
             llvm::Function::ExternalLinkage, 
-            cle,          
+            key,          
             _contextGenCode->getBackend()->getModule()
         );
 
-        auto nouveauSymbole = std::make_unique<SymboleFunctionLocale>();
-        nouveauSymbole->function = vraieFunction;
-        nouveauSymbole->typeReturn = ancienSymbole->typeReturn;
-        nouveauSymbole->node = ancienSymbole->node;
+        auto newSymbol = std::make_unique<SymbolFunctionLocal>();
+        newSymbol->function = realFunction;
+        newSymbol->returnType = oldSymbol->returnType;
+        newSymbol->node = oldSymbol->node;
         
-        _contextGenCode->getRegistryFunctionLocale()->enregistryr(cle, std::move(nouveauSymbole));        
+        _contextGenCode->getRegistryFunctionLocal()->registerElement(key, std::move(newSymbol));        
     }
 
-    // Filling des méthodes de classes (VTable, mangling)
-    for (const auto& nomClasse : _contextGenCode->getRegistryClass()->obtenirCles())
+    // Fill class methods (VTable, mangling)
+    for (const auto& className : _contextGenCode->getRegistryClass()->getKeys())
     {
-        auto const& classInfo = _contextGenCode->getRegistryClass()->recuperer(nomClasse);
+        auto const& classInfo = _contextGenCode->getRegistryClass()->get(className);
         
-        for (const auto& nomMethode : classInfo->getRegistryFunctionLocale()->obtenirCles())
+        for (const auto& methodName : classInfo->getRegistryFunctionLocal()->getKeys())
         {
-            // On récupère le SymboleFunctionLocale créé dans FillingVisitorRegistry
-            const auto& symboleUniquePtr = classInfo->getRegistryFunctionLocale()->recuperer(nomMethode);
-            auto* symbole = prysma::cast<SymboleFunctionLocale>(symboleUniquePtr.get());
+            // Retrieve the SymbolFunctionLocal created in FillingVisitorRegistry
+            const auto& symbolUniquePtr = classInfo->getRegistryFunctionLocal()->get(methodName);
+            auto* symbol = prysma::cast<SymbolFunctionLocal>(symbolUniquePtr.get());
             
-            if (symbole->node == nullptr || symbole->function != nullptr) 
+            if (symbol->node == nullptr || symbol->function != nullptr) 
             {
-                std::string errorMsg = "Error : SymboleFunctionLocale pour la méthode '";
-                errorMsg += nomMethode;
-                errorMsg += "' de la classe '";
-                errorMsg += nomClasse;
-                errorMsg += "' est mal initialisé ou déjà traité";
+                std::string errorMsg = "Error: SymbolFunctionLocal for method '";
+                errorMsg += methodName;
+                errorMsg += "' of class '";
+                errorMsg += className;
+                errorMsg += "' is not properly initialized or already processed";
                 throw std::runtime_error(errorMsg);
             }
 
-            llvm::Type* retType = symbole->typeReturn->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
+            llvm::Type* retType = symbol->returnType->generateLLVMType(_contextGenCode->getBackend()->getContext());
             
             std::vector<llvm::Type*> paramTypes;
             
-            // Ajouter le paramètre 'this' caché comme premier paramètre
+            // Add the hidden 'this' parameter as the first parameter
             paramTypes.push_back(llvm::PointerType::getUnqual(_contextGenCode->getBackend()->getContext()));
 
-            for (auto* arg : symbole->node->getArguments()) {
+            for (auto* arg : symbol->node->getArguments()) {
                 auto* argFunction = prysma::cast<NodeArgFunction>(arg);
-                paramTypes.push_back(argFunction->getType()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext()));
+                paramTypes.push_back(argFunction->getType()->generateLLVMType(_contextGenCode->getBackend()->getContext()));
             }
 
             llvm::FunctionType* funcType = llvm::FunctionType::get(retType, paramTypes, false);
             
-            // Mangling du nom pour LLVM (ex: Joueur_initialiser)
-            std::string nomLLVM = nomClasse;
-            nomLLVM += "_";
-            nomLLVM += nomMethode;
+            // Name mangling for LLVM (e.g., Player_initialize)
+            std::string llvmName = className;
+            llvmName += "_";
+            llvmName += methodName;
 
-            llvm::Function* vraieFunction = llvm::Function::Create(
+            llvm::Function* realFunction = llvm::Function::Create(
                 funcType, 
                 llvm::Function::ExternalLinkage, 
-                nomLLVM,          
+                llvmName,          
                 _contextGenCode->getBackend()->getModule()
             );
             
-            symbole->function = vraieFunction;    
+            symbol->function = realFunction;    
             
-            // Construire la vtable pour cette classe
-            std::vector<NodeDeclarationFunction*> listMethodeParent;
-            if (classInfo->getParentHeritage() != nullptr) {
-                MembersExtractorClass extracteurParent;
-                classInfo->getParentHeritage()->accept(&extracteurParent);
-                listMethodeParent = extracteurParent.getMethodes();
+            // Build the vtable for this class
+            std::vector<NodeDeclarationFunction*> parentMethodList;
+            if (classInfo->getParentInheritance() != nullptr) {
+                MembersExtractorClass parentExtractor;
+                classInfo->getParentInheritance()->accept(&parentExtractor);
+                parentMethodList = parentExtractor.getMethods();
             }
-            if(nomMethode != nomClasse) // Si la méthode n'est pas le builder, on le met dans la vtable, sinon on ne le met pas dans la vtable et on l'callle directement par son nom manglé
+            if(methodName != className) // If the method is not the builder, put it in the vtable, otherwise do not put it in the vtable and call it directly by its mangled name
             {
-                construireVTable(classInfo.get(), nomClasse, listMethodeParent);
+                buildVTable(classInfo.get(), className, parentMethodList);
             }
-            // On vérifi si la classe contient un builder, sinon la classe n'est pas valide. 
-            if (!classInfo->getRegistryFunctionLocale()->existe(nomClasse)) {
-                throw std::runtime_error("Error : La classe '" + nomClasse + "' doit avoir un builder du même nom");
+            // Check if the class contains a builder, otherwise the class is not valid.
+            if (!classInfo->getRegistryFunctionLocal()->exists(className)) {
+                throw std::runtime_error("Error: The class '" + className + "' must have a builder with the same name");
             }
         }
     }

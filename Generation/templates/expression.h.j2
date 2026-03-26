@@ -7,13 +7,13 @@
 class Expression{{nom}} : public IExpressionEngine
 {
 private:
-    ContextExpression& _contexteExpression;
+    ContextExpression& _context;
 
 public:
-    Expression{{nom}}(ContextExpression& contexteExpression);
+    Expression{{nom}}(ContextExpression& expressionContext);
     ~Expression{{nom}}() override;
 
-    INode* construire(std::vector<Token>& equation) override;
+    auto build(std::vector<Token>& equation) -> INode* override;
 };
 
 #endif /* EXPRESSION_{{nom | upper}}_H */

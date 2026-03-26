@@ -15,7 +15,7 @@ private:
 public:
     GeneralVisitorGraphViz(OutputVisualGraphText outputVisualGraph);
     ~GeneralVisitorGraphViz() override;
-    void generatedr();
+    void generate();
 
 {% for nom in nodes %}
     void visiter(Node{{ nom }}* node{{ nom }}) override;

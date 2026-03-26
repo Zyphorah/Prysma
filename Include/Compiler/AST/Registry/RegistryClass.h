@@ -15,36 +15,36 @@ class INode;
 struct Class
 {
 private:
-    RegistryFunctionLocale* registryFunctionLocale;
+    RegistryFunctionLocal* registryFunctionLocal;
     RegistryVariable* registryVariable;
 
     llvm::GlobalVariable* vtable;
     
-    // Pour calculer la taille automatique de l'object avec llvm 
+    // To automatically compute the object size with llvm 
     llvm::StructType* structType;
-    INode* parentHeritage;
+    INode* parentInheritance;
     
-    // Mapping des indices des membres pour la Passe 3
+    // Mapping of member indices for Pass 3
     std::map<std::string, unsigned int> memberIndices;
     std::map<std::string, INode*> memberInitializers;
     
-    // Mapping des indices des méthodes dans la vtable
+    // Mapping of method indices in the vtable
     std::map<std::string, unsigned int> methodIndices;
 
 public:
-    // Builder pour initialiser les membres
+    // Builder to initialize members
     Class(
-        RegistryFunctionLocale* p_registryFunctionLocale,
+        RegistryFunctionLocal* p_registryFunctionLocal,
         RegistryVariable* p_registryVariable,
         llvm::GlobalVariable* p_vtable,
         llvm::StructType* p_structType,
-        INode* p_parentHeritage
+        INode* p_parentInheritance
     )
-        : registryFunctionLocale(p_registryFunctionLocale),
+        : registryFunctionLocal(p_registryFunctionLocal),
           registryVariable(p_registryVariable),
           vtable(p_vtable),
           structType(p_structType),
-          parentHeritage(p_parentHeritage)
+          parentInheritance(p_parentInheritance)
     {}
 
     Class(const Class&) = delete;
@@ -53,37 +53,37 @@ public:
     auto operator=(Class&&) -> Class& = delete;
 
     ~Class() {
-        delete registryFunctionLocale;
+        delete registryFunctionLocal;
         delete registryVariable;
     }
 
-    Class() : registryFunctionLocale(nullptr), registryVariable(nullptr), vtable(nullptr), structType(nullptr), parentHeritage(nullptr) {}
+    Class() : registryFunctionLocal(nullptr), registryVariable(nullptr), vtable(nullptr), structType(nullptr), parentInheritance(nullptr) {}
 
     void setStructType(llvm::StructType* type) { structType = type; }
-    void setParentHeritage(INode* node) { parentHeritage = node; }
+    void setParentInheritance(INode* node) { parentInheritance = node; }
     void setRegistryVariable(RegistryVariable* reg) { registryVariable = reg; }
-    void setRegistryFunctionLocale(RegistryFunctionLocale* reg) { registryFunctionLocale = reg; }
+    void setRegistryFunctionLocal(RegistryFunctionLocal* reg) { registryFunctionLocal = reg; }
     void setVTable(llvm::GlobalVariable* vtablePtr) { vtable = vtablePtr; }
 
     // Getters
-    [[nodiscard]] auto getRegistryFunctionLocale() const -> RegistryFunctionLocale* { return registryFunctionLocale; }
+    [[nodiscard]] auto getRegistryFunctionLocal() const -> RegistryFunctionLocal* { return registryFunctionLocal; }
     [[nodiscard]] auto getRegistryVariable() const -> RegistryVariable* { return registryVariable; }
     [[nodiscard]] auto getVTable() const -> llvm::GlobalVariable* { return vtable; }
     [[nodiscard]] auto getStructType() const -> llvm::StructType* { return structType; }
-    [[nodiscard]] auto getParentHeritage() const -> INode* { return parentHeritage; }
+    [[nodiscard]] auto getParentInheritance() const -> INode* { return parentInheritance; }
     [[nodiscard]] auto getMemberIndices() -> std::map<std::string, unsigned int>& { return memberIndices; }
     [[nodiscard]] auto getMemberInitializers() -> std::map<std::string, INode*>& { return memberInitializers; }
     [[nodiscard]] auto getMethodIndices() -> std::map<std::string, unsigned int>& { return methodIndices; }
     
-    [[nodiscard]] auto getIndexMethode(const std::string& nomMethode) const -> int {
-        auto iterator = methodIndices.find(nomMethode);
+    [[nodiscard]] auto getMethodIndex(const std::string& methodName) const -> int {
+        auto iterator = methodIndices.find(methodName);
         if (iterator != methodIndices.end()) {
             return static_cast<int>(iterator->second);
         }
         return -1;
     }
 };
-// TODO : supporter les mutex multi thread pour les classes Sinon le multi fichier n'est pas possible
+// TODO: support multi-thread mutex for classes. Otherwise, multi-file is not possible.
 
 #include <memory>
 

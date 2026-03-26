@@ -42,7 +42,7 @@ private:
     OrchestratorInclude* _orchestratorInclude;
 
 public:
-    // Prévient la copie et le déplacement accidentels de ce visitor 
+    // Prevent accidental copy and move of this visitor
     GeneralVisitorGenCode(const GeneralVisitorGenCode&) = delete;
     auto operator=(const GeneralVisitorGenCode&) -> GeneralVisitorGenCode& = delete;
     GeneralVisitorGenCode(GeneralVisitorGenCode&&) = delete;
@@ -73,11 +73,11 @@ public:
     void visiter(NodeAccesAttribute* nodeAccesAttribute) override;
     GeneralVisitorGenCode(ContextGenCode* contextGenCode, OrchestratorInclude* orchestratorInclude);
     ~GeneralVisitorGenCode() override;
-    void parcourirChild(NodeInstruction* node);
+    void traverseChild(NodeInstruction* node);
     
-    auto evaluerExpression(INode* expression) -> Symbole;
+    auto evaluateExpression(INode* expression) -> Symbol;
     
-    static auto obtenirNomClasseDepuisSymbole(const Symbole& objectSymbole) -> std::string;
+    static auto getClassNameFromSymbol(const Symbol& objectSymbol) -> std::string;
 };
 
 #endif /* FDDB5968_6DEF_49B0_AD11_8791D523278A */

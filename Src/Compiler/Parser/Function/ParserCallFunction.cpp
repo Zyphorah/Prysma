@@ -1,5 +1,5 @@
-#ifndef PARSEUR_APPELFONCTION_CPP
-#define PARSEUR_APPELFONCTION_CPP
+#ifndef PARSER_CALLFUNCTION_CPP
+#define PARSER_CALLFUNCTION_CPP
 
 #include "Compiler/Function/ParserCallFunction.h"
 #include "Compiler/AST/AST_Genere.h"
@@ -19,28 +19,28 @@ ParserCallFunction::ParserCallFunction(ContextParser& contextParser)
 ParserCallFunction::~ParserCallFunction()
 = default;
 
-INode* ParserCallFunction::parser(std::vector<Token>& tokens, int& index)
+INode* ParserCallFunction::parse(std::vector<Token>& tokens, int& index)
 {
-  const bool callCommeInstruction = index == 0 || tokens[static_cast<size_t>(index - 1)].type != TOKEN_EGAL;
+  const bool callAsInstruction = index == 0 || tokens[static_cast<size_t>(index - 1)].type != TOKEN_EQUAL;
 
-  consommer(tokens, index, TOKEN_CALL, "Error: 'call' attendu");
-  Token nomFunction = consommer(tokens, index, TOKEN_IDENTIFIANT, "Error: identifiant de function attendu");
-  consommer(tokens, index, TOKEN_PAREN_OUVERTE, "Error: '(' attendue");
+  consume(tokens, index, TOKEN_CALL, "Error: 'call' expected");
+  Token functionName = consume(tokens, index, TOKEN_IDENTIFIER, "Error: function identifier expected");
+  consume(tokens, index, TOKEN_PAREN_OPEN, "Error: '(' expected");
   
-  IInstruction* nodeCall = _contextParser.getBuilderTreeEquation()->allouer<NodeCallFunction>(nomFunction);
+  IInstruction* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallFunction>(functionName);
   
-  consommerChildBody(tokens, index, nodeCall, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_FERMEE);
+  consumeChildBody(tokens, index, nodeCall, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_CLOSE);
 
-  consommer(tokens, index, TOKEN_PAREN_FERMEE, "Error: ')' attendue");
+  consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: ')' expected");
 
-  if (callCommeInstruction && index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type == TOKEN_POINT_VIRGULE) {
-      consommer(tokens, index, TOKEN_POINT_VIRGULE, "Error : ';' attendu à la fin de l'call de function");
+  if (callAsInstruction && index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type == TOKEN_SEMICOLON) {
+      consume(tokens, index, TOKEN_SEMICOLON, "Error: ';' expected at the end of the function call");
   }
 
   return nodeCall;
 }
 
-#endif /* PARSEUR_APPELFONCTION_CPP */
+#endif /* PARSER_CALLFUNCTION_CPP */
 
 
 

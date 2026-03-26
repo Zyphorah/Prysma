@@ -6,13 +6,13 @@
 class RegistryArgument
 {
 private: 
-    std::vector<llvm::Value*> _vecArg;
+    std::vector<llvm::Value*> _args;
 
 public: 
    RegistryArgument();
-   void ajouter(llvm::Value* arg);
-   auto recuperer() -> std::vector<llvm::Value*>&;
-   void vider();
+   void add(llvm::Value* arg);
+   auto get() -> std::vector<llvm::Value*>&;
+   void clear();
 };
 
 #endif /* CCD2D336_FEA8_4097_8361_E253E2A1166E */

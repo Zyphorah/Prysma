@@ -5,9 +5,9 @@
 
 void FillingVisitorRegistry::visiter(NodeInclude* nodeInclude)
 {
-    std::filesystem::path cheminFileParent(_contextGenCode->getCheminFileCourant());
-    std::filesystem::path repertoireParent = cheminFileParent.parent_path();
-    std::filesystem::path cheminAbsolu = repertoireParent / nodeInclude->getPath();
-    _orchestrator->inclureFile(cheminAbsolu.string());
+    std::filesystem::path parentFilePath(_contextGenCode->getCurrentFilePath());
+    std::filesystem::path parentDirectory = parentFilePath.parent_path();
+    std::filesystem::path absolutePath = parentDirectory / nodeInclude->getPath();
+    _orchestrator->includeFile(absolutePath.string());
 }
 

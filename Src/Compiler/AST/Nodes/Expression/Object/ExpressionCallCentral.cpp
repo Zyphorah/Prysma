@@ -1,5 +1,5 @@
-#ifndef EXPRESSION_APPELCENTRAL_CPP
-#define EXPRESSION_APPELCENTRAL_CPP
+#ifndef EXPRESSION_CALLCENTRAL_CPP
+#define EXPRESSION_CALLCENTRAL_CPP
 
 #include "Compiler/Object/ExpressionCallCentral.h"
 
@@ -11,29 +11,29 @@
 #include "Compiler/Object/ParserCallObject.h"
 #include <vector>
 
-ExpressionCallCentral::ExpressionCallCentral(ContextExpression& contexteExpression)
-    : _contexteExpression(contexteExpression)
+ExpressionCallCentral::ExpressionCallCentral(ContextExpression& expressionContext)
+    : _context(expressionContext)
 {}
 
 ExpressionCallCentral::~ExpressionCallCentral()
 = default;
 
-auto ExpressionCallCentral::construire(std::vector<Token>& equation) -> INode*
+auto ExpressionCallCentral::build(std::vector<Token>& equation) -> INode*
 {
     int indexZero = 0;
 
     const bool callObject = equation.size() >= 3
         && equation[0].type == TOKEN_CALL
-        && equation[1].type == TOKEN_IDENTIFIANT
-        && equation[2].type == TOKEN_POINT;
+        && equation[1].type == TOKEN_IDENTIFIER
+        && equation[2].type == TOKEN_DOT;
 
     if (callObject) {
-        ParserCallObject parserCall(*_contexteExpression.getContextParser());
-        return parserCall.parser(equation, indexZero);
+        ParserCallObject parserCall(*_context.getContextParser());
+        return parserCall.parse(equation, indexZero);
     }
 
-    ParserCallFunction parserCall(*_contexteExpression.getContextParser());
-    return parserCall.parser(equation, indexZero);
+    ParserCallFunction parserCall(*_context.getContextParser());
+    return parserCall.parse(equation, indexZero);
 }
 
-#endif /* EXPRESSION_APPELCENTRAL_CPP */
+#endif /* EXPRESSION_CALLCENTRAL_CPP */

@@ -1,5 +1,5 @@
-#ifndef EXPRESSION_APPELFONCTION_CPP
-#define EXPRESSION_APPELFONCTION_CPP
+#ifndef EXPRESSION_CALLFUNCTION_CPP
+#define EXPRESSION_CALLFUNCTION_CPP
 
 #include "Compiler/Function/ExpressionCallFunction.h"
 #include "Compiler/AST/Nodes/Interfaces/INode.h"
@@ -8,18 +8,18 @@
 #include "Compiler/Lexer/Lexer.h"
 #include <vector>
 
-ExpressionCallFunction::ExpressionCallFunction(ContextExpression& contexteExpression)
-    : _contexteExpression(contexteExpression)
+ExpressionCallFunction::ExpressionCallFunction(ContextExpression& expressionContext)
+    : _context(expressionContext)
 {}
 
 ExpressionCallFunction::~ExpressionCallFunction()
 = default;
 
-auto ExpressionCallFunction::construire(std::vector<Token>& equation) -> INode*
+auto ExpressionCallFunction::build(std::vector<Token>& equation) -> INode*
 {
-    ParserCallFunction parserCall(*_contexteExpression.getContextParser());
+    ParserCallFunction parserCall(*_context.getContextParser());
     int indexZero = 0;
-    return parserCall.parser(equation, indexZero);
+    return parserCall.parse(equation, indexZero);
 }
 
-#endif /* EXPRESSION_APPELFONCTION_CPP */
+#endif /* EXPRESSION_CALLFUNCTION_CPP */

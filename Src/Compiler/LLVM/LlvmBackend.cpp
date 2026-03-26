@@ -39,76 +39,73 @@ LlvmBackend::LlvmBackend() {
     _targetMachine.reset(target->createTargetMachine(targetTriple, "generic", "", opt, Reloc::Model::PIC_));
 }
 
-
-
-llvm::Value* LlvmBackend::creerAutoCast(llvm::Value* valeurSource, llvm::Type* typeCible)
+llvm::Value* LlvmBackend::createAutoCast(llvm::Value* sourceValue, llvm::Type* targetType)
 {
-    if (valeurSource->getType() == typeCible)
+    if (sourceValue->getType() == targetType)
     {
-        return valeurSource;
+        return sourceValue;
     }
-    // Vérifier que c'est un array 
-    if(typeCible->isArrayTy() && valeurSource->getType()->isPointerTy())
+    // Check if it's an array
+    if(targetType->isArrayTy() && sourceValue->getType()->isPointerTy())
     {
         llvm::Value* zero = _builder->getInt32(0);
         std::vector<llvm::Value*> indices = { zero, zero };
 
         return _builder->CreateInBoundsGEP(
-            typeCible,      
-            valeurSource, 
+            targetType,      
+            sourceValue, 
             indices,       
             "autocast_array_to_ptr"
         );
     }
 
     llvm::Instruction::CastOps opcode = llvm::CastInst::getCastOpcode(
-        valeurSource, 
+        sourceValue, 
         true,       
-        typeCible, 
+        targetType, 
         true      
     );
 
-    return _builder->CreateCast(opcode, valeurSource, typeCible, "autocast");
+    return _builder->CreateCast(opcode, sourceValue, targetType, "autocast");
 }
 
-
-void LlvmBackend::declarerExterne(const std::string& nom, llvm::Type* ret, const std::vector<llvm::Type*>& args)
+void LlvmBackend::declareExternal(const std::string& name, llvm::Type* ret, const std::vector<llvm::Type*>& args)
 {
     llvm::FunctionType* type = llvm::FunctionType::get(ret, args, false);
-    llvm::Function::Create(type, llvm::Function::ExternalLinkage, nom, *_module);
+    llvm::Function::Create(type, llvm::Function::ExternalLinkage, name, *_module);
 }
 
-auto LlvmBackend::loadrValeur(llvm::Value* adresseMemory, const std::string& nomVariable) -> llvm::Value*
+auto LlvmBackend::loadValue(llvm::Value* memoryAddress, const std::string& variableName) -> llvm::Value*
 {
-    if (adresseMemory == nullptr) 
+    if (memoryAddress == nullptr) 
     { 
         return nullptr;
     }
 
-    if (auto* allocaInst = llvm::dyn_cast<llvm::AllocaInst>(adresseMemory)) {
+    if (auto* allocaInst = llvm::dyn_cast<llvm::AllocaInst>(memoryAddress)) {
         
-        llvm::Type* typeStocke = allocaInst->getAllocatedType();
+        llvm::Type* storedType = allocaInst->getAllocatedType();
 
-        return _builder->CreateLoad(typeStocke, allocaInst, nomVariable);
+        return _builder->CreateLoad(storedType, allocaInst, variableName);
     }
-    return adresseMemory;
+    return memoryAddress;
 }
 
-// Créer l'allocation au début du bloc d'entrée (mais après les autres allocas) : simple manager de position il déplace le curseur LLVM
-void LlvmBackend::definirPointInsertionApresAllocation()
+// Create allocation at the beginning of the entry block (but after other allocas): simple position manager, moves the LLVM cursor
+void LlvmBackend::setInsertionPointAfterAllocation()
 {
     llvm::BasicBlock* insertBlock = _builder->GetInsertBlock();
-    llvm::Instruction* positionInsertion = nullptr;
+    llvm::Instruction* insertionPosition = nullptr;
     
     if (insertBlock != nullptr) {
         for (auto& instruction : *insertBlock) {
             if (llvm::dyn_cast<llvm::AllocaInst>(&instruction) != nullptr) {
-                positionInsertion = &instruction;
+                insertionPosition = &instruction;
             }
         }
         
-        if (positionInsertion != nullptr) {
-            llvm::Instruction* nextNode = positionInsertion->getNextNode();
+        if (insertionPosition != nullptr) {
+            llvm::Instruction* nextNode = insertionPosition->getNextNode();
             if (nextNode != nullptr) {
                 _builder->SetInsertPoint(nextNode);
             } else {

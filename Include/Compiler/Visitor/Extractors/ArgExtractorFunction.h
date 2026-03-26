@@ -5,6 +5,7 @@
 
 class NodeArgFunction;
 
+// Extracts an argument node from a function argument node
 class ArgExtractorFunction : public VisitorBaseGenerale {
 public:
     using VisitorBaseGenerale::visiter;

@@ -4,12 +4,12 @@
 #include "Compiler/AST/Nodes/Interfaces/INode.h"
 #include <vector>
 
-enum class NodeTypeGenere;
+enum class NodeTypeGenerated;
 
 class NodeInstruction: public IInstruction
 {
 private: 
-    std::vector<INode*> childs; 
+    std::vector<INode*> children; 
 public: 
 
     NodeInstruction();
@@ -18,14 +18,14 @@ public:
     auto operator=(const NodeInstruction& other) -> NodeInstruction&;
     NodeInstruction(NodeInstruction&& other) noexcept;
     auto operator=(NodeInstruction&& other)  noexcept -> NodeInstruction&;
-     ~NodeInstruction() override = default;
+    ~NodeInstruction() override = default;
 
     void accept(IVisitor* visitor) override;
-    void ajouterInstruction(INode* child) override;
+    void addInstruction(INode* child) override;
     
-    [[nodiscard]] auto getTypeGenere() const -> NodeTypeGenere override;
+    [[nodiscard]] auto getGeneratedType() const -> NodeTypeGenerated override;
     
-    [[nodiscard]] auto getChilds() const -> const std::vector<INode*>& { return childs; }
+    [[nodiscard]] auto getChildren() const -> const std::vector<INode*>& { return children; }
 };
 
 #endif /* CE440E6B_95E4_4EC8_8C66_1916C9716A77 */

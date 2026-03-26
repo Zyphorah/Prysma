@@ -23,15 +23,15 @@
 #include <utility>
 #include <vector>
 
-UnitCompilation::UnitCompilation(OrchestratorInclude* orchestrator, RegistryFile* registry, std::string cheminFile, RegistryFunctionGlobale* registryFunctionGlobale) 
+UnitCompilation::UnitCompilation(OrchestratorInclude* orchestrator, FileRegistry* registry, std::string filePath, RegistryFunctionGlobal* registryFunctionGlobale) 
     : _orchestrator(orchestrator), 
-      _registryFile(registry),
+      _fileRegistry(registry),
       _context(nullptr),
       _tree(nullptr),
-      _cheminFileOriginal(std::move(cheminFile)) 
+      _originalFilePath(std::move(filePath)) 
 {
-    // Initialization du contexte séparé (la bulle privée)
-    _facadeConfigurationEnvironnement = std::make_unique<ConfigurationFacadeEnvironnement>(registryFunctionGlobale, _registryFile);
+    // Initialization of the separate context (the private bubble)
+    _facadeConfigurationEnvironment = std::make_unique<ConfigurationFacadeEnvironment>(registryFunctionGlobale, _fileRegistry);
 }
 
 UnitCompilation::~UnitCompilation() 
@@ -40,87 +40,87 @@ UnitCompilation::~UnitCompilation()
     _context = nullptr; 
 }
 
-void UnitCompilation::passe1() {
-    std::filesystem::path cheminAbsolu = std::filesystem::absolute(_cheminFileOriginal);
+void UnitCompilation::pass1() {
+    std::filesystem::path absolutePath = std::filesystem::absolute(_originalFilePath);
     
-    if (!std::filesystem::exists(cheminAbsolu) && !_repertoireCourant.empty()) {
-        cheminAbsolu = std::filesystem::path(_repertoireCourant) / _cheminFileOriginal;
+    if (!std::filesystem::exists(absolutePath) && !_currentDirectory.empty()) {
+        absolutePath = std::filesystem::path(_currentDirectory) / _originalFilePath;
     }
     
-    std::string cheminResolu = cheminAbsolu.string();
+    std::string resolvedPath = absolutePath.string();
     
-    _ancienRepertoire = _repertoireCourant;
-    _repertoireCourant = cheminAbsolu.parent_path().string();
+    _oldDirectory = _currentDirectory;
+    _currentDirectory = absolutePath.parent_path().string();
 
-    // Construire un nom de fichier unique en incluant le nom du dossier parent 
-    // pour éviter les collisions quand plusieurs fichiers ont le même nom dans des dossiers différents
+    // Build a unique file name including the parent folder name 
+    // to avoid collisions when multiple files have the same name in different folders
     // Ex: ParentA/ChildA.p -> "ParentA_ChildA", ParentB/ChildA.p -> "ParentB_ChildA"
-    std::string nomBase = cheminAbsolu.stem().string();
-    std::string nomParent = cheminAbsolu.parent_path().filename().string();
-    _nomFile = nomParent + "_" + nomBase;
+    std::string baseName = absolutePath.stem().string();
+    std::string parentName = absolutePath.parent_path().filename().string();
+    _fileName = parentName + "_" + baseName;
 
-    _registryFile->ajouterFile("programme/" + _nomFile + ".ll");
+    _fileRegistry->addFile("programme/" + _fileName + ".ll");
 
-    _facadeConfigurationEnvironnement->initialiser(cheminResolu);
+    _facadeConfigurationEnvironment->initialize(resolvedPath);
 
-    _context = _facadeConfigurationEnvironnement->getContext();
-    BuilderTreeInstruction* builderTreeInstruction = _facadeConfigurationEnvironnement->getBuilderTreeInstruction();
+    _context = _facadeConfigurationEnvironment->getContext();
+    BuilderTreeInstruction* builderTreeInstruction = _facadeConfigurationEnvironment->getBuilderTreeInstruction();
 
-    FileReading fichierReading(cheminResolu);
-    std::string document = fichierReading.inputr();
+    FileReading fileReading(resolvedPath);
+    std::string document = fileReading.getInput();
 
-    std::vector<Token> tokens = Lexer::tokenizer(document);
+    std::vector<Token> tokens = Lexer::tokenize(document);
 
-    _tree = builderTreeInstruction->construire(tokens);
+    _tree = builderTreeInstruction->build(tokens);
 
     FillingVisitorRegistry visitorFillingRegistry(_context, _orchestrator);
     _tree->accept(&visitorFillingRegistry);
-    FillingVisitorCoprsClass visitorFillingBodyClass(_context);
+    FillingVisitorBodyClass visitorFillingBodyClass(_context);
     _tree->accept(&visitorFillingBodyClass);
 }
 
-void UnitCompilation::passe2() {
+void UnitCompilation::pass2() {
     if (_tree == nullptr) 
     {
         return;
     }
 
-    BuilderEnvironmentRegistryFunction builderEnvironnementRegistryFunction(_context);
-    builderEnvironnementRegistryFunction.remplir();
+    BuilderEnvironmentRegistryFunction builderEnvironmentRegistryFunction(_context);
+    builderEnvironmentRegistryFunction.fill();
 
-    BuilderEnvironmentRegistryVariable builderEnvironnementRegistryVariable(_context);
-    builderEnvironnementRegistryVariable.remplir();
+    BuilderEnvironmentRegistryVariable builderEnvironmentRegistryVariable(_context);
+    builderEnvironmentRegistryVariable.fill();
 
     std::filesystem::path buildDir = std::filesystem::canonical("/proc/self/exe").parent_path();
-    std::string pathProgramme = (buildDir / "programme/").string();
+    std::string pathProgram = (buildDir / "programme/").string();
     std::string pathGraph = (buildDir / "graphe/").string();
 
     GeneralVisitorGenCode visitor(_context, _orchestrator);
     _tree->accept(&visitor);
 
-    if (_orchestrator->estGraphVizActif()) {
-        OutputVisualGraphText outputVisualGraph(pathGraph + _nomFile + ".dot");
+    if (_orchestrator->isGraphVizEnabled()) {
+        OutputVisualGraphText outputVisualGraph(pathGraph + _fileName + ".dot");
         auto visitorGraphViz = std::make_unique<GeneralVisitorGraphViz>(std::move(outputVisualGraph));
         _tree->accept(visitorGraphViz.get());
-        visitorGraphViz->generatedr();
+        visitorGraphViz->generate();
 
-        if (system(("dot -Tsvg " + pathGraph + _nomFile + ".dot -o " + pathGraph + _nomFile + ".svg").c_str()) != 0)
+        if (system(("dot -Tsvg " + pathGraph + _fileName + ".dot -o " + pathGraph + _fileName + ".svg").c_str()) != 0)
         {
-            std::cerr << "Error lors de la génération du graphe." << std::endl;
+            std::cerr << "Error during graph generation." << std::endl;
         }
 
-        // Supprimer le fichier .dot intermédiaire
-        std::filesystem::remove(pathGraph + _nomFile + ".dot");
+        // Remove the intermediate .dot file
+        std::filesystem::remove(pathGraph + _fileName + ".dot");
     }
 
     LlvmSerializer serializer(_context->getBackend()->getModule());
-    serializer.SauvegarderCodeLLVM(pathProgramme + _nomFile + ".ll"); 
+    serializer.SaveLLVMCode(pathProgram + _fileName + ".ll"); 
 
-    // Restaurer le répertoire courant pour les includes au même niveau
-    _repertoireCourant = _ancienRepertoire;
+    // Restore the current directory for includes at the same level
+    _currentDirectory = _oldDirectory;
 }
 
-auto UnitCompilation::getChemin() const -> std::string
+auto UnitCompilation::getPath() const -> std::string
 {
-    return _cheminFileOriginal;
+    return _originalFilePath;
 }

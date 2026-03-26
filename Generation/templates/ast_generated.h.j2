@@ -12,7 +12,7 @@
 #include "Compiler/AST/Registry/Types/IType.h"
 
 // Enum généré dynamiquement pour tous les nodes AST
-enum class NodeTypeGenere {
+enum class NodeTypeGenerated {
 {%- for classe in classes %}
     {{ classe.nom }},
 {%- endfor %}
@@ -25,7 +25,7 @@ class Node{{ nom }};
 {% for classe in classes %}
 class Node{{ classe.nom }} : public {{ classe.parent }} {
 private:
-    NodeTypeGenere nodeTypeGenere = NodeTypeGenere::{{ classe.nom }};
+    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::{{ classe.nom }};
 {% for nom_champ, type_champ in classe.champs.items() %}
     {{ type_champ }} _{{ nom_champ }};
 {% endfor %}
@@ -41,22 +41,22 @@ public:
         visitor->visiter(this);
     }
 
-    [[nodiscard]] NodeTypeGenere getTypeGenere() const override {
-        return nodeTypeGenere;
+    [[nodiscard]] NodeTypeGenerated getGeneratedType() const override {
+        return _nodeTypeGenerated;
     }
 
     [[nodiscard]] static bool classof(const INode* node) {
-        return node->getTypeGenere() == NodeTypeGenere::{{ classe.nom }};
+        return node->getGeneratedType() == NodeTypeGenerated::{{ classe.nom }};
     }
 
 {%- if classe.parent == 'IExpression' %}
 
-    IExpression* ajouterExpression(INode* gauche, INode* droite) override {
+    IExpression* addExpression(INode* left, INode* right) override {
 {%- if 'gauche' in classe.champs %}
-        _gauche = gauche;
+        _gauche = left;
 {%- endif %}
 {%- if 'droite' in classe.champs %}
-        _droite = droite;
+        _droite = right;
 {%- endif %}
         return this;
     }

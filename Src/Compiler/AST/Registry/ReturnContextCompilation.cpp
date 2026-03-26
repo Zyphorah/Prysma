@@ -3,22 +3,24 @@
 #include <stack>
 #include <stdexcept>
 
-
-auto ReturnContextCompilation::recupererContext() -> IType*
+// Retrieve the current return context
+auto ReturnContextCompilation::getContext() -> IType*
 {
-    return _contexte.top();
+    return _context.top();
 }
 
-void ReturnContextCompilation::piler(IType* token)
+// Push a new return context
+void ReturnContextCompilation::push(IType* token)
 {
-    _contexte.push(token);
+    _context.push(token);
 }
 
-void ReturnContextCompilation::depiler()
+// Pop the current return context
+void ReturnContextCompilation::pop()
 {
-    if(_contexte.empty())
+    if(_context.empty())
     {
-        throw std::runtime_error("La pile est déjà vide! ");
+        throw std::runtime_error("The stack is already empty!");
     }
-    _contexte.pop();
+    _context.pop();
 }

@@ -4,27 +4,26 @@
 #include <string>
 
 FileReading::FileReading(const std::string& path)
-    : _path(path), _fichier(path, std::ios::in)
+    : _path(path), _file(path, std::ios::in)
 {
 }
 
-std::string FileReading :: inputr()
+auto FileReading::getInput() -> std::string
 {
-    std::string ligne; 
+    std::string line; 
     std::string document; 
 
-    if(_fichier.is_open())
+    if(_file.is_open())
     {
-        while(std::getline(_fichier,ligne))
+        while(std::getline(_file, line))
         {
-            document += ligne;
+            document += line;
             document += "\n";  
         }
-        _fichier.close();
+        _file.close();
         return document;
     }
-    throw std::runtime_error("Impossible d'ouvrir le fichier : " + _path);
- 
+    throw std::runtime_error("Unable to open file: " + _path);
 };
 
 FileReading::~FileReading() = default;

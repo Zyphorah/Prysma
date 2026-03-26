@@ -7,20 +7,20 @@
 #include "Compiler/Lexer/Lexer.h"
 #include <vector>
 
-class ParserType {
+class TypeParser {
 private:
     RegistryType* _registryType;
     IBuilderTree* _builderTree;
 
 public:
-     ParserType(RegistryType* registryType, IBuilderTree* builderTree);
-    ~ParserType() = default;
+    TypeParser(RegistryType* registryType, IBuilderTree* builderTree);
+    ~TypeParser() = default;
 
-    ParserType(const ParserType&) = delete;
-    auto operator=(const ParserType&) -> ParserType& = delete;
-    ParserType(ParserType&&) = delete;
-    auto operator=(ParserType&&) -> ParserType& = delete;
-    auto parser(std::vector<Token>& tokens, int& index) -> IType*;
+    TypeParser(const TypeParser&) = delete;
+    auto operator=(const TypeParser&) -> TypeParser& = delete;
+    TypeParser(TypeParser&&) = delete;
+    auto operator=(TypeParser&&) -> TypeParser& = delete;
+    auto parse(std::vector<Token>& tokens, int& index) -> IType*;
 };
 
 #endif /* BA12D61E_9205_4816_94C1_379B8ABA63D3 */

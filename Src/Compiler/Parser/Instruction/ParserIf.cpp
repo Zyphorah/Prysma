@@ -1,5 +1,5 @@
-#ifndef PARSEUR_IF_CPP
-#define PARSEUR_IF_CPP
+#ifndef PARSER_IF_CPP
+#define PARSER_IF_CPP
 
 #include "Compiler/Instruction/ParserIf.h"
 #include "Compiler/AST/AST_Genere.h"
@@ -19,42 +19,41 @@ ParserIf::ParserIf(ContextParser& contextParser)
 ParserIf::~ParserIf()
 = default;
 
-auto ParserIf::parser(std::vector<Token>& tokens, int& index) -> INode* 
+auto ParserIf::parse(std::vector<Token>& tokens, int& index) -> INode* 
 {
-  consommer(tokens,index,TOKEN_SI,"Error, le token n'est pas 'if'! ");
+  consume(tokens, index, TOKEN_IF, "Error, token is not 'if'! ");
 
-  consommer(tokens,index,TOKEN_PAREN_OUVERTE,"Error, le token n'est pas '('! ");
+  consume(tokens, index, TOKEN_PAREN_OPEN, "Error, token is not '('! ");
   
+  INode* condition = _contextParser.getBuilderTreeEquation()->build(tokens, index);
 
-  INode* condition = _contextParser.getBuilderTreeEquation()->construire(tokens, index);
+  consume(tokens, index, TOKEN_PAREN_CLOSE, "Error, token is not ')'! ");
 
-  consommer(tokens,index,TOKEN_PAREN_FERMEE,"Error, le token n'est pas ')'! ");
+  // Create the IF block node
+  auto* nodeBlockIf = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>();
+  consume(tokens, index, TOKEN_BRACE_OPEN, "Error, token is not '{'");
+  consumeChildBody(tokens, index, nodeBlockIf, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
+  consume(tokens, index, TOKEN_BRACE_CLOSE, "Error, token is not '}'");
 
-  // Créer le node bloc IF
-  auto* nodeBlocIf = _contextParser.getBuilderTreeInstruction()->allouer<NodeInstruction>();
-  consommer(tokens,index,TOKEN_ACCOLADE_OUVERTE, "Error, le token n'est pas '{'");
-  consommerChildBody(tokens,index,nodeBlocIf,_contextParser.getBuilderTreeInstruction(),TOKEN_ACCOLADE_FERMEE);
-  consommer(tokens,index,TOKEN_ACCOLADE_FERMEE,"Error, le token n'est pas '}'");
-
-  // Créer le node bloc ELSE s'il existe
-  NodeInstruction* nodeBlocElse = nullptr;
-  if (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type == TOKEN_SINON) {
-      consommer(tokens,index,TOKEN_SINON,"Error, le token n'est pas 'else'! ");
-      nodeBlocElse = _contextParser.getBuilderTreeInstruction()->allouer<NodeInstruction>();
-      consommer(tokens,index,TOKEN_ACCOLADE_OUVERTE, "Error, le token n'est pas '{'");
-      consommerChildBody(tokens,index,nodeBlocElse,_contextParser.getBuilderTreeInstruction(),TOKEN_ACCOLADE_FERMEE);
-      consommer(tokens,index,TOKEN_ACCOLADE_FERMEE,"Error, le token n'est pas '}'");
+  // Create the ELSE block node if it exists
+  NodeInstruction* nodeBlockElse = nullptr;
+  if (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type == TOKEN_ELSE) {
+      consume(tokens, index, TOKEN_ELSE, "Error, token is not 'else'! ");
+      nodeBlockElse = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>();
+      consume(tokens, index, TOKEN_BRACE_OPEN, "Error, token is not '{'");
+      consumeChildBody(tokens, index, nodeBlockElse, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
+      consume(tokens, index, TOKEN_BRACE_CLOSE, "Error, token is not '}'");
   }
 
-  // Créer le node bloc ENDIF
-  auto* nodeBlocEndif = _contextParser.getBuilderTreeInstruction()->allouer<NodeInstruction>();
+  // Create the ENDIF block node
+  auto* nodeBlockEndif = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>();
 
-  auto* nodeIf = _contextParser.getBuilderTreeInstruction()->allouer<NodeIf>(condition, nodeBlocIf, nodeBlocElse, nodeBlocEndif);
+  auto* nodeIf = _contextParser.getBuilderTreeInstruction()->allocate<NodeIf>(condition, nodeBlockIf, nodeBlockElse, nodeBlockEndif);
 
   return nodeIf;
 }
 
-#endif /* PARSEUR_IF_CPP */
+#endif /* PARSER_IF_CPP */
 
 
 

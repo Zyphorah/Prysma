@@ -7,26 +7,26 @@
 #include <string>
 #include <vector>
 
-class FillingVisitorCoprsClass : public VisitorBaseGenerale
+// Visitor that fills the body of a class (methods, vtable, etc.)
+class FillingVisitorBodyClass : public VisitorBaseGenerale
 {
 private:
     ContextGenCode* _contextGenCode; 
     using VisitorBaseGenerale::visiter;
     
-    void construireVTable(Class* classInfo, const std::string& nomClass, 
-                         const std::vector<NodeDeclarationFunction*>& listMethodeParent);
+    void buildVTable(Class* classInfo, const std::string& className, 
+                     const std::vector<NodeDeclarationFunction*>& parentMethodList);
     
 public:
-    explicit FillingVisitorCoprsClass(ContextGenCode* contextGenCode);
-    ~FillingVisitorCoprsClass() override;
+    explicit FillingVisitorBodyClass(ContextGenCode* contextGenCode);
+    ~FillingVisitorBodyClass() override;
 
-    FillingVisitorCoprsClass(const FillingVisitorCoprsClass&) = delete;
-    auto operator=(const FillingVisitorCoprsClass&) -> FillingVisitorCoprsClass& = delete;
-    FillingVisitorCoprsClass(FillingVisitorCoprsClass&&) = delete;
-    auto operator=(FillingVisitorCoprsClass&&) -> FillingVisitorCoprsClass& = delete;
+    FillingVisitorBodyClass(const FillingVisitorBodyClass&) = delete;
+    auto operator=(const FillingVisitorBodyClass&) -> FillingVisitorBodyClass& = delete;
+    FillingVisitorBodyClass(FillingVisitorBodyClass&&) = delete;
+    auto operator=(FillingVisitorBodyClass&&) -> FillingVisitorBodyClass& = delete;
 
     void visiter(NodeClass* nodeClass) override;
-
 };
 
 #endif /* EC7E55EB_FEC0_4AFD_AEFD_1D5B3BCB89C0 */

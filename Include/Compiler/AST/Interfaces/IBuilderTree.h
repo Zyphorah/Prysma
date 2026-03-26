@@ -14,9 +14,9 @@ class IBuilderTree
 private:
     struct Finalizer {
         void (*destroy)(void*);
-        void* pointeur;
+        void* pointer;
     };
-    std::vector<Finalizer> finalizers; // TODO : remplacer par une solutions llvm::StringRef vue car la destruction est temporaire actuellement, je veux utiliser la puissance du bump allocator
+    std::vector<Finalizer> finalizers; // TODO: replace with an llvm::StringRef-based solution as destruction is currently temporary, I want to use the power of the bump allocator
 public:
     IBuilderTree() = default;
     IBuilderTree(const IBuilderTree&) = delete;
@@ -26,16 +26,16 @@ public:
 
     virtual ~IBuilderTree() {
         for (auto it = finalizers.rbegin(); it != finalizers.rend(); ++it) {
-            it->destroy(it->pointeur);
+            it->destroy(it->pointer);
         }
     }
     
-    virtual auto construire(std::vector<Token>& tokens) -> INode* = 0;
-    virtual auto construire(std::vector<Token>& tokens, int& index) -> INode* = 0;
+    virtual auto build(std::vector<Token>& tokens) -> INode* = 0;
+    virtual auto build(std::vector<Token>& tokens, int& index) -> INode* = 0;
     virtual auto getArena() -> llvm::BumpPtrAllocator& = 0;
 
     template<typename T, typename... Args>
-    auto allouer(Args&&... args) -> T* {
+    auto allocate(Args&&... args) -> T* {
         void* mem = getArena().Allocate(sizeof(T), alignof(T));
         T* obj = new (mem) T(std::forward<Args>(args)...); // NOLINT(cppcoreguidelines-owning-memory)
         finalizers.push_back({[](void* ptr) { static_cast<T*>(ptr)->~T(); }, mem});
@@ -44,16 +44,16 @@ public:
 
     static constexpr std::size_t kArenaAlignment = 8;
 
-    auto operator new(size_t taille) -> void* { return ::operator new(taille); }
+    auto operator new(size_t size) -> void* { return ::operator new(size); }
     static void operator delete(void* ptr) { ::operator delete(ptr); }
 
-    auto operator new(size_t taille, llvm::BumpPtrAllocator& arena) -> void* {
-        return arena.Allocate(taille, kArenaAlignment); 
+    auto operator new(size_t size, llvm::BumpPtrAllocator& arena) -> void* {
+        return arena.Allocate(size, kArenaAlignment); 
     }
     
     static void operator delete(void* ptr, llvm::BumpPtrAllocator& allocator) {
-        // On ne fait rien ici ! 
-        // Le BumpPtrAllocator libère toute la mémoire d'un coup à sa destruction.
+        // Do nothing here!
+        // The BumpPtrAllocator frees all memory at once upon its destruction.
         (void)ptr;
         (void)allocator;
     }

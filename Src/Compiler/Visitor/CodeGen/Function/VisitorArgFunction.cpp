@@ -4,5 +4,5 @@
 
 void GeneralVisitorGenCode::visiter([[maybe_unused]]NodeArgFunction* nodeArgFunction) 
 {
-    _contextGenCode->modifierValeurTemporaire(Symbole(nullptr, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+    _contextGenCode->setTemporaryValue(Symbol(nullptr, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
 }

@@ -5,23 +5,23 @@
 #include <string>
 
 FileWriting::FileWriting(const std::string& path)
-    : _path(path), _fichier(path, std::ios::out | std::ios::app)
+    : _path(path), _file(path, std::ios::out | std::ios::app)
 {
 }
 
 FileWriting::~FileWriting()
 {
-    if (_fichier.is_open()) {
-        _fichier.close();
+    if (_file.is_open()) {
+        _file.close();
     }
 }
 
-void FileWriting::sort(const std::string& data)
+void FileWriting::output(const std::string& data)
 {
-    if (!_fichier) {
-        throw std::runtime_error("Error : impossible d'ouvrir output.txt pour écriture\n");
+    if (!_file) {
+        throw std::runtime_error("Error: unable to open output.txt for writing\n");
     }
-    _fichier << data;
+    _file << data;
     
-    _fichier.close();
+    _file.close();
 }

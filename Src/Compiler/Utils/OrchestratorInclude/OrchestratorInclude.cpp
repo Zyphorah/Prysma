@@ -17,62 +17,62 @@
 #include <string>
 
 
-OrchestratorInclude::OrchestratorInclude(RegistryFunctionGlobale* registryFunctionGlobale, RegistryFile* registryFile, std::mutex* mutex, bool activerGraphViz)
-    : _mutex(mutex), _registryFunctionGlobale(registryFunctionGlobale), _registryFile(registryFile), _activerGraphViz(activerGraphViz)
+OrchestratorInclude::OrchestratorInclude(RegistryFunctionGlobal* registryFunctionGlobale, FileRegistry* fileRegistry, std::mutex* mutex, bool enableGraphViz)
+    : _mutex(mutex), _registryFunctionGlobal(registryFunctionGlobale), _registryFile(fileRegistry), _enableGraphViz(enableGraphViz)
 {}
 
 OrchestratorInclude::~OrchestratorInclude()
 = default;
 
-auto OrchestratorInclude::estGraphVizActif() const -> bool {
-    return _activerGraphViz;
+auto OrchestratorInclude::isGraphVizEnabled() const -> bool {
+    return _enableGraphViz;
 }
 
-auto OrchestratorInclude::aDesErrors() const -> bool {
-    return _aDesErrors;
+auto OrchestratorInclude::hasErrors() const -> bool {
+    return _hasErrors;
 }
 
-void OrchestratorInclude::compilerProject(const std::string& cheminFile) 
+void OrchestratorInclude::compileProject(const std::string& filePath) 
 {
-    inclureFile(cheminFile);
-    _threads.wait(); // Attendre que tous les threads finissent la passe 1 
+    includeFile(filePath);
+    _threads.wait(); // Wait for all threads to finish pass 1
 
 
-    for(const auto& unit : _unitsCompilation) {
+    for(const auto& unit : _compilationUnits) {
         UnitCompilation* ptrUnit = unit.get();
         _threads.async([this, ptrUnit] {
             try {
-                ptrUnit->passe2();
-            } catch (const ErrorCompilation& e) {
+                ptrUnit->pass2();
+            } catch (const CompilationError& e) {
                 std::lock_guard<std::mutex> lock(*_mutex);
-                _aDesErrors = true;
-                std::cerr << "Error dans le fichier '" << ptrUnit->getChemin() << "': " << e.what() << std::endl;
+                _hasErrors = true;
+                std::cerr << "Error in file '" << ptrUnit->getPath() << "': " << e.what() << std::endl;
             }
         });
     }
-    _threads.wait(); // Attendre que tous les threads finissent la passe 2
+    _threads.wait(); // Wait for all threads to finish pass 2
 }
 
-void OrchestratorInclude::inclureFile(const std::string& cheminAbsolu)
+void OrchestratorInclude::includeFile(const std::string& absolutePath)
 {
     std::lock_guard<std::mutex> lock(*_mutex);
-    if (_fichiersDejaInclus.count(cheminAbsolu) > 0) {
-        return; // Le fichier a déjà été inclus, on ignore pour éviter les inclusions multiples
+    if (_alreadyIncludedFiles.count(absolutePath) > 0) {
+        return; // File already included, ignore to avoid multiple inclusions
     }
-    _fichiersDejaInclus.insert(cheminAbsolu);
+    _alreadyIncludedFiles.insert(absolutePath);
 
-   // On remplis le vecteur d'unité de compilation 
-    _unitsCompilation.push_back(std::make_unique<UnitCompilation>(this, _registryFile, cheminAbsolu, _registryFunctionGlobale));
-    auto *ptrUnitNouvelle = _unitsCompilation.back().get();
+   // Fill the compilation unit vector 
+    _compilationUnits.push_back(std::make_unique<UnitCompilation>(this, _registryFile, absolutePath, _registryFunctionGlobal));
+    auto *ptrNewUnit = _compilationUnits.back().get();
 
-    // Filling du pool de thread 
-    _threads.async([this, ptrUnitNouvelle, cheminAbsolu] {
+    // Fill the thread pool 
+    _threads.async([this, ptrNewUnit, absolutePath] {
         try {
-            ptrUnitNouvelle->passe1();
-        } catch (const ErrorCompilation& e) {
+            ptrNewUnit->pass1();
+        } catch (const CompilationError& e) {
             std::lock_guard<std::mutex> lock(*_mutex);
-            _aDesErrors = true;
-            std::cerr << "Error dans le fichier '" << cheminAbsolu << "': " << e.what() << std::endl;
+            _hasErrors = true;
+            std::cerr << "Error in file '" << absolutePath << "': " << e.what() << std::endl;
         }
     });
 

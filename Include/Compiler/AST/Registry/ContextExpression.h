@@ -14,7 +14,7 @@ struct ContextExpression
 private:
     IBuilderTree* builderTreeEquation;
     IBuilderTree* builderTreeInstruction;
-    ParserType* parserType;
+    TypeParser* parserType;
     ContextParser* contextParser;
     llvm::BumpPtrAllocator* arena;
     RegistryVariable* registryVariable;
@@ -24,7 +24,7 @@ public:
     ContextExpression(
         IBuilderTree* p_builderTreeEquation,
         IBuilderTree* p_builderTreeInstruction,
-        ParserType* p_parserType,
+        TypeParser* p_parserType,
         ContextParser* p_contextParser,
         llvm::BumpPtrAllocator* p_arena,
         RegistryVariable* p_registryVariable,
@@ -40,33 +40,33 @@ public:
     {
         if (p_contextParser == nullptr)
         {
-            throw std::invalid_argument("contextParser ne peut pas être nul");
+            throw std::invalid_argument("contextParser cannot be null");
         }
         if (p_builderTreeEquation == nullptr)
         {
-            throw std::invalid_argument("builderTreeEquation ne peut pas être nul");
+            throw std::invalid_argument("builderTreeEquation cannot be null");
         }
         if (p_builderTreeInstruction == nullptr)
         {
-            throw std::invalid_argument("builderTreeInstruction ne peut pas être nul");
+            throw std::invalid_argument("builderTreeInstruction cannot be null");
         }
         if (p_parserType == nullptr)
         {
-            throw std::invalid_argument("parserType ne peut pas être nul");
+            throw std::invalid_argument("parserType cannot be null");
         }
-         if (p_registryVariable == nullptr)
+        if (p_registryVariable == nullptr)
         {
-            throw std::invalid_argument("registryVariable ne peut pas être nul");
+            throw std::invalid_argument("registryVariable cannot be null");
         }
-         if (p_registryType == nullptr)
+        if (p_registryType == nullptr)
         {
-            throw std::invalid_argument("registryType ne peut pas être nul");
+            throw std::invalid_argument("registryType cannot be null");
         }   
     }
 
     [[nodiscard]] auto getBuilderTreeEquation() const -> IBuilderTree* { return builderTreeEquation; }
     [[nodiscard]] auto getBuilderTreeInstruction() const -> IBuilderTree* { return builderTreeInstruction; }
-    [[nodiscard]] auto getParserType() const -> ParserType* { return parserType; }
+    [[nodiscard]] auto getTypeParser() const -> TypeParser* { return parserType; }
     [[nodiscard]] auto getContextParser() const -> ContextParser* { return contextParser; }
     [[nodiscard]] auto getArena() const -> llvm::BumpPtrAllocator* { return arena; }
     [[nodiscard]] auto getRegistryVariable() const -> RegistryVariable* { return registryVariable; }

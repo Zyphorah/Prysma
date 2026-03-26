@@ -7,32 +7,30 @@
 
 void GeneralVisitorGenCode::visiter(NodeWhile* nodeWhile) 
 {
-    // Récupérer la condition et les blocs à partir du node while
+    // Retrieve the condition and blocks from the while node
     INode* nodeCondition = nodeWhile->getNodeCondition();
-    INode* nodeBlocWhile = nodeWhile->getNodeBlocWhile();
-    INode* nodeBlocEndWhile = nodeWhile->getNodeBlocFinWhile();
+    INode* nodeWhileBlock = nodeWhile->getNodeBlocWhile();
+    INode* nodeEndWhileBlock = nodeWhile->getNodeBlocFinWhile();
     
-    // construire les blocs de base pour le while 
-    llvm::Function* functionEnCours = _contextGenCode->getBackend()->getBuilder().GetInsertBlock()->getParent();
-    auto [blocCondition, blocWhile, blocEndWhile] = ControlFlowHelper::creerBlocsControle(functionEnCours, _contextGenCode->getBackend()->getContext(), "while.cond", "while.body", "while.end");
+    // Build the basic blocks for the while
+    llvm::Function* currentFunction = _contextGenCode->getBackend()->getBuilder().GetInsertBlock()->getParent();
+    auto [conditionBlock, whileBlock, endWhileBlock] = ControlFlowHelper::createControlBlocks(currentFunction, _contextGenCode->getBackend()->getContext(), "while.cond", "while.body", "while.end");
 
-    // Générer le code pour la condition du while while.cond
-    _contextGenCode->getBackend()->getBuilder().CreateBr(blocCondition);
-    _contextGenCode->getBackend()->getBuilder().SetInsertPoint(blocCondition); 
+    // Generate code for the while condition while.cond
+    _contextGenCode->getBackend()->getBuilder().CreateBr(conditionBlock);
+    _contextGenCode->getBackend()->getBuilder().SetInsertPoint(conditionBlock); 
     nodeCondition->accept(this);
-    llvm::Value* cmp = _contextGenCode->getValeurTemporaire().getAdresse();
-    _contextGenCode->getBackend()->getBuilder().CreateCondBr(cmp, blocWhile, blocEndWhile);
+    llvm::Value* cmp = _contextGenCode->getTemporaryValue().getAddress();
+    _contextGenCode->getBackend()->getBuilder().CreateCondBr(cmp, whileBlock, endWhileBlock);
 
-    // Générer le code pour le bloc du while while.body
-
-    _contextGenCode->getBackend()->getBuilder().SetInsertPoint(blocWhile);
-    if (nodeBlocWhile != nullptr) {
-        nodeBlocWhile->accept(this);
-        _contextGenCode->getBackend()->getBuilder().CreateBr(blocCondition);
-
+    // Generate code for the while block while.body
+    _contextGenCode->getBackend()->getBuilder().SetInsertPoint(whileBlock);
+    if (nodeWhileBlock != nullptr) {
+        nodeWhileBlock->accept(this);
+        _contextGenCode->getBackend()->getBuilder().CreateBr(conditionBlock);
     }
-    _contextGenCode->getBackend()->getBuilder().SetInsertPoint(blocEndWhile);
-    if (nodeBlocEndWhile != nullptr) {
-        nodeBlocEndWhile->accept(this);
+    _contextGenCode->getBackend()->getBuilder().SetInsertPoint(endWhileBlock);
+    if (nodeEndWhileBlock != nullptr) {
+        nodeEndWhileBlock->accept(this);
     }
 }

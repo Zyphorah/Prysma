@@ -4,12 +4,10 @@
 #include "Compiler/AST/Registry/ContextGenCode.h"
 #include "Compiler/AST/Utils/IBuilderEnvironmentRegistry.h"
 
-
 class BuilderEnvironmentRegistryVariable : public IBuilderEnvironmentRegistry
 {
 private:
     ContextGenCode* _contextGenCode;
-
 
 public:
     explicit BuilderEnvironmentRegistryVariable(ContextGenCode* _contextGenCode);
@@ -21,7 +19,7 @@ public:
     BuilderEnvironmentRegistryVariable(BuilderEnvironmentRegistryVariable&&) = delete;
     auto operator=(BuilderEnvironmentRegistryVariable&&) -> BuilderEnvironmentRegistryVariable& = delete;
 
-    void remplir() override;
+    void fill() override;
 
 };
 

@@ -6,10 +6,10 @@
 
 class TypeSimple : public IType {
 private:
-    llvm::Type* _typeLLVM;
+    llvm::Type* _llvmType;
 
 public:
-    explicit TypeSimple(llvm::Type* typeLLVM);
+    explicit TypeSimple(llvm::Type* llvmType);
     ~TypeSimple() override = default;
 
     TypeSimple(const TypeSimple&) = delete;
@@ -17,12 +17,12 @@ public:
     TypeSimple(TypeSimple&&) = delete;
     auto operator=(TypeSimple&&) -> TypeSimple& = delete;
 
-    auto generatedrTypeLLVM(llvm::LLVMContext& context) -> llvm::Type* override;
+    auto generateLLVMType(llvm::LLVMContext& context) -> llvm::Type* override;
     
-    [[nodiscard]] auto estFlottant() const -> bool override;
-    [[nodiscard]] auto estBooleen() const -> bool override;
-    [[nodiscard]] auto estChaine() const -> bool override;
-    [[nodiscard]] auto estArray() const -> bool override { return false; }
+    [[nodiscard]] auto isFloating() const -> bool override;
+    [[nodiscard]] auto isBoolean() const -> bool override;
+    [[nodiscard]] auto isString() const -> bool override;
+    [[nodiscard]] auto isArray() const -> bool override { return false; }
 };
 
 #endif /* D3CF3339_1CBC_4EEE_9EE7_B2E99140A4CB */

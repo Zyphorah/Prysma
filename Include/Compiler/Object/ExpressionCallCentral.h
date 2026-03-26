@@ -1,5 +1,5 @@
-#ifndef EXPRESSION_APPELCENTRAL_H
-#define EXPRESSION_APPELCENTRAL_H
+#ifndef EXPRESSION_CALLCENTRAL_H
+#define EXPRESSION_CALLCENTRAL_H
 
 #include "Compiler/AST/Nodes/Expression/IExpressionEngine.h"
 #include "Compiler/AST/Nodes/Interfaces/INode.h"
@@ -10,10 +10,10 @@
 class ExpressionCallCentral : public IExpressionEngine
 {
 private:
-    ContextExpression& _contexteExpression;
+    ContextExpression& _context;
 
 public:
-    explicit ExpressionCallCentral(ContextExpression& contexteExpression);
+    explicit ExpressionCallCentral(ContextExpression& expressionContext);
     ~ExpressionCallCentral() override;
 
     ExpressionCallCentral(const ExpressionCallCentral&) = delete;
@@ -22,7 +22,7 @@ public:
     ExpressionCallCentral(ExpressionCallCentral&&) = delete;
     auto operator=(ExpressionCallCentral&&) -> ExpressionCallCentral& = delete;
 
-    auto construire(std::vector<Token>& equation) -> INode* override;
+    auto build(std::vector<Token>& equation) -> INode* override;
 };
 
-#endif /* EXPRESSION_APPELCENTRAL_H */
+#endif /* EXPRESSION_CALLCENTRAL_H */

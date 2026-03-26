@@ -1,5 +1,5 @@
-#ifndef EXPRESSION_TABLEAUINITIALISATION_CPP
-#define EXPRESSION_TABLEAUINITIALISATION_CPP
+#ifndef EXPRESSION_ARRAYINITIALIZATION_CPP
+#define EXPRESSION_ARRAYINITIALIZATION_CPP
 
 #include "Compiler/Array/ExpressionArrayInitialization.h"
 #include "Compiler/AST/AST_Genere.h"
@@ -10,42 +10,42 @@
 #include <cstddef>
 #include <vector>
 
-ExpressionArrayInitialization::ExpressionArrayInitialization(ContextExpression& contexteExpression)
-    : _contexteExpression(contexteExpression)
+ExpressionArrayInitialization::ExpressionArrayInitialization(ContextExpression& expressionContext)
+    : _context(expressionContext)
 {}
 
 ExpressionArrayInitialization::~ExpressionArrayInitialization()
 = default;
 
-auto ExpressionArrayInitialization::construire(std::vector<Token>& equation) -> INode*
+auto ExpressionArrayInitialization::build(std::vector<Token>& equation) -> INode*
 {
-    std::vector<INode*> elementsArray;
-    std::vector<Token> sousEquation;
+    std::vector<INode*> arrayElements;
+    std::vector<Token> subEquation;
     size_t index = 1;
 
-    while (index < equation.size() && equation[index].type != TOKEN_CROCHET_FERME) {
-        if (equation[index].type == TOKEN_VIRGULE) {
+    while (index < equation.size() && equation[index].type != TOKEN_BRACKET_CLOSE) {
+        if (equation[index].type == TOKEN_COMMA) {
             index++;
-            INode* element = _contexteExpression.getBuilderTreeEquation()->construire(sousEquation);
+            INode* element = _context.getBuilderTreeEquation()->build(subEquation);
             if (element != nullptr) {
-                elementsArray.push_back(element);
+                arrayElements.push_back(element);
             }
-            sousEquation.clear();
+            subEquation.clear();
             continue;
         }
 
-        sousEquation.push_back(equation[index]);
+        subEquation.push_back(equation[index]);
         index++;
     }
 
-    if (!sousEquation.empty()) {
-        INode* element = _contexteExpression.getBuilderTreeEquation()->construire(sousEquation);
+    if (!subEquation.empty()) {
+        INode* element = _context.getBuilderTreeEquation()->build(subEquation);
         if (element != nullptr) {
-            elementsArray.push_back(element);
+            arrayElements.push_back(element);
         }
     }
 
-    return _contexteExpression.getBuilderTreeEquation()->allouer<NodeArrayInitialization>(elementsArray);
+    return _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(arrayElements);
 }
 
-#endif /* EXPRESSION_TABLEAUINITIALISATION_CPP */
+#endif /* EXPRESSION_ARRAYINITIALIZATION_CPP */

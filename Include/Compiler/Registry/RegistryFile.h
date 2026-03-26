@@ -6,14 +6,14 @@
 #include <mutex>
 #include <vector>
 
-class RegistryFile {
+class FileRegistry {
 public:
-    void ajouterFile(const std::string& cheminFile);
-    auto verifierFile(const std::string& cheminFile) -> bool;
-    auto obtenirTousLesFiles() -> std::vector<std::string>;
+    void addFile(const std::string& filePath);
+    auto checkFile(const std::string& filePath) -> bool;
+    auto getAllFiles() -> std::vector<std::string>;
 
 private:
-    std::set<std::string> fichiersTraites;
+    std::set<std::string> processedFiles;
     std::mutex mtx;
 };
 

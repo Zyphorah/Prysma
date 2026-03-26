@@ -4,33 +4,33 @@
 #include <vector>
 
 
-class IManagerOperateur;
+class IOperatorManager;
 
 /**
- * @interface IManagerOperateur
- * @brief Interface pour la chaîne de responsabilité des opérateurs
+ * @interface IOperatorManager
+ * @brief Interface for the operator chain of responsibility
  */
-class IManagerOperateur {
+class IOperatorManager {
 public:
-    IManagerOperateur() = default;
+    IOperatorManager() = default;
 
-    IManagerOperateur(const IManagerOperateur&) = delete;
-    auto operator=(const IManagerOperateur&) -> IManagerOperateur& = delete;
-    IManagerOperateur(IManagerOperateur&&) = delete;
-    auto operator=(IManagerOperateur&&) -> IManagerOperateur& = delete;
+    IOperatorManager(const IOperatorManager&) = delete;
+    auto operator=(const IOperatorManager&) -> IOperatorManager& = delete;
+    IOperatorManager(IOperatorManager&&) = delete;
+    auto operator=(IOperatorManager&&) -> IOperatorManager& = delete;
 
-    virtual ~IManagerOperateur() = default;
+    virtual ~IOperatorManager() = default;
     
     /**
-     * @brief Définit le prochain maillon de la chaîne
-     * @param suivant Le prochain manager
+     * @brief Sets the next link in the chain
+     * @param next The next manager
      */
-    virtual void definirSuivant(IManagerOperateur* suivant) = 0;
+    virtual void setNext(IOperatorManager* next) = 0;
     
     /**
-     * @brief Traite la recherche d'un opérateur
-     * @param equation L'équation à traiter
-     * @return L'index de l'opérateur trouvé, ou -1
+     * @brief Handles the search for an operator
+     * @param equation The equation to process
+     * @return The index of the found operator, or -1
      */
-    virtual auto traiter(const std::vector<Token>& equation) -> int = 0;
+    virtual auto handle(const std::vector<Token>& equation) -> int = 0;
 };

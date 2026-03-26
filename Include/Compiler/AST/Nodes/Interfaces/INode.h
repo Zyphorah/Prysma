@@ -3,7 +3,7 @@
 #include <llvm/IR/Value.h>
 
 class IVisitor;
-enum class NodeTypeGenere;
+enum class NodeTypeGenerated;
 
 class INode {
 public:
@@ -17,5 +17,5 @@ public:
 
     virtual void accept(IVisitor* visitor) = 0;
     
-    [[nodiscard]] virtual auto getTypeGenere() const -> NodeTypeGenere = 0;
+    [[nodiscard]] virtual auto getGeneratedType() const -> NodeTypeGenerated = 0;
 };

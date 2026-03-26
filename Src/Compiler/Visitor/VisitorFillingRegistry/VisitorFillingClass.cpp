@@ -12,72 +12,72 @@
 #include <string>
 #include <utility>
 
-// Passe 1 : Enregistryment des types opaques de classes
-// On crée un StructType opaque (sans body) pour chaque classe déclarée.
-// Cela permet de résoudre les dépendances circulaires input classes
-// lors de la Passe 2 (remplissage du body des struct).
+// Pass 1: Register opaque class types
+// We create an opaque StructType (without body) for each declared class.
+// This allows resolving circular dependencies between classes
+// during Pass 2 (struct body filling).
 
 void FillingVisitorRegistry::visiter(NodeClass* nodeClass)
 {
-    // 1. Récupérer le nom de la classe à partir du nœud de déclaration
-    const Token& nomClasseToken = nodeClass->getNomClass();
-    std::string nomClasse = nomClasseToken.value;
+    // 1. Retrieve the class name from the declaration node
+    const Token& classNameToken = nodeClass->getNomClass();
+    std::string className = classNameToken.value;
 
-    // 2. Créer le type "Opaque" dans LLVM
-    llvm::StructType* typeOpaqueLLVM = llvm::StructType::create(
+    // 2. Create the "Opaque" type in LLVM
+    llvm::StructType* opaqueTypeLLVM = llvm::StructType::create(
         _contextGenCode->getBackend()->getContext(),
-        "Class_" + nomClasse
+        "Class_" + className
     );
 
-    // 3. Créer l'instance de la structure "Class" qui contient les métadonnées
-    auto infosClasse = std::make_unique<Class>();
+    // 3. Create the "Class" structure instance containing metadata
+    auto classInfo = std::make_unique<Class>();
 
-    // 4. Lier le type LLVM opaque à la structure
-    infosClasse->setStructType(typeOpaqueLLVM);
+    // 4. Link the opaque LLVM type to the structure
+    classInfo->setStructType(opaqueTypeLLVM);
 
-    // 5. Initialiser l'héritage
+    // 5. Initialize inheritance
     const auto& heritage = nodeClass->getHeritage();
     if (!heritage.empty()) {
-        infosClasse->setParentHeritage(heritage[0]);
+        classInfo->setParentInheritance(heritage[0]);
     } else {
-        infosClasse->setParentHeritage(nullptr);
+        classInfo->setParentInheritance(nullptr);
     }
 
-    // 6. Préparer les registrys internes (vides pour l'instant, seront remplis en Passe 2)
-    infosClasse->setRegistryVariable(new RegistryVariable());
-    infosClasse->setRegistryFunctionLocale(new RegistryFunctionLocale());
+    // 6. Prepare internal registries (empty for now, will be filled in Pass 2)
+    classInfo->setRegistryVariable(new RegistryVariable());
+    classInfo->setRegistryFunctionLocal(new RegistryFunctionLocal());
 
-    // La VTable sera générée plus tard lors de la résolution des méthodes virtuelles
-    infosClasse->setVTable(nullptr);
+    // The VTable will be generated later during virtual method resolution
+    classInfo->setVTable(nullptr);
 
-    Class* infosClassePtr = infosClasse.get();
+    Class* classInfoPtr = classInfo.get();
 
-    // 7. Enregistryr la classe dans le registry global du compiler
-    _contextGenCode->getRegistryClass()->enregistryr(nomClasse, std::move(infosClasse));
+    // 7. Register the class in the compiler's global registry
+    _contextGenCode->getRegistryClass()->registerElement(className, std::move(classInfo));
 
-    // 8. Visiter le body de la classe pour remplir ses registrys (méthodes, etc.)
-    std::string ancienneClasse = _contextGenCode->getNomClasseCourante();
-    _contextGenCode->modifierNomClasseCourante(nomClasse);
+    // 8. Visit the class body to fill its registries (methods, etc.)
+    std::string previousClass = _contextGenCode->getCurrentClassName();
+    _contextGenCode->setCurrentClassName(className);
 
-    for (auto* membre : nodeClass->getListMembers()) {
-        if (prysma::isa<NodeDeclarationFunction>(membre)) {
-            membre->accept(this);
+    for (auto* member : nodeClass->getListMembers()) {
+        if (prysma::isa<NodeDeclarationFunction>(member)) {
+            member->accept(this);
         }
-        else if (auto* declVar = prysma::dyn_cast<NodeDeclarationVariable>(membre)) {
+        else if (auto* declVar = prysma::dyn_cast<NodeDeclarationVariable>(member)) {
             Token token;
             token.value = declVar->getNom();
-            infosClassePtr->getRegistryVariable()->enregistryr(token, Symbole(nullptr, declVar->getType()));
+            classInfoPtr->getRegistryVariable()->registerVariable(token, Symbol(nullptr, declVar->getType()));
             
             if (declVar->getExpression() != nullptr) {
-                infosClassePtr->getMemberInitializers()[declVar->getNom()] = declVar->getExpression();
+                classInfoPtr->getMemberInitializers()[declVar->getNom()] = declVar->getExpression();
             }
         }
     }
 
-    // Aussi visiter les builders si nécessaire :
+    // Also visit builders if necessary:
     for (auto* builder : nodeClass->getBuilder()) {
         builder->accept(this);
     }
 
-    _contextGenCode->modifierNomClasseCourante(ancienneClasse);
+    _contextGenCode->setCurrentClassName(previousClass);
 }

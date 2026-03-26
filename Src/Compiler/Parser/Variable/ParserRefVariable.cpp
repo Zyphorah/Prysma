@@ -1,5 +1,5 @@
-#ifndef PARSEUR_REFVARIABLE_CPP
-#define PARSEUR_REFVARIABLE_CPP
+#ifndef PARSER_REFVARIABLE_CPP
+#define PARSER_REFVARIABLE_CPP
 
 #include "Compiler/Variable/ParserRefVariable.h"
 #include "Compiler/AST/AST_Genere.h"
@@ -16,20 +16,20 @@ ParserRefVariable::ParserRefVariable(ContextParser& contextParser)
 {}
 
 ParserRefVariable::~ParserRefVariable()
-= default;
+=default;
 
-// Exemple ref variable
-auto ParserRefVariable::parser(std::vector<Token>& tokens, int& index) -> INode* 
+// Example: ref variable
+auto ParserRefVariable::parse(std::vector<Token>& tokens, int& index) -> INode* 
 {
-    consommer(tokens, index, TOKEN_REF, "Error : 'ref' attendu");
+    consume(tokens, index, TOKEN_REF, "Error: 'ref' expected");
     
-    Token nomToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Error : nom de variable attendu après 'ref'");
-    std::string nomVariable = nomToken.value;
+    Token nameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Error: variable name expected after 'ref'");
+    std::string variableName = nameToken.value;
     
-    return _contextParser.getBuilderTreeEquation()->allouer<NodeRefVariable>(nomVariable);
+    return _contextParser.getBuilderTreeEquation()->allocate<NodeRefVariable>(variableName);
 }
 
-#endif /* PARSEUR_REFVARIABLE_CPP */
+#endif /* PARSER_REFVARIABLE_CPP */
 
 
 

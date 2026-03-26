@@ -6,22 +6,22 @@
 
 void GeneralVisitorGenCode::visiter(NodeAssignmentVariable* nodeAssignmentVariable)
 {
-    llvm::Value* expressionResult = evaluerExpression(nodeAssignmentVariable->getExpression()).getAdresse();
+    llvm::Value* expressionResult = evaluateExpression(nodeAssignmentVariable->getExpression()).getAddress();
 
-    AdresseurVariable adresseur(_contextGenCode);
-    Symbole symbole = adresseur.recupererAdresse(nodeAssignmentVariable->getToken().value);
+    VariableAddressor addressor(_contextGenCode);
+    Symbol symbol = addressor.getAddress(nodeAssignmentVariable->getToken().value);
     
-    llvm::Value* variableExistante = symbole.getAdresse();
+    llvm::Value* existingVariable = symbol.getAddress();
     
-    llvm::Type* typeVariableLLVM = nullptr;
-    if (symbole.getType() != nullptr) {
-        typeVariableLLVM = symbole.getType()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
+    llvm::Type* variableTypeLLVM = nullptr;
+    if (symbol.getType() != nullptr) {
+        variableTypeLLVM = symbol.getType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
     }
     
-    AffecteurVariable affecteur(_contextGenCode);
-    affecteur.affecter(variableExistante, expressionResult, typeVariableLLVM);
+    VariableAssigner assigner(_contextGenCode);
+    assigner.assign(existingVariable, expressionResult, variableTypeLLVM);
     
-    // Reset la valeur pour éviter des problèmes
-    _contextGenCode->modifierValeurTemporaire(Symbole(nullptr, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+    // Reset the value to avoid problems
+    _contextGenCode->setTemporaryValue(Symbol(nullptr, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
 }
 

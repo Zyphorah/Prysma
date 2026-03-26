@@ -12,7 +12,7 @@ public:
     auto operator=(const IInstruction&) -> IInstruction& = delete;
     IInstruction(IInstruction&&) = delete;
     auto operator=(IInstruction&&) -> IInstruction& = delete;
-    virtual void ajouterInstruction(INode* child) = 0; 
+    virtual void addInstruction(INode* child) = 0; 
 };
 
 #endif /* C6C14887_3564_44B6_93AF_297915A05DCF */

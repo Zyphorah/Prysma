@@ -6,7 +6,7 @@
 class ReturnContextCompilation
 {
 private:
-    std::stack<IType*> _contexte; 
+    std::stack<IType*> _context; 
 
 public:
 
@@ -22,10 +22,10 @@ public:
     ReturnContextCompilation(ReturnContextCompilation&&) = delete;
     auto operator=(ReturnContextCompilation&&) -> ReturnContextCompilation& = delete;
 
-    auto recupererContext() -> IType*;
+    auto getContext() -> IType*;
         
-    void piler(IType* token);
-    void depiler();
+    void push(IType* token);
+    void pop();
 
 };
 

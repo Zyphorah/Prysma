@@ -5,19 +5,19 @@
 RegistryArgument::RegistryArgument()
 = default;
 
-void RegistryArgument::ajouter(llvm::Value* arg)
+void RegistryArgument::add(llvm::Value* arg)
 {
-    _vecArg.push_back(arg);
+    _args.push_back(arg);
 }
 
-auto RegistryArgument::recuperer() -> std::vector<llvm::Value*>&
+auto RegistryArgument::get() -> std::vector<llvm::Value*>&
 {
-    return _vecArg;
+    return _args;
 }
 
-void RegistryArgument::vider()
+void RegistryArgument::clear()
 {
-    _vecArg.clear();
+    _args.clear();
 }
 
 

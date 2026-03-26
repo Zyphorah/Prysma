@@ -22,9 +22,9 @@ class GenerateurVisitorBaseGenerale(EngineGeneration):
             champs = definition.get("champs", {}) if definition else {}
             if definition and definition.get("parent") == "NodeInstruction":
                 champs_copie = dict(champs)
-                champs_copie["childs"] = "std::vector<INode*>"
+                champs_copie["children"] = "std::vector<INode*>"
                 champs = champs_copie
             nodes_avec_champs[nom] = champs
-        nodes_avec_champs["Instruction"] = {"childs": "std::vector<INode*>"}
+        nodes_avec_champs["Instruction"] = {"children": "std::vector<INode*>"}
         methodes = {nom: self._extraire_traversables(champs) for nom, champs in nodes_avec_champs.items()}
         self._rendre_et_ecrire("visitor_base_general.cpp.j2", self._fichier_source, methodes=methodes)

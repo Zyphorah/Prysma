@@ -9,32 +9,32 @@
 class OrchestratorInclude; 
 struct ContextGenCode;
 class INode;
-class RegistryFile;
-class RegistryFunctionGlobale;
+class FileRegistry;
+class RegistryFunctionGlobal;
 
 class UnitCompilation
 {
 private: 
 
-    // Groupe de donnée globale pour l'unité de compilation 
-    // Orchestrator récursif pour les includes, utilise un système de mutex pour protéger les données partagées 
+    // Global data group for the compilation unit
+    // Recursive orchestrator for includes, uses a mutex system to protect shared data
     OrchestratorInclude* _orchestrator;
 
-    // contexte séparé pour chaque unité de compilation pour éviter les conflits input les includes imbriqués
-    // Note: ne jamais partager toujours copier c'est donnée pour ne pas avoir de problème de race condition
-    std::unique_ptr<ConfigurationFacadeEnvironnement> _facadeConfigurationEnvironnement;
-    std::string _nomFile;
+    // Separate context for each compilation unit to avoid conflicts with nested includes
+    // Note: never share, always copy this data to avoid race condition problems
+    std::unique_ptr<ConfigurationFacadeEnvironment> _facadeConfigurationEnvironment;
+    std::string _fileName;
     
-    std::string _ancienRepertoire;
-    std::string _repertoireCourant;
+    std::string _oldDirectory;
+    std::string _currentDirectory;
 
-    RegistryFile* _registryFile;
+    FileRegistry* _fileRegistry;
     ContextGenCode* _context;
     INode* _tree;
-    std::string _cheminFileOriginal;
+    std::string _originalFilePath;
 
 public: 
-    UnitCompilation(OrchestratorInclude* orchestrator, RegistryFile* registry, std::string cheminFile, RegistryFunctionGlobale* registryFunctionGlobale);
+    UnitCompilation(OrchestratorInclude* orchestrator, FileRegistry* registry, std::string filePath, RegistryFunctionGlobal* registryFunctionGlobal);
     ~UnitCompilation();
 
     UnitCompilation(const UnitCompilation&) = delete;
@@ -42,12 +42,12 @@ public:
     UnitCompilation(UnitCompilation&&) = delete;
     auto operator=(UnitCompilation&&) -> UnitCompilation& = delete;
 
-    void passe1();
-    // Callée après que tous les threads passe1 soient terminés.
-    // Remplit les registrys locaux (function, variable) à partir du registry global complet.
-    void passe2();
+    void pass1();
+    // Called after all pass1 threads are finished.
+    // Fills local registries (function, variable) from the complete global registry.
+    void pass2();
 
-    [[nodiscard]] auto getChemin() const -> std::string;
+    [[nodiscard]] auto getPath() const -> std::string;
 };
 
 #endif /* DB7C496D_6A43_4B78_B490_52A0C21C5224 */

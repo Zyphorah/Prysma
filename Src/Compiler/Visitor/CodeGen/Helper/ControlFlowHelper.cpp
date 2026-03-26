@@ -2,16 +2,16 @@
 #include <llvm-18/llvm/IR/BasicBlock.h>
 #include <string>
 
-auto ControlFlowHelper::creerBlocsControle(
+auto ControlFlowHelper::createControlBlocks(
     llvm::Function* function,
     llvm::LLVMContext& context,
-    const std::string& nomInput,
-    const std::string& nomBody,
-    const std::string& nomOutput
-) -> BlocsControle {
+    const std::string& inputName,
+    const std::string& bodyName,
+    const std::string& outputName
+) -> ControlBlocks {
     return {
-        llvm::BasicBlock::Create(context, nomInput, function),
-        llvm::BasicBlock::Create(context, nomBody, function),
-        llvm::BasicBlock::Create(context, nomOutput, function)
+        llvm::BasicBlock::Create(context, inputName, function),
+        llvm::BasicBlock::Create(context, bodyName, function),
+        llvm::BasicBlock::Create(context, outputName, function)
     };
 }

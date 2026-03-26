@@ -12,42 +12,38 @@
 
 class IExpression;
 
-class RegistrySymbole : public RegistryGeneric<TokenType,std::function<IExpression*(Token)>>,
-                        public IRegistrySymbole {
+class RegistrySymbol : public RegistryGeneric<TokenType, std::function<IExpression*(Token)>>,
+                      public IRegistrySymbol {
 public:
-    RegistrySymbole() = default;
-    RegistrySymbole(const RegistrySymbole&) = delete;
-    auto operator=(const RegistrySymbole&) -> RegistrySymbole& = delete;
-    RegistrySymbole(RegistrySymbole&&) = delete;
-    auto operator=(RegistrySymbole&&) -> RegistrySymbole& = delete;
-    ~RegistrySymbole() override = default;
+    RegistrySymbol() = default;
+    RegistrySymbol(const RegistrySymbol&) = delete;
+    auto operator=(const RegistrySymbol&) -> RegistrySymbol& = delete;
+    RegistrySymbol(RegistrySymbol&&) = delete;
+    auto operator=(RegistrySymbol&&) -> RegistrySymbol& = delete;
+    ~RegistrySymbol() override = default;
 
-  
-    void enregistryr(
-        TokenType symbole, 
-        std::function<IExpression*(Token)> fournisseur) override {
-        RegistryGeneric::enregistryr(symbole, std::move(fournisseur));
+    void registerSymbol(
+        TokenType symbol, 
+        std::function<IExpression*(Token)> provider) override {
+        RegistryGeneric::registerElement(symbol, std::move(provider));
     }
 
-
-    auto recupererNode(Token token) -> IExpression* override {
-        std::function<IExpression*(Token)> fournisseur = RegistryGeneric::recuperer(token.type);
-        return fournisseur(token);
+    auto getNode(Token token) -> IExpression* override {
+        std::function<IExpression*(Token)> provider = RegistryGeneric::get(token.type);
+        return provider(token);
     }
 
-  
-    [[nodiscard]] auto estOperateur(TokenType symbole) const -> bool override {
-        return existe(symbole);
+    [[nodiscard]] auto isOperator(TokenType symbol) const -> bool override {
+        return exists(symbol);
     }
 
-    [[nodiscard]] auto obtenirSymboles() const -> std::set<TokenType> override {
-        return obtenirCles();
+    [[nodiscard]] auto getSymbols() const -> std::set<TokenType> override {
+        return getKeys();
     }
 
 protected:
-   
-    using RegistryGeneric<TokenType, std::function<IExpression*(Token)>>::generatedrMessageError;
-    [[nodiscard]] auto generatedrMessageError(const TokenType& cle) const -> std::string override {
-        return RegistryGeneric::generatedrMessageError(cle);
+    using RegistryGeneric<TokenType, std::function<IExpression*(Token)>>::generateErrorMessage;
+    [[nodiscard]] auto generateErrorMessage(const TokenType& key) const -> std::string override {
+        return RegistryGeneric::generateErrorMessage(key);
     }
 };

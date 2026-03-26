@@ -6,42 +6,42 @@
 
 void GeneralVisitorGenCode::visiter(NodeIf* nodeIf) 
 {
-    // Récupérer la condition et les blocs à partir du node if
+    // Retrieve the condition and blocks from the if node
     INode* nodeCondition = nodeIf->getNodeCondition();
-    INode* nodeBlocIf = nodeIf->getNodeBlocIf();
-    INode* nodeBlocElse = nodeIf->getNodeBlocElse();
+    INode* nodeIfBlock = nodeIf->getNodeBlocIf();
+    INode* nodeElseBlock = nodeIf->getNodeBlocElse();
 
-    // Évaluer la condition
+    // Evaluate the condition
     nodeCondition->accept(this);
-    llvm::Value* cmp = _contextGenCode->getValeurTemporaire().getAdresse(); 
+    llvm::Value* cmp = _contextGenCode->getTemporaryValue().getAddress(); 
 
-    llvm::Function* functionEnCours = _contextGenCode->getBackend()->getBuilder().GetInsertBlock()->getParent();
+    llvm::Function* currentFunction = _contextGenCode->getBackend()->getBuilder().GetInsertBlock()->getParent();
 
-    auto [blocThen, blocElse, blocFin] = ControlFlowHelper::creerBlocsControle(functionEnCours, _contextGenCode->getBackend()->getContext(), "if", "else", "endif");
+    auto [thenBlock, elseBlock, endBlock] = ControlFlowHelper::createControlBlocks(currentFunction, _contextGenCode->getBackend()->getContext(), "if", "else", "endif");
 
-    // Générer le code de branchement conditionnel
-    _contextGenCode->getBackend()->getBuilder().CreateCondBr(cmp, blocThen, blocElse);
+    // Generate conditional branch code
+    _contextGenCode->getBackend()->getBuilder().CreateCondBr(cmp, thenBlock, elseBlock);
 
-    // Générer le code pour le bloc "if"
-    _contextGenCode->getBackend()->getBuilder().SetInsertPoint(blocThen);
-    if (nodeBlocIf != nullptr) {
-        nodeBlocIf->accept(this);
+    // Generate code for the "if" block
+    _contextGenCode->getBackend()->getBuilder().SetInsertPoint(thenBlock);
+    if (nodeIfBlock != nullptr) {
+        nodeIfBlock->accept(this);
     }
-    // Brancher vers endif à la fin du bloc if
-    _contextGenCode->getBackend()->getBuilder().CreateBr(blocFin);
+    // Branch to endif at the end of the if block
+    _contextGenCode->getBackend()->getBuilder().CreateBr(endBlock);
 
-    // Générer le code pour le bloc "else"
-    _contextGenCode->getBackend()->getBuilder().SetInsertPoint(blocElse);
-    if (nodeBlocElse != nullptr) {
-        nodeBlocElse->accept(this);
+    // Generate code for the "else" block
+    _contextGenCode->getBackend()->getBuilder().SetInsertPoint(elseBlock);
+    if (nodeElseBlock != nullptr) {
+        nodeElseBlock->accept(this);
     }
-    // Brancher vers endif à la fin du bloc else
-    _contextGenCode->getBackend()->getBuilder().CreateBr(blocFin);
+    // Branch to endif at the end of the else block
+    _contextGenCode->getBackend()->getBuilder().CreateBr(endBlock);
 
-    // Générer le code pour le bloc "endif"
-    _contextGenCode->getBackend()->getBuilder().SetInsertPoint(blocFin);
+    // Generate code for the "endif" block
+    _contextGenCode->getBackend()->getBuilder().SetInsertPoint(endBlock);
     
-    // Car plus de node devrait traiter cette valeur temporaire après le if
-    _contextGenCode->modifierValeurTemporaire(Symbole(nullptr, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+    // No more node should process this temporary value after the if
+    _contextGenCode->setTemporaryValue(Symbol(nullptr, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
 
 }

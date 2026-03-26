@@ -4,44 +4,44 @@
 #include <stdexcept>
 #include <string>
 
-TypeSimple::TypeSimple(llvm::Type* typeLLVM)
-    : _typeLLVM(typeLLVM)
+TypeSimple::TypeSimple(llvm::Type* llvmType)
+    : _llvmType(llvmType)
 {
 }
 
-auto TypeSimple::generatedrTypeLLVM(llvm::LLVMContext& context) -> llvm::Type*
+auto TypeSimple::generateLLVMType(llvm::LLVMContext& context) -> llvm::Type*
 {
-    if (&_typeLLVM->getContext() == &context) {
-        return _typeLLVM;
+    if (&_llvmType->getContext() == &context) {
+        return _llvmType;
     }
 
-    switch (_typeLLVM->getTypeID()) {
+    switch (_llvmType->getTypeID()) {
         case llvm::Type::VoidTyID:   return llvm::Type::getVoidTy(context);
         case llvm::Type::FloatTyID:  return llvm::Type::getFloatTy(context);
         case llvm::Type::DoubleTyID: return llvm::Type::getDoubleTy(context);
         case llvm::Type::IntegerTyID:
-            return llvm::IntegerType::get(context, _typeLLVM->getIntegerBitWidth());
+            return llvm::IntegerType::get(context, _llvmType->getIntegerBitWidth());
         case llvm::Type::PointerTyID:
-            return llvm::PointerType::get(context, _typeLLVM->getPointerAddressSpace());
+            return llvm::PointerType::get(context, _llvmType->getPointerAddressSpace());
         default:
-            throw std::runtime_error("Type LLVM non supporté pour la migration input contextes : "
-                                      + std::to_string(_typeLLVM->getTypeID()));
+            throw std::runtime_error("Unsupported LLVM type for migration between contexts: "
+                                      + std::to_string(_llvmType->getTypeID()));
     }
 }
 
-auto TypeSimple::estFlottant() const -> bool
+auto TypeSimple::isFloating() const -> bool
 {
-    return _typeLLVM->isFloatingPointTy();
+    return _llvmType->isFloatingPointTy();
 }
 
-auto TypeSimple::estBooleen() const -> bool
+auto TypeSimple::isBoolean() const -> bool
 {
-    return _typeLLVM->isIntegerTy(1);
+    return _llvmType->isIntegerTy(1);
 }
 
-constexpr int CHAINE_BIT_WIDTH = 8;
+constexpr int STRING_BIT_WIDTH = 8;
 
-auto TypeSimple::estChaine() const -> bool
+auto TypeSimple::isString() const -> bool
 {
-    return _typeLLVM->isIntegerTy(CHAINE_BIT_WIDTH);
+    return _llvmType->isIntegerTy(STRING_BIT_WIDTH);
 }

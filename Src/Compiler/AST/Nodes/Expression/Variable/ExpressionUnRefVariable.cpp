@@ -10,19 +10,19 @@
 #include <stdexcept>
 #include <vector>
 
-ExpressionUnRefVariable::ExpressionUnRefVariable(ContextExpression& contexteExpression)
-    : _contexteExpression(contexteExpression)
+ExpressionUnRefVariable::ExpressionUnRefVariable(ContextExpression& expressionContext)
+    : _context(expressionContext)
 {}
 
 ExpressionUnRefVariable::~ExpressionUnRefVariable()
 = default;
 
-auto ExpressionUnRefVariable::construire(std::vector<Token>& equation) -> INode*
+auto ExpressionUnRefVariable::build(std::vector<Token>& equation) -> INode*
 {
-    if (equation.size() < 2 || equation[1].type != TOKEN_IDENTIFIANT) {
-        throw std::runtime_error("Error: 'unref' doit être suivi d'un identifiant");
+    if (equation.size() < 2 || equation[1].type != TOKEN_IDENTIFIER) {
+        throw std::runtime_error("Error: 'unref' must be followed by an identifier");
     }
-    return _contexteExpression.getBuilderTreeEquation()->allouer<NodeUnRefVariable>(equation[1].value); 
+    return _context.getBuilderTreeEquation()->allocate<NodeUnRefVariable>(equation[1].value); 
 }
 
 #endif /* EXPRESSION_UNREFVARIABLE_CPP */

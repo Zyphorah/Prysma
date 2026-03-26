@@ -10,19 +10,19 @@
 #include <stdexcept>
 #include <vector>
 
-ExpressionRefVariable::ExpressionRefVariable(ContextExpression& contexteExpression)
-    : _contexteExpression(contexteExpression)
+ExpressionRefVariable::ExpressionRefVariable(ContextExpression& expressionContext)
+    : _context(expressionContext)
 {}
 
 ExpressionRefVariable::~ExpressionRefVariable()
 = default;
 
-auto ExpressionRefVariable::construire(std::vector<Token>& equation) -> INode*
+auto ExpressionRefVariable::build(std::vector<Token>& equation) -> INode*
 {
-    if (equation.size() < 2 || equation[1].type != TOKEN_IDENTIFIANT) {
-        throw std::runtime_error("Error: 'ref' doit être suivi d'un identifiant");
+    if (equation.size() < 2 || equation[1].type != TOKEN_IDENTIFIER) {
+        throw std::runtime_error("Error: 'ref' must be followed by an identifier");
     }
-    return _contexteExpression.getBuilderTreeEquation()->allouer<NodeRefVariable>(equation[1].value); 
+    return _context.getBuilderTreeEquation()->allocate<NodeRefVariable>(equation[1].value); 
 }
 
 #endif /* EXPRESSION_REFVARIABLE_CPP */

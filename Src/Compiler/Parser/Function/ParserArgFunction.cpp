@@ -1,5 +1,5 @@
-#ifndef PARSEUR_ARGFONCTION_CPP
-#define PARSEUR_ARGFONCTION_CPP
+#ifndef PARSER_ARGFUNCTION_CPP
+#define PARSER_ARGFUNCTION_CPP
 
 #include "Compiler/Function/ParserArgFunction.h"
 #include "Compiler/AST/AST_Genere.h"
@@ -18,19 +18,18 @@ ParserArgFunction::ParserArgFunction(ContextParser& contextParser)
 ParserArgFunction::~ParserArgFunction()
 = default;
 
-auto ParserArgFunction::parser(std::vector<Token>& tokens, int& index) -> INode* 
+auto ParserArgFunction::parse(std::vector<Token>& tokens, int& index) -> INode* 
 {
+  consume(tokens, index, TOKEN_ARG, "Error: token is not 'arg'!");
 
-  consommer(tokens,index,TOKEN_ARG,"Error: le token n'est pas 'arg' !");
+  IType* type = _contextParser.getTypeParser()->parse(tokens, index);
 
-  IType* type = _contextParser.getParserType()->parser(tokens, index);
+  Token name = consume(tokens, index, TOKEN_IDENTIFIER, "Error: not an identifier!");
 
-  Token nom = consommer(tokens,index,TOKEN_IDENTIFIANT,"Error: ce n'est pas un identifiant!");
-
-  return _contextParser.getBuilderTreeEquation()->allouer<NodeArgFunction>(type, nom.value);
+  return _contextParser.getBuilderTreeEquation()->allocate<NodeArgFunction>(type, name.value);
 }
 
-#endif /* PARSEUR_ARGFONCTION_CPP */
+#endif /* PARSER_ARGFUNCTION_CPP */
 
 
 

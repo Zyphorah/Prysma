@@ -6,7 +6,8 @@
 #include <llvm-18/llvm/IR/LLVMContext.h>
 #include <string>
 
-struct BlocsControle {
+// Structure representing control flow blocks
+struct ControlBlocks {
     llvm::BasicBlock* input;
     llvm::BasicBlock* body; 
     llvm::BasicBlock* output;
@@ -14,13 +15,14 @@ struct BlocsControle {
 
 class ControlFlowHelper {
 public:
-    static auto creerBlocsControle(
+    // Creates control flow blocks for a function
+    static auto createControlBlocks(
         llvm::Function* function,
         llvm::LLVMContext& context,
-        const std::string& nomInput,
-        const std::string& nomBody, 
-        const std::string& nomOutput
-    ) -> BlocsControle;
+        const std::string& inputName,
+        const std::string& bodyName, 
+        const std::string& outputName
+    ) -> ControlBlocks;
 };
 
 #endif /* C6E13746_23A9_489F_AD56_E4937A64E42F */

@@ -17,7 +17,7 @@ public:
     Parser{{nom}}(ContextParser& contextParser);
     ~Parser{{nom}}();
     
-    INode* parser(std::vector<Token>& tokens, int& index) override;
+    auto parse(std::vector<Token>& tokens, int& index) -> INode* override;
 };
 
 

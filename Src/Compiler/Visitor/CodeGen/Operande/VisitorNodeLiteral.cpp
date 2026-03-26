@@ -16,39 +16,39 @@ void GeneralVisitorGenCode::visiter(NodeLiteral* nodeLiteral)
     llvm::LLVMContext& context = _contextGenCode->getBackend()->getContext();
     Token token = nodeLiteral->getToken();
 
-    if (token.type == TOKEN_IDENTIFIANT) {
-        LoadurVariable loadur(_contextGenCode);
-        _contextGenCode->modifierValeurTemporaire( loadur.loadr(token.value));
+    if (token.type == TOKEN_IDENTIFIER) {
+        VariableLoader loader(_contextGenCode);
+        _contextGenCode->setTemporaryValue(loader.load(token.value));
         return; 
     }
 
     llvm::Value* llvmValue = nullptr;
     llvm::Type* llvmType = nullptr;
 
-    if (token.type == TOKEN_VRAI || token.type == TOKEN_FAUX) {
-        bool valeur = (token.type == TOKEN_VRAI);
+    if (token.type == TOKEN_TRUE || token.type == TOKEN_FALSE) {
+        bool value = (token.type == TOKEN_TRUE);
         llvmType = llvm::Type::getInt1Ty(context);
-        llvmValue = llvm::ConstantInt::get(llvmType, valeur ? 1 : 0);
+        llvmValue = llvm::ConstantInt::get(llvmType, value ? 1 : 0);
     }
-    else if (token.type == TOKEN_LIT_BOLEEN) {
-        int valeur = std::stoi(token.value);
+    else if (token.type == TOKEN_LIT_BOOL) {
+        int value = std::stoi(token.value);
         llvmType = llvm::Type::getInt1Ty(context);
-        llvmValue = llvm::ConstantInt::get(llvmType, valeur != 0 ? 1 : 0);
+        llvmValue = llvm::ConstantInt::get(llvmType, value != 0 ? 1 : 0);
     }
     else if (token.type == TOKEN_LIT_INT) { 
-        int valeur = std::stoi(token.value); 
+        int value = std::stoi(token.value); 
         llvmType = llvm::Type::getInt32Ty(context);
-        llvmValue = llvm::ConstantInt::get(llvmType, static_cast<uint64_t>(valeur), true);
+        llvmValue = llvm::ConstantInt::get(llvmType, static_cast<uint64_t>(value), true);
     }
     else if (token.type == TOKEN_LIT_FLOAT) { 
-        float valeur = std::stof(token.value); 
+        float value = std::stof(token.value); 
         llvmType = llvm::Type::getFloatTy(context);
-        llvmValue = llvm::ConstantFP::get(llvmType, valeur);
+        llvmValue = llvm::ConstantFP::get(llvmType, value);
     }
     else {
-        ErrorHelper::errorCompilation("Type de littéral non supporté (" + token.value + ")");
+        ErrorHelper::compilationError("Unsupported literal type (" + token.value + ")");
     }
 
-    _contextGenCode->modifierValeurTemporaire(Symbole(llvmValue, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
-    _contextGenCode->modifierValeurTemporaire(Symbole(_contextGenCode->getValeurTemporaire().getAdresse(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(llvmType), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+    _contextGenCode->setTemporaryValue(Symbol(llvmValue, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
+    _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(llvmType), _contextGenCode->getTemporaryValue().getPointedElementType()));
 }

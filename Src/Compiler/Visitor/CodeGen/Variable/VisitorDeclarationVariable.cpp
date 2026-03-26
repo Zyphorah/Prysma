@@ -19,102 +19,101 @@
 
 void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVariable) 
 {
-    AllocateurVariable allocateur(_contextGenCode);
+    VariableAllocator allocator(_contextGenCode);
     INode* expression = nodeDeclarationVariable->getExpression();
        
-    // Vérifier si l'expression est une initialization de array
+    // Check if the expression is an array initialization
     auto* arrayInit = prysma::dyn_cast<NodeArrayInitialization>(expression);
     
-    llvm::AllocaInst* allocaCree = nullptr; 
+    llvm::AllocaInst* createdAlloca = nullptr; 
     
     if (arrayInit != nullptr) {
-        // Déterminer le type LLVM du array
-        llvm::Type* typeVariable = nullptr;
-        llvm::Type* typeElement = nullptr;
+        // Determine the LLVM type of the array
+        llvm::Type* variableType = nullptr;
+        llvm::Type* elementType = nullptr;
         
         IType* typeDecl = nodeDeclarationVariable->getType();
         auto* typeArrayDecl = prysma::dyn_cast<TypeArray>(typeDecl);
         
-        if (typeArrayDecl != nullptr && typeArrayDecl->getTaille() == nullptr) {
-            size_t tailleReelle = arrayInit->getElements().size();
-            typeElement = typeArrayDecl->getTypeChild()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
-            typeVariable = llvm::ArrayType::get(typeElement, tailleReelle);
+        if (typeArrayDecl != nullptr && typeArrayDecl->getSize() == nullptr) {
+            size_t realSize = arrayInit->getElements().size();
+            elementType = typeArrayDecl->getChildType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
+            variableType = llvm::ArrayType::get(elementType, realSize);
         } else {
-            typeVariable = nodeDeclarationVariable->getType()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
-            if (typeVariable == nullptr) {
-                ErrorHelper::errorCompilation("Impossible de déterminer la taille du array");
+            variableType = nodeDeclarationVariable->getType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
+            if (variableType == nullptr) {
+                ErrorHelper::compilationError("Unable to determine array size");
             }
-            auto* typeArrayLLVM = llvm::dyn_cast<llvm::ArrayType>(typeVariable);
+            auto* typeArrayLLVM = llvm::dyn_cast<llvm::ArrayType>(variableType);
             if (typeArrayLLVM == nullptr) {
-                ErrorHelper::errorCompilation("Le type de la variable n'est pas un array pour une initialization de array");
+                ErrorHelper::compilationError("Variable type is not an array for array initialization");
             }
-            typeElement = typeArrayLLVM->getElementType();
+            elementType = typeArrayLLVM->getElementType();
         }
         
-        // Allouer et enregistryr le array
-        llvm::AllocaInst* allocaInstArray = allocateur.allouer(typeVariable, nodeDeclarationVariable->getNom());
-        
-        allocaCree = allocaInstArray;
+        // Allocate and register the array
+        llvm::AllocaInst* allocaInstArray = allocator.allocate(variableType, nodeDeclarationVariable->getNom());
+        createdAlloca = allocaInstArray;
 
-        // Initialiser chaque élément du array
-        auto* typeArrayLLVM = llvm::dyn_cast<llvm::ArrayType>(typeVariable);
+        // Initialize each element of the array
+        auto* typeArrayLLVM = llvm::dyn_cast<llvm::ArrayType>(variableType);
         for (size_t i = 0; i < arrayInit->getElements().size(); ++i) {
             std::vector<llvm::Value*> indices = {
                 _contextGenCode->getBackend()->getBuilder().getInt32(0),
                 _contextGenCode->getBackend()->getBuilder().getInt32(static_cast<uint32_t>(i))
             }; 
-            llvm::Value* ptrCase = _contextGenCode->getBackend()->getBuilder().CreateGEP(typeArrayLLVM, allocaInstArray, indices, "ptr_case");
+            llvm::Value* ptrElement = _contextGenCode->getBackend()->getBuilder().CreateGEP(typeArrayLLVM, allocaInstArray, indices, "ptr_element");
             
             INode* element = arrayInit->getElements()[i];
-            Symbole symboleElement = evaluerExpression(element);
-            llvm::Value* valeurCastee = _contextGenCode->getBackend()->creerAutoCast(symboleElement.getAdresse(), typeElement);
-            _contextGenCode->getBackend()->getBuilder().CreateStore(valeurCastee, ptrCase);
+            Symbol symbolElement = evaluateExpression(element);
+            llvm::Value* castedValue = _contextGenCode->getBackend()->createAutoCast(symbolElement.getAddress(), elementType);
+            _contextGenCode->getBackend()->getBuilder().CreateStore(castedValue, ptrElement);
         }
     } else {
-        // Variable simple (non-array)
-        llvm::Type* typeVariable = nodeDeclarationVariable->getType()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
-        llvm::AllocaInst* allocaInst = allocateur.allouer(typeVariable, nodeDeclarationVariable->getNom());
-        allocaCree = allocaInst;
+        // Simple (non-array) variable
+        llvm::Type* variableType = nodeDeclarationVariable->getType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
+        llvm::AllocaInst* allocaInst = allocator.allocate(variableType, nodeDeclarationVariable->getNom());
+        createdAlloca = allocaInst;
         
-        llvm::Value* valeurCalculee = evaluerExpression(expression).getAdresse();
-        if (valeurCalculee == nullptr) {
+        llvm::Value* calculatedValue = evaluateExpression(expression).getAddress();
+        if (calculatedValue == nullptr) {
             return;
         }
 
-        llvm::Value* valeurCastee = _contextGenCode->getBackend()->creerAutoCast(valeurCalculee, typeVariable);
-        allocateur.stocker(valeurCastee, allocaInst);
+        llvm::Value* castedValue = _contextGenCode->getBackend()->createAutoCast(calculatedValue, variableType);
+        allocator.store(castedValue, allocaInst);
     }
-    if (allocaCree != nullptr) {
+    if (createdAlloca != nullptr) {
         Token token;
         token.value = nodeDeclarationVariable->getNom();
         
-        // Créer le symbole avec le type pointé si c'est un pointeur
-        llvm::Type* typeVariable = nodeDeclarationVariable->getType()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
+        // Create the symbol with the pointed type if it's a pointer
+        llvm::Type* variableType = nodeDeclarationVariable->getType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
         
-        // Si on a un array avec taille dynamique (nullptr), on doit utiliser le type réel qu'on a calculé
-        if (typeVariable == nullptr) {
+        // If we have an array with dynamic size (nullptr), use the real type we calculated
+        if (variableType == nullptr) {
             IType* typeDecl = nodeDeclarationVariable->getType();
             auto* typeArrayDecl = prysma::dyn_cast<TypeArray>(typeDecl);
             if (typeArrayDecl != nullptr && arrayInit != nullptr) {
-                // On peut recalculer à partir de l'initialization
-                size_t tailleReelle = arrayInit->getElements().size();
-                llvm::Type* typeElement = typeArrayDecl->getTypeChild()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
-                typeVariable = llvm::ArrayType::get(typeElement, tailleReelle);
+                // Recalculate from the initialization
+                size_t realSize = arrayInit->getElements().size();
+                llvm::Type* elementType = typeArrayDecl->getChildType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
+                variableType = llvm::ArrayType::get(elementType, realSize);
             } else {
-                ErrorHelper::errorCompilation("Impossible de déterminer le type de la variable");
+                ErrorHelper::compilationError("Unable to determine variable type");
             }
         }
         
-        llvm::Type* typePointeElement = nullptr;
+        llvm::Type* elementPointerType = nullptr;
         
-        if (typeVariable->isPointerTy()) {
-            // Pour un pointeur, on récupère le type pointé qui a été mémorisé lors de l'évaluation de l'expression (new)
-            typePointeElement = _contextGenCode->getValeurTemporaire().getTypePointeElement();
+        if (variableType->isPointerTy()) {
+            // For a pointer, get the pointed type memorized during expression evaluation (new)
+            elementPointerType = _contextGenCode->getTemporaryValue().getPointedElementType();
         }
         
-        _contextGenCode->getRegistryVariable()->enregistryr(
+        _contextGenCode->getRegistryVariable()->registerVariable(
             token, 
-            Symbole(allocaCree, nodeDeclarationVariable->getType(), typePointeElement)
+            Symbol(createdAlloca, nodeDeclarationVariable->getType(), elementPointerType)
         );
     }
 }

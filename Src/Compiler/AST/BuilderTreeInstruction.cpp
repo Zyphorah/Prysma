@@ -19,31 +19,31 @@ BuilderTreeInstruction::BuilderTreeInstruction(RegistryInstruction* registryInst
 BuilderTreeInstruction::~BuilderTreeInstruction()
 = default;
 
-auto BuilderTreeInstruction::construire(std::vector<Token>& tokens, int& index) -> INode*
+auto BuilderTreeInstruction::build(std::vector<Token>& tokens, int& index) -> INode*
 {
-    if (!_registryInstructions->existe(tokens[static_cast<size_t>(index)].type)) {
-        throw ErrorCompilation("Instruction inconnue : '" + tokens[static_cast<size_t>(index)].value + "'", Ligne(tokens[static_cast<size_t>(index)].ligne), Colonne(tokens[static_cast<size_t>(index)].colonne));
+    if (!_registryInstructions->exists(tokens[static_cast<size_t>(index)].type)) {
+        throw CompilationError("Unknown instruction: '" + tokens[static_cast<size_t>(index)].value + "'", Line(tokens[static_cast<size_t>(index)].line), Column(tokens[static_cast<size_t>(index)].column));
     }
-    IParser* ParentNode = _registryInstructions->recuperer(tokens[static_cast<size_t>(index)].type);
-    INode* child = ParentNode->parser(tokens, index);
+    IParser* parentNode = _registryInstructions->get(tokens[static_cast<size_t>(index)].type);
+    INode* child = parentNode->parse(tokens, index);
    
     return child;
 }
 
 
-auto BuilderTreeInstruction::construire(std::vector<Token>& tokens) -> INode*
+auto BuilderTreeInstruction::build(std::vector<Token>& tokens) -> INode*
 {
     int index = 0; 
-    // On crée un conteneur global pour tout le fichier
-    auto* programmeGlobal = allouer<NodeInstruction>();
+    // Create a global container for the whole file
+    auto* globalProgram = allocate<NodeInstruction>();
     
     while (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != TOKEN_EOF) {
-        INode* child = construire(tokens, index);
+        INode* child = build(tokens, index);
         if (child != nullptr) {
-            programmeGlobal->ajouterInstruction(child);
+            globalProgram->addInstruction(child);
         }
     }
-    return programmeGlobal;
+    return globalProgram;
 }
 
 auto BuilderTreeInstruction::getArena() -> llvm::BumpPtrAllocator&

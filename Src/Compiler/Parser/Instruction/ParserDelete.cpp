@@ -1,5 +1,5 @@
-#ifndef PARSEUR_DELETE_CPP
-#define PARSEUR_DELETE_CPP
+#ifndef PARSER_DELETE_CPP
+#define PARSER_DELETE_CPP
 
 #include "Compiler/Instruction/ParserDelete.h"
 #include "Compiler/AST/AST_Genere.h"
@@ -17,17 +17,17 @@ ParserDelete::ParserDelete(ContextParser& contextParser)
 ParserDelete::~ParserDelete()
 = default;
 
-// Exemple : delete variableNom;
-auto ParserDelete::parser(std::vector<Token>& tokens, int& index) -> INode*
+// Example: delete variableName;
+auto ParserDelete::parse(std::vector<Token>& tokens, int& index) -> INode*
 {
-    consommer(tokens, index, TOKEN_DELETE, "Attendu 'delete' au début de l'instruction delete.");
-    Token identifiantToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Attendu un identifiant après 'delete'.");
-    consommer(tokens,index, TOKEN_POINT_VIRGULE, "Attendu ';' après l'identifiant dans l'instruction delete.");
+    consume(tokens, index, TOKEN_DELETE, "Expected 'delete' at the beginning of the delete instruction.");
+    Token identifierToken = consume(tokens, index, TOKEN_IDENTIFIER, "Expected an identifier after 'delete'.");
+    consume(tokens, index, TOKEN_SEMICOLON, "Expected ';' after the identifier in the delete instruction.");
 
-    return _contextParser.getBuilderTreeInstruction()->allouer<NodeDelete>(identifiantToken);
+    return _contextParser.getBuilderTreeInstruction()->allocate<NodeDelete>(identifierToken);
 }
 
-#endif /* PARSEUR_DELETE_CPP */
+#endif /* PARSER_DELETE_CPP */
 
 
 

@@ -3,17 +3,17 @@
 #include <string>
 #include <vector>
 
-void RegistryFile::ajouterFile(const std::string& cheminFile) {
+void FileRegistry::addFile(const std::string& filePath) {
     std::lock_guard<std::mutex> lock(mtx);
-    fichiersTraites.insert(cheminFile);
+    processedFiles.insert(filePath);
 }
 
-auto RegistryFile::verifierFile(const std::string& cheminFile) -> bool {
+auto FileRegistry::checkFile(const std::string& filePath) -> bool {
     std::lock_guard<std::mutex> lock(mtx);
-    return fichiersTraites.count(cheminFile) > 0;
+    return processedFiles.count(filePath) > 0;
 }
 
-auto RegistryFile::obtenirTousLesFiles() -> std::vector<std::string> {
+auto FileRegistry::getAllFiles() -> std::vector<std::string> {
     std::lock_guard<std::mutex> lock(mtx);
-    return std::vector<std::string>(fichiersTraites.begin(), fichiersTraites.end());
+    return std::vector<std::string>(processedFiles.begin(), processedFiles.end());
 }

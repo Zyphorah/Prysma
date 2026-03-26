@@ -1,5 +1,5 @@
-#ifndef PARSEUR_APPELCENTRAL_CPP
-#define PARSEUR_APPELCENTRAL_CPP
+#ifndef PARSER_CALLCENTRAL_CPP
+#define PARSER_CALLCENTRAL_CPP
 
 #include "Compiler/AST/Nodes/Interfaces/INode.h"
 #include "Compiler/Function/ParserCallFunction.h"
@@ -20,21 +20,21 @@ ParserCallCentral::ParserCallCentral(ContextParser& contextParser)
 ParserCallCentral::~ParserCallCentral()
 = default;
 
-INode* ParserCallCentral::parser(std::vector<Token>& tokens, int& index)
+INode* ParserCallCentral::parse(std::vector<Token>& tokens, int& index)
 {
-    const auto indexCourant = static_cast<size_t>(index);
-    const bool callObject = indexCourant + 2 < tokens.size()
-        && tokens[indexCourant].type == TOKEN_CALL
-        && tokens[indexCourant + 1].type == TOKEN_IDENTIFIANT
-        && tokens[indexCourant + 2].type == TOKEN_POINT;
+    const auto currentIndex = static_cast<size_t>(index);
+    const bool callObject = currentIndex + 2 < tokens.size()
+        && tokens[currentIndex].type == TOKEN_CALL
+        && tokens[currentIndex + 1].type == TOKEN_IDENTIFIER
+        && tokens[currentIndex + 2].type == TOKEN_DOT;
 
     if (callObject) {
         ParserCallObject parserObject(_contextParser);
-        return parserObject.parser(tokens, index);
+        return parserObject.parse(tokens, index);
     }
 
     ParserCallFunction parserFunction(_contextParser);
-    return parserFunction.parser(tokens, index);
+    return parserFunction.parse(tokens, index);
 }
 
-#endif /* PARSEUR_APPELCENTRAL_CPP */
+#endif /* PARSER_CALLCENTRAL_CPP */

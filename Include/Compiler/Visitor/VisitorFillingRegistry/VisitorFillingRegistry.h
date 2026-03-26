@@ -4,9 +4,9 @@
 #include "Compiler/AST/Registry/ContextGenCode.h"
 #include "Compiler/Visitor/VisitorBaseGenerale.h"
 
-// Ce visitor a pour but de remplir les registrys de function et de variable avant la génération du code, 
-// Il va parcourir l'tree syntaxique abstrait pour remplir les registrys avec des valeur nullptr pour les function et les variables
-// Cela permet d'avoir une première passe pour remplir les registrys. 
+// This visitor is intended to fill the function and variable registries before code generation.
+// It traverses the abstract syntax tree to fill the registries with nullptr values for functions and variables.
+// This allows a first pass to populate the registries.
 
 class OrchestratorInclude;
 
@@ -19,7 +19,7 @@ private:
 public:
     using VisitorBaseGenerale::visiter;
     FillingVisitorRegistry(ContextGenCode* contextGenCode, OrchestratorInclude* orchestrator);
-     ~FillingVisitorRegistry() override;
+    ~FillingVisitorRegistry() override;
 
     FillingVisitorRegistry(const FillingVisitorRegistry&) = delete;
     auto operator=(const FillingVisitorRegistry&) -> FillingVisitorRegistry& = delete;

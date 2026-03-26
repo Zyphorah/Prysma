@@ -3,22 +3,22 @@
 #include <llvm/IR/Type.h>
 #include <string>
 
-TypeComplex::TypeComplex(const std::string& nom) : nomClasse(nom) {}
+TypeComplex::TypeComplex(const std::string& className) : className(className) {}
 
-auto TypeComplex::generatedrTypeLLVM(llvm::LLVMContext& context) -> llvm::Type* {
+auto TypeComplex::generateLLVMType(llvm::LLVMContext& context) -> llvm::Type* {
     return llvm::PointerType::getUnqual(context);
 }
 
-auto TypeComplex::estFlottant() const -> bool { return false; }
-auto TypeComplex::estBooleen() const -> bool { return false; }
-auto TypeComplex::estChaine() const -> bool { return false; }
-auto TypeComplex::estArray() const -> bool { return false; }
-auto TypeComplex::estComplex() const -> bool { return true; }
+auto TypeComplex::isFloating() const -> bool { return false; }
+auto TypeComplex::isBoolean() const -> bool { return false; }
+auto TypeComplex::isString() const -> bool { return false; }
+auto TypeComplex::isArray() const -> bool { return false; }
+auto TypeComplex::isComplex() const -> bool { return true; }
 
 auto TypeComplex::getVTableType(llvm::LLVMContext& context) -> llvm::Type* {
     return llvm::PointerType::getUnqual(context);
 }
 
-auto TypeComplex::getNomClasse() const -> std::string {
-    return nomClasse;
+auto TypeComplex::getClassName() const -> std::string {
+    return className;
 }

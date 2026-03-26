@@ -7,10 +7,10 @@
 void GeneralVisitorGenCode::visiter(NodeReturn* nodeReturn)
 {
     nodeReturn->getValeurReturn()->accept(this);
-    llvm::Value* valeurEvaluee = _contextGenCode->getValeurTemporaire().getAdresse();
-    IType* typeReturnObj = _contextGenCode->getReturnContextCompilation()->recupererContext();
-    llvm::Type* typeReturnLLVM = typeReturnObj->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
-    llvm::Value* valeurReturn = _contextGenCode->getBackend()->creerAutoCast(valeurEvaluee, typeReturnLLVM);
-    _contextGenCode->getBackend()->getBuilder().CreateRet(valeurReturn);
-    _contextGenCode->modifierValeurTemporaire(Symbole(valeurReturn, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+    llvm::Value* evaluatedValue = _contextGenCode->getTemporaryValue().getAddress();
+    IType* returnTypeObj = _contextGenCode->getReturnContextCompilation()->getContext();
+    llvm::Type* returnTypeLLVM = returnTypeObj->generateLLVMType(_contextGenCode->getBackend()->getContext());
+    llvm::Value* returnValue = _contextGenCode->getBackend()->createAutoCast(evaluatedValue, returnTypeLLVM);
+    _contextGenCode->getBackend()->getBuilder().CreateRet(returnValue);
+    _contextGenCode->setTemporaryValue(Symbol(returnValue, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
 }

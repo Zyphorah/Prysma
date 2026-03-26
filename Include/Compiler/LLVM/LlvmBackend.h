@@ -34,9 +34,9 @@ public:
     auto getModule() -> llvm::Module& { return *_module; }
     auto getBuilder() -> llvm::IRBuilder<llvm::NoFolder>& { return *_builder; }
 
-    auto creerAutoCast(llvm::Value* valeurSource, llvm::Type* typeCible) -> llvm::Value*;
-    void declarerExterne(const std::string& nom, llvm::Type* ret, const std::vector<llvm::Type*>& args);
-    auto loadrValeur(llvm::Value* adresseMemory, const std::string& nomVariable) -> llvm::Value*;
-    void definirPointInsertionApresAllocation();
+    auto createAutoCast(llvm::Value* sourceValue, llvm::Type* targetType) -> llvm::Value*;
+    void declareExternal(const std::string& name, llvm::Type* ret, const std::vector<llvm::Type*>& args);
+    auto loadValue(llvm::Value* memoryAddress, const std::string& variableName) -> llvm::Value*;
+    void setInsertionPointAfterAllocation();
 };
 

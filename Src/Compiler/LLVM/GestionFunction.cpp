@@ -23,34 +23,34 @@
 #include <vector>
 
 
-// Génération de la Déclaration
+// Generation of the Declaration
 
-std::unique_ptr<GenerateurDeclarationFunction> GenerateurDeclarationFunction::creer(ContextGenCode* context, NodeDeclarationFunction* node, IVisitor* visitor)
+std::unique_ptr<FunctionDeclarationGenerator> FunctionDeclarationGenerator::create(ContextGenCode* context, NodeDeclarationFunction* node, IVisitor* visitor)
 {
-    if (!context->getNomClasseCourante().empty()) {
-        return std::make_unique<GenerateurDeclarationMethode>(context, node, visitor);
+    if (!context->getCurrentClassName().empty()) {
+        return std::make_unique<MethodFunctionDeclarationGenerator>(context, node, visitor);
     } 
-    return std::make_unique<GenerateurDeclarationStandard>(context, node, visitor);
+    return std::make_unique<StandardFunctionDeclarationGenerator>(context, node, visitor);
 }
 
-GenerateurDeclarationFunction::GenerateurDeclarationFunction(ContextGenCode* contextGenCode, NodeDeclarationFunction* nodeDeclarationFunction, IVisitor* visitorGeneralCodeGen) 
+FunctionDeclarationGenerator::FunctionDeclarationGenerator(ContextGenCode* contextGenCode, NodeDeclarationFunction* nodeDeclarationFunction, IVisitor* visitorGeneralCodeGen) 
 :   _contextGenCode(contextGenCode),
     _nodeDeclarationFunction(nodeDeclarationFunction),
     _visitorGeneralCodeGen(visitorGeneralCodeGen)
 {
 }
 
-llvm::Function* GenerateurDeclarationStandard::creerFunction()
+llvm::Function* StandardFunctionDeclarationGenerator::createFunction()
 {
-    std::string nomFunction = getNodeDeclarationFunction()->getNom();
+    std::string functionName = getNodeDeclarationFunction()->getNom();
     
-    const auto& symbolePtr = getContextGenCode()->getRegistryFunctionLocale()->recuperer(nomFunction);
-    if (!prysma::isa<SymboleFunctionLocale>(symbolePtr.get())) {
-        throw std::runtime_error("Error : SymboleFunctionLocale attendu");
+    const auto& symbolPtr = getContextGenCode()->getRegistryFunctionLocal()->get(functionName);
+    if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
+        throw std::runtime_error("Error: Expected SymbolFunctionLocal");
     }
-    const auto* symbole = prysma::cast<const SymboleFunctionLocale>(symbolePtr.get());
+    const auto* symbol = prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
     
-    llvm::Function* function = symbole->function;
+    llvm::Function* function = symbol->function;
 
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(getContextGenCode()->getBackend()->getContext(), "entry", function);
     getContextGenCode()->getBackend()->getBuilder().SetInsertPoint(entryBlock);
@@ -58,18 +58,18 @@ llvm::Function* GenerateurDeclarationStandard::creerFunction()
     return function;
 }
 
-llvm::Function* GenerateurDeclarationMethode::creerFunction()
+llvm::Function* MethodFunctionDeclarationGenerator::createFunction()
 {
-    std::string nomFunction = getNodeDeclarationFunction()->getNom();
-    std::string nomClasse = getContextGenCode()->getNomClasseCourante();
-    auto const& classInfo = getContextGenCode()->getRegistryClass()->recuperer(nomClasse);
-    const auto& symbolePtr = classInfo->getRegistryFunctionLocale()->recuperer(nomFunction);
-    if (!prysma::isa<SymboleFunctionLocale>(symbolePtr.get())) {
-        throw std::runtime_error("Error : SymboleFunctionLocale attendu");
+    std::string functionName = getNodeDeclarationFunction()->getNom();
+    std::string className = getContextGenCode()->getCurrentClassName();
+    auto const& classInfo = getContextGenCode()->getRegistryClass()->get(className);
+    const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(functionName);
+    if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
+        throw std::runtime_error("Error: Expected SymbolFunctionLocal");
     }
-    const auto* symbole = prysma::cast<const SymboleFunctionLocale>(symbolePtr.get());
+    const auto* symbol = prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
     
-    llvm::Function* function = symbole->function;
+    llvm::Function* function = symbol->function;
 
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(getContextGenCode()->getBackend()->getContext(), "entry", function);
     getContextGenCode()->getBackend()->getBuilder().SetInsertPoint(entryBlock);
@@ -77,7 +77,7 @@ llvm::Function* GenerateurDeclarationMethode::creerFunction()
     return function;
 }
 
-void GenerateurDeclarationMethode::traiterArgumentsConstruit(llvm::Function* function, const ArgumentsCodeGen& args)
+void MethodFunctionDeclarationGenerator::handleConstructedArguments(llvm::Function* function, const ArgumentsCodeGen& args)
 {
     size_t argIndex = 0;
     
@@ -91,13 +91,13 @@ void GenerateurDeclarationMethode::traiterArgumentsConstruit(llvm::Function* fun
         
         Token thisToken;
         thisToken.value = "this";
-        thisToken.type = TOKEN_IDENTIFIANT;
+        thisToken.type = TOKEN_IDENTIFIER;
         
-        Symbole symboleThis;
-        symboleThis = Symbole(alloca, symboleThis.getType(), symboleThis.getTypePointeElement());
-        symboleThis = Symbole(symboleThis.getAdresse(), nullptr, symboleThis.getTypePointeElement()); 
+        Symbol symboleThis;
+        symboleThis = Symbol(alloca, symboleThis.getType(), symboleThis.getPointedElementType());
+        symboleThis = Symbol(symboleThis.getAddress(), nullptr, symboleThis.getPointedElementType()); 
         
-        getContextGenCode()->getRegistryVariable()->enregistryr(thisToken, symboleThis);
+        getContextGenCode()->getRegistryVariable()->registerVariable(thisToken, symboleThis);
         argIndex = 1;
     }
 
@@ -111,18 +111,18 @@ void GenerateurDeclarationMethode::traiterArgumentsConstruit(llvm::Function* fun
         
         Token argumentToken;
         argumentToken.value = nodeArg->getNom();
-        argumentToken.type = TOKEN_IDENTIFIANT;
+        argumentToken.type = TOKEN_IDENTIFIER;
         
-        Symbole symbole;
-        symbole = Symbole(alloca, symbole.getType(), symbole.getTypePointeElement());
-        symbole = Symbole(symbole.getAdresse(), nodeArg->getType(), symbole.getTypePointeElement());
-        getContextGenCode()->getRegistryVariable()->enregistryr(argumentToken, symbole);
+        Symbol symbole;
+        symbole = Symbol(alloca, symbole.getType(), symbole.getPointedElementType());
+        symbole = Symbol(symbole.getAddress(), nodeArg->getType(), symbole.getPointedElementType());
+        getContextGenCode()->getRegistryVariable()->registerVariable(argumentToken, symbole);
         
         argIndex++;
     }
 }
 
-void GenerateurDeclarationStandard::traiterArgumentsConstruit(llvm::Function* function, const ArgumentsCodeGen& args)
+void StandardFunctionDeclarationGenerator::handleConstructedArguments(llvm::Function* function, const ArgumentsCodeGen& args)
 {
     size_t argIndex = 0;
 
@@ -136,214 +136,214 @@ void GenerateurDeclarationStandard::traiterArgumentsConstruit(llvm::Function* fu
         
         Token argumentToken;
         argumentToken.value = nodeArg->getNom();
-        argumentToken.type = TOKEN_IDENTIFIANT;
+        argumentToken.type = TOKEN_IDENTIFIER;
         
-        Symbole symbole;
-        symbole = Symbole(alloca, symbole.getType(), symbole.getTypePointeElement());
-        symbole = Symbole(symbole.getAdresse(), nodeArg->getType(), symbole.getTypePointeElement());
-        getContextGenCode()->getRegistryVariable()->enregistryr(argumentToken, symbole);
+        Symbol symbole;
+        symbole = Symbol(alloca, symbole.getType(), symbole.getPointedElementType());
+        symbole = Symbol(symbole.getAddress(), nodeArg->getType(), symbole.getPointedElementType());
+        getContextGenCode()->getRegistryVariable()->registerVariable(argumentToken, symbole);
         
         argIndex++;
     }
 }
 
-void GenerateurDeclarationFunction::declarerFunction()
+void FunctionDeclarationGenerator::declareFunction()
 {
-    llvm::Type* typeDeReturn = getNodeDeclarationFunction()->getTypeReturn()->generatedrTypeLLVM(getContextGenCode()->getBackend()->getContext());
+    llvm::Type* returnType = getNodeDeclarationFunction()->getTypeReturn()->generateLLVMType(getContextGenCode()->getBackend()->getContext());
     
     ArgumentsCodeGen argumentsCodeGen;
     if (getNodeDeclarationFunction() != nullptr) {
         for (INode* node : getNodeDeclarationFunction()->getArguments()) {
-            ArgExtractorFunction extracteur;
-            node->accept(&extracteur);
-            if (extracteur.getArg() != nullptr) {
-                argumentsCodeGen.arguments.push_back(extracteur.getArg());
-                llvm::Type* argType = extracteur.getArg()->getType()->generatedrTypeLLVM(getContextGenCode()->getBackend()->getContext());
+            ArgExtractorFunction extractor;
+            node->accept(&extractor);
+            if (extractor.getArg() != nullptr) {
+                argumentsCodeGen.arguments.push_back(extractor.getArg());
+                llvm::Type* argType = extractor.getArg()->getType()->generateLLVMType(getContextGenCode()->getBackend()->getContext());
                 argumentsCodeGen.argTypes.push_back(argType);
             }
         }
     }
 
-    llvm::Function* function = creerFunction();
+    llvm::Function* function = createFunction();
     
-    getContextGenCode()->getReturnContextCompilation()->piler(getNodeDeclarationFunction()->getTypeReturn());
-    getContextGenCode()->getRegistryVariable()->piler();
+    getContextGenCode()->getReturnContextCompilation()->push(getNodeDeclarationFunction()->getTypeReturn());
+    getContextGenCode()->getRegistryVariable()->push();
     
-    traiterArgumentsConstruit(function, argumentsCodeGen);
+    handleConstructedArguments(function, argumentsCodeGen);
 
     getNodeDeclarationFunction()->getBody()->accept(_visitorGeneralCodeGen);
 
-    llvm::BasicBlock* blocCourant = getContextGenCode()->getBackend()->getBuilder().GetInsertBlock();
-    if (blocCourant != nullptr && typeDeReturn->isVoidTy())
+    llvm::BasicBlock* currentBlock = getContextGenCode()->getBackend()->getBuilder().GetInsertBlock();
+    if (currentBlock != nullptr && returnType->isVoidTy())
     {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnull-dereference"
-        if (blocCourant->getTerminator() == nullptr)
+        if (currentBlock->getTerminator() == nullptr)
         {
             getContextGenCode()->getBackend()->getBuilder().CreateRetVoid();
         }
 #pragma GCC diagnostic pop
     }
 
-    getContextGenCode()->getRegistryVariable()->depiler();
-    getContextGenCode()->getReturnContextCompilation()->depiler();
+    getContextGenCode()->getRegistryVariable()->pop();
+    getContextGenCode()->getReturnContextCompilation()->pop();
 
-    getContextGenCode()->modifierValeurTemporaire(Symbole(function, getContextGenCode()->getValeurTemporaire().getType(), getContextGenCode()->getValeurTemporaire().getTypePointeElement()));
+    getContextGenCode()->setTemporaryValue(Symbol(function, getContextGenCode()->getTemporaryValue().getType(), getContextGenCode()->getTemporaryValue().getPointedElementType()));
 }
 
-// Génération de l'Call
+// Generation of the Call
 
-std::unique_ptr<GenerateurCallFunction> GenerateurCallFunction::creer(ContextGenCode* context, IVisitor* visitor)
+std::unique_ptr<FunctionCallGenerator> FunctionCallGenerator::create(ContextGenCode* context, IVisitor* visitor)
 {
-    if (!context->getNomClasseCourante().empty()) {
-        return std::make_unique<GenerateurCallMethode>(context, visitor);
+    if (!context->getCurrentClassName().empty()) {
+        return std::make_unique<MethodFunctionCallGenerator>(context, visitor);
     }
-    return std::make_unique<GenerateurCallStandard>(context, visitor);
+    return std::make_unique<StandardFunctionCallGenerator>(context, visitor);
 }
 
-GenerateurCallFunction::GenerateurCallFunction(ContextGenCode* context, IVisitor* visitor)
+FunctionCallGenerator::FunctionCallGenerator(ContextGenCode* context, IVisitor* visitor)
     : _contextGenCode(context), _visitorGeneralCodeGen(visitor)
 {
 }
 
-const SymboleFunctionLocale* GenerateurCallMethode::obtenirFunctionLocale(const std::string& nomFunction)
+const SymbolFunctionLocal* MethodFunctionCallGenerator::getLocalFunction(const std::string& functionName)
 {
-    std::string nomClasse = getContextGenCode()->getNomClasseCourante();
-    auto const& classInfo = getContextGenCode()->getRegistryClass()->recuperer(nomClasse);
-    if(classInfo->getRegistryFunctionLocale()->existe(nomFunction)){
-        const auto& symbolePtr = classInfo->getRegistryFunctionLocale()->recuperer(nomFunction);
-        if (!prysma::isa<SymboleFunctionLocale>(symbolePtr.get())) {
-            throw std::runtime_error("Error : SymboleFunctionLocale attendu");
+    std::string className = getContextGenCode()->getCurrentClassName();
+    auto const& classInfo = getContextGenCode()->getRegistryClass()->get(className);
+    if(classInfo->getRegistryFunctionLocal()->exists(functionName)){
+        const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(functionName);
+        if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
+            throw std::runtime_error("Error: Expected SymbolFunctionLocal");
         }
-        return prysma::cast<const SymboleFunctionLocale>(symbolePtr.get());
+        return prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
     }
     
-    if (getContextGenCode()->getRegistryFunctionLocale()->existe(nomFunction)) {
-        const auto& symbolePtr = getContextGenCode()->getRegistryFunctionLocale()->recuperer(nomFunction);
-        if (!prysma::isa<SymboleFunctionLocale>(symbolePtr.get())) {
-            throw std::runtime_error("Error : SymboleFunctionLocale attendu");
+    if (getContextGenCode()->getRegistryFunctionLocal()->exists(functionName)) {
+        const auto& symbolPtr = getContextGenCode()->getRegistryFunctionLocal()->get(functionName);
+        if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
+            throw std::runtime_error("Error: Expected SymbolFunctionLocal");
         }
-        return prysma::cast<const SymboleFunctionLocale>(symbolePtr.get());
+        return prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
     }
 
-    throw std::runtime_error("Méthode ou function introuvable dans la portée de la classe : " + nomFunction);
+    throw std::runtime_error("Method or function not found in class scope: " + functionName);
 }
 
-const SymboleFunctionLocale* GenerateurCallStandard::obtenirFunctionLocale(const std::string& nomFunction)
+const SymbolFunctionLocal* StandardFunctionCallGenerator::getLocalFunction(const std::string& functionName)
 {
-    if (getContextGenCode()->getRegistryFunctionLocale()->existe(nomFunction)) {
-        const auto& symbolePtr = getContextGenCode()->getRegistryFunctionLocale()->recuperer(nomFunction);
-        if (!prysma::isa<SymboleFunctionLocale>(symbolePtr.get())) {
-            throw std::runtime_error("Error : SymboleFunctionLocale attendu");
+    if (getContextGenCode()->getRegistryFunctionLocal()->exists(functionName)) {
+        const auto& symbolPtr = getContextGenCode()->getRegistryFunctionLocal()->get(functionName);
+        if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
+            throw std::runtime_error("Error: Expected SymbolFunctionLocal");
         }
-        return prysma::cast<const SymboleFunctionLocale>(symbolePtr.get());
+        return prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
     }
 
-    throw std::runtime_error("Function introuvable dans le registry local : " + nomFunction);
+    throw std::runtime_error("Function not found in local registry: " + functionName);
 }
 
-void GenerateurCallFunction::generatedrCallFunction(NodeCallFunction* nodeCallFunction)
+void FunctionCallGenerator::generateCallFunction(NodeCallFunction* nodeCallFunction)
 {
-    std::string nomFunction = nodeCallFunction->getNomFunction().value;
+    std::string functionName = nodeCallFunction->getNomFunction().value;
 
-    if (RegistryBuiltIns::estBuiltIn(nomFunction)) {
-        RegistryBuiltIns::generatedrCall(nomFunction, nodeCallFunction, getContextGenCode(), _visitorGeneralCodeGen);
+    if (RegistryBuiltIns::isBuiltIn(functionName)) {
+        RegistryBuiltIns::generateCall(functionName, nodeCallFunction, getContextGenCode(), _visitorGeneralCodeGen);
         return; 
     }
 
-    getContextGenCode()->getRegistryArgument()->vider();
+    getContextGenCode()->getRegistryArgument()->clear();
 
-    const SymboleFunctionLocale* symboleFunction = obtenirFunctionLocale(nomFunction);
-    llvm::Function* functionCible = symboleFunction->function;
-    llvm::FunctionType* typeFunction = functionCible->getFunctionType();
+    const SymbolFunctionLocal* symbolFunction = getLocalFunction(functionName);
+    llvm::Function* targetFunction = symbolFunction->function;
+    llvm::FunctionType* functionType = targetFunction->getFunctionType();
     
-    unsigned int indexParam = 0; 
-    for (INode* argumentChild : nodeCallFunction->getChilds()) 
+    unsigned int paramIndex = 0; 
+    for (INode* argumentChild : nodeCallFunction->getChildren()) 
     {
         argumentChild->accept(_visitorGeneralCodeGen);
-        llvm::Value* valeurArgument = getContextGenCode()->getValeurTemporaire().getAdresse();
+        llvm::Value* argumentValue = getContextGenCode()->getTemporaryValue().getAddress();
 
-        if (valeurArgument == nullptr) {
-            throw std::runtime_error("Error : L'argument n'a pas généré de valeur.");
+        if (argumentValue == nullptr) {
+            throw std::runtime_error("Error: Argument did not generate a value.");
         }
 
-        llvm::Value* valeurFinale = valeurArgument;
-        if (indexParam < typeFunction->getNumParams()) {
-            llvm::Type* typeAttendu = typeFunction->getParamType(indexParam);
-            valeurFinale = getContextGenCode()->getBackend()->creerAutoCast(valeurArgument, typeAttendu);
+        llvm::Value* finalValue = argumentValue;
+        if (paramIndex < functionType->getNumParams()) {
+            llvm::Type* expectedType = functionType->getParamType(paramIndex);
+            finalValue = getContextGenCode()->getBackend()->createAutoCast(argumentValue, expectedType);
         }
 
-        getContextGenCode()->getRegistryArgument()->ajouter(valeurFinale);
-        indexParam++;
+        getContextGenCode()->getRegistryArgument()->add(finalValue);
+        paramIndex++;
     }
 
-    std::vector<llvm::Value*> args = getContextGenCode()->getRegistryArgument()->recuperer();
-    getContextGenCode()->getRegistryArgument()->vider();
+    std::vector<llvm::Value*> args = getContextGenCode()->getRegistryArgument()->get();
+    getContextGenCode()->getRegistryArgument()->clear();
 
-    if(functionCible->getReturnType()->isVoidTy())
+    if(targetFunction->getReturnType()->isVoidTy())
     {
-        getContextGenCode()->getBackend()->getBuilder().CreateCall(functionCible, args);
-        getContextGenCode()->modifierValeurTemporaire(Symbole(nullptr, getContextGenCode()->getValeurTemporaire().getType(), getContextGenCode()->getValeurTemporaire().getTypePointeElement()));
-        getContextGenCode()->modifierValeurTemporaire(Symbole(getContextGenCode()->getValeurTemporaire().getAdresse(), nullptr, getContextGenCode()->getValeurTemporaire().getTypePointeElement()));
+        getContextGenCode()->getBackend()->getBuilder().CreateCall(targetFunction, args);
+        getContextGenCode()->setTemporaryValue(Symbol(nullptr, getContextGenCode()->getTemporaryValue().getType(), getContextGenCode()->getTemporaryValue().getPointedElementType()));
+        getContextGenCode()->setTemporaryValue(Symbol(getContextGenCode()->getTemporaryValue().getAddress(), nullptr, getContextGenCode()->getTemporaryValue().getPointedElementType()));
         return;
     }
     
-    getContextGenCode()->modifierValeurTemporaire(Symbole(getContextGenCode()->getBackend()->getBuilder().CreateCall(
-        functionCible, 
+    getContextGenCode()->setTemporaryValue(Symbol(getContextGenCode()->getBackend()->getBuilder().CreateCall(
+        targetFunction, 
         args, 
-        "resultat_call"
-    ), getContextGenCode()->getValeurTemporaire().getType(), getContextGenCode()->getValeurTemporaire().getTypePointeElement()));
-    getContextGenCode()->modifierValeurTemporaire(Symbole(getContextGenCode()->getValeurTemporaire().getAdresse(), symboleFunction->typeReturn, getContextGenCode()->getValeurTemporaire().getTypePointeElement()));
+        "call_result"
+    ), getContextGenCode()->getTemporaryValue().getType(), getContextGenCode()->getTemporaryValue().getPointedElementType()));
+    getContextGenCode()->setTemporaryValue(Symbol(getContextGenCode()->getTemporaryValue().getAddress(), symbolFunction->returnType, getContextGenCode()->getTemporaryValue().getPointedElementType()));
 }
 
 
-// Gestion des functions Natives (Built-ins)
+// Management of Native Functions (Built-ins)
 
-bool RegistryBuiltIns::estBuiltIn(const std::string& nom) {
-    return nom == "print";
+bool RegistryBuiltIns::isBuiltIn(const std::string& name) {
+    return name == "print";
 }
 
-void RegistryBuiltIns::generatedrCall(const std::string& nom, NodeCallFunction* nodeCallFunction, ContextGenCode* context, IVisitor* visitor) {
-    if (nom == "print") {
-        if (nodeCallFunction->getChilds().empty()) {
+void RegistryBuiltIns::generateCall(const std::string& name, NodeCallFunction* nodeCallFunction, ContextGenCode* context, IVisitor* visitor) {
+    if (name == "print") {
+        if (nodeCallFunction->getChildren().empty()) {
             return;
         }
 
-        nodeCallFunction->getChilds()[0]->accept(visitor);
-        llvm::Value* valeurArgument = context->getValeurTemporaire().getAdresse();
-        IType* typeArgument = context->getValeurTemporaire().getType();
+        nodeCallFunction->getChildren()[0]->accept(visitor);
+        llvm::Value* argumentValue = context->getTemporaryValue().getAddress();
+        IType* argumentType = context->getTemporaryValue().getType();
         
-        if (valeurArgument == nullptr) {
-            throw std::runtime_error("Error : L'argument de print n'a pas généré de valeur.");
+        if (argumentValue == nullptr) {
+            throw std::runtime_error("Error: The print argument did not generate a value.");
         }
 
         char tag = 'i';
         auto& builder = context->getBackend()->getBuilder();
 
-        if (typeArgument != nullptr && typeArgument->estFlottant()) {
+        if (argumentType != nullptr && argumentType->isFloating()) {
             tag = 'f';
-            valeurArgument = builder.CreateFPExt(valeurArgument, builder.getDoubleTy());
+            argumentValue = builder.CreateFPExt(argumentValue, builder.getDoubleTy());
         } 
-        else if (typeArgument != nullptr && typeArgument->estBooleen()) {
+        else if (argumentType != nullptr && argumentType->isBoolean()) {
             tag = 'b';
-            valeurArgument = builder.CreateZExt(valeurArgument, builder.getInt32Ty());
+            argumentValue = builder.CreateZExt(argumentValue, builder.getInt32Ty());
         } 
-        else if (typeArgument != nullptr && typeArgument->estChaine()) {
+        else if (argumentType != nullptr && argumentType->isString()) {
             tag = 's';
-            if (auto* loadInst = llvm::dyn_cast<llvm::LoadInst>(valeurArgument)) {
-                valeurArgument = loadInst->getPointerOperand();
+            if (auto* loadInst = llvm::dyn_cast<llvm::LoadInst>(argumentValue)) {
+                argumentValue = loadInst->getPointerOperand();
             }
         }
 
         llvm::Value* llvmTag = builder.getInt32(static_cast<uint32_t>(tag));
         
-        const auto& symbolePtr = context->getRegistryFunctionLocale()->recuperer("print");
-        if (!prysma::isa<SymboleFunctionLocale>(symbolePtr.get())) {
-            throw std::runtime_error("Error : SymboleFunctionLocale attendu pour 'print'");
+        const auto& symbolPtr = context->getRegistryFunctionLocal()->get("print");
+        if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
+            throw std::runtime_error("Error: Expected SymbolFunctionLocal for 'print'");
         }
-        const auto* symbolePrint = prysma::cast<const SymboleFunctionLocale>(symbolePtr.get());
+        const auto* symbolPrint = prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
         
-        builder.CreateCall(symbolePrint->function, { llvmTag, valeurArgument });
-        context->modifierValeurTemporaire(Symbole(nullptr, context->getValeurTemporaire().getType(), context->getValeurTemporaire().getTypePointeElement()));
+        builder.CreateCall(symbolPrint->function, { llvmTag, argumentValue });
+        context->setTemporaryValue(Symbol(nullptr, context->getTemporaryValue().getType(), context->getTemporaryValue().getPointedElementType()));
     }
 }

@@ -58,31 +58,31 @@
 
 // NOLINTBEGIN(cppcoreguidelines-owning-memory)
 
-ConfigurationFacadeEnvironnement::ConfigurationFacadeEnvironnement(RegistryFunctionGlobale* registryFunctionGlobale, RegistryFile* registryFile)
-    : _registryFunctionGlobale(registryFunctionGlobale),
-      _registryFile(registryFile),
-    _registryExpression(nullptr),
+ConfigurationFacadeEnvironment::ConfigurationFacadeEnvironment(RegistryFunctionGlobal* registryFunctionGlobale, [[maybe_unused]] FileRegistry* fileRegistry)
+    : _registryFunctionGlobal(registryFunctionGlobale),
+      // _registryFile(fileRegistry),
+      _registryExpression(nullptr),
       _builderTreeInstruction(nullptr),
       _builderEquation(nullptr),
       _parserType(nullptr),
-    _contextParser(nullptr),
-    _contexteExpression(nullptr)
+      _contextParser(nullptr),
+      _contextExpression(nullptr)
 {
 }
 
-ConfigurationFacadeEnvironnement::~ConfigurationFacadeEnvironnement()
+ConfigurationFacadeEnvironment::~ConfigurationFacadeEnvironment()
 {
-    if (_contexteExpression != nullptr) {
-        _contexteExpression->~ContextExpression();
+    if (_contextExpression != nullptr) {
+        _contextExpression->~ContextExpression();
     }
     if (_contextParser != nullptr) {
         _contextParser->~ContextParser();
     }
     if (_parserType != nullptr) {
-        _parserType->~ParserType();
+        _parserType->~TypeParser();
     }
     if (_builderEquation != nullptr) {
-        _builderEquation->~BuilderEquationFlottante();
+        _builderEquation->~BuilderFloatEquation();
     }
     if (_builderTreeInstruction != nullptr) {
         _builderTreeInstruction->~BuilderTreeInstruction();
@@ -92,69 +92,68 @@ ConfigurationFacadeEnvironnement::~ConfigurationFacadeEnvironnement()
     }
 }
 
-void ConfigurationFacadeEnvironnement::initialiser(const std::string& cheminFile)
+void ConfigurationFacadeEnvironment::initialize(const std::string& filePath)
 {
-    creerRegistrys();
-    creerContext(cheminFile);
-    enregistryrFunctionsExternes();
-    enregistryrTypesDeBase();
-    enregistryrExpressions();
-    enregistryrInstructions();
+    createRegistries();
+    createContext(filePath);
+    registerExternalFunctions();
+    registerBaseTypes();
+    registerExpressions();
+    registerInstructions();
 }
 
-void ConfigurationFacadeEnvironnement::creerRegistrys()
+void ConfigurationFacadeEnvironment::createRegistries()
 {
     _backend = std::make_unique<LlvmBackend>();
     _registryInstruction = std::make_unique<RegistryInstruction>();
     _registryVariable = std::make_unique<RegistryVariable>();
-    _registryFunctionLocale = std::make_unique<RegistryFunctionLocale>();
+    _registryFunctionLocal = std::make_unique<RegistryFunctionLocal>();
     _registryType = std::make_unique<RegistryType>();
     _returnContextCompilation = std::make_unique<ReturnContextCompilation>();
     _registryArgument = std::make_unique<RegistryArgument>();
     _registryClass = std::make_unique<RegistryClass>();
 }
 
-void ConfigurationFacadeEnvironnement::creerContext(const std::string& cheminFile)
+void ConfigurationFacadeEnvironment::createContext(const std::string& filePath)
 {
-    Symbole valeurTemporaire;
-    valeurTemporaire = Symbole(nullptr, valeurTemporaire.getType(), valeurTemporaire.getTypePointeElement());
-    valeurTemporaire = Symbole(valeurTemporaire.getAdresse(), nullptr, valeurTemporaire.getTypePointeElement());
+    Symbol tempValue;
+    tempValue = Symbol(nullptr, tempValue.getType(), tempValue.getPointedElementType());
+    tempValue = Symbol(tempValue.getAddress(), nullptr, tempValue.getPointedElementType());
 
     _context = std::make_unique<ContextGenCode>(
-        _registryFile,
+        _registryType.get(),
         _backend.get(),
         _registryInstruction.get(),
         _registryVariable.get(),
-        _registryFunctionGlobale,
-        _registryFunctionLocale.get(),
-        _registryType.get(),
+        _registryFunctionGlobal,
+        _registryFunctionLocal.get(),
         _returnContextCompilation.get(),
         _registryArgument.get(),
         _registryClass.get(),
-        valeurTemporaire,
+        tempValue,
         &_arena,
-        cheminFile
+        filePath
     );
 }
 
-void ConfigurationFacadeEnvironnement::enregistryrFunctionsExternes()
+void ConfigurationFacadeEnvironment::registerExternalFunctions()
 {
-    // Créer un vrai type Void pour Prysma
-    IType* typeVoidPrysma = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::getVoidTy(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
+    // Create a real Void type for Prysma
+    IType* prysmaVoidType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::getVoidTy(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
 
     // backSlashN
-    _context->getBackend()->declarerExterne("backSlashN", llvm::Type::getVoidTy(_context->getBackend()->getContext()), {});
+    _context->getBackend()->declareExternal("backSlashN", llvm::Type::getVoidTy(_context->getBackend()->getContext()), {});
     {
-        auto symBackSlashNGlobal = std::make_unique<SymboleFunctionGlobale>();
-        symBackSlashNGlobal->typeReturn = typeVoidPrysma;
+        auto symBackSlashNGlobal = std::make_unique<SymbolFunctionGlobal>();
+        symBackSlashNGlobal->returnType = prysmaVoidType;
         symBackSlashNGlobal->node = nullptr;
-        _context->getRegistryFunctionGlobale()->enregistryr("backSlashN", std::move(symBackSlashNGlobal));
+        _context->getRegistryFunctionGlobal()->registerElement("backSlashN", std::move(symBackSlashNGlobal));
 
-        auto symBackSlashNLocal = std::make_unique<SymboleFunctionLocale>();
+        auto symBackSlashNLocal = std::make_unique<SymbolFunctionLocal>();
         symBackSlashNLocal->function = _context->getBackend()->getModule().getFunction("backSlashN");
-        symBackSlashNLocal->typeReturn = typeVoidPrysma;
+        symBackSlashNLocal->returnType = prysmaVoidType;
         symBackSlashNLocal->node = nullptr;
-        _context->getRegistryFunctionLocale()->enregistryr("backSlashN", std::move(symBackSlashNLocal));
+        _context->getRegistryFunctionLocal()->registerElement("backSlashN", std::move(symBackSlashNLocal));
     }
 
     // print
@@ -163,16 +162,16 @@ void ConfigurationFacadeEnvironnement::enregistryrFunctionsExternes()
     llvm::FunctionType* print_type = llvm::FunctionType::get(llvm::Type::getVoidTy(_context->getBackend()->getContext()), print_args, true);
     llvm::Function* printFunc = llvm::Function::Create(print_type, llvm::Function::ExternalLinkage, "print", _context->getBackend()->getModule());
     {
-        auto symPrintGlobal = std::make_unique<SymboleFunctionGlobale>();
-        symPrintGlobal->typeReturn = typeVoidPrysma;
+        auto symPrintGlobal = std::make_unique<SymbolFunctionGlobal>();
+        symPrintGlobal->returnType = prysmaVoidType;
         symPrintGlobal->node = nullptr;
-        _context->getRegistryFunctionGlobale()->enregistryr("print", std::move(symPrintGlobal));
+        _context->getRegistryFunctionGlobal()->registerElement("print", std::move(symPrintGlobal));
 
-        auto symPrintLocal = std::make_unique<SymboleFunctionLocale>();
+        auto symPrintLocal = std::make_unique<SymbolFunctionLocal>();
         symPrintLocal->function = printFunc;
-        symPrintLocal->typeReturn = typeVoidPrysma;
+        symPrintLocal->returnType = prysmaVoidType;
         symPrintLocal->node = nullptr;
-        _context->getRegistryFunctionLocale()->enregistryr("print", std::move(symPrintLocal));
+        _context->getRegistryFunctionLocal()->registerElement("print", std::move(symPrintLocal));
     }
 
     // prysma_malloc
@@ -181,16 +180,16 @@ void ConfigurationFacadeEnvironnement::enregistryrFunctionsExternes()
     llvm::FunctionType* malloc_type = llvm::FunctionType::get(llvm::PointerType::getUnqual(_context->getBackend()->getContext()), malloc_args, false);
     llvm::Function* mallocFunc = llvm::Function::Create(malloc_type, llvm::Function::ExternalLinkage, "prysma_malloc", _context->getBackend()->getModule());
     {
-        auto symMallocGlobal = std::make_unique<SymboleFunctionGlobale>();
-        symMallocGlobal->typeReturn = static_cast<TypeSimple*>(static_cast<void*>(new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::PointerType::getUnqual(_context->getBackend()->getContext()))));
+        auto symMallocGlobal = std::make_unique<SymbolFunctionGlobal>();
+        symMallocGlobal->returnType = static_cast<TypeSimple*>(static_cast<void*>(new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::PointerType::getUnqual(_context->getBackend()->getContext()))));
         symMallocGlobal->node = nullptr;
-        _context->getRegistryFunctionGlobale()->enregistryr("prysma_malloc", std::move(symMallocGlobal));
+        _context->getRegistryFunctionGlobal()->registerElement("prysma_malloc", std::move(symMallocGlobal));
 
-        auto symMallocLocal = std::make_unique<SymboleFunctionLocale>();
+        auto symMallocLocal = std::make_unique<SymbolFunctionLocal>();
         symMallocLocal->function = mallocFunc;
-        symMallocLocal->typeReturn = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::PointerType::getUnqual(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
+        symMallocLocal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::PointerType::getUnqual(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
         symMallocLocal->node = nullptr;
-        _context->getRegistryFunctionLocale()->enregistryr("prysma_malloc", std::move(symMallocLocal));
+        _context->getRegistryFunctionLocal()->registerElement("prysma_malloc", std::move(symMallocLocal));
     }
 
     // prysma_free
@@ -199,39 +198,39 @@ void ConfigurationFacadeEnvironnement::enregistryrFunctionsExternes()
     llvm::FunctionType* free_type = llvm::FunctionType::get(llvm::Type::getVoidTy(_context->getBackend()->getContext()), free_args, false);
     llvm::Function* freeFunc = llvm::Function::Create(free_type, llvm::Function::ExternalLinkage, "prysma_free", _context->getBackend()->getModule());
     {
-        auto symFreeGlobal = std::make_unique<SymboleFunctionGlobale>();
-        symFreeGlobal->typeReturn = typeVoidPrysma;
+        auto symFreeGlobal = std::make_unique<SymbolFunctionGlobal>();
+        symFreeGlobal->returnType = prysmaVoidType;
         symFreeGlobal->node = nullptr;
-        _context->getRegistryFunctionGlobale()->enregistryr("prysma_free", std::move(symFreeGlobal));
+        _context->getRegistryFunctionGlobal()->registerElement("prysma_free", std::move(symFreeGlobal));
 
-        auto symFreeLocal = std::make_unique<SymboleFunctionLocale>();
+        auto symFreeLocal = std::make_unique<SymbolFunctionLocal>();
         symFreeLocal->function = freeFunc;
-        symFreeLocal->typeReturn = typeVoidPrysma;
+        symFreeLocal->returnType = prysmaVoidType;
         symFreeLocal->node = nullptr;
-        _context->getRegistryFunctionLocale()->enregistryr("prysma_free", std::move(symFreeLocal));
+        _context->getRegistryFunctionLocal()->registerElement("prysma_free", std::move(symFreeLocal));
     }
 }
 
-void ConfigurationFacadeEnvironnement::enregistryrTypesDeBase()
+void ConfigurationFacadeEnvironment::registerBaseTypes()
 {
-    _context->getRegistryType()->enregistryr(TOKEN_TYPE_STRING, llvm::Type::getInt8Ty(_context->getBackend()->getContext()));
-    _context->getRegistryType()->enregistryr(TOKEN_TYPE_CHAR, llvm::Type::getInt8Ty(_context->getBackend()->getContext()));
-    _context->getRegistryType()->enregistryr(TOKEN_TYPE_INT64, llvm::Type::getInt64Ty(_context->getBackend()->getContext()));
-    _context->getRegistryType()->enregistryr(TOKEN_TYPE_INT32, llvm::Type::getInt32Ty(_context->getBackend()->getContext()));
-    _context->getRegistryType()->enregistryr(TOKEN_TYPE_FLOAT, llvm::Type::getFloatTy(_context->getBackend()->getContext()));
-    _context->getRegistryType()->enregistryr(TOKEN_TYPE_BOOL, llvm::Type::getInt1Ty(_context->getBackend()->getContext()));
-    _context->getRegistryType()->enregistryr(TOKEN_TYPE_VOID, llvm::Type::getVoidTy(_context->getBackend()->getContext()));
-    _context->getRegistryType()->enregistryr(TOKEN_TYPE_PTR, llvm::PointerType::getUnqual(_context->getBackend()->getContext()));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_STRING, llvm::Type::getInt8Ty(_context->getBackend()->getContext()));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_CHAR, llvm::Type::getInt8Ty(_context->getBackend()->getContext()));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_INT64, llvm::Type::getInt64Ty(_context->getBackend()->getContext()));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_INT32, llvm::Type::getInt32Ty(_context->getBackend()->getContext()));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_FLOAT, llvm::Type::getFloatTy(_context->getBackend()->getContext()));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_BOOL, llvm::Type::getInt1Ty(_context->getBackend()->getContext()));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_VOID, llvm::Type::getVoidTy(_context->getBackend()->getContext()));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_PTR, llvm::PointerType::getUnqual(_context->getBackend()->getContext()));
 }
 
-void ConfigurationFacadeEnvironnement::creerContextParser()
+void ConfigurationFacadeEnvironment::createContextParser()
 {
     if (_builderTreeInstruction == nullptr || _builderEquation == nullptr || _parserType == nullptr) {
-        throw std::logic_error("ContextParser ne peut pas être créé avant les builders d'trees et le parser de type");
+        throw std::logic_error("ContextParser cannot be created before tree builders and type parser");
     }
 
     ContextParser::Dependencies deps = {
-        _builderEquation->recupererBuilderTree(),
+        _builderEquation->getBuilderTree(),
         _builderTreeInstruction,
         _parserType,
         _registryVariable.get(),
@@ -240,27 +239,27 @@ void ConfigurationFacadeEnvironnement::creerContextParser()
     _contextParser = new (_arena.Allocate<ContextParser>()) ContextParser(deps); // NOLINT(cppcoreguidelines-owning-memory)
 }
 
-void ConfigurationFacadeEnvironnement::enregistryrExpressions()
+void ConfigurationFacadeEnvironment::registerExpressions()
 {
-    // Construire les chef d'orchestre de l'tree syntaxique abstrait
+    // Build the orchestrators of the abstract syntax tree
     _builderTreeInstruction = new (_arena) // NOLINT(cppcoreguidelines-owning-memory)
         BuilderTreeInstruction(_registryInstruction.get(), _arena); 
 
     _registryExpression = new (_arena.Allocate<RegistryExpression>()) RegistryExpression(); // NOLINT(cppcoreguidelines-owning-memory)
 
     _builderEquation = new (_arena) // NOLINT(cppcoreguidelines-owning-memory)
-        BuilderEquationFlottante(_registryExpression, _arena);
+        BuilderFloatEquation(_registryExpression, _arena);
 
-    // Créer le ParserType avec le registry
-    _parserType = new (_arena.Allocate<ParserType>()) // NOLINT(cppcoreguidelines-owning-memory)
-        ParserType(_context->getRegistryType(), _builderEquation->recupererBuilderTree());
+    // Create the TypeParser with the registry
+    _parserType = new (_arena.Allocate<TypeParser>()) // NOLINT(cppcoreguidelines-owning-memory)
+        TypeParser(_context->getRegistryType(), _builderEquation->getBuilderTree());
 
     if (_contextParser == nullptr) {
-        creerContextParser();
+        createContextParser();
     }
 
-    _contexteExpression = new (_arena.Allocate<ContextExpression>()) ContextExpression( // NOLINT(cppcoreguidelines-owning-memory)
-        _builderEquation->recupererBuilderTree(),
+    _contextExpression = new (_arena.Allocate<ContextExpression>()) ContextExpression( // NOLINT(cppcoreguidelines-owning-memory)
+        _builderEquation->getBuilderTree(),
         _builderTreeInstruction,
         _parserType,
         _contextParser,
@@ -269,99 +268,98 @@ void ConfigurationFacadeEnvironnement::enregistryrExpressions()
         _registryType.get()
     );
 
-    auto* exprLitInt = new (_arena.Allocate<ExpressionLiteral>()) ExpressionLiteral(*_contexteExpression); // // NOLINT(cppcoreguidelines-owning-memory)
-    _registryExpression->enregistryr(TOKEN_LIT_INT, exprLitInt);
+    auto* exprLitInt = new (_arena.Allocate<ExpressionLiteral>()) ExpressionLiteral(*_contextExpression); // // NOLINT(cppcoreguidelines-owning-memory)
+    _registryExpression->registerElement(TOKEN_LIT_INT, exprLitInt);
 
-    auto* exprLitFloat = new (_arena.Allocate<ExpressionLiteral>()) ExpressionLiteral(*_contexteExpression); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryExpression->enregistryr(TOKEN_LIT_FLOAT, exprLitFloat);
+    auto* exprLitFloat = new (_arena.Allocate<ExpressionLiteral>()) ExpressionLiteral(*_contextExpression); // NOLINT(cppcoreguidelines-owning-memory)
+    _registryExpression->registerElement(TOKEN_LIT_FLOAT, exprLitFloat);
 
-    auto* exprLitBool = new (_arena.Allocate<ExpressionLiteral>()) ExpressionLiteral(*_contexteExpression); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryExpression->enregistryr(TOKEN_LIT_BOLEEN, exprLitBool);
+    auto* exprLitBool = new (_arena.Allocate<ExpressionLiteral>()) ExpressionLiteral(*_contextExpression); // NOLINT(cppcoreguidelines-owning-memory)
+    _registryExpression->registerElement(TOKEN_LIT_BOOL, exprLitBool);
 
-    auto* exprIdentifiant = new (_arena.Allocate<ExpressionIdentifiant>()) ExpressionIdentifiant(*_contexteExpression); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryExpression->enregistryr(TOKEN_IDENTIFIANT, exprIdentifiant);
+    auto* exprIdentifier = new (_arena.Allocate<ExpressionIdentifiant>()) ExpressionIdentifiant(*_contextExpression); // NOLINT(cppcoreguidelines-owning-memory)
+    _registryExpression->registerElement(TOKEN_IDENTIFIER, exprIdentifier);
 
-    auto* exprRef = new (_arena.Allocate<ExpressionRefVariable>()) ExpressionRefVariable(*_contexteExpression); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryExpression->enregistryr(TOKEN_REF, exprRef);
+    auto* exprRef = new (_arena.Allocate<ExpressionRefVariable>()) ExpressionRefVariable(*_contextExpression); // NOLINT(cppcoreguidelines-owning-memory)
+    _registryExpression->registerElement(TOKEN_REF, exprRef);
 
-    auto* exprUnRef = new (_arena.Allocate<ExpressionUnRefVariable>()) ExpressionUnRefVariable(*_contexteExpression); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryExpression->enregistryr(TOKEN_UNREF, exprUnRef);
+    auto* exprUnRef = new (_arena.Allocate<ExpressionUnRefVariable>()) ExpressionUnRefVariable(*_contextExpression); // NOLINT(cppcoreguidelines-owning-memory)
+    _registryExpression->registerElement(TOKEN_UNREF, exprUnRef);
 
-    auto* exprNeg = new (_arena.Allocate<ExpressionNegation>()) ExpressionNegation(*_contexteExpression); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryExpression->enregistryr(TOKEN_NON, exprNeg);
+    auto* exprNeg = new (_arena.Allocate<ExpressionNegation>()) ExpressionNegation(*_contextExpression); // NOLINT(cppcoreguidelines-owning-memory)
+    _registryExpression->registerElement(TOKEN_NOT, exprNeg);
 
-    auto* exprString = new (_arena.Allocate<ExpressionString>()) ExpressionString(*_contexteExpression); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryExpression->enregistryr(TOKEN_GUILLEMET, exprString);
+    auto* exprString = new (_arena.Allocate<ExpressionString>()) ExpressionString(*_contextExpression); // NOLINT(cppcoreguidelines-owning-memory)
+    _registryExpression->registerElement(TOKEN_QUOTE, exprString);
 
-    auto* exprTab = new (_arena.Allocate<ExpressionArrayInitialization>()) ExpressionArrayInitialization(*_contexteExpression); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryExpression->enregistryr(TOKEN_CROCHET_OUVERT, exprTab);
+    auto* exprArray = new (_arena.Allocate<ExpressionArrayInitialization>()) ExpressionArrayInitialization(*_contextExpression); // NOLINT(cppcoreguidelines-owning-memory)
+    _registryExpression->registerElement(TOKEN_BRACKET_OPEN, exprArray);
 
-    auto* exprCall = new (_arena.Allocate<ExpressionCallCentral>()) ExpressionCallCentral(*_contexteExpression); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryExpression->enregistryr(TOKEN_CALL, exprCall);
+    auto* exprCall = new (_arena.Allocate<ExpressionCallCentral>()) ExpressionCallCentral(*_contextExpression); // NOLINT(cppcoreguidelines-owning-memory)
+    _registryExpression->registerElement(TOKEN_CALL, exprCall);
 
-    auto* exprNew = new (_arena.Allocate<ExpressionNew>()) ExpressionNew(*_contexteExpression); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryExpression->enregistryr(TOKEN_NEW, exprNew);
+    auto* exprNew = new (_arena.Allocate<ExpressionNew>()) ExpressionNew(*_contextExpression); // NOLINT(cppcoreguidelines-owning-memory)
+    _registryExpression->registerElement(TOKEN_NEW, exprNew);
 }
 
-void ConfigurationFacadeEnvironnement::enregistryrInstructions()
+void ConfigurationFacadeEnvironment::registerInstructions()
 {
-    
     auto* parsFonc = new (_arena.Allocate<ParserDeclarationFunction>()) ParserDeclarationFunction(*_contextParser); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryInstruction->enregistryr(TOKEN_FONCTION, parsFonc);
+    _registryInstruction->registerElement(TOKEN_FUNCTION, parsFonc);
 
     auto* parsAff = new (_arena.Allocate<ParserAssignmentVariable>()) ParserAssignmentVariable(*_contextParser); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryInstruction->enregistryr(TOKEN_AFF, parsAff);
+    _registryInstruction->registerElement(TOKEN_ASSIGN, parsAff);
 
     auto* parsDec = new (_arena.Allocate<ParserDeclarationVariable>()) ParserDeclarationVariable(*_contextParser); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryInstruction->enregistryr(TOKEN_DEC, parsDec);
+    _registryInstruction->registerElement(TOKEN_DECL, parsDec);
 
     auto* parsCall = new (_arena.Allocate<ParserCallCentral>()) ParserCallCentral(*_contextParser); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryInstruction->enregistryr(TOKEN_CALL, parsCall);
+    _registryInstruction->registerElement(TOKEN_CALL, parsCall);
 
     auto* parsRet = new (_arena.Allocate<ParserReturn>()) ParserReturn(*_contextParser); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryInstruction->enregistryr(TOKEN_RETOUR, parsRet);
+    _registryInstruction->registerElement(TOKEN_RETURN, parsRet);
 
     auto* parsArg = new (_arena.Allocate<ParserArgFunction>()) ParserArgFunction(*_contextParser); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryInstruction->enregistryr(TOKEN_ARG, parsArg);
+    _registryInstruction->registerElement(TOKEN_ARG, parsArg);
 
     auto* parsUnRef = new (_arena.Allocate<ParserUnRefVariable>()) ParserUnRefVariable(*_contextParser); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryInstruction->enregistryr(TOKEN_UNREF, parsUnRef);
+    _registryInstruction->registerElement(TOKEN_UNREF, parsUnRef);
 
     auto* parsRefVar = new (_arena.Allocate<ParserRefVariable>()) ParserRefVariable(*_contextParser); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryInstruction->enregistryr(TOKEN_REF, parsRefVar);
+    _registryInstruction->registerElement(TOKEN_REF, parsRefVar);
 
     auto* parsIf = new (_arena.Allocate<ParserIf>()) ParserIf(*_contextParser); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryInstruction->enregistryr(TOKEN_SI, parsIf);
+    _registryInstruction->registerElement(TOKEN_IF, parsIf);
 
     auto* parsWhile = new (_arena.Allocate<ParserWhile>()) ParserWhile(*_contextParser); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryInstruction->enregistryr(TOKEN_TANT_QUE, parsWhile);
+    _registryInstruction->registerElement(TOKEN_WHILE, parsWhile);
 
     auto* parsInclude = new (_arena.Allocate<ParserInclude>()) ParserInclude(*_contextParser); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryInstruction->enregistryr(TOKEN_INCLUDE, parsInclude);
+    _registryInstruction->registerElement(TOKEN_INCLUDE, parsInclude);
 
     auto* parsDelete = new (_arena.Allocate<ParserDelete>()) ParserDelete(*_contextParser); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryInstruction->enregistryr(TOKEN_DELETE, parsDelete);
+    _registryInstruction->registerElement(TOKEN_DELETE, parsDelete);
 
     auto* parsClass = new (_arena.Allocate<ParserClass>()) ParserClass(*_contextParser); // NOLINT(cppcoreguidelines-owning-memory)
-    _registryInstruction->enregistryr(TOKEN_CLASS, parsClass);
+    _registryInstruction->registerElement(TOKEN_CLASS, parsClass);
 }
 
-auto ConfigurationFacadeEnvironnement::getContext() const -> ContextGenCode*
+auto ConfigurationFacadeEnvironment::getContext() const -> ContextGenCode*
 {
     return _context.get();
 }
 
-auto ConfigurationFacadeEnvironnement::getArena() -> llvm::BumpPtrAllocator&
+auto ConfigurationFacadeEnvironment::getArena() -> llvm::BumpPtrAllocator&
 {
     return _arena;
 }
 
-auto ConfigurationFacadeEnvironnement::getBuilderTreeInstruction() const -> BuilderTreeInstruction*
+auto ConfigurationFacadeEnvironment::getBuilderTreeInstruction() const -> BuilderTreeInstruction*
 {
     return _builderTreeInstruction;
 }
 
-auto ConfigurationFacadeEnvironnement::getBuilderEquation() const -> BuilderEquationFlottante*
+auto ConfigurationFacadeEnvironment::getBuilderEquation() const -> BuilderFloatEquation*
 {
     return _builderEquation;
 }

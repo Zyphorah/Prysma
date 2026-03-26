@@ -21,118 +21,118 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
     auto& module = _contextGenCode->getBackend()->getModule();
     auto& builder = _contextGenCode->getBackend()->getBuilder();
 
-    llvm::Type* typeCible = nullptr;
-    Class* infoClasse = nullptr;
+    llvm::Type* targetType = nullptr;
+    Class* classInfo = nullptr;
 
-    if (nodeNew->getNomType().type == TOKEN_IDENTIFIANT) {
-        infoClasse = _contextGenCode->getRegistryClass()->recuperer(nodeNew->getNomType().value).get();
-        infoClasse = ErrorHelper::verifierNonNull(infoClasse, "Classe '" + nodeNew->getNomType().value + "' non trouvée");
-        typeCible = infoClasse->getStructType();
+    if (nodeNew->getNomType().type == TOKEN_IDENTIFIER) {
+        classInfo = _contextGenCode->getRegistryClass()->get(nodeNew->getNomType().value).get();
+        classInfo = ErrorHelper::verifyNotNull(classInfo, "Class '" + nodeNew->getNomType().value + "' not found");
+        targetType = classInfo->getStructType();
     } else {
-        typeCible = _contextGenCode->getRegistryType()->recuperer(nodeNew->getNomType().type);
+        targetType = _contextGenCode->getRegistryType()->get(nodeNew->getNomType().type);
     }
 
-    typeCible = ErrorHelper::verifierNonNull(typeCible, "Type cible non déterminé pour 'new'");
+    targetType = ErrorHelper::verifyNotNull(targetType, "Target type not determined for 'new'");
 
-    // C'est ici que LLVM décide si un int32 fait 4 octets, etc.
+    // LLVM decides if an int32 is 4 bytes, etc.
     const llvm::DataLayout& dataLayout = module.getDataLayout();
-    uint64_t tailleOctets = dataLayout.getTypeAllocSize(typeCible);
+    uint64_t byteSize = dataLayout.getTypeAllocSize(targetType);
     
-    // On transforme ce chiffre en valeur LLVM (i64) pour l'argument de malloc
-    llvm::Value* tailleLLVM = builder.getInt64(tailleOctets);
+    // Convert this number to an LLVM value (i64) for malloc argument
+    llvm::Value* llvmSize = builder.getInt64(byteSize);
 
     llvm::Function* mallocFunc = module.getFunction("prysma_malloc");
 
-    mallocFunc = ErrorHelper::verifierNonNull(mallocFunc, "Function prysma_malloc non déclarée dans le module");
+    mallocFunc = ErrorHelper::verifyNotNull(mallocFunc, "Function prysma_malloc not declared in the module");
 
-    llvm::Value* adresseAllouee = builder.CreateCall(mallocFunc, {tailleLLVM}, "memoire_new");
+    llvm::Value* allocatedAddress = builder.CreateCall(mallocFunc, {llvmSize}, "memory_new");
 
-    // Il faut remplir le vecteur d'argument du builder avec les argument du nodeNew exemple ; new MaClasse(arg1, arg2)
-    std::vector<llvm::Value*> argsBuilder;
-    argsBuilder.push_back(adresseAllouee);  // this
+    // Fill the builder's argument vector with the arguments from nodeNew, e.g., new MyClass(arg1, arg2)
+    std::vector<llvm::Value*> builderArgs;
+    builderArgs.push_back(allocatedAddress);  // this
 
-    // Ajouter les arguments passés au new (les childs du node)
+    // Add arguments passed to new (the node's children)
     for (INode* arg : nodeNew->getArguments()) {
-        arg->accept(this);  // Évalue l'expression (ex: entier = 204)
-        argsBuilder.push_back(_contextGenCode->getValeurTemporaire().getAdresse());
+        arg->accept(this);  // Evaluate the expression (e.g., int = 204)
+        builderArgs.push_back(_contextGenCode->getTemporaryValue().getAddress());
     }
     
-    if (infoClasse != nullptr && infoClasse->getVTable() != nullptr) {
-        // Initialiser le vptr à l'adresse 0 de l'object alloué
-        llvm::Value* vptrAdresse = builder.CreateStructGEP(typeCible, adresseAllouee, 0, "vptr_adresse");
-        llvm::Value* vtablePtr = builder.CreateBitCast(infoClasse->getVTable(), builder.getPtrTy());
-        builder.CreateStore(vtablePtr, vptrAdresse);
+    if (classInfo != nullptr && classInfo->getVTable() != nullptr) {
+        // Initialize the vptr at address 0 of the allocated object
+        llvm::Value* vptrAddress = builder.CreateStructGEP(targetType, allocatedAddress, 0, "vptr_address");
+        llvm::Value* vtablePtr = builder.CreateBitCast(classInfo->getVTable(), builder.getPtrTy());
+        builder.CreateStore(vtablePtr, vptrAddress);
     }
 
-    if (infoClasse != nullptr) {
-        for (const auto& pair : infoClasse->getMemberInitializers()) {
-            const std::string& nomMembre = pair.first;
-            INode* expressionInit = pair.second;
+    if (classInfo != nullptr) {
+        for (const auto& pair : classInfo->getMemberInitializers()) {
+            const std::string& memberName = pair.first;
+            INode* initExpression = pair.second;
 
-            if (expressionInit != nullptr) {
-                auto* arrayInit = prysma::dyn_cast<NodeArrayInitialization>(expressionInit);
+            if (initExpression != nullptr) {
+                auto* arrayInit = prysma::dyn_cast<NodeArrayInitialization>(initExpression);
                 
                 if (arrayInit != nullptr) {
-                    if (infoClasse->getMemberIndices().find(nomMembre) != infoClasse->getMemberIndices().end()) {
-                        unsigned int idx = infoClasse->getMemberIndices()[nomMembre];
+                    if (classInfo->getMemberIndices().find(memberName) != classInfo->getMemberIndices().end()) {
+                        unsigned int idx = classInfo->getMemberIndices()[memberName];
                         
-                        Token tokenMembre; tokenMembre.value = nomMembre;
-                        Symbole modele = infoClasse->getRegistryVariable()->recupererVariables(tokenMembre);
-                        llvm::Type* typeMembre = modele.getType()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
-                        auto* typeArrayLLVM = llvm::dyn_cast<llvm::ArrayType>(typeMembre);
+                        Token memberToken; memberToken.value = memberName;
+                        Symbol model = classInfo->getRegistryVariable()->getVariable(memberToken);
+                        llvm::Type* memberType = model.getType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
+                        auto* typeArrayLLVM = llvm::dyn_cast<llvm::ArrayType>(memberType);
                         if (typeArrayLLVM != nullptr) {
-                            llvm::Type* typeElement = typeArrayLLVM->getElementType();
-                            llvm::Value* membrePtr = builder.CreateStructGEP(typeCible, adresseAllouee, idx, nomMembre + "_ptrinit");
+                            llvm::Type* elementType = typeArrayLLVM->getElementType();
+                            llvm::Value* memberPtr = builder.CreateStructGEP(targetType, allocatedAddress, idx, memberName + "_ptrinit");
                             
                             for (size_t i = 0; i < arrayInit->getElements().size(); ++i) {
                                 std::vector<llvm::Value*> indices = {
                                     builder.getInt32(0),
                                     builder.getInt32(static_cast<uint32_t>(i))
                                 }; 
-                                llvm::Value* ptrCase = builder.CreateGEP(typeArrayLLVM, membrePtr, indices, "ptr_case");
+                                llvm::Value* ptrElement = builder.CreateGEP(typeArrayLLVM, memberPtr, indices, "ptr_element");
                                 
                                 INode* element = arrayInit->getElements()[i];
                                 element->accept(this);
-                                llvm::Value* expressionVal = _contextGenCode->getValeurTemporaire().getAdresse();
+                                llvm::Value* expressionVal = _contextGenCode->getTemporaryValue().getAddress();
                                 
-                                llvm::Value* valeurCastee = _contextGenCode->getBackend()->creerAutoCast(expressionVal, typeElement);
-                                builder.CreateStore(valeurCastee, ptrCase);
+                                llvm::Value* castedValue = _contextGenCode->getBackend()->createAutoCast(expressionVal, elementType);
+                                builder.CreateStore(castedValue, ptrElement);
                             }
                         }
                     }
                 } else {
-                    expressionInit->accept(this);
-                    llvm::Value* valeurCalculee = _contextGenCode->getValeurTemporaire().getAdresse();
+                    initExpression->accept(this);
+                    llvm::Value* calculatedValue = _contextGenCode->getTemporaryValue().getAddress();
 
-                    if (valeurCalculee != nullptr && infoClasse->getMemberIndices().find(nomMembre) != infoClasse->getMemberIndices().end()) {
-                        unsigned int idx = infoClasse->getMemberIndices()[nomMembre];
+                    if (calculatedValue != nullptr && classInfo->getMemberIndices().find(memberName) != classInfo->getMemberIndices().end()) {
+                        unsigned int idx = classInfo->getMemberIndices()[memberName];
                         
-                        Token tokenMembre; tokenMembre.value = nomMembre;
-                        Symbole modele = infoClasse->getRegistryVariable()->recupererVariables(tokenMembre);
-                        llvm::Type* typeMembre = modele.getType()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
+                        Token memberToken; memberToken.value = memberName;
+                        Symbol model = classInfo->getRegistryVariable()->getVariable(memberToken);
+                        llvm::Type* memberType = model.getType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
 
-                        llvm::Value* valeurCastee = _contextGenCode->getBackend()->creerAutoCast(valeurCalculee, typeMembre);
-                        llvm::Value* membrePtr = builder.CreateStructGEP(typeCible, adresseAllouee, idx, nomMembre + "_ptrinit");
-                        builder.CreateStore(valeurCastee, membrePtr);
+                        llvm::Value* castedValue = _contextGenCode->getBackend()->createAutoCast(calculatedValue, memberType);
+                        llvm::Value* memberPtr = builder.CreateStructGEP(targetType, allocatedAddress, idx, memberName + "_ptrinit");
+                        builder.CreateStore(castedValue, memberPtr);
                     }
                 }
             }
         }
     }
 
-    // Construction du builder avec arguments
-    if (infoClasse != nullptr) {
-        std::string nomBuilder = nodeNew->getNomType().value;
-        if (infoClasse->getRegistryFunctionLocale()->existe(nomBuilder)) {
-            const auto& symbolePtr = infoClasse->getRegistryFunctionLocale()->recuperer(nomBuilder);
-            if (!prysma::isa<SymboleFunctionLocale>(symbolePtr.get())) {
-                throw std::runtime_error("Error : SymboleFunctionLocale attendu");
+    // Build the builder with arguments
+    if (classInfo != nullptr) {
+        std::string builderName = nodeNew->getNomType().value;
+        if (classInfo->getRegistryFunctionLocal()->exists(builderName)) {
+            const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(builderName);
+            if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
+                throw std::runtime_error("Error: SymbolFunctionLocal expected");
             }
-            const auto* symboleFunction = prysma::cast<const SymboleFunctionLocale>(symbolePtr.get());
-            builder.CreateCall(symboleFunction->function, argsBuilder);
+            const auto* functionSymbol = prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
+            builder.CreateCall(functionSymbol->function, builderArgs);
         }
     }
 
-    _contextGenCode->modifierValeurTemporaire(Symbole(adresseAllouee, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
-    _contextGenCode->modifierValeurTemporaire(Symbole(_contextGenCode->getValeurTemporaire().getAdresse(), _contextGenCode->getValeurTemporaire().getType(), typeCible));
+    _contextGenCode->setTemporaryValue(Symbol(allocatedAddress, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
+    _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), _contextGenCode->getTemporaryValue().getType(), targetType));
 }

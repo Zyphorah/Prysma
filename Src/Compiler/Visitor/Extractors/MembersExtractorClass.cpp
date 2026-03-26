@@ -2,7 +2,7 @@
 #include "Compiler/AST/AST_Genere.h"
 
 void MembersExtractorClass::visiter(NodeDeclarationFunction* node) { 
-    methodes.push_back(node); 
+    methods.push_back(node); 
 }
 
 void MembersExtractorClass::visiter(NodeDeclarationVariable* node) { 
@@ -10,5 +10,5 @@ void MembersExtractorClass::visiter(NodeDeclarationVariable* node) {
 }
 
 void MembersExtractorClass::visiter(NodeClass* node) { 
-    nomClass = node->getNomClass().value; 
+    className = node->getNomClass().value; 
 }

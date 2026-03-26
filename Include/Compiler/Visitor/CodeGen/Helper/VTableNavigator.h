@@ -10,7 +10,7 @@ private:
 
 public:
     explicit VTableNavigator(llvm::IRBuilderBase* p_builder);
-    auto recupererPointerMethode(llvm::Value* vtable, llvm::Type* vtableType, int indexMethode) -> llvm::Value*;
+    auto getMethodPointer(llvm::Value* vtable, llvm::Type* vtableType, int methodIndex) -> llvm::Value*;
 };
 
 #endif

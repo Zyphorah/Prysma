@@ -10,35 +10,35 @@ void GeneralVisitorGenCode::visiter(NodeDelete* nodeDelete)
     auto& module = _contextGenCode->getBackend()->getModule();
     auto& builder = _contextGenCode->getBackend()->getBuilder();
 
-    // Récupérer le token de la variable à supprimer
-    const Token& tokenVariable = nodeDelete->getNomType();
+    // Retrieve the token of the variable to delete
+    const Token& variableToken = nodeDelete->getNomType();
 
-    // Chercher la variable dans le registry de variables pour déterminer si elle existe
-    Symbole symbole = _contextGenCode->getRegistryVariable()->recupererVariables(tokenVariable);
+    // Search for the variable in the variable registry to determine if it exists
+    Symbol symbol = _contextGenCode->getRegistryVariable()->getVariable(variableToken);
 
-    ErrorHelper::verifierNonNull(symbole.getAdresse(), "Variable '" + tokenVariable.value + "' non déclarée");
+    ErrorHelper::verifyNotNull(symbol.getAddress(), "Variable '" + variableToken.value + "' not declared");
     
-    llvm::Value* adresseMemory = symbole.getAdresse();
-    llvm::Type* typeDonnee = adresseMemory->getType();
+    llvm::Value* memoryAddress = symbol.getAddress();
+    llvm::Type* dataType = memoryAddress->getType();
 
-    if (!typeDonnee->isPointerTy()) {
-        ErrorHelper::errorCompilation("Variable '" + tokenVariable.value + "' n'est pas un pointeur (delete requiert un pointeur)");
+    if (!dataType->isPointerTy()) {
+        ErrorHelper::compilationError("Variable '" + variableToken.value + "' is not a pointer (delete requires a pointer)");
     }
 
-    llvm::Value* adresseALiberer = builder.CreateLoad(
-        typeDonnee,
-        adresseMemory,
-        "pointeur_" + tokenVariable.value
+    llvm::Value* addressToFree = builder.CreateLoad(
+        dataType,
+        memoryAddress,
+        "pointer_" + variableToken.value
     );
 
-    // Récupérer la function prysma_free du module
+    // Retrieve the prysma_free function from the module
     llvm::Function* freeFunc = module.getFunction("prysma_free");
 
-    freeFunc = ErrorHelper::verifierNonNull(freeFunc, "Function prysma_free non déclarée");
+    freeFunc = ErrorHelper::verifyNotNull(freeFunc, "Function prysma_free not declared");
 
-    // Caller prysma_free avec l'adresse à libérer
-    builder.CreateCall(freeFunc, {adresseALiberer});
+    // Call prysma_free with the address to free
+    builder.CreateCall(freeFunc, {addressToFree});
 
-    // Réinitialiser la valeur temporaire
-    _contextGenCode->modifierValeurTemporaire(Symbole(nullptr, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+    // Reset the temporary value
+    _contextGenCode->setTemporaryValue(Symbol(nullptr, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
 }

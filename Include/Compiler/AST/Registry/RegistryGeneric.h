@@ -9,17 +9,17 @@
 #include <sstream>
 #include <mutex>
 
-// Structure fantôme pour l'usage local (monothread)
+// Phantom structure for local (single-threaded) usage
 struct RegistryLock {
     void lock() const{}
     void unlock() const {}
 };
 
-template <typename TKey, typename TValeur, typename TLock = RegistryLock>
+template <typename TKey, typename TValue, typename TLock = RegistryLock>
 class RegistryGeneric {
 private:
-    std::map<TKey, TValeur> _elements;
-    std::function<std::string(TKey)> _messageErrorCallback;
+    std::map<TKey, TValue> _elements;
+    std::function<std::string(TKey)> _errorMessageCallback;
     mutable TLock _lock;
 public:
     RegistryGeneric() = default;
@@ -30,54 +30,52 @@ public:
     RegistryGeneric(RegistryGeneric&&) = delete;
     auto operator=(RegistryGeneric&&) -> RegistryGeneric& = delete;
    
-    void setMessageError(std::function<std::string(TKey)>&& callback) {
+    void setErrorMessage(std::function<std::string(TKey)>&& callback) {
         std::lock_guard<TLock> guard(_lock);
-        _messageErrorCallback = std::move(callback);
+        _errorMessageCallback = std::move(callback);
     }
 
-   
-    void enregistryr(const TKey& cle, TValeur valeur) {
+    void registerElement(const TKey& key, TValue value) {
         std::lock_guard<TLock> guard(_lock);
-        _elements[cle] = std::move(valeur);
+        _elements[key] = std::move(value);
     }
 
-    auto recuperer(const TKey& cle) const -> const TValeur& {
+    auto get(const TKey& key) const -> const TValue& {
         std::lock_guard<TLock> guard(_lock);
-        auto iterator = _elements.find(cle);
+        auto iterator = _elements.find(key);
         if (iterator == _elements.end()) {
-            throw std::invalid_argument(generatedrMessageErrorInterne(cle));
+            throw std::invalid_argument(generateInternalErrorMessage(key));
         }
         return iterator->second;
     }
 
-    auto existe(const TKey& cle) const -> bool {
+    auto exists(const TKey& key) const -> bool {
         std::lock_guard<TLock> guard(_lock);
-        return _elements.count(cle) > 0;
+        return _elements.count(key) > 0;
     }
 
-  
-    auto obtenirCles() const -> std::set<TKey> {
+    auto getKeys() const -> std::set<TKey> {
         std::lock_guard<TLock> guard(_lock);
-        std::set<TKey> cles;
+        std::set<TKey> keys;
         for (const auto& pair : _elements) {
-            cles.insert(pair.first);
+            keys.insert(pair.first);
         }
-        return cles;
+        return keys;
     }
 
 protected:
-   virtual auto generatedrMessageError(const TKey& cle) const -> std::string {
+    virtual auto generateErrorMessage(const TKey& key) const -> std::string {
         std::lock_guard<TLock> guard(_lock);
-        return generatedrMessageErrorInterne(cle);
+        return generateInternalErrorMessage(key);
     }
 
 private:
-   auto generatedrMessageErrorInterne(const TKey& cle) const -> std::string {
-        if (_messageErrorCallback) {
-            return _messageErrorCallback(cle);
+    auto generateInternalErrorMessage(const TKey& key) const -> std::string {
+        if (_errorMessageCallback) {
+            return _errorMessageCallback(key);
         }
         std::stringstream stringStream;
-        stringStream << "Element inconnu dans le registry : " << cle;
+        stringStream << "Unknown element in registry: " << key;
         return stringStream.str();
     }
 };

@@ -7,49 +7,49 @@
 #include <llvm-18/llvm/IR/Value.h>
 #include <string>
 
-class ExtractorTypeVariable {
+class VariableTypeExtractor {
 private:
     ContextGenCode* _context;
 public:
-    explicit ExtractorTypeVariable(ContextGenCode* context);
-    auto extraire(llvm::Value* adresseMemory) -> llvm::Type*;
+    explicit VariableTypeExtractor(ContextGenCode* context);
+    auto extract(llvm::Value* memoryAddress) -> llvm::Type*;
 };
 
-class AdresseurVariable {
+class VariableAddressor {
 private:
     ContextGenCode* _context;
 public:
-    explicit AdresseurVariable(ContextGenCode* context);
-    auto recupererAdresse(const std::string& nomVariable) -> Symbole;
+    explicit VariableAddressor(ContextGenCode* context);
+    auto getAddress(const std::string& variableName) -> Symbol;
 };
 
-class LoadurVariable {
+class VariableLoader {
 private:
     ContextGenCode* _context;
-    AdresseurVariable _adresseur;
-    ExtractorTypeVariable _extracteur;
+    VariableAddressor _addressor;
+    VariableTypeExtractor _extractor;
 public:
-    explicit LoadurVariable(ContextGenCode* context);
-    auto loadr(const std::string& nomVariable) -> Symbole;
-    auto loadrUnref(const std::string& nomVariable) -> Symbole;
+    explicit VariableLoader(ContextGenCode* context);
+    auto load(const std::string& variableName) -> Symbol;
+    auto loadUnref(const std::string& variableName) -> Symbol;
 };
 
-class AllocateurVariable {
+class VariableAllocator {
 private:
     ContextGenCode* _context;
 public:
-    explicit AllocateurVariable(ContextGenCode* context);
-    llvm::AllocaInst* allouer(llvm::Type* type, const std::string& nomVariable);
-    void stocker(llvm::Value* valeur, llvm::AllocaInst* allocaInst);
+    explicit VariableAllocator(ContextGenCode* context);
+    auto allocate(llvm::Type* type, const std::string& variableName) -> llvm::AllocaInst*;
+    void store(llvm::Value* value, llvm::AllocaInst* allocaInst);
 };
 
-class AffecteurVariable {
+class VariableAssigner {
 private:
     ContextGenCode* _context;
-    ExtractorTypeVariable _extracteur;
+    VariableTypeExtractor _extractor;
 public:
-    explicit AffecteurVariable(ContextGenCode* context);
-    void affecter(llvm::Value* variableExistante, llvm::Value* valeur, llvm::Type* typeVariableLLVM = nullptr);
+    explicit VariableAssigner(ContextGenCode* context);
+    void assign(llvm::Value* existingVariable, llvm::Value* value, llvm::Type* llvmVariableType = nullptr);
 };
 
 #endif /* D5B94044_819C_4C15_B528_AAE97CBCB264 */

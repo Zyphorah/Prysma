@@ -14,24 +14,24 @@
 class BuilderTreeEquation : public IBuilderTree
 {
 private:
-    ChainOfResponsibility* _chaineResponsabilite;
-    RegistrySymbole* _registrySymbole;
-    RegistryExpression* _registryExpression;
-    IManagerParenthese* _managerParenthese;
+    ChainOfResponsibility* _chainOfResponsibility;
+    RegistrySymbol* _symbolRegistry;
+    RegistryExpression* _expressionRegistry;
+    IManagerParenthesis* _parenthesisManager;
     llvm::BumpPtrAllocator& _arena;
-    Token _dernierToken;
+    Token _lastToken;
 
 public:
   
     BuilderTreeEquation(
-        ChainOfResponsibility* chaineResponsabilite,
-        RegistrySymbole* registrySymbole,
-    RegistryExpression* registryExpression,
-        IManagerParenthese* managerParenthese,
+        ChainOfResponsibility* chainOfResponsibility,
+        RegistrySymbol* symbolRegistry,
+        RegistryExpression* expressionRegistry,
+        IManagerParenthesis* parenthesisManager,
         llvm::BumpPtrAllocator& arena
     );
     
-    auto construire(std::vector<Token> &equation) -> INode* override;
-    auto construire(std::vector<Token>& tokens, int& index) -> INode* override;
+    auto build(std::vector<Token> &tokens) -> INode* override;
+    auto build(std::vector<Token>& tokens, int& index) -> INode* override;
     auto getArena() -> llvm::BumpPtrAllocator& override;
 };

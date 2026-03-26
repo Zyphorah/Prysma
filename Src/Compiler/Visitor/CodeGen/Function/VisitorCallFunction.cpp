@@ -4,6 +4,6 @@
 
 void GeneralVisitorGenCode::visiter(NodeCallFunction* nodeCallFunction)
 {
-    auto generator = GenerateurCallFunction::creer(_contextGenCode, this);
-    generator->generatedrCallFunction(nodeCallFunction);
+    auto generator = FunctionCallGenerator::create(_contextGenCode, this);
+    generator->generateCallFunction(nodeCallFunction);
 }

@@ -9,22 +9,22 @@
 #include <stdexcept>
 #include <vector>
 
-ExpressionNegation::ExpressionNegation(ContextExpression& contexteExpression)
-    : _contexteExpression(contexteExpression)
+ExpressionNegation::ExpressionNegation(ContextExpression& expressionContext)
+    : _context(expressionContext)
 {}
 
 ExpressionNegation::~ExpressionNegation()
 = default;
 
-auto ExpressionNegation::construire(std::vector<Token>& equation) -> INode*
+auto ExpressionNegation::build(std::vector<Token>& equation) -> INode*
 {
     if (equation.size() < 2) {
-        throw std::runtime_error("Error: '!' doit être suivi d'une expression");
+        throw std::runtime_error("Error: '!' must be followed by an expression");
     }
 
-    std::vector<Token> operande(equation.begin() + 1, equation.end());
-    INode* exprOperande = _contexteExpression.getBuilderTreeEquation()->construire(operande);
-    return _contexteExpression.getBuilderTreeEquation()->allouer<NodeNegation>(equation[0], exprOperande);
+    std::vector<Token> operand(equation.begin() + 1, equation.end());
+    INode* exprOperand = _context.getBuilderTreeEquation()->build(operand);
+    return _context.getBuilderTreeEquation()->allocate<NodeNegation>(equation[0], exprOperand);
 }
 
 #endif /* EXPRESSION_NEGATION_CPP */

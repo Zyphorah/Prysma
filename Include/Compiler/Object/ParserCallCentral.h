@@ -1,5 +1,5 @@
-#ifndef PARSEUR_APPELCENTRAL_H
-#define PARSEUR_APPELCENTRAL_H
+#ifndef PARSER_CALLCENTRAL_H
+#define PARSER_CALLCENTRAL_H
 
 #include "Compiler/AST/Nodes/Interfaces/INode.h"
 #include "Compiler/AST/Registry/ContextParser.h"
@@ -21,7 +21,7 @@ public:
     ParserCallCentral(ParserCallCentral&&) = delete;
     auto operator=(ParserCallCentral&&) -> ParserCallCentral& = delete;
     
-    auto parser(std::vector<Token>& tokens, int& index) -> INode* override;
+    auto parse(std::vector<Token>& tokens, int& index) -> INode* override;
 };
 
-#endif /* PARSEUR_APPELCENTRAL_H */
+#endif /* PARSER_CALLCENTRAL_H */

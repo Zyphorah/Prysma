@@ -1,8 +1,9 @@
-#ifndef PARSEUR_APPELOBJET_CPP
-#define PARSEUR_APPELOBJET_CPP
+#ifndef PARSER_CALLOBJECT_CPP
+#define PARSER_CALLOBJECT_CPP
 
 #include "Compiler/Object/ParserCallObject.h"
 #include "Compiler/AST/AST_Genere.h"
+#include "Compiler/AST/Nodes/Interfaces/IInstruction.h"
 #include "Compiler/AST/Nodes/Interfaces/INode.h"
 #include "Compiler/AST/Registry/ContextParser.h"
 #include "Compiler/Lexer/Lexer.h"
@@ -18,30 +19,30 @@ ParserCallObject::ParserCallObject(ContextParser& contextParser)
 ParserCallObject::~ParserCallObject()
 {}
 
-auto ParserCallObject::parser(std::vector<Token>& tokens, int& index) -> INode*
+auto ParserCallObject::parse(std::vector<Token>& tokens, int& index) -> INode*
 {
-  const bool callCommeInstruction = index == 0 || tokens[static_cast<size_t>(index - 1)].type != TOKEN_EGAL;
+  const bool callAsInstruction = index == 0 || tokens[static_cast<size_t>(index - 1)].type != TOKEN_EQUAL;
 
-  consommer(tokens, index, TOKEN_CALL, "Error: 'call' attendu");
-  Token nomObject = consommer(tokens, index, TOKEN_IDENTIFIANT, "Error: identifiant d'object attendu");
-  consommer(tokens, index, TOKEN_POINT, "Error: '.' attendu après le nom de l'object");
-  Token nomMethode = consommer(tokens, index, TOKEN_IDENTIFIANT, "Error: identifiant de méthode attendu");
-  consommer(tokens, index, TOKEN_PAREN_OUVERTE, "Error: '(' attendue");
+  consume(tokens, index, TOKEN_CALL, "Error: 'call' expected");
+  Token objectName = consume(tokens, index, TOKEN_IDENTIFIER, "Error: object identifier expected");
+  consume(tokens, index, TOKEN_DOT, "Error: '.' expected after object name");
+  Token methodName = consume(tokens, index, TOKEN_IDENTIFIER, "Error: method identifier expected");
+  consume(tokens, index, TOKEN_PAREN_OPEN, "Error: '(' expected");
 
-  IInstruction* nodeCall = _contextParser.getBuilderTreeEquation()->allouer<NodeCallObject>(nomObject, nomMethode);
+  IInstruction* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallObject>(objectName, methodName);
 
-  consommerChildBody(tokens, index, nodeCall, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_FERMEE);
+  consumeChildBody(tokens, index, nodeCall, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_CLOSE);
 
-  consommer(tokens, index, TOKEN_PAREN_FERMEE, "Error: ')' attendue");
+  consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: ')' expected");
 
-  if (callCommeInstruction && index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type == TOKEN_POINT_VIRGULE) {
-      consommer(tokens, index, TOKEN_POINT_VIRGULE, "Error : ';' attendu à la fin de l'call d'object");
+  if (callAsInstruction && index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type == TOKEN_SEMICOLON) {
+      consume(tokens, index, TOKEN_SEMICOLON, "Error: ';' expected at the end of the object call");
   }
 
   return nodeCall;
 }
 
-#endif /* PARSEUR_APPELOBJET_CPP */
+#endif /* PARSER_CALLOBJECT_CPP */
 
 
 

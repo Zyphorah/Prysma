@@ -13,29 +13,29 @@
 
 struct ContextGenCode;
 class INode;
-class RegistryFunctionGlobale;
-class RegistryFile;
+class RegistryFunctionGlobal;
+class FileRegistry;
 
 class OrchestratorInclude
 {
 private: 
    std::mutex* _mutex;
-   RegistryFunctionGlobale* _registryFunctionGlobale;
-   RegistryFile* _registryFile;
+   RegistryFunctionGlobal* _registryFunctionGlobal;
+   FileRegistry* _registryFile;
    llvm::ThreadPool _threads;
-   std::vector<std::unique_ptr<UnitCompilation>> _unitsCompilation;
+   std::vector<std::unique_ptr<UnitCompilation>> _compilationUnits;
    
-   // Un registry dédié aux fichiers sources (.p)
-   std::set<std::string> _fichiersDejaInclus; 
+   // A registry dedicated to source files (.p)
+   std::set<std::string> _alreadyIncludedFiles; 
 
-   // Indicateur d'error thread-safe pour savoir si la compilation a échoué
-   std::atomic<bool> _aDesErrors{false};
+   // Thread-safe error indicator to know if compilation failed
+   std::atomic<bool> _hasErrors{false};
 
-   // Flag pour activer la génération du graphe AST
-   bool _activerGraphViz;
+   // Flag to enable AST graph generation
+   bool _enableGraphViz;
 
 public:
-    OrchestratorInclude(RegistryFunctionGlobale* registryFunctionGlobale, RegistryFile* registryFile, std::mutex* mutex, bool activerGraphViz = false);
+    OrchestratorInclude(RegistryFunctionGlobal* registryFunctionGlobal, FileRegistry* registryFile, std::mutex* mutex, bool enableGraphViz = false);
     ~OrchestratorInclude();
 
     OrchestratorInclude(const OrchestratorInclude&) = delete;
@@ -43,11 +43,11 @@ public:
     OrchestratorInclude(OrchestratorInclude&&) = delete;
     auto operator=(OrchestratorInclude&&) -> OrchestratorInclude& = delete;
     
-   void compilerProject(const std::string& cheminFile);
-   void inclureFile(const std::string& cheminAbsolu);
-   static void attendreFinPass(llvm::ThreadPool& threads);
-   [[nodiscard]] auto aDesErrors() const -> bool;
-   [[nodiscard]] auto estGraphVizActif() const -> bool;
+   void compileProject(const std::string& filePath);
+   void includeFile(const std::string& absolutePath);
+   static void waitForPassEnd(llvm::ThreadPool& threads);
+   [[nodiscard]] auto hasErrors() const -> bool;
+   [[nodiscard]] auto isGraphVizEnabled() const -> bool;
 };
 
 #endif /* D2577958_A8A8_4878_AFA0_2B3478129911 */

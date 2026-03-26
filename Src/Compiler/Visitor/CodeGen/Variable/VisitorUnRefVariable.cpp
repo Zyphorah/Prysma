@@ -4,7 +4,6 @@
 
 void GeneralVisitorGenCode::visiter(NodeUnRefVariable* nodeUnRefVariable) 
 {
-    LoadurVariable loadur(_contextGenCode);
-    
-    _contextGenCode->modifierValeurTemporaire(loadur.loadrUnref(nodeUnRefVariable->getNomVariable()));
+    VariableLoader loader(_contextGenCode);
+    _contextGenCode->setTemporaryValue(loader.loadUnref(nodeUnRefVariable->getNomVariable()));
 }

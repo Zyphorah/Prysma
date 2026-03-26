@@ -9,29 +9,29 @@
 #include <string>
 #include <vector>
 
-auto ParserBase::consommer(std::vector<Token>& tokens, int& index, TokenType typeAttendu, const std::string& messageError) -> Token
+auto ParserBase::consume(std::vector<Token>& tokens, int& index, TokenType expectedType, const std::string& errorMessage) -> Token
 {
-    if (index < 0 || index >= static_cast<int>(tokens.size()) || tokens[static_cast<size_t>(index)].type != typeAttendu) {
+    if (index < 0 || index >= static_cast<int>(tokens.size()) || tokens[static_cast<size_t>(index)].type != expectedType) {
         if (index >= 0 && index < static_cast<int>(tokens.size())) {
-            throw ErrorCompilation(messageError, Ligne(tokens[static_cast<size_t>(index)].ligne), Colonne(tokens[static_cast<size_t>(index)].colonne));
+            throw CompilationError(errorMessage, Line(tokens[static_cast<size_t>(index)].line), Column(tokens[static_cast<size_t>(index)].column));
         }
-        throw ErrorCompilation(messageError, Ligne(1), Colonne(1));
+        throw CompilationError(errorMessage, Line(1), Column(1));
     }
     return tokens[static_cast<size_t>(index++)];
 }
 
-void ParserBase::consommerChildBody(std::vector<Token>& tokens, int& index , IInstruction* parent, IBuilderTree* builderTree,TokenType fin)
+void ParserBase::consumeChildBody(std::vector<Token>& tokens, int& index , IInstruction* parent, IBuilderTree* builderTree, TokenType end)
 {
-    while(index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != fin)
+    while(index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != end)
     {
-        // Ignorer les virgules input les éléments
-        if(tokens[static_cast<size_t>(index)].type == TOKEN_VIRGULE)
+        // Ignore commas between elements
+        if(tokens[static_cast<size_t>(index)].type == TOKEN_COMMA)
         {
             index++;
             continue;
         }
         
-        INode* child = builderTree->construire(tokens, index);
-        parent->ajouterInstruction(child);
+        INode* child = builderTree->build(tokens, index);
+        parent->addInstruction(child);
     }
 }

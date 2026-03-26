@@ -5,6 +5,7 @@
 #include <vector>
 #include <llvm-18/llvm/Support/Allocator.h>
 #include <llvm/Support/TargetSelect.h>
+#include "Compiler/AST/Nodes/NodeInstruction.h"
 #include "Compiler/Lexer/TokenType.h"
 #include "catch.hpp"
 #include "Compiler/Lexer/Lexer.h"
@@ -54,8 +55,8 @@ struct EnvironnementAST {
     std::unique_ptr<RegistryVariable> registryVariable;
 
     BuilderTreeInstruction* builderTree = nullptr;
-    BuilderEquationFlottante* builderEquation = nullptr;
-    ParserType* parserType = nullptr;
+    BuilderFloatEquation* builderEquation = nullptr;
+    TypeParser* parserType = nullptr;
     ContextParser* contextParser = nullptr;
     ContextExpression* contexteExpression = nullptr;
 
@@ -75,14 +76,14 @@ struct EnvironnementAST {
         //  Strategie d'équation 
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wmismatched-new-delete"
-        builderEquation = new (arena) BuilderEquationFlottante(registryExpression.get(), arena);
+        builderEquation = new (arena) BuilderFloatEquation(registryExpression.get(), arena);
         #pragma GCC diagnostic pop
 
-        parserType = new (arena.Allocate<ParserType>()) ParserType(registryType.get(), builderEquation->recupererBuilderTree());
+        parserType = new (arena.Allocate<TypeParser>()) TypeParser(registryType.get(), builderEquation->getBuilderTree());
 
         // Créer le ContextParser
         contextParser = new (arena.Allocate<ContextParser>()) ContextParser(ContextParser::Dependencies{
-            builderEquation->recupererBuilderTree(),
+            builderEquation->getBuilderTree(),
             builderTree,
             parserType,
             registryVariable.get(),
@@ -90,7 +91,7 @@ struct EnvironnementAST {
         });
 
         contexteExpression = new (arena.Allocate<ContextExpression>()) ContextExpression(
-            builderEquation->recupererBuilderTree(),
+            builderEquation->getBuilderTree(),
             builderTree,
             parserType,
             contextParser,
@@ -100,68 +101,68 @@ struct EnvironnementAST {
         );
 
         auto* exprLitInt = new (arena.Allocate<ExpressionLiteral>()) ExpressionLiteral(*contexteExpression);
-        registryExpression->enregistryr(TOKEN_LIT_INT, exprLitInt);
+        registryExpression->registerElement(TOKEN_LIT_INT, exprLitInt);
 
         auto* exprLitFloat = new (arena.Allocate<ExpressionLiteral>()) ExpressionLiteral(*contexteExpression);
-        registryExpression->enregistryr(TOKEN_LIT_FLOAT, exprLitFloat);
+        registryExpression->registerElement(TOKEN_LIT_FLOAT, exprLitFloat);
 
         auto* exprLitBool = new (arena.Allocate<ExpressionLiteral>()) ExpressionLiteral(*contexteExpression);
-        registryExpression->enregistryr(TOKEN_LIT_BOLEEN, exprLitBool);
+        registryExpression->registerElement(TOKEN_LIT_BOOL, exprLitBool);
 
         auto* exprIdentifiant = new (arena.Allocate<ExpressionIdentifiant>()) ExpressionIdentifiant(*contexteExpression);
-        registryExpression->enregistryr(TOKEN_IDENTIFIANT, exprIdentifiant);
+        registryExpression->registerElement(TOKEN_IDENTIFIER, exprIdentifiant);
 
         auto* exprRef = new (arena.Allocate<ExpressionRefVariable>()) ExpressionRefVariable(*contexteExpression);
-        registryExpression->enregistryr(TOKEN_REF, exprRef);
+        registryExpression->registerElement(TOKEN_REF, exprRef);
 
         auto* exprUnRef = new (arena.Allocate<ExpressionUnRefVariable>()) ExpressionUnRefVariable(*contexteExpression);
-        registryExpression->enregistryr(TOKEN_UNREF, exprUnRef);
+        registryExpression->registerElement(TOKEN_UNREF, exprUnRef);
 
         auto* exprNeg = new (arena.Allocate<ExpressionNegation>()) ExpressionNegation(*contexteExpression);
-        registryExpression->enregistryr(TOKEN_NON, exprNeg);
+        registryExpression->registerElement(TOKEN_NOT, exprNeg);
 
         auto* exprString = new (arena.Allocate<ExpressionString>()) ExpressionString(*contexteExpression);
-        registryExpression->enregistryr(TOKEN_GUILLEMET, exprString);
+        registryExpression->registerElement(TOKEN_QUOTE, exprString);
 
         auto* exprTab = new (arena.Allocate<ExpressionArrayInitialization>()) ExpressionArrayInitialization(*contexteExpression);
-        registryExpression->enregistryr(TOKEN_CROCHET_OUVERT, exprTab);
+        registryExpression->registerElement(TOKEN_BRACKET_OPEN, exprTab);
 
         auto* exprCall = new (arena.Allocate<ExpressionCallFunction>()) ExpressionCallFunction(*contexteExpression);
-        registryExpression->enregistryr(TOKEN_CALL, exprCall);
+        registryExpression->registerElement(TOKEN_CALL, exprCall);
 
         // Parsers d'instructions
         auto* parsFonc = new (arena.Allocate<ParserDeclarationFunction>()) ParserDeclarationFunction(*contextParser);
-        registryInstruction->enregistryr(TOKEN_FONCTION, parsFonc);
+        registryInstruction->registerElement(TOKEN_FUNCTION, parsFonc);
 
         auto* parsAff = new (arena.Allocate<ParserAssignmentVariable>()) ParserAssignmentVariable(*contextParser);
-        registryInstruction->enregistryr(TOKEN_AFF, parsAff);
+        registryInstruction->registerElement(TOKEN_ASSIGN, parsAff);
 
         auto* parsDec = new (arena.Allocate<ParserDeclarationVariable>()) ParserDeclarationVariable(*contextParser);
-        registryInstruction->enregistryr(TOKEN_DEC, parsDec);
+        registryInstruction->registerElement(TOKEN_DECL, parsDec);
 
         auto* parsCall = new (arena.Allocate<ParserCallFunction>()) ParserCallFunction(*contextParser);
-        registryInstruction->enregistryr(TOKEN_CALL, parsCall);
+        registryInstruction->registerElement(TOKEN_CALL, parsCall);
 
         auto* parsRet = new (arena.Allocate<ParserReturn>()) ParserReturn(*contextParser);
-        registryInstruction->enregistryr(TOKEN_RETOUR, parsRet);
+        registryInstruction->registerElement(TOKEN_RETURN, parsRet);
 
         auto* parsArg = new (arena.Allocate<ParserArgFunction>()) ParserArgFunction(*contextParser);
-        registryInstruction->enregistryr(TOKEN_ARG, parsArg);
+        registryInstruction->registerElement(TOKEN_ARG, parsArg);
 
         auto* parsUnRef = new (arena.Allocate<ParserUnRefVariable>()) ParserUnRefVariable(*contextParser);
-        registryInstruction->enregistryr(TOKEN_UNREF, parsUnRef);
+        registryInstruction->registerElement(TOKEN_UNREF, parsUnRef);
 
         auto* parsRefVar = new (arena.Allocate<ParserRefVariable>()) ParserRefVariable(*contextParser);
-        registryInstruction->enregistryr(TOKEN_REF, parsRefVar);
+        registryInstruction->registerElement(TOKEN_REF, parsRefVar);
 
         auto* parsIf = new (arena.Allocate<ParserIf>()) ParserIf(*contextParser);
-        registryInstruction->enregistryr(TOKEN_SI, parsIf);
+        registryInstruction->registerElement(TOKEN_IF, parsIf);
 
         auto* parsWhile = new (arena.Allocate<ParserWhile>()) ParserWhile(*contextParser);
-        registryInstruction->enregistryr(TOKEN_TANT_QUE, parsWhile);
+        registryInstruction->registerElement(TOKEN_WHILE, parsWhile);
 
         auto* parsInclude = new (arena.Allocate<ParserInclude>()) ParserInclude(*contextParser);
-        registryInstruction->enregistryr(TOKEN_INCLUDE, parsInclude);
+        registryInstruction->registerElement(TOKEN_INCLUDE, parsInclude);
     }
 };
 
@@ -169,21 +170,21 @@ struct EnvironnementAST {
 /// Construit un tree d'équation à partir d'une string de code source.
 INode* construireEquationDepuisString(EnvironnementAST& env, const std::string& code) {
     Lexer lexer;
-    std::vector<Token> tokens = lexer.tokenizer(code);
+    std::vector<Token> tokens = lexer.tokenize(code);
 
     // Retirer le token EOF ajouté par le Lexer
     if (!tokens.empty() && tokens.back().type == TOKEN_EOF) {
         tokens.pop_back();
     }
 
-    return env.builderEquation->construire(tokens);
+    return env.builderEquation->build(tokens);
 }
 
 /// Construit un tree d'instructions à partir d'une string de code source.
 INode* construireTreeDepuisString(EnvironnementAST& env, const std::string& code) {
     Lexer lexer;
-    std::vector<Token> tokens = lexer.tokenizer(code);
-    return env.builderTree->construire(tokens);
+    std::vector<Token> tokens = lexer.tokenize(code);
+    return env.builderTree->build(tokens);
 }
 
 template<typename TypeAttendu, typename TypeInputr>
@@ -395,10 +396,10 @@ TEST_CASE("Construction Tree If simple avec else", "[AST][Branch]")
     // 1. Racine = NodeInstruction qui contient le if
     auto* racine = dynamic_cast<NodeInstruction*>(tree);
     REQUIRE(racine != nullptr);
-    REQUIRE(racine->getChilds().size() == 1);
+    REQUIRE(racine->getChildren().size() == 1);
 
     // 2. Premier child = NodeIf
-    auto* nodeIf = dynamic_cast<NodeIf*>(racine->getChilds()[0]);
+    auto* nodeIf = dynamic_cast<NodeIf*>(racine->getChildren()[0]);
     REQUIRE(nodeIf != nullptr);
 
     // 3. Condition pas nulle
@@ -407,17 +408,17 @@ TEST_CASE("Construction Tree If simple avec else", "[AST][Branch]")
     // 4. Vérifier condition : opération '>'
     auto* condition = dynamic_cast<NodeOperation*>(nodeIf->getNodeCondition());
     REQUIRE(condition != nullptr);
-    REQUIRE(condition->getToken().type == TOKEN_PLUS_GRAND);
+    REQUIRE(condition->getToken().type == TOKEN_GREATER);
 
     // 5. Bloc if existe et contient 1 instruction
     auto* blocIf = dynamic_cast<NodeInstruction*>(nodeIf->getNodeBlocIf());
     REQUIRE(blocIf != nullptr);
-    REQUIRE(blocIf->getChilds().size() == 1);
+    REQUIRE(blocIf->getChildren().size() == 1);
 
     // 6. Bloc else existe et contient 1 instruction
     auto* blocElse = dynamic_cast<NodeInstruction*>(nodeIf->getNodeBlocElse());
     REQUIRE(blocElse != nullptr);
-    REQUIRE(blocElse->getChilds().size() == 1);
+    REQUIRE(blocElse->getChildren().size() == 1);
 
     // 7. Bloc endif existe (node de output)
     REQUIRE(nodeIf->getNodeBlocEndif() != nullptr);
@@ -439,18 +440,18 @@ TEST_CASE("Construction Tree If sans else", "[AST][Branch]")
     REQUIRE(racine != nullptr);
 
     // 1. NodeIf
-    auto* nodeIf = dynamic_cast<NodeIf*>(racine->getChilds()[0]);
+    auto* nodeIf = dynamic_cast<NodeIf*>(racine->getChildren()[0]);
     REQUIRE(nodeIf != nullptr);
 
     // 2. Condition == 
     auto* condition = dynamic_cast<NodeOperation*>(nodeIf->getNodeCondition());
     REQUIRE(condition != nullptr);
-    REQUIRE(condition->getToken().type == TOKEN_EGAL_EGAL);
+    REQUIRE(condition->getToken().type == TOKEN_EQUAL_EQUAL);
 
     // 3. Bloc if a 1 child
     auto* blocIf = dynamic_cast<NodeInstruction*>(nodeIf->getNodeBlocIf());
     REQUIRE(blocIf != nullptr);
-    REQUIRE(blocIf->getChilds().size() == 1);
+    REQUIRE(blocIf->getChildren().size() == 1);
 
     // 4. Pas de else
     REQUIRE(nodeIf->getNodeBlocElse() == nullptr);
@@ -474,23 +475,23 @@ TEST_CASE("Construction Tree If condition logique ET", "[AST][Branch]")
     auto* racine = dynamic_cast<NodeInstruction*>(tree);
     REQUIRE(racine != nullptr);
 
-    auto* nodeIf = dynamic_cast<NodeIf*>(racine->getChilds()[0]);
+    auto* nodeIf = dynamic_cast<NodeIf*>(racine->getChildren()[0]);
     REQUIRE(nodeIf != nullptr);
 
     // Condition racine = &&
     auto* condition = dynamic_cast<NodeOperation*>(nodeIf->getNodeCondition());
     REQUIRE(condition != nullptr);
-    REQUIRE(condition->getToken().type == TOKEN_ET);
+    REQUIRE(condition->getToken().type == TOKEN_AND);
 
     // Gauche du && = '>'
     auto* gauche = dynamic_cast<NodeOperation*>(condition->getGauche());
     REQUIRE(gauche != nullptr);
-    REQUIRE(gauche->getToken().type == TOKEN_PLUS_GRAND);
+    REQUIRE(gauche->getToken().type == TOKEN_GREATER);
 
     // Droite du && = '<'
     auto* droite = dynamic_cast<NodeOperation*>(condition->getDroite());
     REQUIRE(droite != nullptr);
-    REQUIRE(droite->getToken().type == TOKEN_PLUS_PETIT);
+    REQUIRE(droite->getToken().type == TOKEN_LESS);
 }
 
 // Test while simple
@@ -507,21 +508,21 @@ TEST_CASE("Construction Tree While simple", "[AST][Branch]")
 
     auto* racine = dynamic_cast<NodeInstruction*>(tree);
     REQUIRE(racine != nullptr);
-    REQUIRE(racine->getChilds().size() == 1);
+    REQUIRE(racine->getChildren().size() == 1);
 
     // 1. NodeWhile
-    auto* nodeWhile = dynamic_cast<NodeWhile*>(racine->getChilds()[0]);
+    auto* nodeWhile = dynamic_cast<NodeWhile*>(racine->getChildren()[0]);
     REQUIRE(nodeWhile != nullptr);
 
     // 2. Condition '<'
     auto* condition = dynamic_cast<NodeOperation*>(nodeWhile->getNodeCondition());
     REQUIRE(condition != nullptr);
-    REQUIRE(condition->getToken().type == TOKEN_PLUS_PETIT);
+    REQUIRE(condition->getToken().type == TOKEN_LESS);
 
     // 3. Bloc while a 1 instruction
     auto* blocWhile = dynamic_cast<NodeInstruction*>(nodeWhile->getNodeBlocWhile());
     REQUIRE(blocWhile != nullptr);
-    REQUIRE(blocWhile->getChilds().size() == 1);
+    REQUIRE(blocWhile->getChildren().size() == 1);
 
     // 4. Bloc fin while existe
     REQUIRE(nodeWhile->getNodeBlocFinWhile() != nullptr);
@@ -542,23 +543,23 @@ TEST_CASE("Construction Tree While condition OU", "[AST][Branch]")
     auto* racine = dynamic_cast<NodeInstruction*>(tree);
     REQUIRE(racine != nullptr);
 
-    auto* nodeWhile = dynamic_cast<NodeWhile*>(racine->getChilds()[0]);
+    auto* nodeWhile = dynamic_cast<NodeWhile*>(racine->getChildren()[0]);
     REQUIRE(nodeWhile != nullptr);
 
     // Condition racine = ||
     auto* condition = dynamic_cast<NodeOperation*>(nodeWhile->getNodeCondition());
     REQUIRE(condition != nullptr);
-    REQUIRE(condition->getToken().type == TOKEN_OU);
+    REQUIRE(condition->getToken().type == TOKEN_OR);
 
     // Gauche du || = '=='
     auto* gauche = dynamic_cast<NodeOperation*>(condition->getGauche());
     REQUIRE(gauche != nullptr);
-    REQUIRE(gauche->getToken().type == TOKEN_EGAL_EGAL);
+    REQUIRE(gauche->getToken().type == TOKEN_EQUAL_EQUAL);
 
     // Droite du || = '=='
     auto* droite = dynamic_cast<NodeOperation*>(condition->getDroite());
     REQUIRE(droite != nullptr);
-    REQUIRE(droite->getToken().type == TOKEN_EGAL_EGAL);
+    REQUIRE(droite->getToken().type == TOKEN_EQUAL_EQUAL);
 }
 
 // Test while avec plusieurs instructions dans le body
@@ -576,11 +577,11 @@ TEST_CASE("Construction Tree While plusieurs instructions", "[AST][Branch]")
     auto* racine = dynamic_cast<NodeInstruction*>(tree);
     REQUIRE(racine != nullptr);
 
-    auto* nodeWhile = dynamic_cast<NodeWhile*>(racine->getChilds()[0]);
+    auto* nodeWhile = dynamic_cast<NodeWhile*>(racine->getChildren()[0]);
     REQUIRE(nodeWhile != nullptr);
 
     // Bloc while contient 2 instructions (aff + aff)
     auto* blocWhile = dynamic_cast<NodeInstruction*>(nodeWhile->getNodeBlocWhile());
     REQUIRE(blocWhile != nullptr);
-    REQUIRE(blocWhile->getChilds().size() == 2);
+    REQUIRE(blocWhile->getChildren().size() == 2);
 }

@@ -1,5 +1,5 @@
-#ifndef PARSEUR_UNREFVARIABLE_CPP
-#define PARSEUR_UNREFVARIABLE_CPP
+#ifndef PARSER_UNREFVARIABLE_CPP
+#define PARSER_UNREFVARIABLE_CPP
 
 #include "Compiler/Variable/ParserUnRefVariable.h"
 #include "Compiler/AST/AST_Genere.h"
@@ -18,18 +18,18 @@ ParserUnRefVariable::ParserUnRefVariable(ContextParser& contextParser)
 ParserUnRefVariable::~ParserUnRefVariable()
 = default;
 
-// Exemple unref variable
-INode* ParserUnRefVariable::parser(std::vector<Token>& tokens, int& index) 
+// Example: unref variable
+INode* ParserUnRefVariable::parse(std::vector<Token>& tokens, int& index) 
 {
-    consommer(tokens, index, TOKEN_UNREF, "Error : 'unref' attendu");
+    consume(tokens, index, TOKEN_UNREF, "Error: 'unref' expected");
     
-    Token nomToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Error : nom de variable attendu après 'unref'");
-    std::string nomVariable = nomToken.value;
+    Token nameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Error: variable name expected after 'unref'");
+    std::string variableName = nameToken.value;
     
-    return _contextParser.getBuilderTreeEquation()->allouer<NodeUnRefVariable>(nomVariable);
+    return _contextParser.getBuilderTreeEquation()->allocate<NodeUnRefVariable>(variableName);
 }
 
-#endif /* PARSEUR_UNREFVARIABLE_CPP */
+#endif /* PARSER_UNREFVARIABLE_CPP */
 
 
 

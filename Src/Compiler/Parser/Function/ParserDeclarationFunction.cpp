@@ -1,5 +1,5 @@
-#ifndef PARSEUR_DECLARATIONFONCTION_CPP
-#define PARSEUR_DECLARATIONFONCTION_CPP
+#ifndef PARSER_DECLARATIONFUNCTION_CPP
+#define PARSER_DECLARATIONFUNCTION_CPP
 
 #include "Compiler/Function/ParserDeclarationFunction.h"
 #include "Compiler/AST/AST_Genere.h"
@@ -20,50 +20,50 @@ ParserDeclarationFunction::ParserDeclarationFunction(ContextParser& contextParse
 
 ParserDeclarationFunction::~ParserDeclarationFunction() = default;
 
-INode* ParserDeclarationFunction::parser(std::vector<Token>& tokens, int& index)
+INode* ParserDeclarationFunction::parse(std::vector<Token>& tokens, int& index)
 {
-  consommer(tokens, index, TOKEN_FONCTION, "Error: ce n'est pas le bon token ! 'fn'");
+  consume(tokens, index, TOKEN_FUNCTION, "Error: not the correct token! 'fn'");
 
   Token tokenTypeReturn = tokens[static_cast<size_t>(index)];
-  IType* typeReturn = _contextParser.getParserType()->parser(tokens, index);
+  IType* typeReturn = _contextParser.getTypeParser()->parse(tokens, index);
   
-  Token tokenNomFunction = tokens[static_cast<size_t>(index)];
-  std::string nomFunction = tokenNomFunction.value;
-  consommer(tokens, index, TOKEN_IDENTIFIANT, "Error: identifiant invalide, ce dois être un nom de function ");
+  Token tokenFunctionName = tokens[static_cast<size_t>(index)];
+  std::string functionName = tokenFunctionName.value;
+  consume(tokens, index, TOKEN_IDENTIFIER, "Error: invalid identifier, must be a function name");
 
-  // Parser les arguments input parenthèses
-  consommer(tokens, index, TOKEN_PAREN_OUVERTE, "Error: ce n'est pas une parenthèse ouverte '('");
+  // Parse arguments inside parentheses
+  consume(tokens, index, TOKEN_PAREN_OPEN, "Error: not an opening parenthesis '('");
   
   std::vector<INode*> arguments;
-  while(index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != TOKEN_PAREN_FERMEE)
+  while(index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != TOKEN_PAREN_CLOSE)
   {
-      if(tokens[static_cast<size_t>(index)].type == TOKEN_VIRGULE)
+      if(tokens[static_cast<size_t>(index)].type == TOKEN_COMMA)
       {
           index++;
           continue;
       }
       
-      INode* child = _contextParser.getBuilderTreeInstruction()->construire(tokens, index);
+      INode* child = _contextParser.getBuilderTreeInstruction()->build(tokens, index);
       arguments.push_back(child);
   }
 
-  consommer(tokens, index, TOKEN_PAREN_FERMEE, "Error: ce n'est pas une parenthèse fermée ')'");
+  consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: not a closing parenthesis ')'");
 
-  // Parser le body dans un NodeScope strict
-  consommer(tokens, index, TOKEN_ACCOLADE_OUVERTE, "Error: ce n'est pas une accolade ouverte '{' ");
+  // Parse the body in a strict NodeScope
+  consume(tokens, index, TOKEN_BRACE_OPEN, "Error: not an opening brace '{' ");
 
-  auto* body = _contextParser.getBuilderTreeInstruction()->allouer<NodeInstruction>();
-  consommerChildBody(tokens, index, body, _contextParser.getBuilderTreeInstruction(), TOKEN_ACCOLADE_FERMEE);
+  auto* body = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>();
+  consumeChildBody(tokens, index, body, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
 
-  consommer(tokens, index, TOKEN_ACCOLADE_FERMEE, "Error: ce n'est pas une accolade fermée '}'");
+  consume(tokens, index, TOKEN_BRACE_CLOSE, "Error: not a closing brace '}'");
 
   auto* nodeFunction = 
-      _contextParser.getBuilderTreeInstruction()->allouer<NodeDeclarationFunction>(Token{}, typeReturn, nomFunction, arguments, body);
+      _contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(Token{}, typeReturn, functionName, arguments, body);
 
   return nodeFunction; 
 }
 
-#endif /* PARSEUR_DECLARATIONFONCTION_CPP */
+#endif /* PARSER_DECLARATIONFUNCTION_CPP */
 
 
 

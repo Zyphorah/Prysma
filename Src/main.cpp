@@ -102,35 +102,35 @@ auto main(int argc, char* argv[]) -> int
         std::string srcLib = (racineProject / "Src" / "Lib").string();
         std::string objLib = (buildDir / "obj" / "Lib").string();
 
-        std::unique_ptr<RegistryFunctionGlobale> registryFunctionGlobale = std::make_unique<RegistryFunctionGlobale>();
-        std::unique_ptr<RegistryFile> registryFiles = std::make_unique<RegistryFile>();
-        std::unique_ptr<ConfigurationFacadeEnvironnement> facadeConfigurationEnvironnement = std::make_unique<ConfigurationFacadeEnvironnement>(registryFunctionGlobale.get(), registryFiles.get());
+        std::unique_ptr<RegistryFunctionGlobal> registryFunctionGlobale = std::make_unique<RegistryFunctionGlobal>();
+        std::unique_ptr<FileRegistry> registryFiles = std::make_unique<FileRegistry>();
+        std::unique_ptr<ConfigurationFacadeEnvironment> facadeConfigurationEnvironnement = std::make_unique<ConfigurationFacadeEnvironment>(registryFunctionGlobale.get(), registryFiles.get());
         
         OrchestratorInclude orchestratorInclude(registryFunctionGlobale.get(), registryFiles.get(), mutex.get(), activerGraphViz);
-        orchestratorInclude.compilerProject(cheminFile);
+        orchestratorInclude.compileProject(cheminFile);
 
-        if (orchestratorInclude.aDesErrors()) {
+        if (orchestratorInclude.hasErrors()) {
             std::cerr << "Error: La compilation a échoué, arrêt du processus." << std::endl;
             return 1;
         }
 
         std::string nomExecutable = std::filesystem::path(cheminFile).stem().string();
 
-        BuilderSysteme::BuilderParams params = {
+        BuilderSystem::BuilderParams params = {
             srcLib,
             objLib,
             buildDir.string(),
-            registryFiles->obtenirTousLesFiles(),
+            registryFiles->getAllFiles(),
             nomExecutable
         };
-        BuilderSysteme builder(params);
-        builder.compilerLib();
-        builder.lierLibExecutable();
+        BuilderSystem builder(params);
+        builder.compileLib();
+        builder.linkLibExecutable();
     }
-    catch (const ErrorCompilation& error) {
+    catch (const CompilationError& error) {
         std::cerr << nomFile << ":" 
-                  << error.getLigne() << ":" 
-                  << error.getColonne() << ": Error: " 
+                  << error.getLine() << ":" 
+                  << error.getColumn() << ": Error: " 
                   << error.what() << std::endl;
         return 1;
     }

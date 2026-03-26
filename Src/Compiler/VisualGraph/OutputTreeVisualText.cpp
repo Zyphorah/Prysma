@@ -3,36 +3,36 @@
 #include <stdexcept>
 #include <string>
 
-OutputVisualGraphText::OutputVisualGraphText(const std::string& cheminOutput)
-    : _cheminOutput(cheminOutput), _compteurId(0) {}
+OutputVisualGraphText::OutputVisualGraphText(const std::string& outputPath)
+    : _outputPath(outputPath), _idCounter(0) {}
 
-auto OutputVisualGraphText::ajouterNode(const std::string& label) -> int {
-    int nodeId = obtenirNouvelId();
-    _contenuGraph << "    node" << nodeId 
-                   << " [label=\"" << label << "\", shape=ellipse, style=filled, fillcolor=lightgreen];\n";
+auto OutputVisualGraphText::addNode(const std::string& label) -> int {
+    int nodeId = getNewId();
+    _graphContent << "    node" << nodeId 
+                  << " [label=\"" << label << "\", shape=ellipse, style=filled, fillcolor=lightgreen];\n";
     return nodeId;
 }
 
-void OutputVisualGraphText::ajouterArete(int parentId, int childId) {
-    _contenuGraph << "    node" << parentId << " -> node" << childId << ";\n";
+void OutputVisualGraphText::addEdge(int parentId, int childId) {
+    _graphContent << "    node" << parentId << " -> node" << childId << ";\n";
 }
 
-void OutputVisualGraphText::generatedr() {
-    std::ofstream fichier(_cheminOutput);
+void OutputVisualGraphText::generate() {
+    std::ofstream file(_outputPath);
     
-    if (!fichier.is_open()) {
-        throw std::runtime_error("Impossible d'ouvrir le fichier: " + _cheminOutput);
+    if (!file.is_open()) {
+        throw std::runtime_error("Unable to open file: " + _outputPath);
     }
     
-    fichier << "digraph AST {\n";
-    fichier << "    rankdir=TB;\n";
-    fichier << "    node [fontname=\"Arial\"];\n";
-    fichier << _contenuGraph.str();
-    fichier << "}\n";
+    file << "digraph AST {\n";
+    file << "    rankdir=TB;\n";
+    file << "    node [fontname=\"Arial\"];\n";
+    file << _graphContent.str();
+    file << "}\n";
     
-    fichier.close();
+    file.close();
 }
 
-auto OutputVisualGraphText::obtenirNouvelId() -> int {
-    return _compteurId++;
+auto OutputVisualGraphText::getNewId() -> int {
+    return _idCounter++;
 }

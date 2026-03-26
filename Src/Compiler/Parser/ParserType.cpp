@@ -14,45 +14,45 @@
 #include <llvm/IR/Type.h>
 #include <vector>
 
-ParserType::ParserType(RegistryType* registryType, IBuilderTree* builderTree)
+TypeParser::TypeParser(RegistryType* registryType, IBuilderTree* builderTree)
     : _registryType(registryType), _builderTree(builderTree)
 {
 }
 
-auto ParserType::parser(std::vector<Token>& tokens, int& index) -> IType*
+auto TypeParser::parse(std::vector<Token>& tokens, int& index) -> IType*
 {
-    // Vérifier que le token courant est un type valide
-    if (!estType(tokens[static_cast<size_t>(index)].type)) {
-        throw ErrorCompilation("Error : type attendu", Ligne(tokens[static_cast<size_t>(index)].ligne), Colonne(tokens[static_cast<size_t>(index)].colonne));
+    // Check that the current token is a valid type
+    if (!isType(tokens[static_cast<size_t>(index)].type)) {
+        throw CompilationError("Error: expected type", Line(tokens[static_cast<size_t>(index)].line), Column(tokens[static_cast<size_t>(index)].column));
     }
 
     IType* type = nullptr;
     
-    if (tokens[static_cast<size_t>(index)].type == TOKEN_IDENTIFIANT) {
-        type = _builderTree->allouer<TypeComplex>(tokens[static_cast<size_t>(index)].value);
+    if (tokens[static_cast<size_t>(index)].type == TOKEN_IDENTIFIER) {
+        type = _builderTree->allocate<TypeComplex>(tokens[static_cast<size_t>(index)].value);
     } else {
-        llvm::Type* typeLLVM = _registryType->recuperer(tokens[static_cast<size_t>(index)].type);
-        type = _builderTree->allouer<TypeSimple>(typeLLVM);
+        llvm::Type* typeLLVM = _registryType->get(tokens[static_cast<size_t>(index)].type);
+        type = _builderTree->allocate<TypeSimple>(typeLLVM);
     }
     index++;
 
-    if (tokens[static_cast<size_t>(index)].type == TOKEN_CROCHET_OUVERT) {
+    if (tokens[static_cast<size_t>(index)].type == TOKEN_BRACKET_OPEN) {
     
-        index++; // Consommer le crochet ouvert
+        index++; // Consume the opening bracket
 
-        INode* tailleEquation = nullptr;
+        INode* sizeEquation = nullptr;
         
-        // Vérifier si la taille est spécifiée ou si les crochets sont vides
-        if (tokens[static_cast<size_t>(index)].type != TOKEN_CROCHET_FERME) {
-            tailleEquation = _builderTree->construire(tokens, index);
+        // Check if the size is specified or if the brackets are empty
+        if (tokens[static_cast<size_t>(index)].type != TOKEN_BRACKET_CLOSE) {
+            sizeEquation = _builderTree->build(tokens, index);
         }
 
-        if (index >= static_cast<int>(tokens.size()) || tokens[static_cast<size_t>(index)].type != TOKEN_CROCHET_FERME) {
-            throw ErrorCompilation("Error : ']' attendu après la taille du array", Ligne(tokens[static_cast<size_t>(index)].ligne), Colonne(tokens[static_cast<size_t>(index)].colonne));
+        if (index >= static_cast<int>(tokens.size()) || tokens[static_cast<size_t>(index)].type != TOKEN_BRACKET_CLOSE) {
+            throw CompilationError("Error: ']' expected after array size", Line(tokens[static_cast<size_t>(index)].line), Column(tokens[static_cast<size_t>(index)].column));
         }
-        index++; // Consommer le crochet fermant
+        index++; // Consume the closing bracket
 
-        type = _builderTree->allouer<TypeArray>(type, tailleEquation);
+        type = _builderTree->allocate<TypeArray>(type, sizeEquation);
     }
     return type;
 }

@@ -4,8 +4,8 @@
 
 /**
  * @interface IExpression
- * @brief Interface pour les nœuds d'une tree d'expression
- * Hérite de INode
+ * @brief Interface for nodes of an expression tree
+ * Inherits from INode
  */
 class IExpression : public INode {
 public:
@@ -18,13 +18,13 @@ public:
     auto operator=(IExpression&&) -> IExpression& = delete;
     
     /**
-     * @brief Ajoute deux expressions comme childs gauche et droit
-     * @param gauche Expression child gauche
-     * @param droite Expression child droit
-     * @return Référence au nœud courant
+     * @brief Adds two expressions as left and right children
+     * @param left Left child expression
+     * @param right Right child expression
+     * @return Reference to the current node
      */
-    virtual auto ajouterExpression(
-        INode* gauche, 
-        INode* droite
+    virtual auto addExpression(
+        INode* left, 
+        INode* right
     ) -> IExpression* = 0;
 };

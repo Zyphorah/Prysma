@@ -7,37 +7,37 @@ using namespace std;
 
 // Tests du registry de functions (globale et locale)
 
-TEST_CASE("Enregistryr et recuperer une function globale", "[RegistryFunction]") {
-    RegistryFunctionGlobale registry;
+TEST_CASE("Enregistryr et get une function globale", "[RegistryFunction]") {
+    RegistryFunctionGlobal registry;
 
-    auto symbole = make_unique<SymboleFunctionGlobale>();
-    symbole->typeReturn = nullptr;
+    auto symbole = make_unique<SymbolFunctionGlobal>();
+    symbole->returnType = nullptr;
     symbole->node = nullptr;
 
-    registry.enregistryr("maFunction", std::move(symbole));
+    registry.registerElement("maFunction", std::move(symbole));
 
-    CHECK(registry.existe("maFunction"));
+    CHECK(registry.exists("maFunction"));
 
-    const auto& recupere = registry.recuperer("maFunction");
-    auto* symboleCast = dynamic_cast<SymboleFunctionGlobale*>(recupere.get());
+    const auto& recupere = registry.get("maFunction");
+    auto* symboleCast = dynamic_cast<SymbolFunctionGlobal*>(recupere.get());
     REQUIRE(symboleCast != nullptr);
 }
 
 TEST_CASE("Recuperer une function inexistante lance une exception", "[RegistryFunction]") {
-    RegistryFunctionGlobale registry;
+    RegistryFunctionGlobal registry;
 
-    CHECK_FALSE(registry.existe("fantome"));
-    CHECK_THROWS_AS(registry.recuperer("fantome"), std::invalid_argument);
+    CHECK_FALSE(registry.exists("fantome"));
+    CHECK_THROWS_AS(registry.get("fantome"), std::invalid_argument);
 }
 
 TEST_CASE("Enregistryr plusieurs functions et verifier les cles", "[RegistryFunction]") {
-    RegistryFunctionGlobale registry;
+    RegistryFunctionGlobal registry;
 
-    registry.enregistryr("fn_a", make_unique<SymboleFunctionGlobale>());
-    registry.enregistryr("fn_b", make_unique<SymboleFunctionGlobale>());
-    registry.enregistryr("fn_c", make_unique<SymboleFunctionGlobale>());
+    registry.registerElement("fn_a", make_unique<SymbolFunctionGlobal>());
+    registry.registerElement("fn_b", make_unique<SymbolFunctionGlobal>());
+    registry.registerElement("fn_c", make_unique<SymbolFunctionGlobal>());
 
-    auto cles = registry.obtenirCles();
+    auto cles = registry.getKeys();
     CHECK(cles.size() == 3);
     CHECK(cles.count("fn_a") == 1);
     CHECK(cles.count("fn_b") == 1);
@@ -45,59 +45,59 @@ TEST_CASE("Enregistryr plusieurs functions et verifier les cles", "[RegistryFunc
 }
 
 TEST_CASE("Ecraser une function existante dans le registry", "[RegistryFunction]") {
-    RegistryFunctionLocale registry;
+    RegistryFunctionLocal registry;
 
-    auto premier = make_unique<SymboleFunctionLocale>();
+    auto premier = make_unique<SymbolFunctionLocal>();
     premier->function = nullptr;
-    registry.enregistryr("update", std::move(premier));
+    registry.registerElement("update", std::move(premier));
 
-    auto second = make_unique<SymboleFunctionLocale>();
+    auto second = make_unique<SymbolFunctionLocal>();
     second->function = reinterpret_cast<llvm::Function*>(0xDEAD);
-    registry.enregistryr("update", std::move(second));
+    registry.registerElement("update", std::move(second));
 
-    const auto& recupere = registry.recuperer("update");
-    auto* symboleCast = dynamic_cast<SymboleFunctionLocale*>(recupere.get());
+    const auto& recupere = registry.get("update");
+    auto* symboleCast = dynamic_cast<SymbolFunctionLocal*>(recupere.get());
     REQUIRE(symboleCast != nullptr);
     CHECK(symboleCast->function == reinterpret_cast<llvm::Function*>(0xDEAD));
 }
 
 TEST_CASE("Registry local functionne independamment du global", "[RegistryFunction]") {
-    RegistryFunctionGlobale registryGlobal;
-    RegistryFunctionLocale registryLocal;
+    RegistryFunctionGlobal registryGlobal;
+    RegistryFunctionLocal registryLocal;
 
-    registryGlobal.enregistryr("shared", make_unique<SymboleFunctionGlobale>());
-    registryLocal.enregistryr("shared", make_unique<SymboleFunctionLocale>());
+    registryGlobal.registerElement("shared", make_unique<SymbolFunctionGlobal>());
+    registryLocal.registerElement("shared", make_unique<SymbolFunctionLocal>());
 
-    CHECK(registryGlobal.existe("shared"));
-    CHECK(registryLocal.existe("shared"));
+    CHECK(registryGlobal.exists("shared"));
+    CHECK(registryLocal.exists("shared"));
 
-    const auto& globale = registryGlobal.recuperer("shared");
-    const auto& locale = registryLocal.recuperer("shared");
+    const auto& globale = registryGlobal.get("shared");
+    const auto& locale = registryLocal.get("shared");
 
-    CHECK(dynamic_cast<SymboleFunctionGlobale*>(globale.get()) != nullptr);
-    CHECK(dynamic_cast<SymboleFunctionLocale*>(locale.get()) != nullptr);
+    CHECK(dynamic_cast<SymbolFunctionGlobal*>(globale.get()) != nullptr);
+    CHECK(dynamic_cast<SymbolFunctionLocal*>(locale.get()) != nullptr);
 }
 
 // cas non functionnel sad test 
-TEST_CASE("RegistryFunction - Enregistryr null et recuperer ne plante pas", "[RegistryFunction][SadTest]") {
-    RegistryFunctionLocale registry;
+TEST_CASE("RegistryFunction - Enregistryr null et get ne plante pas", "[RegistryFunction][SadTest]") {
+    RegistryFunctionLocal registry;
 
-    registry.enregistryr("fn1", make_unique<SymboleFunctionLocale>());
-    registry.enregistryr("fn2", make_unique<SymboleFunctionLocale>());
+    registry.registerElement("fn1", make_unique<SymbolFunctionLocal>());
+    registry.registerElement("fn2", make_unique<SymbolFunctionLocal>());
 
-    CHECK(registry.existe("fn1"));
-    CHECK(registry.existe("fn2"));
-    CHECK(registry.obtenirCles().size() == 2);
+    CHECK(registry.exists("fn1"));
+    CHECK(registry.exists("fn2"));
+    CHECK(registry.getKeys().size() == 2);
 
-    auto fnUpdate = make_unique<SymboleFunctionLocale>();
+    auto fnUpdate = make_unique<SymbolFunctionLocal>();
     fnUpdate->function = reinterpret_cast<llvm::Function*>(0xABCD);
-    registry.enregistryr("fn1", std::move(fnUpdate));
+    registry.registerElement("fn1", std::move(fnUpdate));
 
-    const auto& recupere = registry.recuperer("fn1");
-    auto* symbole = dynamic_cast<SymboleFunctionLocale*>(recupere.get());
+    const auto& recupere = registry.get("fn1");
+    auto* symbole = dynamic_cast<SymbolFunctionLocal*>(recupere.get());
     REQUIRE(symbole != nullptr);
     CHECK(symbole->function == reinterpret_cast<llvm::Function*>(0xABCD));
 
-    CHECK(registry.obtenirCles().size() == 2);
-    CHECK_THROWS_AS(registry.recuperer("fn_inexistante"), std::invalid_argument);
+    CHECK(registry.getKeys().size() == 2);
+    CHECK_THROWS_AS(registry.get("fn_inexistante"), std::invalid_argument);
 }

@@ -7,19 +7,19 @@
 class ErrorHelper {
 public:
     template<typename T>
-    static auto verifierNonNull(T* ptr, const std::string& message) -> T* {
+    static auto verifyNotNull(T* ptr, const std::string& message) -> T* {
         if (ptr == nullptr) {
-            throw std::runtime_error("Error sémantique : " + message);
+            throw std::runtime_error("Semantic error: " + message);
         }
         return ptr;
     }
     
-    static void errorCompilation(const std::string& message);
+    static void compilationError(const std::string& message);
     
-    template<typename Registry, typename Cle>
-    static void verifierExistence(Registry& registry, const Cle& cle, const std::string& message) {
-        if (!registry.existe(cle)) {
-            throw std::runtime_error("Error sémantique : " + message);
+    template<typename Registry, typename Key>
+    static void verifyExistence(Registry& registry, const Key& key, const std::string& message) {
+        if (!registry.exists(key)) {
+            throw std::runtime_error("Semantic error: " + message);
         }
     }
 };

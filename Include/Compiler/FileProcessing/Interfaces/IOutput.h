@@ -12,7 +12,7 @@ class IOutput
         auto operator=(IOutput&&) -> IOutput& = delete;
         IOutput() = default;
         virtual ~IOutput() = default;
-        virtual void sort(const std::string& data) = 0;
+        virtual void output(const std::string& data) = 0;
 };
 
 #endif /* BB599809_0BCB_4424_9F67_25155C176A5E */

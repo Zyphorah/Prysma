@@ -9,24 +9,24 @@
 
 void FillingVisitorRegistry::visiter(NodeDeclarationFunction* nodeDeclarationFunction)
 {
-    IType* typeReturn = nodeDeclarationFunction->getTypeReturn();
-    std::string nomFunction = nodeDeclarationFunction->getNom();
+    IType* returnType = nodeDeclarationFunction->getTypeReturn();
+    std::string functionName = nodeDeclarationFunction->getNom();
     
-    if (_contextGenCode->getNomClasseCourante() != "") {
-        // contexte de la class (méthode)
-        auto symboleFunction = std::make_unique<SymboleFunctionLocale>();
-        symboleFunction->typeReturn = typeReturn;
-        symboleFunction->node = nodeDeclarationFunction;
+    if (_contextGenCode->getCurrentClassName() != "") {
+        // class context (method)
+        auto functionSymbol = std::make_unique<SymbolFunctionLocal>();
+        functionSymbol->returnType = returnType;
+        functionSymbol->node = nodeDeclarationFunction;
 
-        std::string nomClasse = _contextGenCode->getNomClasseCourante();
-        auto* classInfo = _contextGenCode->getRegistryClass()->recuperer(nomClasse).get();
-        classInfo->getRegistryFunctionLocale()->enregistryr(nomFunction, std::move(symboleFunction));
+        std::string className = _contextGenCode->getCurrentClassName();
+        auto* classInfo = _contextGenCode->getRegistryClass()->get(className).get();
+        classInfo->getRegistryFunctionLocal()->registerElement(functionName, std::move(functionSymbol));
     } else {
-        // contexte global (function globale)
-        auto symboleFunction = std::make_unique<SymboleFunctionGlobale>();
-        symboleFunction->typeReturn = typeReturn;
-        symboleFunction->node = nodeDeclarationFunction;
+        // global context (global function)
+        auto functionSymbol = std::make_unique<SymbolFunctionGlobal>();
+        functionSymbol->returnType = returnType;
+        functionSymbol->node = nodeDeclarationFunction;
 
-        _contextGenCode->getRegistryFunctionGlobale()->enregistryr(nomFunction, std::move(symboleFunction));
+        _contextGenCode->getRegistryFunctionGlobal()->registerElement(functionName, std::move(functionSymbol));
     }
 }

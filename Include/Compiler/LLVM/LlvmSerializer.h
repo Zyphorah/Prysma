@@ -17,7 +17,7 @@ class LlvmSerializer {
             
     public: 
         explicit LlvmSerializer(Module& mod) : _module(&mod) {}
-        void SauvegarderCodeLLVM(const string& path);
+        void SaveLLVMCode(const string& path);
 };
 
 #endif /* LLVMSERIALIZER_H */

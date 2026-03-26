@@ -12,51 +12,51 @@
 #include <string>
 #include <vector>
 
-ExpressionString::ExpressionString(ContextExpression& contexteExpression)
-    : _contexteExpression(contexteExpression)
+ExpressionString::ExpressionString(ContextExpression& expressionContext)
+    : _context(expressionContext)
 {}
 
 ExpressionString::~ExpressionString()
 = default;
 
-auto ExpressionString::construire(std::vector<Token>& equation) -> INode*
+auto ExpressionString::build(std::vector<Token>& equation) -> INode*
 {
-    std::vector<INode*> elementsString;
+    std::vector<INode*> stringElements;
 
     int index = 0;
-    if (equation.empty() || equation[0].type != TOKEN_GUILLEMET) {
-        throw std::runtime_error("Error: une chaine de caractere doit commencer par un guillemet");
+    if (equation.empty() || equation[0].type != TOKEN_QUOTE) {
+        throw std::runtime_error("Error: a string must start with a quote");
     }
     index++;
 
-    if (index >= static_cast<int>(equation.size()) || equation[static_cast<size_t>(index)].type != TOKEN_IDENTIFIANT) {
-        throw std::runtime_error("Error: une chaine de caractere doit etre composee de caracteres alphanumeriques");
+    if (index >= static_cast<int>(equation.size()) || equation[static_cast<size_t>(index)].type != TOKEN_IDENTIFIER) {
+        throw std::runtime_error("Error: a string must be composed of alphanumeric characters");
     }
-    Token chaine = equation[static_cast<size_t>(index)];
+    Token str = equation[static_cast<size_t>(index)];
     index++;
 
-    if (index >= static_cast<int>(equation.size()) || equation[static_cast<size_t>(index)].type != TOKEN_GUILLEMET) {
-        throw std::runtime_error("Error: une chaine de caractere doit finir par un guillemet");
+    if (index >= static_cast<int>(equation.size()) || equation[static_cast<size_t>(index)].type != TOKEN_QUOTE) {
+        throw std::runtime_error("Error: a string must end with a quote");
     }
 
-    for (size_t caractereIndex = 0; caractereIndex < chaine.value.size(); caractereIndex++) {
-        int ascii = static_cast<unsigned char>(chaine.value[caractereIndex]);
+    for (size_t charIndex = 0; charIndex < str.value.size(); charIndex++) {
+        int ascii = static_cast<unsigned char>(str.value[charIndex]);
         Token token;
         token.type = TOKEN_LIT_INT;
         token.value = std::to_string(ascii);
-        token.ligne = chaine.ligne;
-        token.colonne = chaine.colonne;
-        elementsString.push_back(_contexteExpression.getBuilderTreeEquation()->allouer<NodeLiteral>(token)); 
+        token.line = str.line;
+        token.column = str.column;
+        stringElements.push_back(_context.getBuilderTreeEquation()->allocate<NodeLiteral>(token)); 
     }
 
     Token tokenZero;
     tokenZero.type = TOKEN_LIT_INT;
     tokenZero.value = "0";
-    tokenZero.ligne = chaine.ligne;
-    tokenZero.colonne = chaine.colonne;
-    elementsString.push_back(_contexteExpression.getBuilderTreeEquation()->allouer<NodeLiteral>(tokenZero)); 
+    tokenZero.line = str.line;
+    tokenZero.column = str.column;
+    stringElements.push_back(_context.getBuilderTreeEquation()->allocate<NodeLiteral>(tokenZero)); 
 
-    return _contexteExpression.getBuilderTreeEquation()->allouer<NodeArrayInitialization>(elementsString);
+    return _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(stringElements);
 }
 
 #endif /* EXPRESSION_STRING_CPP */

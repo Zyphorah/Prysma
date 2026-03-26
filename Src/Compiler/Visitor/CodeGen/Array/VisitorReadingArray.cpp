@@ -16,83 +16,83 @@
 
 void GeneralVisitorGenCode::visiter(NodeReadingArray* nodeReadingArray)
 {
-    std::string nomArrayStr = nodeReadingArray->getNomArray().value;
-    Symbole symbole;
-    llvm::Value* adresseArray = nullptr;
+    std::string arrayNameStr = nodeReadingArray->getNomArray().value;
+    Symbol symbol;
+    llvm::Value* arrayAddress = nullptr;
 
-    if (nomArrayStr.find('.') != std::string::npos) {
-        size_t pos = nomArrayStr.find('.');
-        std::string nomObject = nomArrayStr.substr(0, pos);
-        std::string nomAttribute = nomArrayStr.substr(pos + 1);
+    if (arrayNameStr.find('.') != std::string::npos) {
+        size_t pos = arrayNameStr.find('.');
+        std::string objectName = arrayNameStr.substr(0, pos);
+        std::string attributeName = arrayNameStr.substr(pos + 1);
 
-        LoadurVariable loadur(_contextGenCode);
-        Symbole objectSymbole = loadur.loadr(nomObject);
-        llvm::Value* object = objectSymbole.getAdresse();
+        VariableLoader loader(_contextGenCode);
+        Symbol objectSymbol = loader.load(objectName);
+        llvm::Value* object = objectSymbol.getAddress();
 
-        std::string nomClasse = obtenirNomClasseDepuisSymbole(objectSymbole);
-        auto* classInfo = _contextGenCode->getRegistryClass()->recuperer(nomClasse).get();
-        auto iterator = classInfo->getMemberIndices().find(nomAttribute);
+        std::string className = getClassNameFromSymbol(objectSymbol);
+        auto* classInfo = _contextGenCode->getRegistryClass()->get(className).get();
+        auto iterator = classInfo->getMemberIndices().find(attributeName);
         unsigned int indexObj = iterator->second;
 
-        Token tokenAttribute; tokenAttribute.value = nomAttribute; tokenAttribute.type = TOKEN_IDENTIFIANT;
-        symbole = classInfo->getRegistryVariable()->recupererVariables(tokenAttribute);
+        Token tokenAttribute; tokenAttribute.value = attributeName; tokenAttribute.type = TOKEN_IDENTIFIER;
+        symbol = classInfo->getRegistryVariable()->getVariable(tokenAttribute);
         
-        llvm::Type* typeDuStruct = classInfo->getStructType();
-        adresseArray = _contextGenCode->getBackend()->getBuilder().CreateStructGEP(typeDuStruct, object, indexObj, nomObject + "_" + nomAttribute + "_ptr");
+        llvm::Type* structType = classInfo->getStructType();
+        arrayAddress = _contextGenCode->getBackend()->getBuilder().CreateStructGEP(structType, object, indexObj, objectName + "_" + attributeName + "_ptr");
     } else {
-        AdresseurVariable adresseur(_contextGenCode);
-        symbole = adresseur.recupererAdresse(nomArrayStr);
-        adresseArray = symbole.getAdresse();
+        VariableAddressor addressor(_contextGenCode);
+        symbol = addressor.getAddress(arrayNameStr);
+        arrayAddress = symbol.getAddress();
     }
 
-    llvm::Type* typeArray = nullptr;
-    if (symbole.getType() != nullptr) {
-        typeArray = symbole.getType()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
+    llvm::Type* arrayType = nullptr;
+    if (symbol.getType() != nullptr) {
+        arrayType = symbol.getType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
     } else {
-        auto* allocaInst = llvm::dyn_cast<llvm::AllocaInst>(adresseArray);
-        allocaInst = ErrorHelper::verifierNonNull(allocaInst, "L'adresse du array n'est pas une instruction d'allocation");
-        typeArray = allocaInst->getAllocatedType();
+        auto* allocaInst = llvm::dyn_cast<llvm::AllocaInst>(arrayAddress);
+        allocaInst = ErrorHelper::verifyNotNull(allocaInst, "The array address is not an allocation instruction");
+        arrayType = allocaInst->getAllocatedType();
     }
     
-    // Calculer l'index à partir de l'équation 
+    // Compute the index from the equation 
     nodeReadingArray->getIndexEquation()->accept(this);
-    llvm::Value* indexValue = _contextGenCode->getValeurTemporaire().getAdresse();
+    llvm::Value* indexValue = _contextGenCode->getTemporaryValue().getAddress();
     
-    llvm::Value* adresseElement = nullptr;
-    llvm::Type* typeElement = nullptr;
+    llvm::Value* elementAddress = nullptr;
+    llvm::Type* elementType = nullptr;
 
-    if (typeArray->isArrayTy()) {
-        // calculer le décalage avec GEP 
-        adresseElement = _contextGenCode->getBackend()->getBuilder().CreateGEP(typeArray, adresseArray, 
+    if (arrayType->isArrayTy()) {
+        // compute the offset with GEP 
+        elementAddress = _contextGenCode->getBackend()->getBuilder().CreateGEP(arrayType, arrayAddress, 
             { 
                 _contextGenCode->getBackend()->getBuilder().getInt32(0), 
                 indexValue 
             }, nodeReadingArray->getNomArray().value);
-        typeElement = typeArray->getArrayElementType();
+        elementType = arrayType->getArrayElementType();
     } else {
-        // C'est un pointeur vers un array (référence), on doit loadr le pointeur
-        llvm::Value* loadedPtr = _contextGenCode->getBackend()->getBuilder().CreateLoad(typeArray, adresseArray);
+        // It's a pointer to an array (reference), must load the pointer
+        llvm::Value* loadedPtr = _contextGenCode->getBackend()->getBuilder().CreateLoad(arrayType, arrayAddress);
         
-        IType* astType = symbole.getType();
-        auto* typeArrayDecla = prysma::dyn_cast<TypeArray>(astType);
-        if (typeArrayDecla != nullptr) {
-            typeElement = typeArrayDecla->getTypeChild()->generatedrTypeLLVM(_contextGenCode->getBackend()->getContext());
+        IType* astType = symbol.getType();
+        auto* declaredArrayType = prysma::dyn_cast<TypeArray>(astType);
+        if (declaredArrayType != nullptr) {
+            elementType = declaredArrayType->getChildType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
         } else {
-            typeElement = symbole.getTypePointeElement();
+            elementType = symbol.getPointedElementType();
         }
         
-        adresseElement = _contextGenCode->getBackend()->getBuilder().CreateGEP(
-            typeElement, 
+        elementAddress = _contextGenCode->getBackend()->getBuilder().CreateGEP(
+            elementType, 
             loadedPtr, 
             indexValue,
             nodeReadingArray->getNomArray().value
         );
     }
         
-    // Lire la valeur de l'adresse de l'élément
-    llvm::Value* valeurElement = _contextGenCode->getBackend()->getBuilder().CreateLoad(typeElement, adresseElement, nodeReadingArray->getNomArray().value);
+    // Load the value from the element address
+    llvm::Value* elementValue = _contextGenCode->getBackend()->getBuilder().CreateLoad(elementType, elementAddress, nodeReadingArray->getNomArray().value);
 
-    _contextGenCode->modifierValeurTemporaire(Symbole(valeurElement, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
-    _contextGenCode->modifierValeurTemporaire(Symbole(_contextGenCode->getValeurTemporaire().getAdresse(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(typeElement), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
-} 
+    _contextGenCode->setTemporaryValue(Symbol(elementValue, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
+    _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(elementType), _contextGenCode->getTemporaryValue().getPointedElementType()));
+}
 

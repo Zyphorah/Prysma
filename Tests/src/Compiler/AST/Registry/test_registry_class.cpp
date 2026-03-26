@@ -10,7 +10,7 @@ using namespace std;
 
 TEST_CASE("Recuperation d'une classe inexistante lance exception", "[RegistryClass]") {
     RegistryClass registry;
-    CHECK_THROWS_AS(registry.recuperer("ClasseFantome"), std::invalid_argument);
+    CHECK_THROWS_AS(registry.get("ClasseFantome"), std::invalid_argument);
 }
 
 TEST_CASE("Enregistryment et recuperation d'une classe valide", "[RegistryClass]") {
@@ -19,11 +19,11 @@ TEST_CASE("Enregistryment et recuperation d'une classe valide", "[RegistryClass]
     
     // On met quelques proprietes dans 'maClasse' pour s'assurer que c'est la meme
     maClasse->setStructType(reinterpret_cast<llvm::StructType*>(0x800));
-    registry.enregistryr("MaClasseTest", std::move(maClasse));
+    registry.registerElement("MaClasseTest", std::move(maClasse));
 
-    CHECK(registry.existe("MaClasseTest") == true);
-    auto& recupererClasse = registry.recuperer("MaClasseTest");
-    CHECK(recupererClasse->getStructType() == reinterpret_cast<llvm::StructType*>(0x800));
+    CHECK(registry.exists("MaClasseTest") == true);
+    auto& getClasse = registry.get("MaClasseTest");
+    CHECK(getClasse->getStructType() == reinterpret_cast<llvm::StructType*>(0x800));
 }
 
 TEST_CASE("Ecrasement d'une classe existante avec la meme cle", "[RegistryClass]") {
@@ -31,24 +31,24 @@ TEST_CASE("Ecrasement d'une classe existante avec la meme cle", "[RegistryClass]
     
     auto classe1 = make_unique<Class>();
     classe1->setStructType(reinterpret_cast<llvm::StructType*>(0x111));
-    registry.enregistryr("ClasseDoublon", std::move(classe1));
+    registry.registerElement("ClasseDoublon", std::move(classe1));
     
     auto classe2 = make_unique<Class>();
     classe2->setStructType(reinterpret_cast<llvm::StructType*>(0x222));
-    registry.enregistryr("ClasseDoublon", std::move(classe2));
+    registry.registerElement("ClasseDoublon", std::move(classe2));
 
-    auto& recuperation = registry.recuperer("ClasseDoublon");
+    auto& recuperation = registry.get("ClasseDoublon");
     CHECK(recuperation->getStructType() == reinterpret_cast<llvm::StructType*>(0x222));
 }
 
 TEST_CASE("Generer un message d'error personnalise avec callback", "[RegistryClass]") {
     RegistryClass registry;
-    registry.setMessageError([](const std::string& cle) {
+    registry.setErrorMessage([](const std::string& cle) {
         return "Error specifique : impossible de trouver " + cle;
     });
 
     try {
-        registry.recuperer("Introuvable");
+        registry.get("Introuvable");
         FAIL("Devrait lancer une exception");
     } catch (const std::invalid_argument& e) {
         CHECK(string(e.what()) == "Error specifique : impossible de trouver Introuvable");
@@ -58,11 +58,11 @@ TEST_CASE("Generer un message d'error personnalise avec callback", "[RegistryCla
 TEST_CASE("Recuperation correcte des cles du registry", "[RegistryClass]") {
     RegistryClass registry;
     
-    registry.enregistryr("ClasseA", make_unique<Class>());
-    registry.enregistryr("ClasseB", make_unique<Class>());
-    registry.enregistryr("ClasseC", make_unique<Class>());
+    registry.registerElement("ClasseA", make_unique<Class>());
+    registry.registerElement("ClasseB", make_unique<Class>());
+    registry.registerElement("ClasseC", make_unique<Class>());
 
-    auto cles = registry.obtenirCles();
+    auto cles = registry.getKeys();
     CHECK(cles.size() == 3);
     CHECK(cles.count("ClasseA") == 1);
     CHECK(cles.count("ClasseB") == 1);

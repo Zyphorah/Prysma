@@ -20,8 +20,8 @@ public:
 
 protected:
     
-    [[nodiscard]] auto generatedrMessageError(const TokenType& cle) const -> std::string override {
-        return RegistryGeneric::generatedrMessageError(cle);
+    [[nodiscard]] auto generateErrorMessage(const TokenType& key) const -> std::string override {
+        return RegistryGeneric::generateErrorMessage(key);
     }
 };
 

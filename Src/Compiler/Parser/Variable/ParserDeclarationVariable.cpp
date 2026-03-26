@@ -1,5 +1,5 @@
-#ifndef PARSEUR_DECLARATIONVARIABLE_CPP
-#define PARSEUR_DECLARATIONVARIABLE_CPP
+#ifndef PARSER_DECLARATIONVARIABLE_CPP
+#define PARSER_DECLARATIONVARIABLE_CPP
 
 #include "Compiler/Variable/ParserDeclarationVariable.h"
 #include "Compiler/AST/AST_Genere.h"
@@ -19,30 +19,30 @@ ParserDeclarationVariable::ParserDeclarationVariable(ContextParser& contextParse
 ParserDeclarationVariable::~ParserDeclarationVariable()
 = default;
 
-auto ParserDeclarationVariable::parser(std::vector<Token>& tokens, int& index) -> INode*
+auto ParserDeclarationVariable::parse(std::vector<Token>& tokens, int& index) -> INode*
 {
-    consommer(tokens, index, TOKEN_DEC, "Error : type attendu 'dec");
+    consume(tokens, index, TOKEN_DECL, "Error: expected type 'dec'");
     
-    // Utiliser le ParserType pour analyser le type (simple ou array)
-    IType* type = _contextParser.getParserType()->parser(tokens, index);
+    // Use ParserType to analyze the type (simple or array)
+    IType* type = _contextParser.getTypeParser()->parse(tokens, index);
     
-    Token nomToken = consommer(tokens, index, TOKEN_IDENTIFIANT, "Error : nom de variable attendu");
-    std::string nomVariable = nomToken.value;
+    Token nameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Error: variable name expected");
+    std::string variableName = nameToken.value;
     
-    consommer(tokens, index, TOKEN_EGAL, "Error : '=' attendu après le nom de variable");
+    consume(tokens, index, TOKEN_EQUAL, "Error: '=' expected after variable name");
     
-    INode* expression = _contextParser.getBuilderTreeEquation()->construire(tokens, index);
+    INode* expression = _contextParser.getBuilderTreeEquation()->build(tokens, index);
     
-    consommer(tokens, index, TOKEN_POINT_VIRGULE, "Error : ';' attendu à la fin de la déclaration");
+    consume(tokens, index, TOKEN_SEMICOLON, "Error: ';' expected at the end of the declaration");
 
-    return _contextParser.getBuilderTreeEquation()->allouer<NodeDeclarationVariable>(
+    return _contextParser.getBuilderTreeEquation()->allocate<NodeDeclarationVariable>(
         Token{},
-        nomVariable,
+        variableName,
         type,
         expression
     );
 }
-#endif /* PARSEUR_DECLARATIONVARIABLE_CPP */
+#endif /* PARSER_DECLARATIONVARIABLE_CPP */
 
 
 

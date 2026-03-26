@@ -1,5 +1,5 @@
-#ifndef EXPRESSION_LITTERAL_CPP
-#define EXPRESSION_LITTERAL_CPP
+#ifndef EXPRESSION_LITERAL_CPP
+#define EXPRESSION_LITERAL_CPP
 
 #include "Compiler/Math/ExpressionLiteral.h"
 #include "Compiler/AST/AST_Genere.h"
@@ -8,16 +8,16 @@
 #include "Compiler/Lexer/Lexer.h"
 #include <vector>
 
-ExpressionLiteral::ExpressionLiteral(ContextExpression& contexteExpression)
-    : _contexteExpression(contexteExpression)
+ExpressionLiteral::ExpressionLiteral(ContextExpression& expressionContext)
+    : _context(expressionContext)
 {}
 
 ExpressionLiteral::~ExpressionLiteral()
 = default;
 
-auto ExpressionLiteral::construire(std::vector<Token>& equation) -> INode*
+auto ExpressionLiteral::build(std::vector<Token>& equation) -> INode*
 {
-    return _contexteExpression.getBuilderTreeEquation()->allouer<NodeLiteral>(equation[0]);
+    return _context.getBuilderTreeEquation()->allocate<NodeLiteral>(equation[0]);
 }
 
-#endif /* EXPRESSION_LITTERAL_CPP */
+#endif /* EXPRESSION_LITERAL_CPP */

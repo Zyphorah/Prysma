@@ -11,8 +11,10 @@
 class ParserBase
 {
 protected:
-    static auto consommer(std::vector<Token>& tokens, int& index, TokenType typeAttendu, const std::string& messageError) -> Token;
-    static void consommerChildBody(std::vector<Token>& tokens, int& index, IInstruction* parent, IBuilderTree* builderTree,TokenType fin);
+    // Consumes a token of the expected type, throws if not found
+    static auto consume(std::vector<Token>& tokens, int& index, TokenType expectedType, const std::string& errorMessage) -> Token;
+    // Consumes the child body until the end token
+    static void consumeChildBody(std::vector<Token>& tokens, int& index, IInstruction* parent, IBuilderTree* builderTree, TokenType end);
 };
 
 #endif /* DD335087_6EDE_4036_872C_8BD586E26251 */

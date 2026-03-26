@@ -5,36 +5,36 @@
 #include "Compiler/Lexer/TokenType.h"
 #include <vector>
 
-ManagerOperateur::ManagerOperateur(TokenType tokenType)
-    : _suivant(nullptr), _managerParenthese(nullptr), _tokenType(tokenType) {}
+OperatorManager::OperatorManager(TokenType tokenType)
+    : _next(nullptr), _parenthesisManager(nullptr), _tokenType(tokenType) {}
 
-void ManagerOperateur::definirManagerParenthese(IManagerParenthese* managerParenthese) {
-    _managerParenthese = managerParenthese;
+void OperatorManager::setParenthesisManager(IManagerParenthesis* parenthesisManager) {
+    _parenthesisManager = parenthesisManager;
 }
 
-void ManagerOperateur::definirSuivant(IManagerOperateur* suivant) {
-    _suivant = suivant;
+void OperatorManager::setNext(IOperatorManager* next) {
+    _next = next;
 }
 
-auto ManagerOperateur::chercherOperateur(const std::vector<Token>& equation) const -> int {
-    if (_managerParenthese == nullptr) {
+auto OperatorManager::findOperator(const std::vector<Token>& equation) const -> int {
+    if (_parenthesisManager == nullptr) {
         return -1;
     }
-    Token operateur;
-    operateur.type = _tokenType;
-    operateur.value = "";
-    return _managerParenthese->trouverDernierAuNiveauZero(equation, operateur);
+    Token op;
+    op.type = _tokenType;
+    op.value = "";
+    return _parenthesisManager->findLastAtLevelZero(equation, op);
 }
 
-auto ManagerOperateur::traiter(const std::vector<Token>& equation) -> int {
-    int indice = chercherOperateur(equation);
+auto OperatorManager::handle(const std::vector<Token>& equation) -> int {
+    int index = findOperator(equation);
     
-    if (indice != -1) {
-        return indice;
+    if (index != -1) {
+        return index;
     }
     
-    if (_suivant != nullptr) {
-        return _suivant->traiter(equation);
+    if (_next != nullptr) {
+        return _next->handle(equation);
     }
     
     return -1;

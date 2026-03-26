@@ -10,66 +10,66 @@
 class IType;
 class NodeDeclarationFunction;
 
-class ISymboleRegistryFunction
+class IFunctionSymbolRegistry
 {
     public:
-        enum class SymboleType { Globale, Locale };
-        ISymboleRegistryFunction() = default;
-        ISymboleRegistryFunction(const ISymboleRegistryFunction&) = delete;
-        auto operator=(const ISymboleRegistryFunction&) -> ISymboleRegistryFunction& = delete;
-        ISymboleRegistryFunction(ISymboleRegistryFunction&&) = delete;
-        auto operator=(ISymboleRegistryFunction&&) -> ISymboleRegistryFunction& = delete;
-        virtual ~ISymboleRegistryFunction() = default;
-        [[nodiscard]] virtual SymboleType getType() const = 0;
+        enum class SymbolType { Global, Local };
+        IFunctionSymbolRegistry() = default;
+        IFunctionSymbolRegistry(const IFunctionSymbolRegistry&) = delete;
+        auto operator=(const IFunctionSymbolRegistry&) -> IFunctionSymbolRegistry& = delete;
+        IFunctionSymbolRegistry(IFunctionSymbolRegistry&&) = delete;
+        auto operator=(IFunctionSymbolRegistry&&) -> IFunctionSymbolRegistry& = delete;
+        virtual ~IFunctionSymbolRegistry() = default;
+        [[nodiscard]] virtual SymbolType getType() const = 0;
 };
 
-// Fait office de struct pour stocker les functions globales donc 
-// Je met en public 
-// Pas de llvm::Function* ici, thread safe pour le registry global
-class SymboleFunctionGlobale : public ISymboleRegistryFunction {
+// Acts as a struct to store global functions
+// Public members
+// No llvm::Function* here, thread safe for the global registry
+class SymbolFunctionGlobal : public IFunctionSymbolRegistry {
 public: 
-    IType* typeReturn = nullptr;
+    IType* returnType = nullptr;
     NodeDeclarationFunction* node = nullptr;
     
-    [[nodiscard]] auto getType() const -> SymboleType override { return SymboleType::Globale; }
-    [[nodiscard]] static auto classof(const ISymboleRegistryFunction* s) -> bool { 
-        return s->getType() == SymboleType::Globale; 
+    [[nodiscard]] auto getType() const -> SymbolType override { return SymbolType::Global; }
+    [[nodiscard]] static auto classof(const IFunctionSymbolRegistry* s) -> bool { 
+        return s->getType() == SymbolType::Global; 
     }
 };
 
-// Registry local avec llvm::Function* pour la génération de code dans un thread
-class SymboleFunctionLocale : public ISymboleRegistryFunction {
+// Local registry with llvm::Function* for code generation in a thread
+class SymbolFunctionLocal : public IFunctionSymbolRegistry {
 public:
     llvm::Function* function = nullptr;
-    IType* typeReturn = nullptr;
+    IType* returnType = nullptr;
     NodeDeclarationFunction* node = nullptr;
 
-    [[nodiscard]] auto getType() const -> SymboleType override { return SymboleType::Locale; }
-    [[nodiscard]] static auto classof(const ISymboleRegistryFunction* s) -> bool { 
-        return s->getType() == SymboleType::Locale; 
+    [[nodiscard]] auto getType() const -> SymbolType override { return SymbolType::Local; }
+    [[nodiscard]] static auto classof(const IFunctionSymbolRegistry* s) -> bool { 
+        return s->getType() == SymbolType::Local; 
     }
 };
 
-class RegistryFunctionGlobale : public RegistryGeneric<std::string, std::unique_ptr<ISymboleRegistryFunction>, std::mutex>
+class RegistryFunctionGlobal : public RegistryGeneric<std::string, std::unique_ptr<IFunctionSymbolRegistry>, std::mutex>
 {
 public:
-    RegistryFunctionGlobale() = default;
-    RegistryFunctionGlobale(const RegistryFunctionGlobale&) = delete;
-    auto operator=(const RegistryFunctionGlobale&) -> RegistryFunctionGlobale& = delete;
-    RegistryFunctionGlobale(RegistryFunctionGlobale&&) = delete;
-    auto operator=(RegistryFunctionGlobale&&) -> RegistryFunctionGlobale& = delete;
-    ~RegistryFunctionGlobale() override = default;
+    RegistryFunctionGlobal() = default;
+    RegistryFunctionGlobal(const RegistryFunctionGlobal&) = delete;
+    auto operator=(const RegistryFunctionGlobal&) -> RegistryFunctionGlobal& = delete;
+    RegistryFunctionGlobal(RegistryFunctionGlobal&&) = delete;
+    auto operator=(RegistryFunctionGlobal&&) -> RegistryFunctionGlobal& = delete;
+    ~RegistryFunctionGlobal() override = default;
 };
 
-class RegistryFunctionLocale : public RegistryGeneric<std::string, std::unique_ptr<ISymboleRegistryFunction>>
+class RegistryFunctionLocal : public RegistryGeneric<std::string, std::unique_ptr<IFunctionSymbolRegistry>>
 {
 public:
-    RegistryFunctionLocale() = default;
-    RegistryFunctionLocale(const RegistryFunctionLocale&) = delete;
-    auto operator=(const RegistryFunctionLocale&) -> RegistryFunctionLocale& = delete;
-    RegistryFunctionLocale(RegistryFunctionLocale&&) = delete;
-    auto operator=(RegistryFunctionLocale&&) -> RegistryFunctionLocale& = delete;
-    ~RegistryFunctionLocale() override = default;
+    RegistryFunctionLocal() = default;
+    RegistryFunctionLocal(const RegistryFunctionLocal&) = delete;
+    auto operator=(const RegistryFunctionLocal&) -> RegistryFunctionLocal& = delete;
+    RegistryFunctionLocal(RegistryFunctionLocal&&) = delete;
+    auto operator=(RegistryFunctionLocal&&) -> RegistryFunctionLocal& = delete;
+    ~RegistryFunctionLocal() override = default;
 };
 
 #endif /* F2141F07_2C85_4ADB_9BC9_A909EBD34394 */

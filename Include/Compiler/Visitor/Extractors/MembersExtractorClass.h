@@ -9,16 +9,17 @@ class NodeDeclarationFunction;
 class NodeDeclarationVariable;
 class NodeClass;
 
+// Extracts members (methods and variables) from a class node
 class MembersExtractorClass : public VisitorBaseGenerale {
 private:
-    std::vector<NodeDeclarationFunction*> methodes;
+    std::vector<NodeDeclarationFunction*> methods;
     std::vector<NodeDeclarationVariable*> variables;
-    std::string nomClass;
+    std::string className;
 
 public:
-    [[nodiscard]] auto getMethodes() const -> const std::vector<NodeDeclarationFunction*>& { return methodes; }
+    [[nodiscard]] auto getMethods() const -> const std::vector<NodeDeclarationFunction*>& { return methods; }
     [[nodiscard]] auto getVariables() const -> const std::vector<NodeDeclarationVariable*>& { return variables; }
-    [[nodiscard]] auto getNomClass() const -> const std::string& { return nomClass; }
+    [[nodiscard]] auto getClassName() const -> const std::string& { return className; }
     using VisitorBaseGenerale::visiter;
     void visiter(NodeDeclarationFunction* node) override;
     void visiter(NodeDeclarationVariable* node) override;

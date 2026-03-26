@@ -4,7 +4,7 @@
 void GeneralVisitorGenCode::visiter(NodeInstruction* instruction)
 {
     if (instruction != nullptr) {
-        for (const auto& child : instruction->getChilds()) {
+        for (const auto& child : instruction->getChildren()) {
             if (child != nullptr) {
                 child->accept(this);
             }

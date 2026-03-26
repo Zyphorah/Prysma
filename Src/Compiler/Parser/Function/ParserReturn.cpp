@@ -1,5 +1,5 @@
-#ifndef PARSEUR_RETOUR_CPP
-#define PARSEUR_RETOUR_CPP
+#ifndef PARSER_RETURN_CPP
+#define PARSER_RETURN_CPP
 
 #include "Compiler/Function/ParserReturn.h"
 #include "Compiler/AST/AST_Genere.h"
@@ -17,25 +17,25 @@ ParserReturn::ParserReturn(ContextParser& contextParser)
 
 ParserReturn::~ParserReturn() = default;
 
-auto ParserReturn::parser(std::vector<Token>& tokens, int& index) -> INode*
+auto ParserReturn::parse(std::vector<Token>& tokens, int& index) -> INode*
 {
-  consommer(tokens, index, TOKEN_RETOUR, "Error: ce n'est pas le bon token ! 'return'");
+  consume(tokens, index, TOKEN_RETURN, "Error: not the correct token! 'return'");
 
-  INode* valeurReturn = nullptr;
+  INode* returnValue = nullptr;
 
-  if (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != TOKEN_POINT_VIRGULE) {
-      valeurReturn = _contextParser.getBuilderTreeEquation()->construire(tokens, index);
+  if (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != TOKEN_SEMICOLON) {
+      returnValue = _contextParser.getBuilderTreeEquation()->build(tokens, index);
   } else {
-      consommer(tokens, index, TOKEN_POINT_VIRGULE, "Error: point-virgule attendu après return");
-      return _contextParser.getBuilderTreeEquation()->allouer<NodeReturn>(valeurReturn);
+      consume(tokens, index, TOKEN_SEMICOLON, "Error: semicolon expected after return");
+      return _contextParser.getBuilderTreeEquation()->allocate<NodeReturn>(returnValue);
   }
   
-  consommer(tokens, index, TOKEN_POINT_VIRGULE, "Error : ';' attendu à la fin du return");
+  consume(tokens, index, TOKEN_SEMICOLON, "Error: ';' expected at the end of return");
 
-  return _contextParser.getBuilderTreeEquation()->allouer<NodeReturn>(valeurReturn);
+  return _contextParser.getBuilderTreeEquation()->allocate<NodeReturn>(returnValue);
 }
 
-#endif /* PARSEUR_RETOUR_CPP */
+#endif /* PARSER_RETURN_CPP */
 
 
 

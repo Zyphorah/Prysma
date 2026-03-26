@@ -17,90 +17,89 @@
 
 void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
 {
-    // Récupérer le nom de l'object (ex: "chien")
-    std::string nomObject = nodeCallObject->getNomObject().value;
+    // Retrieve the object name (e.g., "dog")
+    std::string objectName = nodeCallObject->getNomObject().value;
 
-    // Récupérer le nom de la méthode callée (ex: "aboyer")
-    std::string nomMethode = nodeCallObject->getNomMethode().value;
+    // Retrieve the called method name (e.g., "bark")
+    std::string methodName = nodeCallObject->getNomMethode().value;
 
-    LoadurVariable loadur(_contextGenCode);
+    VariableLoader loader(_contextGenCode);
     
-    // Loadr la variable object (qui est un pointeur)
-    Symbole objectSymbole = loadur.loadr(nomObject);
-    llvm::Value* object = objectSymbole.getAdresse();
+    // Load the object variable (which is a pointer)
+    Symbol objectSymbol = loader.load(objectName);
+    llvm::Value* object = objectSymbol.getAddress();
 
-    std::string nomClasse = obtenirNomClasseDepuisSymbole(objectSymbole);
+    std::string className = getClassNameFromSymbol(objectSymbol);
 
-    if (nomClasse.empty()) {
-        ErrorHelper::errorCompilation("Classe de l'object '" + nomObject + "' indéterminée");
+    if (className.empty()) {
+        ErrorHelper::compilationError("Class of object '" + objectName + "' undetermined");
     }
-    // On crée le chemin vers l'object 
-    auto* typeStructClass = llvm::dyn_cast<llvm::StructType>(objectSymbole.getTypePointeElement());
-    llvm::Value* adresseVptr = _contextGenCode->getBackend()->getBuilder().CreateStructGEP(typeStructClass, object, 0, "adresse_vptr");
+    // Create the path to the object
+    auto* structClassType = llvm::dyn_cast<llvm::StructType>(objectSymbol.getPointedElementType());
+    llvm::Value* vptrAddress = _contextGenCode->getBackend()->getBuilder().CreateStructGEP(structClassType, object, 0, "vptr_address");
 
-    
-    // Récupérer la vtable de la classe qui contient les méthodes de l'object (ex: "Chien")
-    // On dois construire la vtable de façon dynamique à partir de l'adresse du vptr dans l'object, car en cas d'héritage la vtable peut être différente 
-    // de celle de la classe static de l'object 
-    llvm::Value* vtable = _contextGenCode->getBackend()->getBuilder().CreateLoad(_contextGenCode->getBackend()->getBuilder().getPtrTy(), adresseVptr, "vptr");
-    // On récupère l'index de la méthode dans la vtable pour faire le call indirect
-    int indexMethode = _contextGenCode->getRegistryClass()->recuperer(nomClasse)->getIndexMethode(nomMethode);
+    // Retrieve the class vtable containing the object's methods (e.g., "Dog")
+    // We must build the vtable dynamically from the vptr address in the object, because in case of inheritance the vtable may be different
+    // from the static class vtable of the object
+    llvm::Value* vtable = _contextGenCode->getBackend()->getBuilder().CreateLoad(_contextGenCode->getBackend()->getBuilder().getPtrTy(), vptrAddress, "vptr");
+    // Get the method index in the vtable for indirect call
+    int methodIndex = _contextGenCode->getRegistryClass()->get(className)->getMethodIndex(methodName);
 
-    auto* classInfo = _contextGenCode->getRegistryClass()->recuperer(nomClasse).get();
-    classInfo = ErrorHelper::verifierNonNull(classInfo, "Classe '" + nomClasse + "' introuvable");
+    auto* classInfo = _contextGenCode->getRegistryClass()->get(className).get();
+    classInfo = ErrorHelper::verifyNotNull(classInfo, "Class '" + className + "' not found");
 
-    ErrorHelper::verifierExistence(*classInfo->getRegistryFunctionLocale(), nomMethode,
-        "Méthode '" + nomMethode + "' inexistante dans '" + nomClasse + "'");
+    ErrorHelper::verifyExistence(*classInfo->getRegistryFunctionLocal(), methodName,
+        "Method '" + methodName + "' does not exist in '" + className + "'");
 
     auto& builder = _contextGenCode->getBackend()->getBuilder();
     
     VTableNavigator navigator(&builder);
     
-    llvm::Value* methodePointer = navigator.recupererPointerMethode(vtable, classInfo->getVTable()->getValueType(), indexMethode);
+    llvm::Value* methodPointer = navigator.getMethodPointer(vtable, classInfo->getVTable()->getValueType(), methodIndex);
     
-    // Le premier argument à passer à la méthode est le pointeur "this" (qui est l'object lui-même)
+    // The first argument to pass to the method is the "this" pointer (the object itself)
     std::vector<llvm::Value*> args;
     args.push_back(object);
 
-    const auto& symbolePtr = classInfo->getRegistryFunctionLocale()->recuperer(nomMethode);
-    if (!prysma::isa<SymboleFunctionLocale>(symbolePtr.get())) {
-        throw std::runtime_error("Error : SymboleFunctionLocale attendu");
+    const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(methodName);
+    if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
+        throw std::runtime_error("Error: SymbolFunctionLocal expected");
     }
-    const auto* symboleFunction = prysma::cast<const SymboleFunctionLocale>(symbolePtr.get());
-    llvm::FunctionType* typeFunction = symboleFunction->function->getFunctionType();
+    const auto* functionSymbol = prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
+    llvm::FunctionType* functionType = functionSymbol->function->getFunctionType();
 
-    unsigned int indexParam = 1; // 0 est "this"
-    for (INode* argumentChild : nodeCallObject->getChilds()) 
+    unsigned int paramIndex = 1; // 0 is "this"
+    for (INode* argumentChild : nodeCallObject->getChildren()) 
     {
         argumentChild->accept(this);
-        llvm::Value* valeurArgument = _contextGenCode->getValeurTemporaire().getAdresse();
+        llvm::Value* argumentValue = _contextGenCode->getTemporaryValue().getAddress();
         
-        valeurArgument = ErrorHelper::verifierNonNull(valeurArgument, "L'argument d'call d'object n'a pas généré de valeur");
+        argumentValue = ErrorHelper::verifyNotNull(argumentValue, "Object call argument did not generate a value");
 
-        llvm::Value* valeurFinale = valeurArgument;
-        if (indexParam < typeFunction->getNumParams()) {
-            llvm::Type* typeAttendu = typeFunction->getParamType(indexParam);
-            valeurFinale = _contextGenCode->getBackend()->creerAutoCast(valeurArgument, typeAttendu);
+        llvm::Value* finalValue = argumentValue;
+        if (paramIndex < functionType->getNumParams()) {
+            llvm::Type* expectedType = functionType->getParamType(paramIndex);
+            finalValue = _contextGenCode->getBackend()->createAutoCast(argumentValue, expectedType);
         }
-        args.push_back(valeurFinale);
-        indexParam++;
+        args.push_back(finalValue);
+        paramIndex++;
     }
 
-    // Si la méthode est le builder alors il faut caller la méthode d'initialization static 
-    if(nomMethode == nomClasse)
+    // If the method is the builder then call the static initialization method
+    if(methodName == className)
     {
-        builder.CreateCall(symboleFunction->function, args);
+        builder.CreateCall(functionSymbol->function, args);
         return;
     }
 
-    // On utilise la vtable pour faire un call indirect à la méthode
-    if (symboleFunction->function->getReturnType()->isVoidTy()) { 
-         builder.CreateCall(typeFunction, methodePointer, args);
-        _contextGenCode->modifierValeurTemporaire(Symbole(nullptr, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
-        _contextGenCode->modifierValeurTemporaire(Symbole(_contextGenCode->getValeurTemporaire().getAdresse(), nullptr, _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+    // Use the vtable for an indirect call to the method
+    if (functionSymbol->function->getReturnType()->isVoidTy()) { 
+         builder.CreateCall(functionType, methodPointer, args);
+        _contextGenCode->setTemporaryValue(Symbol(nullptr, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
+        _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), nullptr, _contextGenCode->getTemporaryValue().getPointedElementType()));
     } else {
-        llvm::Value* resultat = builder.CreateCall(typeFunction, methodePointer, args, "resultat_call_object");
-        _contextGenCode->modifierValeurTemporaire(Symbole(resultat, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
-        _contextGenCode->modifierValeurTemporaire(Symbole(_contextGenCode->getValeurTemporaire().getAdresse(), symboleFunction->typeReturn, _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+        llvm::Value* result = builder.CreateCall(functionType, methodPointer, args, "object_call_result");
+        _contextGenCode->setTemporaryValue(Symbol(result, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
+        _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), functionSymbol->returnType, _contextGenCode->getTemporaryValue().getPointedElementType()));
     }
 }

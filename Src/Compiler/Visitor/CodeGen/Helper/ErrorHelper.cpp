@@ -2,6 +2,6 @@
 #include <stdexcept>
 #include <string>
 
-void ErrorHelper::errorCompilation(const std::string& message) {
-    throw std::runtime_error("Error sémantique : " + message);
+void ErrorHelper::compilationError(const std::string& message) {
+    throw std::runtime_error("Semantic error: " + message);
 }

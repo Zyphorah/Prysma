@@ -10,73 +10,73 @@
 
 void GeneralVisitorGenCode::visiter(NodeOperation* node)
 {
-    // On évalue la gauche et on SAUVEGARDE le Symbole complet
+    // Evaluate the left side and SAVE the complete Symbol
     node->getGauche()->accept(this);
-    Symbole symGauche = _contextGenCode->getValeurTemporaire();
+    Symbol leftSym = _contextGenCode->getTemporaryValue();
 
-    // On évalue la droite (le valeurTemporaire de gauche n'est plus écrasé)
+    // Evaluate the right side (the left temporary value is not overwritten)
     node->getDroite()->accept(this);
-    Symbole symDroite = _contextGenCode->getValeurTemporaire();
+    Symbol rightSym = _contextGenCode->getTemporaryValue();
 
-    llvm::Value* valGauche = symGauche.getAdresse();
-    llvm::Value* valDroite = symDroite.getAdresse();
+    llvm::Value* leftVal = leftSym.getAddress();
+    llvm::Value* rightVal = rightSym.getAddress();
 
     auto& builder = _contextGenCode->getBackend()->getBuilder();
-    llvm::Value* resultat = nullptr;
-    llvm::Type* typeResultat = nullptr;
+    llvm::Value* result = nullptr;
+    llvm::Type* resultType = nullptr;
 
-    // C'est Prysma qui décide du type, plus LLVM
-    bool estFlottant = (symGauche.getType() != nullptr && symGauche.getType()->estFlottant()) || 
-                       (symDroite.getType() != nullptr && symDroite.getType()->estFlottant());
+    // Prysma decides the type, not LLVM
+    bool isFloating = (leftSym.getType() != nullptr && leftSym.getType()->isFloating()) || 
+                      (rightSym.getType() != nullptr && rightSym.getType()->isFloating());
 
-    if (estFlottant) {
+    if (isFloating) {
         llvm::Type* floatTy = llvm::Type::getFloatTy(_contextGenCode->getBackend()->getContext());
-        valGauche = _contextGenCode->getBackend()->creerAutoCast(valGauche, floatTy);
-        valDroite = _contextGenCode->getBackend()->creerAutoCast(valDroite, floatTy);
-        typeResultat = floatTy;
+        leftVal = _contextGenCode->getBackend()->createAutoCast(leftVal, floatTy);
+        rightVal = _contextGenCode->getBackend()->createAutoCast(rightVal, floatTy);
+        resultType = floatTy;
 
         switch (node->getToken().type) {
-            case TOKEN_PLUS:  resultat = builder.CreateFAdd(valGauche, valDroite, "fadd"); break;
-            case TOKEN_MOINS: resultat = builder.CreateFSub(valGauche, valDroite, "fsub"); break;
-            case TOKEN_ETOILE:resultat = builder.CreateFMul(valGauche, valDroite, "fmul"); break;
-            case TOKEN_SLASH: resultat = builder.CreateFDiv(valGauche, valDroite, "fdiv"); break;
-            case TOKEN_MODULO: resultat = builder.CreateFRem(valGauche, valDroite, "frem"); break;
-            // Pour les comparaisons float, ça renvoie un i1 (bool)
-            case TOKEN_PLUS_PETIT:      resultat = builder.CreateFCmpOLT(valGauche, valDroite, "fcmp_lt"); typeResultat = llvm::Type::getInt1Ty(builder.getContext()); break;
-            case TOKEN_PLUS_GRAND:      resultat = builder.CreateFCmpOGT(valGauche, valDroite, "fcmp_gt"); typeResultat = llvm::Type::getInt1Ty(builder.getContext()); break;
-            case TOKEN_PLUS_PETIT_EGAL: resultat = builder.CreateFCmpOLE(valGauche, valDroite, "fcmp_le"); typeResultat = llvm::Type::getInt1Ty(builder.getContext()); break;
-            case TOKEN_PLUS_GRAND_EGAL: resultat = builder.CreateFCmpOGE(valGauche, valDroite, "fcmp_ge"); typeResultat = llvm::Type::getInt1Ty(builder.getContext()); break;
-            case TOKEN_EGAL_EGAL:       resultat = builder.CreateFCmpOEQ(valGauche, valDroite, "fcmp_eq"); typeResultat = llvm::Type::getInt1Ty(builder.getContext()); break;
-            case TOKEN_DIFFERENT:       resultat = builder.CreateFCmpONE(valGauche, valDroite, "fcmp_ne"); typeResultat = llvm::Type::getInt1Ty(builder.getContext()); break;
+            case TOKEN_PLUS:  result = builder.CreateFAdd(leftVal, rightVal, "fadd"); break;
+            case TOKEN_MINUS: result = builder.CreateFSub(leftVal, rightVal, "fsub"); break;
+            case TOKEN_STAR:  result = builder.CreateFMul(leftVal, rightVal, "fmul"); break;
+            case TOKEN_SLASH: result = builder.CreateFDiv(leftVal, rightVal, "fdiv"); break;
+            case TOKEN_MODULO: result = builder.CreateFRem(leftVal, rightVal, "frem"); break;
+            // For float comparisons, returns i1 (bool)
+            case TOKEN_LESS:      result = builder.CreateFCmpOLT(leftVal, rightVal, "fcmp_lt"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
+            case TOKEN_GREATER:   result = builder.CreateFCmpOGT(leftVal, rightVal, "fcmp_gt"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
+            case TOKEN_LESS_EQUAL: result = builder.CreateFCmpOLE(leftVal, rightVal, "fcmp_le"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
+            case TOKEN_GREATER_EQUAL: result = builder.CreateFCmpOGE(leftVal, rightVal, "fcmp_ge"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
+            case TOKEN_EQUAL_EQUAL: result = builder.CreateFCmpOEQ(leftVal, rightVal, "fcmp_eq"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
+            case TOKEN_NOT_EQUAL: result = builder.CreateFCmpONE(leftVal, rightVal, "fcmp_ne"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
             default: break;
         }
     } 
     else {
         llvm::Type* intTy = llvm::Type::getInt32Ty(_contextGenCode->getBackend()->getContext());
-        typeResultat = intTy;
+        resultType = intTy;
 
         switch (node->getToken().type) {
-            case TOKEN_PLUS:  resultat = builder.CreateAdd(valGauche, valDroite, "iadd"); break;
-            case TOKEN_MOINS: resultat = builder.CreateSub(valGauche, valDroite, "isub"); break;
-            case TOKEN_ETOILE:resultat = builder.CreateMul(valGauche, valDroite, "imul"); break;
-            case TOKEN_SLASH: resultat = builder.CreateSDiv(valGauche, valDroite, "idiv"); break;
-            case TOKEN_MODULO: resultat = builder.CreateSRem(valGauche, valDroite, "irem"); break;
+            case TOKEN_PLUS:  result = builder.CreateAdd(leftVal, rightVal, "iadd"); break;
+            case TOKEN_MINUS: result = builder.CreateSub(leftVal, rightVal, "isub"); break;
+            case TOKEN_STAR:  result = builder.CreateMul(leftVal, rightVal, "imul"); break;
+            case TOKEN_SLASH: result = builder.CreateSDiv(leftVal, rightVal, "idiv"); break;
+            case TOKEN_MODULO: result = builder.CreateSRem(leftVal, rightVal, "irem"); break;
             
-            // Comparisons ENTIERS (ICmp)
-            case TOKEN_PLUS_PETIT:      resultat = builder.CreateICmpSLT(valGauche, valDroite, "icmp_lt"); typeResultat = llvm::Type::getInt1Ty(builder.getContext()); break;
-            case TOKEN_PLUS_GRAND:      resultat = builder.CreateICmpSGT(valGauche, valDroite, "icmp_gt"); typeResultat = llvm::Type::getInt1Ty(builder.getContext()); break;
-            case TOKEN_PLUS_PETIT_EGAL: resultat = builder.CreateICmpSLE(valGauche, valDroite, "icmp_le"); typeResultat = llvm::Type::getInt1Ty(builder.getContext()); break;
-            case TOKEN_PLUS_GRAND_EGAL: resultat = builder.CreateICmpSGE(valGauche, valDroite, "icmp_ge"); typeResultat = llvm::Type::getInt1Ty(builder.getContext()); break;
-            case TOKEN_EGAL_EGAL:       resultat = builder.CreateICmpEQ(valGauche, valDroite, "icmp_eq"); typeResultat = llvm::Type::getInt1Ty(builder.getContext()); break;
-            case TOKEN_DIFFERENT:       resultat = builder.CreateICmpNE(valGauche, valDroite, "icmp_ne"); typeResultat = llvm::Type::getInt1Ty(builder.getContext()); break;
-            case TOKEN_ET:              resultat = builder.CreateAnd(valGauche, valDroite, "and"); typeResultat = llvm::Type::getInt1Ty(builder.getContext()); break;
-            case TOKEN_OU:              resultat = builder.CreateOr(valGauche, valDroite, "or"); typeResultat = llvm::Type::getInt1Ty(builder.getContext()); break;
+            // Integer comparisons (ICmp)
+            case TOKEN_LESS:      result = builder.CreateICmpSLT(leftVal, rightVal, "icmp_lt"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
+            case TOKEN_GREATER:   result = builder.CreateICmpSGT(leftVal, rightVal, "icmp_gt"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
+            case TOKEN_LESS_EQUAL: result = builder.CreateICmpSLE(leftVal, rightVal, "icmp_le"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
+            case TOKEN_GREATER_EQUAL: result = builder.CreateICmpSGE(leftVal, rightVal, "icmp_ge"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
+            case TOKEN_EQUAL_EQUAL: result = builder.CreateICmpEQ(leftVal, rightVal, "icmp_eq"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
+            case TOKEN_NOT_EQUAL: result = builder.CreateICmpNE(leftVal, rightVal, "icmp_ne"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
+            case TOKEN_AND:      result = builder.CreateAnd(leftVal, rightVal, "and"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
+            case TOKEN_OR:       result = builder.CreateOr(leftVal, rightVal, "or"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
             default: break;
         }
     }
 
-    resultat = ErrorHelper::verifierNonNull(resultat, "Opération inconnue");
+    result = ErrorHelper::verifyNotNull(result, "Unknown operation");
 
-    _contextGenCode->modifierValeurTemporaire(Symbole(resultat, _contextGenCode->getValeurTemporaire().getType(), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
-    _contextGenCode->modifierValeurTemporaire(Symbole(_contextGenCode->getValeurTemporaire().getAdresse(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(typeResultat), _contextGenCode->getValeurTemporaire().getTypePointeElement()));
+    _contextGenCode->setTemporaryValue(Symbol(result, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
+    _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(resultType), _contextGenCode->getTemporaryValue().getPointedElementType()));
 }

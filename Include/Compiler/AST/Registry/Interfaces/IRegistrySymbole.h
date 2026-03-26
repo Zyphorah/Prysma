@@ -3,42 +3,40 @@
 #include <set>
 #include <functional>
 #include "Compiler/Lexer/TokenType.h"
-
-
 #include "Compiler/Lexer/Lexer.h"
 
 class IExpression;
 
 /**
- * @interface IRegistrySymbole
- * @brief Registry des opérateurs mathématiques avec gestion de priorité
- * L'ordre d'enregistryment détermine la priorité:
- * - Enregistrés EN PREMIER: priorité PLUS BASSE
- * - Enregistrés EN DERNIER: priorité PLUS HAUTE
+ * @interface IRegistrySymbol
+ * @brief Registry of mathematical operators with priority management
+ * The registration order determines the priority:
+ * - Registered FIRST: LOWER priority
+ * - Registered LAST: HIGHER priority
  */
-class IRegistrySymbole {
+class IRegistrySymbol {
 public:
-    IRegistrySymbole() = default;
+    IRegistrySymbol() = default;
 
-    virtual ~IRegistrySymbole() = default;
-    IRegistrySymbole(const IRegistrySymbole&) = delete;
-    auto operator=(const IRegistrySymbole&) -> IRegistrySymbole& = delete;
-    IRegistrySymbole(IRegistrySymbole&&) = delete;
-    auto operator=(IRegistrySymbole&&) -> IRegistrySymbole& = delete;
+    virtual ~IRegistrySymbol() = default;
+    IRegistrySymbol(const IRegistrySymbol&) = delete;
+    auto operator=(const IRegistrySymbol&) -> IRegistrySymbol& = delete;
+    IRegistrySymbol(IRegistrySymbol&&) = delete;
+    auto operator=(IRegistrySymbol&&) -> IRegistrySymbol& = delete;
 
-    virtual void enregistryr(TokenType symbole, std::function<IExpression*(Token)> fournisseur) = 0;
-    virtual auto recupererNode(Token token) -> IExpression* = 0;
+    virtual void registerSymbol(TokenType symbol, std::function<IExpression*(Token)> provider) = 0;
+    virtual auto getNode(Token token) -> IExpression* = 0;
     
     /**
-     * @brief Vérifie si un caractère est un opérateur connu
-     * @param symbole Le caractère à vérifier
-     * @return true si c'est un opérateur connu
+     * @brief Checks if a character is a known operator
+     * @param symbol The character to check
+     * @return true if it is a known operator
      */
-    [[nodiscard]] virtual auto estOperateur(TokenType symbole) const -> bool = 0;
+    [[nodiscard]] virtual auto isOperator(TokenType symbol) const -> bool = 0;
     
     /**
-     * @brief Obtient l'ensemble des symboles enregistrés
-     * @return Ensemble des symboles d'opérateurs
+     * @brief Gets the set of registered symbols
+     * @return Set of operator symbols
      */
-    [[nodiscard]] virtual std::set<TokenType> obtenirSymboles() const = 0;
+    [[nodiscard]] virtual auto getSymbols() const -> std::set<TokenType> = 0;
 };

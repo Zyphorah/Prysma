@@ -1,46 +1,46 @@
-#ifndef GESTIONNAIRE_ERREUR_H
-#define GESTIONNAIRE_ERREUR_H
+#ifndef ERROR_MANAGER_H
+#define ERROR_MANAGER_H
 
 #include <string>
 #include <stdexcept>
 
-struct Ligne {
+struct Line {
 private:
     int value;
 public:
-    explicit Ligne(int val) : value(val) {}
+    explicit Line(int val) : value(val) {}
     [[nodiscard]] auto getValue() const -> int { return value; }
 };
 
-struct Colonne {
+struct Column {
 private:
     int value;
 public:
-    explicit Colonne(int val) : value(val) {}
+    explicit Column(int val) : value(val) {}
     [[nodiscard]] auto getValue() const -> int { return value; }
 };
 
-class ErrorCompilation : public std::runtime_error
+class CompilationError : public std::runtime_error
 {
 private:
-    Ligne ligne;
-    Colonne colonne;
+    Line line;
+    Column column;
 
 public:
-    [[nodiscard]] auto getLigne() const -> int { return ligne.getValue(); }
-    [[nodiscard]] auto getColonne() const -> int { return colonne.getValue(); }
+    [[nodiscard]] auto getLine() const -> int { return line.getValue(); }
+    [[nodiscard]] auto getColumn() const -> int { return column.getValue(); }
 
-    ErrorCompilation(const std::string& message, Ligne lig, Colonne col)
-        : std::runtime_error(message), ligne(lig), colonne(col)
+    CompilationError(const std::string& message, Line lin, Column col)
+        : std::runtime_error(message), line(lin), column(col)
     {
     }
 
-    ErrorCompilation(const ErrorCompilation&) = default;
-    auto operator=(const ErrorCompilation&) -> ErrorCompilation& = default;
-    ErrorCompilation(ErrorCompilation&&) = default;
-    auto operator=(ErrorCompilation&&) -> ErrorCompilation& = default;
+    CompilationError(const CompilationError&) = default;
+    auto operator=(const CompilationError&) -> CompilationError& = default;
+    CompilationError(CompilationError&&) = default;
+    auto operator=(CompilationError&&) -> CompilationError& = default;
 
-    ~ErrorCompilation() override = default;
+    ~CompilationError() override = default;
 };
 
-#endif /* GESTIONNAIRE_ERREUR_H */
+#endif /* ERROR_MANAGER_H */

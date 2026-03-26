@@ -13,91 +13,91 @@
 #include "Compiler/Lexer/TokenType.h"
 
 BuilderTreeEquation::BuilderTreeEquation(
-    ChainOfResponsibility* chaineResponsabilite,
-    RegistrySymbole* registrySymbole,
-    RegistryExpression* registryExpression,
-    IManagerParenthese* managerParenthese,
+    ChainOfResponsibility* chainOfResponsibility,
+    RegistrySymbol* symbolRegistry,
+    RegistryExpression* expressionRegistry,
+    IManagerParenthesis* parenthesisManager,
     llvm::BumpPtrAllocator& arena)
-    : _chaineResponsabilite(chaineResponsabilite), 
-      _registrySymbole(registrySymbole), 
-    _registryExpression(registryExpression),
-      _managerParenthese(managerParenthese),
+    : _chainOfResponsibility(chainOfResponsibility), 
+      _symbolRegistry(symbolRegistry), 
+      _expressionRegistry(expressionRegistry),
+      _parenthesisManager(parenthesisManager),
       _arena(arena),
-      _dernierToken{TOKEN_EOF, "", 1, 1}
+      _lastToken{TOKEN_EOF, "", 1, 1}
 {
 }
 
-auto BuilderTreeEquation::construire(std::vector<Token> &equation) -> INode* {
-    std::vector<Token> equationSansParentheses = _managerParenthese->enleverParenthesesEnglobantes(equation);
-    equation = equationSansParentheses;
+auto BuilderTreeEquation::build(std::vector<Token> &tokens) -> INode* {
+    std::vector<Token> tokensWithoutParentheses = _parenthesisManager->removeWrappingParentheses(tokens);
+    tokens = tokensWithoutParentheses;
     
-    if (equation.empty()) {
-        throw ErrorCompilation("Error: équation vide", Ligne(_dernierToken.ligne), Colonne(_dernierToken.colonne));
+    if (tokens.empty()) {
+        throw CompilationError("Error: empty equation", Line(_lastToken.line), Column(_lastToken.column));
     }
     
-    int indice = _chaineResponsabilite->trouverOperateur(equation);
+    int index = _chainOfResponsibility->findOperator(tokens);
 
-    if (indice == -1) {
-        TokenType type = equation[0].type;
+    if (index == -1) {
+        TokenType type = tokens[0].type;
 
-        if ((_registryExpression != nullptr) && _registryExpression->existe(type)) {
-            return _registryExpression->recuperer(type)->construire(equation);
+        if ((_expressionRegistry != nullptr) && _expressionRegistry->exists(type)) {
+            return _expressionRegistry->get(type)->build(tokens);
         }
 
-        throw ErrorCompilation("Error: token non reconnu dans l'équation", Ligne(equation[0].ligne), Colonne(equation[0].colonne));
+        throw CompilationError("Error: unrecognized token in the equation", Line(tokens[0].line), Column(tokens[0].column));
     }
     
-    IExpression* node = _registrySymbole->recupererNode(equation[static_cast<size_t>(indice)]);
-    std::vector<Token> gauche(equation.begin(), equation.begin() + indice); 
-    std::vector<Token> droite(equation.begin() + indice + 1, equation.end());
+    IExpression* node = _symbolRegistry->getNode(tokens[static_cast<size_t>(index)]);
+    std::vector<Token> left(tokens.begin(), tokens.begin() + index); 
+    std::vector<Token> right(tokens.begin() + index + 1, tokens.end());
     
-    INode* exprGauche = construire(gauche);
-    INode* exprDroite = construire(droite);
+    INode* leftExpr = build(left);
+    INode* rightExpr = build(right);
     
-    node->ajouterExpression(exprGauche, exprDroite);
+    node->addExpression(leftExpr, rightExpr);
     return node;
 }
 
-auto BuilderTreeEquation::construire(std::vector<Token>& tokens, int& index) -> INode* {
+auto BuilderTreeEquation::build(std::vector<Token>& tokens, int& index) -> INode* {
 
-    // Sauvegarder la position du token courant pour les messages d'error
+    // Save the current token position for error messages
     if (index < static_cast<int>(tokens.size())) {
-        _dernierToken = tokens[static_cast<size_t>(index)];
+        _lastToken = tokens[static_cast<size_t>(index)];
     }
 
-    // Système de niveau pour calculer la depth, c'est obligatoire pour ne pas avoir de problème au niveau de la séparation 34+4)) sinon le 
-    // Système ne sais pas quoi faire avec les deux parenthèses restante. 
+    // Level system to calculate depth, mandatory to avoid issues with separation like 34+4)) otherwise the 
+    // system doesn't know what to do with the two remaining parentheses. 
     
     std::vector<Token> equationTokens;
-    int parenDepth = 0;
-    int crochetDepth = 0;
+    int parenthesisDepth = 0;
+    int bracketDepth = 0;
 
     while(index < static_cast<int>(tokens.size())) {
         TokenType type = tokens[static_cast<size_t>(index)].type;
 
-        if (type == TOKEN_PAREN_OUVERTE) {
-            parenDepth++;
+        if (type == TOKEN_PAREN_OPEN) {
+            parenthesisDepth++;
         }
-        else if (type == TOKEN_PAREN_FERMEE) {
-            if (parenDepth == 0) {
+        else if (type == TOKEN_PAREN_CLOSE) {
+            if (parenthesisDepth == 0) {
                 break; 
             }
-            parenDepth--;
+            parenthesisDepth--;
         }
-        else if (type == TOKEN_CROCHET_OUVERT) {
-            crochetDepth++;
+        else if (type == TOKEN_BRACKET_OPEN) {
+            bracketDepth++;
         }
-        else if (type == TOKEN_CROCHET_FERME) {
-            if (crochetDepth == 0) {
+        else if (type == TOKEN_BRACKET_CLOSE) {
+            if (bracketDepth == 0) {
                 break;
             }
-            crochetDepth--;
+            bracketDepth--;
         }
         
-        if (parenDepth == 0 && crochetDepth == 0) {
-            if (type == TOKEN_POINT_VIRGULE || 
-                type == TOKEN_ACCOLADE_FERMEE || 
-                type == TOKEN_VIRGULE ) {
+        if (parenthesisDepth == 0 && bracketDepth == 0) {
+            if (type == TOKEN_SEMICOLON || 
+                type == TOKEN_BRACE_CLOSE || 
+                type == TOKEN_COMMA ) {
                 break;
             }
         }
@@ -106,7 +106,7 @@ auto BuilderTreeEquation::construire(std::vector<Token>& tokens, int& index) -> 
         index++;
     }
 
-    return construire(equationTokens);
+    return build(equationTokens);
 }
 
 llvm::BumpPtrAllocator& BuilderTreeEquation::getArena()

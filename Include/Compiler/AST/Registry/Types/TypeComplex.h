@@ -9,23 +9,23 @@
 
 class TypeComplex : public IType {
 private:
-    std::string nomClasse;
+    std::string className;
 public:
-    explicit TypeComplex(const std::string& nom);
+    explicit TypeComplex(const std::string& name);
     
-    auto generatedrTypeLLVM(llvm::LLVMContext& context) -> llvm::Type* override;
+    auto generateLLVMType(llvm::LLVMContext& context) -> llvm::Type* override;
     
-    [[nodiscard]] auto estFlottant() const -> bool override;
-    [[nodiscard]] auto estBooleen() const -> bool override;
-    [[nodiscard]] auto estChaine() const -> bool override;
-    [[nodiscard]] auto estArray() const -> bool override;
-    [[nodiscard]] auto estComplex() const -> bool override;
+    [[nodiscard]] auto isFloating() const -> bool override;
+    [[nodiscard]] auto isBoolean() const -> bool override;
+    [[nodiscard]] auto isString() const -> bool override;
+    [[nodiscard]] auto isArray() const -> bool override;
+    [[nodiscard]] auto isComplex() const -> bool override;
 
-    [[nodiscard]] static auto classof(const IType* type) -> bool { return type->estComplex(); }
+    [[nodiscard]] static auto classof(const IType* type) -> bool { return type->isComplex(); }
     
     auto getVTableType(llvm::LLVMContext& context) -> llvm::Type* override;
     
-    [[nodiscard]] auto getNomClasse() const -> std::string;
+    [[nodiscard]] auto getClassName() const -> std::string;
 };
 
 #endif /* C747FE4B_9A53_40BA_A4BE_19C00508C8C4 */
