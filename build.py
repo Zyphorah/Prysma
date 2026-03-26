@@ -1,34 +1,34 @@
 import os
 import shutil
-from tests.orchestration.build_manager import BuildManager
-from generation.generator_ast import GenerateurAST
-from generation.generator_interface_visitor import GenerateurInterfaceVisitor
-from generation.generator_visitor_base_general import GenerateurVisitorBaseGenerale
-from generation.generator_visitor_destruction import GenerateurVisitorDestruction
-from generation.generator_graphe_viz import GenerateurGraphViz
-from generation.generator_expression import GenerateurExpression
-from generation.generator_parser import GenerateurParser
+import subprocess
+from generation.generator_ast import GeneratorAST
+from generation.generator_interface_visitor import GeneratorInterfaceVisitor
+from generation.generator_visitor_base_general import GeneratorVisitorBaseGeneral
+from generation.generator_visitor_destruction import GeneratorVisitorDestruction
+from generation.generator_graphe_viz import GeneratorGraphViz
+from generation.generator_expression import GeneratorExpression
+from generation.generator_parser import GeneratorParser
 
 def main():
-    dossier_script = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(dossier_script)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(script_dir)
 
-    GenerateurAST(dossier_script).generatedr()
-    GenerateurInterfaceVisitor(dossier_script).generatedr()
-    GenerateurVisitorBaseGenerale(dossier_script).generatedr()
-    GenerateurVisitorDestruction(dossier_script).generatedr()
-    GenerateurGraphViz(dossier_script).generatedr()
-    GenerateurExpression(dossier_script).generatedr()
-    GenerateurParser(dossier_script).generatedr()
+    GeneratorAST(script_dir).generate()
+    GeneratorInterfaceVisitor(script_dir).generate()
+    GeneratorVisitorBaseGeneral(script_dir).generate()
+    GeneratorVisitorDestruction(script_dir).generate()
+    GeneratorGraphViz(script_dir).generate()
+    GeneratorExpression(script_dir).generate()
+    GeneratorParser(script_dir).generate()
 
     cxxflags_list = [
-            "-O3",                  # Vitesse brute (optimisation maximale)
-            "-march=native",        # Exploitation totale des instructions de ton CPU
-            "-ffast-math",          # Calculs mathématiques agressifs
-            "-fno-rtti",            # Zéro métadonnée d'exécution (RTTI off)
-            "-fomit-frame-pointer", # Libération d'un registry CPU
-            "-flto",                # Fusion et optimisation globale au linkage (LTO)
-            "-DNDEBUG"              # Désactivation absolue des assertions
+        "-O3",                  # Raw speed (maximum optimization)
+        "-march=native",        # Fully exploit your CPU's instructions
+        "-ffast-math",          # Aggressive math calculations
+        "-fno-rtti",            # No runtime type information (RTTI off)
+        "-fomit-frame-pointer", # Free up a CPU register
+        "-flto",                # Link Time Optimization (LTO)
+        "-DNDEBUG"              # Completely disable assertions
     ]
     
     ldflags_list = [
@@ -41,7 +41,7 @@ def main():
     cxxflags = " ".join(cxxflags_list)
     ldflags = " ".join(ldflags_list)
 
-    BuildManager.executer_commande([
+    subprocess.run([
         "cmake", "-S", ".", "-B", "build", 
         "-DCMAKE_BUILD_TYPE=Release",
         f"-DCMAKE_CXX_FLAGS={cxxflags}",
@@ -49,16 +49,16 @@ def main():
         f"-DCMAKE_MODULE_LINKER_FLAGS={ldflags}",
         f"-DCMAKE_SHARED_LINKER_FLAGS={ldflags}",
         "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
-    ])
+    ], check=True)
 
     os.makedirs("build", exist_ok=True)
     shutil.rmtree(os.path.join("build", "obj"), ignore_errors=True)
 
-    nb_coeurs = str(os.cpu_count() or 1)
+    num_cores = str(os.cpu_count() or 1)
 
-    BuildManager.executer_commande([
-        "cmake", "--build", "build", "--parallel", nb_coeurs
-    ])
+    subprocess.run([
+        "cmake", "--build", "build", "--parallel", num_cores
+    ], check=True)
     
 if __name__ == "__main__":
     main()

@@ -13,7 +13,7 @@ import os
 from generation.engine_generation import EngineGeneration
 
 
-class GenerateurVisitorBaseGenerale(EngineGeneration):
+class GeneratorVisitorBaseGeneral(EngineGeneration):
 
     def __init__(self, racine_project):
         super().__init__(racine_project)
@@ -24,7 +24,7 @@ class GenerateurVisitorBaseGenerale(EngineGeneration):
             "compiler", "visitor", "visitor_base_generale.cpp"
         )
 
-    def generatedr(self):
+    def generate(self):
         nodes = self._loadr_nodes_yaml()
         noms = list(nodes.keys()) + ["Instruction"]
         self._rendre_et_ecrire("visitor_base_general.h.j2", self._fichier_entete, nodes=noms)

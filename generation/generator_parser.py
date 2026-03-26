@@ -12,13 +12,13 @@ def to_snake_case(name):
 import os
 from generation.engine_generation import EngineGeneration
 
-class GenerateurParser(EngineGeneration):
+class GeneratorParser(EngineGeneration):
     def __init__(self, racine_project):
         super().__init__(racine_project)
         self._dossier_squelettes = os.path.join(racine_project, "src", "compiler", "parser")
  
 
-    def generatedr(self):
+    def generate(self):
         definitions = self._loadr_definitions_nodes()
         nodes = [
             nom for nom, donnees in definitions.items()

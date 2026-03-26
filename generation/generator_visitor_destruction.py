@@ -12,14 +12,14 @@ def to_snake_case(name):
 import os
 from generation.engine_generation import EngineGeneration
 
-class GenerateurVisitorDestruction(EngineGeneration):
+class GeneratorVisitorDestruction(EngineGeneration):
     def __init__(self, racine_project):
         super().__init__(racine_project)
         self._fichier_entete = self._chemin_generation_include(
             "compiler", "visitor", "visitor_destruction.h"
         )
     
-    def generatedr(self):
+    def generate(self):
         nodes = self._loadr_nodes_yaml()
         noms = list(nodes.keys()) + ["Instruction"]
         self._rendre_et_ecrire("visitor_destruction.h.j2", self._fichier_entete, nodes=noms)

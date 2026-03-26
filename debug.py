@@ -1,25 +1,25 @@
 import os
 import shutil
 import subprocess
-from generation.generator_ast import GenerateurAST
-from generation.generator_interface_visitor import GenerateurInterfaceVisitor
-from generation.generator_visitor_base_general import GenerateurVisitorBaseGenerale
-from generation.generator_visitor_destruction import GenerateurVisitorDestruction
-from generation.generator_graphe_viz import GenerateurGraphViz
-from generation.generator_expression import GenerateurExpression
-from generation.generator_parser import GenerateurParser
+from generation.generator_ast import GeneratorAST
+from generation.generator_interface_visitor import GeneratorInterfaceVisitor
+from generation.generator_visitor_base_general import GeneratorVisitorBaseGeneral
+from generation.generator_visitor_destruction import GeneratorVisitorDestruction
+from generation.generator_graphe_viz import GeneratorGraphViz
+from generation.generator_expression import GeneratorExpression
+from generation.generator_parser import GeneratorParser
 
 def main():
     dossier_script = os.path.dirname(os.path.abspath(__file__))
     os.chdir(dossier_script)
 
-    GenerateurAST(dossier_script).generatedr()
-    GenerateurInterfaceVisitor(dossier_script).generatedr()
-    GenerateurVisitorBaseGenerale(dossier_script).generatedr()
-    GenerateurGraphViz(dossier_script).generatedr()
-    GenerateurExpression(dossier_script).generatedr()
-    GenerateurParser(dossier_script).generatedr()
-    GenerateurVisitorDestruction(dossier_script).generatedr()
+    GeneratorAST(dossier_script).generate()
+    GeneratorInterfaceVisitor(dossier_script).generate()
+    GeneratorVisitorBaseGeneral(dossier_script).generate()
+    GeneratorGraphViz(dossier_script).generate()
+    GeneratorExpression(dossier_script).generate()
+    GeneratorParser(dossier_script).generate()
+    GeneratorVisitorDestruction(dossier_script).generate()
 
     cxxflags = (
         "-fno-rtti -g3 -O0 " # Debug info max, aucune optimisation

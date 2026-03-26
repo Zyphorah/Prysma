@@ -14,7 +14,7 @@ import os
 from generation.engine_generation import EngineGeneration
 
 
-class GenerateurGraphViz(EngineGeneration):
+class GeneratorGraphViz(EngineGeneration):
 
     def __init__(self, racine_project):
         super().__init__(racine_project)
@@ -28,7 +28,7 @@ class GenerateurGraphViz(EngineGeneration):
             "compiler", "visitor", "ast_graph_viz"
         )
 
-    def generatedr(self):
+    def generate(self):
         nodes = self._loadr_nodes_yaml()
         config = self._loadr_config_graphviz()
         noms = list(nodes.keys()) + ["Instruction"]

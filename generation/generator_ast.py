@@ -20,7 +20,7 @@ _CLES_METADONNEES_NOEUD = {
 }
 
 
-class GenerateurAST(EngineGeneration):
+class GeneratorAST(EngineGeneration):
 
     def __init__(self, racine_project):
         super().__init__(racine_project)
@@ -28,7 +28,7 @@ class GenerateurAST(EngineGeneration):
             "compiler", "ast", "ast_genere.h"
         )
 
-    def generatedr(self):
+    def generate(self):
         nodes_data = self._loadr_nodes_yaml()
         classes = self._preparer_classes(nodes_data)
         self._rendre_et_ecrire(

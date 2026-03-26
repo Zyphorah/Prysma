@@ -13,7 +13,7 @@ import os
 from generation.engine_generation import EngineGeneration
 
 
-class GenerateurExpression(EngineGeneration):
+class GeneratorExpression(EngineGeneration):
     def __init__(self, racine_project):
         super().__init__(racine_project)
         self._dossier_squelettes = os.path.join(
@@ -25,7 +25,7 @@ class GenerateurExpression(EngineGeneration):
             "expression",
         )
 
-    def generatedr(self):
+    def generate(self):
         definitions = self._loadr_definitions_nodes()
         for nom, donnees in definitions.items():
             if not self._a_engine(donnees, "expression"):
