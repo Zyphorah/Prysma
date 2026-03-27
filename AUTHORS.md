@@ -1,2 +1,2 @@
 Raphael Arseneault 
-Félix Olivier duma 
+Félix-Olivier Dumas
