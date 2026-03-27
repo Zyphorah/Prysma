@@ -1,2 +1,2 @@
-    Raphael Arseneault 
-    Félix-Olivier Dumas
+- Raphael Arseneault 
+- Félix-Olivier Dumas
