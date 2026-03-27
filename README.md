@@ -57,3 +57,7 @@ In accordance with the project's modular structure, all technical documentation 
 ## License
 
 This project is distributed under the **GPL v3** license. Consult the `LICENSE` file for legal details.
+
+## Authors
+
+For the list of contributors and authors, see [AUTHORS.md](AUTHORS.md).

@@ -53,3 +53,7 @@ Conformément à la structure modulaire du project, l'intégralité de la docume
 ## Licence
 
 Ce project est distribué sous licence **GPL v3**. Consulter le fichier `LICENSE` pour les détails juridiques.
+
+## Auteurs
+
+Pour la liste des contributeurs et auteurs, voir [AUTHORS.md](AUTHORS.md).
