@@ -8,6 +8,7 @@
 #include "compiler/llvm/gestion_variable.h"
 #include "compiler/utils/prysma_cast.h"
 #include <cstddef>
+#include <llvm-18/llvm/ADT/StringRef.h>
 #include <llvm-18/llvm/IR/Value.h>
 #include <llvm/Support/Casting.h>
 #include <string>
@@ -22,14 +23,14 @@ void GeneralVisitorGenCode::visiter(NodeAssignmentArray* nodeAssignmentArray)
     llvm::Value* expressionResult = evaluateExpression(nodeAssignmentArray->getExpression()).getAddress();
 
     // Retrieve the array
-    std::string arrayNameStr = nodeAssignmentArray->getToken().value.str();
+    llvm::StringRef arrayNameStr = nodeAssignmentArray->getToken().value;
     Symbol symbol;
     llvm::Value* value = nullptr;
 
     if (arrayNameStr.find('.') != std::string::npos) {
         size_t pos = arrayNameStr.find('.');
-        std::string objectName = arrayNameStr.substr(0, pos);
-        std::string attributeName = arrayNameStr.substr(pos + 1);
+        llvm::StringRef objectName = arrayNameStr.substr(0, pos);
+        llvm::StringRef attributeName = arrayNameStr.substr(pos + 1);
 
         VariableLoader loader(_contextGenCode);
         Symbol objectSymbol = loader.load(objectName);

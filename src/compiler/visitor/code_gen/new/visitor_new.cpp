@@ -12,6 +12,7 @@
 #include <llvm-18/llvm/IR/Value.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/Support/Casting.h>
+#include <llvm/Support/FormatVariadic.h>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -25,8 +26,8 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
     Class* classInfo = nullptr;
 
     if (nodeNew->getNomType().type == TOKEN_IDENTIFIER) {
-        classInfo = _contextGenCode->getRegistryClass()->get(nodeNew->getNomType().value.str()).get();
-        classInfo = ErrorHelper::verifyNotNull(classInfo, "Class '" + nodeNew->getNomType().value.str() + "' not found");
+        classInfo = _contextGenCode->getRegistryClass()->get(std::string(nodeNew->getNomType().value)).get();
+        classInfo = ErrorHelper::verifyNotNull(classInfo, llvm::formatv("Class '{0}' not found", nodeNew->getNomType().value).str());
         targetType = classInfo->getStructType();
     } else {
         targetType = _contextGenCode->getRegistryType()->get(nodeNew->getNomType().type);
@@ -122,9 +123,9 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
 
     // Build the builder with arguments
     if (classInfo != nullptr) {
-        std::string builderName = nodeNew->getNomType().value.str();
-        if (classInfo->getRegistryFunctionLocal()->exists(builderName)) {
-            const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(builderName);
+        llvm::StringRef builderName = nodeNew->getNomType().value;
+        if (classInfo->getRegistryFunctionLocal()->exists(std::string(builderName))) {
+            const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(std::string(builderName));
             if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
                 throw std::runtime_error("Error: SymbolFunctionLocal expected");
             }

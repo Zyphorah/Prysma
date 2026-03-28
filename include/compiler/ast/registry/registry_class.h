@@ -5,6 +5,7 @@
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/ast/registry/registry_generic.h"
+#include <llvm-18/llvm/ADT/StringRef.h>
 #include <llvm-18/llvm/IR/DerivedTypes.h>
 #include <llvm-18/llvm/IR/GlobalVariable.h>
 #include <string>
@@ -25,7 +26,7 @@ private:
     INode* parentInheritance;
     
     // Mapping of member indices for Pass 3
-    std::map<std::string, unsigned int> memberIndices;
+    std::map<llvm::StringRef, unsigned int> memberIndices;
     std::map<std::string, INode*> memberInitializers;
     
     // Mapping of method indices in the vtable
@@ -71,7 +72,7 @@ public:
     [[nodiscard]] auto getVTable() const -> llvm::GlobalVariable* { return vtable; }
     [[nodiscard]] auto getStructType() const -> llvm::StructType* { return structType; }
     [[nodiscard]] auto getParentInheritance() const -> INode* { return parentInheritance; }
-    [[nodiscard]] auto getMemberIndices() -> std::map<std::string, unsigned int>& { return memberIndices; }
+    [[nodiscard]] auto getMemberIndices() -> std::map<llvm::StringRef, unsigned int>& { return memberIndices; }
     [[nodiscard]] auto getMemberInitializers() -> std::map<std::string, INode*>& { return memberInitializers; }
     [[nodiscard]] auto getMethodIndices() -> std::map<std::string, unsigned int>& { return methodIndices; }
     

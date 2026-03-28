@@ -8,6 +8,8 @@
 #include <functional>
 #include <sstream>
 #include <mutex>
+#include <type_traits>
+#include <llvm/ADT/StringRef.h>
 
 // Phantom structure for local (single-threaded) usage
 struct RegistryLock {
@@ -75,7 +77,11 @@ private:
             return _errorMessageCallback(key);
         }
         std::stringstream stringStream;
-        stringStream << "Unknown element in registry: " << key;
+        if constexpr (std::is_same_v<TKey, llvm::StringRef>) {
+            stringStream << "Unknown element in registry: " << key.str();
+        } else {
+            stringStream << "Unknown element in registry: " << key;
+        }
         return stringStream.str();
     }
 };

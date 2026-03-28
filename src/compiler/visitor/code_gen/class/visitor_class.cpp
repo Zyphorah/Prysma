@@ -6,7 +6,7 @@
 void GeneralVisitorGenCode::visiter(NodeClass* nodeClass)
 {
     std::string previousClassName = _contextGenCode->getCurrentClassName();
-    _contextGenCode->setCurrentClassName(nodeClass->getNomClass().value.str());
+    _contextGenCode->setCurrentClassName(std::string(nodeClass->getNomClass().value));
 
     for (auto* member : nodeClass->getListMembers()) {
         if (prysma::isa<NodeDeclarationFunction>(member)) {

@@ -20,13 +20,6 @@
 
 
 // Polyspace analyse static prouvé mathématiquement que l'execution d'une function ne cause pas de null pointer ou certaine catégorie de crash
-// Actuellement le compiler utilise des nodes contenant des objects de type std::string et std::vector pour stocker les informations de l'AST
-// Le problème est que les types std::string créer un object dynamiquement avec un new caché 
-// et que les std::vector font la même chose. La destruction des objects std::string et std::vector n'est pas faite par 
-// le bump allocator, nous devons faire un delete manuel pour supprimer chaque object de façon récursive dans L'AST, ça annule les avantages du bump allocator 
-// et peut causer des problèmes de performances et de fragmentation de mémoire. La solution est d'utiliser des llvm::StringRef et des llvm::ArrayRef qui sont des vues 
-// sur des données contigues en mémoire et qui ne font pas d'allocation dynamique, cela permet de supprimer complètement les std::string et std::vector et permettre de 
-// retirer les fuites de mémoire causé par l'allocation dynamique des std::string et std::vector. 
 
 // Ne pas oblier de faire le système de delete en onion pour les objects de la classe du langage prysma. 
 
@@ -55,7 +48,6 @@
 // shard de la map pour les functions. Pour un gain d'environ 70 pourcents en vitesse d'exécution pour les project avec beaucoup de function.
 
 // FUTAMURA projection pour faire un compiler qui se compile lui même
-
 
 // Calculer le nombre d'octet d'un fichier pour déterminer la taille d'un vecteur en mémoire évite la copy lors qu'il grandi. 
 // MemoryBuffer lecture ultra rapide des fichiers permet de faire corespondre directement le binaire. 

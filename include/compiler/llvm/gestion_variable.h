@@ -20,7 +20,7 @@ private:
     ContextGenCode* _context;
 public:
     explicit VariableAddressor(ContextGenCode* context);
-    auto getAddress(const std::string& variableName) -> Symbol;
+    auto getAddress(llvm::StringRef variableName) -> Symbol;
 };
 
 class VariableLoader {
@@ -30,8 +30,8 @@ private:
     VariableTypeExtractor _extractor;
 public:
     explicit VariableLoader(ContextGenCode* context);
-    auto load(const std::string& variableName) -> Symbol;
-    auto loadUnref(const std::string& variableName) -> Symbol;
+    auto load(llvm::StringRef variableName) -> Symbol;
+    auto loadUnref(llvm::StringRef variableName) -> Symbol;
 };
 
 class VariableAllocator {
@@ -39,7 +39,7 @@ private:
     ContextGenCode* _context;
 public:
     explicit VariableAllocator(ContextGenCode* context);
-    auto allocate(llvm::Type* type, const std::string& variableName) -> llvm::AllocaInst*;
+    auto allocate(llvm::Type* type, llvm::StringRef variableName) -> llvm::AllocaInst*;
     void store(llvm::Value* value, llvm::AllocaInst* allocaInst);
 };
 

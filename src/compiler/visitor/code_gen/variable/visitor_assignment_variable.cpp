@@ -9,7 +9,7 @@ void GeneralVisitorGenCode::visiter(NodeAssignmentVariable* nodeAssignmentVariab
     llvm::Value* expressionResult = evaluateExpression(nodeAssignmentVariable->getExpression()).getAddress();
 
     VariableAddressor addressor(_contextGenCode);
-    Symbol symbol = addressor.getAddress(nodeAssignmentVariable->getToken().value.str());
+    Symbol symbol = addressor.getAddress(nodeAssignmentVariable->getToken().value);
     
     llvm::Value* existingVariable = symbol.getAddress();
     

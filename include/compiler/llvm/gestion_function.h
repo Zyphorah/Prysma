@@ -4,11 +4,11 @@
 #include "compiler/ast/registry/context_gen_code.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/visitor/interfaces/i_visitor.h"
+#include <llvm-18/llvm/ADT/StringRef.h>
 #include <llvm-18/llvm/IR/Function.h>
 #include <llvm/IR/Type.h>
 #include <memory>
 #include <vector>
-#include <string>
 
 class GeneralVisitorGenCode;
 class NodeArgFunction;
@@ -72,7 +72,7 @@ private:
     ContextGenCode* _contextGenCode;
     IVisitor* _visitorGeneralCodeGen;
 
-    virtual auto getLocalFunction(const std::string& functionName) -> const SymbolFunctionLocal* = 0;
+    virtual auto getLocalFunction(llvm::StringRef functionName) -> const SymbolFunctionLocal* = 0;
 
 public:
     FunctionCallGenerator(ContextGenCode* context, IVisitor* visitor);
@@ -92,14 +92,14 @@ public:
 
 class StandardFunctionCallGenerator : public FunctionCallGenerator {
 private:
-    auto getLocalFunction(const std::string& functionName) -> const SymbolFunctionLocal* override;
+    auto getLocalFunction(llvm::StringRef functionName) -> const SymbolFunctionLocal* override;
 public:
     using FunctionCallGenerator::FunctionCallGenerator;
 };
 
 class MethodFunctionCallGenerator : public FunctionCallGenerator {
 private:
-    auto getLocalFunction(const std::string& functionName) -> const SymbolFunctionLocal* override;
+    auto getLocalFunction(llvm::StringRef functionName) -> const SymbolFunctionLocal* override;
 public:
     using FunctionCallGenerator::FunctionCallGenerator;
 };
@@ -108,8 +108,8 @@ public:
 
 class RegistryBuiltIns {
 public:
-    static auto isBuiltIn(const std::string& name) -> bool;
-    static void generateCall(const std::string& name, NodeCallFunction* node, ContextGenCode* context, IVisitor* visitor);
+    static auto isBuiltIn(llvm::StringRef name) -> bool;
+    static void generateCall(llvm::StringRef name, NodeCallFunction* node, ContextGenCode* context, IVisitor* visitor);
 };
 
 #endif /* D2944365_C1DD_41F8_A211_BFF33402A958 */

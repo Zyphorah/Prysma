@@ -12,6 +12,7 @@
 #include "compiler/visitor/interfaces/i_visitor.h"
 #include "compiler/utils/prysma_cast.h"
 #include <llvm/ADT/SmallVector.h>
+#include <llvm/Support/FormatVariadic.h>
 #include <vector>
 
 namespace
@@ -66,7 +67,7 @@ namespace
               declarationFunction->getBody()
           );
         }      auto* newDeclarationFunction = prysma::cast<NodeDeclarationFunction>(node);
-      if (newDeclarationFunction != nullptr && newDeclarationFunction->getNom().value.str() == param.classNameToken().value.str()) {
+      if (newDeclarationFunction != nullptr && newDeclarationFunction->getNom().value == param.classNameToken().value) {
         builders.push_back(node);
         return;
       }
@@ -74,7 +75,7 @@ namespace
       return;
     }
 
-    throw CompilationError("Invalid class member: '" + param.classNameToken().value.str() + "'", Line(param.classNameToken().line), Column(param.classNameToken().column));
+    throw CompilationError(llvm::formatv("Invalid class member: '{0}'", param.classNameToken().value).str(), Line(param.classNameToken().line), Column(param.classNameToken().column));
   }
 }
 

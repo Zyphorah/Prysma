@@ -16,14 +16,14 @@
 
 void GeneralVisitorGenCode::visiter(NodeReadingArray* nodeReadingArray)
 {
-    std::string arrayNameStr = nodeReadingArray->getNomArray().value.str();
+    llvm::StringRef arrayNameStr = nodeReadingArray->getNomArray().value;
     Symbol symbol;
     llvm::Value* arrayAddress = nullptr;
 
     if (arrayNameStr.find('.') != std::string::npos) {
         size_t pos = arrayNameStr.find('.');
-        std::string objectName = arrayNameStr.substr(0, pos);
-        std::string attributeName = arrayNameStr.substr(pos + 1);
+        llvm::StringRef objectName = arrayNameStr.substr(0, pos);
+        llvm::StringRef attributeName = arrayNameStr.substr(pos + 1);
 
         VariableLoader loader(_contextGenCode);
         Symbol objectSymbol = loader.load(objectName);
@@ -31,7 +31,7 @@ void GeneralVisitorGenCode::visiter(NodeReadingArray* nodeReadingArray)
 
         std::string className = getClassNameFromSymbol(objectSymbol);
         auto* classInfo = _contextGenCode->getRegistryClass()->get(className).get();
-        auto iterator = classInfo->getMemberIndices().find(attributeName);
+        auto iterator = classInfo->getMemberIndices().find(attributeName.str());
         unsigned int indexObj = iterator->second;
 
         Token tokenAttribute; tokenAttribute.value = attributeName; tokenAttribute.type = TOKEN_IDENTIFIER;

@@ -12,6 +12,7 @@
 #include "compiler/utils/prysma_cast.h"
 #include <cstddef>
 #include <cstdint>
+#include <llvm-18/llvm/ADT/StringRef.h>
 #include <llvm-18/llvm/IR/Function.h>
 #include <llvm/IR/Argument.h>
 #include <llvm/IR/DerivedTypes.h>
@@ -42,7 +43,7 @@ FunctionDeclarationGenerator::FunctionDeclarationGenerator(ContextGenCode* conte
 
 auto StandardFunctionDeclarationGenerator::createFunction() -> llvm::Function*
 {
-    std::string functionName = getNodeDeclarationFunction()->getNom().value.str();
+    llvm::StringRef functionName = getNodeDeclarationFunction()->getNom().value;
     
     const auto& symbolPtr = getContextGenCode()->getRegistryFunctionLocal()->get(functionName);
     if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
@@ -60,7 +61,7 @@ auto StandardFunctionDeclarationGenerator::createFunction() -> llvm::Function*
 
 auto MethodFunctionDeclarationGenerator::createFunction() -> llvm::Function*
 {
-    std::string functionName = getNodeDeclarationFunction()->getNom().value.str();
+    llvm::StringRef functionName = getNodeDeclarationFunction()->getNom().value;
     std::string className = getContextGenCode()->getCurrentClassName();
     auto const& classInfo = getContextGenCode()->getRegistryClass()->get(className);
     const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(functionName);
@@ -206,7 +207,7 @@ FunctionCallGenerator::FunctionCallGenerator(ContextGenCode* context, IVisitor* 
 {
 }
 
-const SymbolFunctionLocal* MethodFunctionCallGenerator::getLocalFunction(const std::string& functionName)
+const SymbolFunctionLocal* MethodFunctionCallGenerator::getLocalFunction(llvm::StringRef functionName)
 {
     std::string className = getContextGenCode()->getCurrentClassName();
     auto const& classInfo = getContextGenCode()->getRegistryClass()->get(className);
@@ -226,10 +227,10 @@ const SymbolFunctionLocal* MethodFunctionCallGenerator::getLocalFunction(const s
         return prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
     }
 
-    throw std::runtime_error("Method or function not found in class scope: " + functionName);
+    throw std::runtime_error("Method or function not found in class scope: " + functionName.str());
 }
 
-const SymbolFunctionLocal* StandardFunctionCallGenerator::getLocalFunction(const std::string& functionName)
+auto StandardFunctionCallGenerator::getLocalFunction(llvm::StringRef functionName) -> const SymbolFunctionLocal*
 {
     if (getContextGenCode()->getRegistryFunctionLocal()->exists(functionName)) {
         const auto& symbolPtr = getContextGenCode()->getRegistryFunctionLocal()->get(functionName);
@@ -239,12 +240,12 @@ const SymbolFunctionLocal* StandardFunctionCallGenerator::getLocalFunction(const
         return prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
     }
 
-    throw std::runtime_error("Function not found in local registry: " + functionName);
+    throw std::runtime_error("Function not found in local registry: " + functionName.str());
 }
 
 void FunctionCallGenerator::generateCallFunction(NodeCallFunction* nodeCallFunction)
 {
-    std::string functionName = nodeCallFunction->getNomFunction().value.str();
+    llvm::StringRef functionName = nodeCallFunction->getNomFunction().value;
 
     if (RegistryBuiltIns::isBuiltIn(functionName)) {
         RegistryBuiltIns::generateCall(functionName, nodeCallFunction, getContextGenCode(), _visitorGeneralCodeGen);
@@ -299,11 +300,11 @@ void FunctionCallGenerator::generateCallFunction(NodeCallFunction* nodeCallFunct
 
 // Management of Native Functions (Built-ins)
 
-bool RegistryBuiltIns::isBuiltIn(const std::string& name) {
+bool RegistryBuiltIns::isBuiltIn(llvm::StringRef name) {
     return name == "print";
 }
 
-void RegistryBuiltIns::generateCall(const std::string& name, NodeCallFunction* nodeCallFunction, ContextGenCode* context, IVisitor* visitor) {
+void RegistryBuiltIns::generateCall(llvm::StringRef name, NodeCallFunction* nodeCallFunction, ContextGenCode* context, IVisitor* visitor) {
     if (name == "print") {
         if (nodeCallFunction->getChildren().empty()) {
             return;

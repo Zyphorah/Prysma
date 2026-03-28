@@ -3,6 +3,7 @@
 #include "compiler/ast/registry/registry_class.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/ast/registry/types/i_type.h"
+#include <llvm/ADT/StringRef.h>
 #include <memory>
 #include <string>
 #include <utility>
@@ -10,7 +11,7 @@
 void FillingVisitorRegistry::visiter(NodeDeclarationFunction* nodeDeclarationFunction)
 {
     IType* returnType = nodeDeclarationFunction->getTypeReturn();
-    std::string functionName = nodeDeclarationFunction->getNom().value.str();
+    llvm::StringRef functionName = nodeDeclarationFunction->getNom().value;
     
     if (_contextGenCode->getCurrentClassName() != "") {
         // class context (method)
@@ -27,6 +28,6 @@ void FillingVisitorRegistry::visiter(NodeDeclarationFunction* nodeDeclarationFun
         functionSymbol->returnType = returnType;
         functionSymbol->node = nodeDeclarationFunction;
 
-        _contextGenCode->getRegistryFunctionGlobal()->registerElement(functionName, std::move(functionSymbol));
+        _contextGenCode->getRegistryFunctionGlobal()->registerElement(std::string(functionName), std::move(functionSymbol));
     }
 }

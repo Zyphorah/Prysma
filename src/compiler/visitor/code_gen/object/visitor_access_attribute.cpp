@@ -4,13 +4,14 @@
 #include "compiler/llvm/gestion_variable.h"
 #include "compiler/ast/registry/registry_class.h"
 #include "compiler/visitor/code_gen/helper/error_helper.h"
+#include <llvm-18/llvm/ADT/StringRef.h>
 #include <llvm/IR/Instructions.h>
 #include <string>
 
 void GeneralVisitorGenCode::visiter(NodeAccesAttribute* nodeAccessAttribute)
 {
-    std::string objectName = nodeAccessAttribute->getNomObject().value.str();
-    std::string attributeName = nodeAccessAttribute->getNomAttribute().value.str();
+    llvm::StringRef objectName = nodeAccessAttribute->getNomObject().value;
+    llvm::StringRef attributeName = nodeAccessAttribute->getNomAttribute().value;
 
     VariableLoader loader(_contextGenCode);
     Symbol objectSymbol = loader.load(objectName);
@@ -19,19 +20,21 @@ void GeneralVisitorGenCode::visiter(NodeAccesAttribute* nodeAccessAttribute)
     std::string className = getClassNameFromSymbol(objectSymbol);
 
     if (className.empty()) {
-        ErrorHelper::compilationError("Unable to determine the class of object '" + objectName + "'");
+        ErrorHelper::compilationError("Unable to determine the class of object '" + objectName.str() + "'");
     }
 
     auto* classInfo = _contextGenCode->getRegistryClass()->get(className).get();
     classInfo = ErrorHelper::verifyNotNull(classInfo, "Class '" + className + "' not found in the registry");
 
-    if (!classInfo->getRegistryVariable()->variableExists(attributeName)) {
-        ErrorHelper::compilationError("Attribute '" + attributeName + "' does not exist in class '" + className + "'");
+    if (!classInfo->getRegistryVariable()->variableExists(attributeName.str())) {
+        ErrorHelper::compilationError("Attribute '" + attributeName.str() + "' does not exist in class '" + className + "'");
     }
 
-    auto iterator = classInfo->getMemberIndices().find(attributeName);
+    auto iterator = classInfo->getMemberIndices().find(llvm::StringRef(attributeName).str());
     if (iterator == classInfo->getMemberIndices().end()) {
-        ErrorHelper::compilationError("Attribute '" + attributeName + "' has no index in " + className);
+        ErrorHelper::compilationError(
+            ("Attribute '" + attributeName + "' has no index in " + className).str()
+        );
     }
     
     unsigned int index = iterator->second;

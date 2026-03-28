@@ -18,10 +18,10 @@
 void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
 {
     // Retrieve the object name (e.g., "dog")
-    std::string objectName = nodeCallObject->getNomObject().value.str();
+    llvm::StringRef objectName = nodeCallObject->getNomObject().value;
 
     // Retrieve the called method name (e.g., "bark")
-    std::string methodName = nodeCallObject->getNomMethode().value.str();
+    llvm::StringRef methodName = nodeCallObject->getNomMethode().value;
 
     VariableLoader loader(_contextGenCode);
     
@@ -32,7 +32,7 @@ void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
     std::string className = getClassNameFromSymbol(objectSymbol);
 
     if (className.empty()) {
-        ErrorHelper::compilationError("Class of object '" + objectName + "' undetermined");
+        ErrorHelper::compilationError("Class of object '" + std::string(objectName) + "' undetermined");
     }
     // Create the path to the object
     auto* structClassType = llvm::dyn_cast<llvm::StructType>(objectSymbol.getPointedElementType());
@@ -43,13 +43,13 @@ void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
     // from the static class vtable of the object
     llvm::Value* vtable = _contextGenCode->getBackend()->getBuilder().CreateLoad(_contextGenCode->getBackend()->getBuilder().getPtrTy(), vptrAddress, "vptr");
     // Get the method index in the vtable for indirect call
-    int methodIndex = _contextGenCode->getRegistryClass()->get(className)->getMethodIndex(methodName);
+    int methodIndex = _contextGenCode->getRegistryClass()->get(className)->getMethodIndex(methodName.str());
 
     auto* classInfo = _contextGenCode->getRegistryClass()->get(className).get();
     classInfo = ErrorHelper::verifyNotNull(classInfo, "Class '" + className + "' not found");
 
-    ErrorHelper::verifyExistence(*classInfo->getRegistryFunctionLocal(), methodName,
-        "Method '" + methodName + "' does not exist in '" + className + "'");
+    ErrorHelper::verifyExistence(*classInfo->getRegistryFunctionLocal(), methodName.str(),
+        "Method '" + methodName.str() + "' does not exist in '" + className + "'");
 
     auto& builder = _contextGenCode->getBackend()->getBuilder();
     
@@ -61,7 +61,7 @@ void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
     std::vector<llvm::Value*> args;
     args.push_back(object);
 
-    const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(methodName);
+    const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(methodName.str());
     if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
         throw std::runtime_error("Error: SymbolFunctionLocal expected");
     }

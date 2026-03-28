@@ -2,12 +2,13 @@
 #include "compiler/ast/utils/orchestrator_include/orchestrator_include.h" 
 #include "compiler/ast/ast_genere.h" 
 #include <filesystem>
+#include <string>
 
 void FillingVisitorRegistry::visiter(NodeInclude* nodeInclude)
 {
     std::filesystem::path parentFilePath(_contextGenCode->getCurrentFilePath());
     std::filesystem::path parentDirectory = parentFilePath.parent_path();
-    std::filesystem::path absolutePath = parentDirectory / nodeInclude->getPath().value.str();
+    std::filesystem::path absolutePath = parentDirectory / std::string(nodeInclude->getPath().value);
     _orchestrator->includeFile(absolutePath.string());
 }
 

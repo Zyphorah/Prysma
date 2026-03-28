@@ -13,6 +13,7 @@
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/GlobalValue.h>
+#include <llvm/Support/FormatVariadic.h>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -27,7 +28,7 @@ FillingVisitorBodyClass::~FillingVisitorBodyClass()
 
 void FillingVisitorBodyClass::visiter(NodeClass* nodeClass)
 {
-    std::string className = nodeClass->getNomClass().value.str();
+    std::string className = std::string(nodeClass->getNomClass().value);
 
     MembersExtractorClass classExtractor;
     for (INode* member : nodeClass->getListMembers()) {
@@ -99,10 +100,7 @@ void FillingVisitorBodyClass::visiter(NodeClass* nodeClass)
 
             if(!found)
             {
-                std::string errorMsg = "Class " + className + " must implement the method ";
-                errorMsg += parentMethod->getNom().value;
-                errorMsg += " inherited from " + parentName;
-                throw std::runtime_error(errorMsg);
+                throw std::runtime_error(llvm::formatv("Class {0} must implement the method {1} inherited from {2}", className, parentMethod->getNom().value, parentName).str());
             }
         }
     }
@@ -119,7 +117,7 @@ void FillingVisitorBodyClass::visiter(NodeClass* nodeClass)
         if (variableType != nullptr) {
             classBodyElements.push_back(variableType);
             // Register the index for Pass 3
-            classInfo->getMemberIndices()[declarationVariable->getNom().value.str()] = currentIndex;
+            classInfo->getMemberIndices()[std::string(declarationVariable->getNom().value)] = currentIndex;
             currentIndex++;
         }
     }

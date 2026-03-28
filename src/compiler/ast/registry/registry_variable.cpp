@@ -3,6 +3,7 @@
 #include "compiler/manager_error.h"
 #include <llvm-18/llvm/ADT/StringMap.h>
 #include <llvm-18/llvm/IR/Instructions.h>
+#include <llvm-18/llvm/Support/FormatVariadic.h>
 #include <stack>
 #include <string>
 
@@ -22,9 +23,9 @@ void RegistryVariable::registerVariable(const Token& token, Symbol symbol)
         auto it = _variables.top().find(token.value);
         if (it != _variables.top().end())
         {
-            throw CompilationError("Variable '" + token.value.str() + "' already declared", Line(token.line), Column(token.column));
+            throw CompilationError(llvm::formatv("Variable '{0}' already declared", token.value).str(), Line(token.line), Column(token.column));
         }
-        _variables.top()[token.value.str()] = symbol;
+        _variables.top()[token.value] = symbol;
     }
 }
 
@@ -33,20 +34,20 @@ auto RegistryVariable::getVariable(const Token& token) -> Symbol
 {
     if(_variables.empty())
     {
-        throw CompilationError("The variable stack is empty! Variable not available: '" + token.value.str() + "'", Line(token.line), Column(token.column));
+        throw CompilationError(llvm::formatv("The variable stack is empty! Variable not available: '{0}'", token.value).str(), Line(token.line), Column(token.column));
     }
 
     std::stack<llvm::StringMap<Symbol>> tempStack = _variables;
     while(!tempStack.empty())
     {
-        auto it = tempStack.top().find(token.value.str());
+        auto it = tempStack.top().find(token.value);
         if (it != tempStack.top().end())
         {
             return it->second;
         }
         tempStack.pop();
     }
-    throw CompilationError("Variable '" + token.value.str() + "' not declared", Line(token.line), Column(token.column));
+    throw CompilationError(llvm::formatv("Variable '{0}' not declared", token.value).str(), Line(token.line), Column(token.column));
 }
 
 // Push a new variable scope

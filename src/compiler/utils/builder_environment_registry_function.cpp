@@ -6,6 +6,7 @@
 #include "compiler/utils/prysma_cast.h"
 #include "compiler/visitor/extractors/members_extractor_class.h"
 #include <llvm-18/llvm/IR/Function.h>
+#include <llvm/ADT/StringRef.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <memory>
@@ -26,12 +27,13 @@ void BuilderEnvironmentRegistryFunction::buildVTable(Class* classInfo, const std
     
     // Add the parent's function pointers to the vtable, in the same order
     for (NodeDeclarationFunction* parentMethodDecl : parentMethodList) {
-        std::string parentMethodName = parentMethodDecl->getNom().value.str();
+        llvm::StringRef parentMethodName = parentMethodDecl->getNom().value;
+        std::string parentMethodNameStr = parentMethodName.str();
         
         // Search for the corresponding method in the current class
         llvm::Function* functionImpl = nullptr;
-        if (classInfo->getRegistryFunctionLocal()->exists(parentMethodName)) {
-            const auto& symbol = classInfo->getRegistryFunctionLocal()->get(parentMethodName);
+        if (classInfo->getRegistryFunctionLocal()->exists(parentMethodNameStr)) {
+            const auto& symbol = classInfo->getRegistryFunctionLocal()->get(parentMethodNameStr);
             if (!prysma::isa<SymbolFunctionLocal>(symbol.get())) {
                 throw std::runtime_error("Error: Expected SymbolFunctionLocal");
             }
@@ -45,14 +47,14 @@ void BuilderEnvironmentRegistryFunction::buildVTable(Class* classInfo, const std
                 functionImpl,
                 llvm::PointerType::get(llvm::Type::getInt8Ty(_contextGenCode->getBackend()->getContext()), 0)
             ));
-            classInfo->getMethodIndices()[parentMethodName] = static_cast<unsigned int>(vtableElements.size() - 1);
+            classInfo->getMethodIndices()[parentMethodName.str()] = static_cast<unsigned int>(vtableElements.size() - 1);
         }
     }
     
     // Add additional methods from the current class that are not in the parent
     auto methodKeys = classInfo->getRegistryFunctionLocal()->getKeys();
     for (const auto& key : methodKeys) {
-        const std::string& methodName = key;
+        llvm::StringRef methodName = key;
         bool isInParent = false;
         
         // Check if this method is in the parent
@@ -75,7 +77,7 @@ void BuilderEnvironmentRegistryFunction::buildVTable(Class* classInfo, const std
                     localSymbol->function,
                     llvm::PointerType::get(llvm::Type::getInt8Ty(_contextGenCode->getBackend()->getContext()), 0)
                 ));
-                classInfo->getMethodIndices()[methodName] = static_cast<unsigned int>(vtableElements.size() - 1);
+                classInfo->getMethodIndices()[std::string(methodName)] = static_cast<unsigned int>(vtableElements.size() - 1);
             }
         }
     }
@@ -132,7 +134,8 @@ void BuilderEnvironmentRegistryFunction::fill()
         newSymbol->returnType = oldSymbol->returnType;
         newSymbol->node = oldSymbol->node;
         
-        _contextGenCode->getRegistryFunctionLocal()->registerElement(key, std::move(newSymbol));        
+        llvm::StringRef safeKey = oldSymbol->node->getNom().value;
+        _contextGenCode->getRegistryFunctionLocal()->registerElement(safeKey, std::move(newSymbol));        
     }
 
     // Fill class methods (VTable, mangling)

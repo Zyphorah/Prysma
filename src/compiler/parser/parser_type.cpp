@@ -29,7 +29,7 @@ auto TypeParser::parse(std::vector<Token>& tokens, int& index) -> IType*
     IType* type = nullptr;
     
     if (tokens[static_cast<size_t>(index)].type == TOKEN_IDENTIFIER) {
-        type = _builderTree->allocate<TypeComplex>(tokens[static_cast<size_t>(index)].value.str());
+        type = _builderTree->allocate<TypeComplex>(std::string(tokens[static_cast<size_t>(index)].value));
     } else {
         llvm::Type* typeLLVM = _registryType->get(tokens[static_cast<size_t>(index)].type);
         type = _builderTree->allocate<TypeSimple>(typeLLVM);

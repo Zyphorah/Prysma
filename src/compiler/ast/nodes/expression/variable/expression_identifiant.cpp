@@ -9,6 +9,7 @@
 #include "compiler/lexer/token_type.h"
 #include <cstddef>
 #include <llvm/ADT/StringRef.h>
+#include <llvm/Support/FormatVariadic.h>
 #include <string.h>
 #include <string>
 #include <vector>
@@ -49,7 +50,7 @@ auto ExpressionIdentifiant::build(std::vector<Token>& equation) -> INode*
 
         if (bracketIndex == 3 && equation[1].type == TOKEN_DOT) {
             Token combinedName;
-            std::string tempStr = equation[0].value.str() + "." + equation[2].value.str();
+            std::string tempStr = llvm::formatv("{0}.{1}", equation[0].value, equation[2].value).str();
             
             auto& arena = _context.getBuilderTreeEquation()->getArena();
             char* arr = static_cast<char*>(arena.Allocate(tempStr.size() + 1, 1));

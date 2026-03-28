@@ -6,12 +6,13 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/Support/Casting.h>
 #include <stdexcept>
+#include <llvm/Support/FormatVariadic.h>
 #include <string>
 #include <vector>
 
 VariableTypeExtractor::VariableTypeExtractor(ContextGenCode* context) : _context(context) {}
 
-llvm::Type* VariableTypeExtractor::extract(llvm::Value* memoryAddress) {
+auto VariableTypeExtractor::extract(llvm::Value* memoryAddress) -> llvm::Type* {
     if (auto* allocaInst = llvm::dyn_cast<llvm::AllocaInst>(memoryAddress)) {
         return allocaInst->getAllocatedType();
     }
@@ -20,21 +21,21 @@ llvm::Type* VariableTypeExtractor::extract(llvm::Value* memoryAddress) {
 
 VariableAddressor::VariableAddressor(ContextGenCode* context) : _context(context) {}
 
-Symbol VariableAddressor::getAddress(const std::string& variableName) {
+auto VariableAddressor::getAddress(llvm::StringRef variableName) -> Symbol {
     Token searchToken;
     searchToken.value = variableName;
 
-    if (_context->getRegistryVariable()->variableExists(variableName)) {
+    if (_context->getRegistryVariable()->variableExists(std::string(variableName))) {
         return _context->getRegistryVariable()->getVariable(searchToken);
     }
 
     if (!_context->getCurrentClassName().empty()) {
         auto const& classInfo = _context->getRegistryClass()->get(_context->getCurrentClassName());
-        if (classInfo->getMemberIndices().find(variableName) != classInfo->getMemberIndices().end()) {
-            unsigned int idx = classInfo->getMemberIndices().at(variableName);
+        if (classInfo->getMemberIndices().find(std::string(variableName)) != classInfo->getMemberIndices().end()) {
+            unsigned int idx = classInfo->getMemberIndices().at(std::string(variableName));
             
             Symbol modelSymbol;
-            if(classInfo->getRegistryVariable()->variableExists(variableName)) {
+            if(classInfo->getRegistryVariable()->variableExists(std::string(variableName))) {
                 modelSymbol = classInfo->getRegistryVariable()->getVariable(searchToken);
             }
 
@@ -58,17 +59,17 @@ Symbol VariableAddressor::getAddress(const std::string& variableName) {
                 variableName + "_ptr"
             );
 
-            return Symbol(fieldPtr, modelSymbol.getType(), modelSymbol.getPointedElementType());
+            return {fieldPtr, modelSymbol.getType(), modelSymbol.getPointedElementType()};
         }
     }
 
-    throw std::runtime_error("Semantic error: Variable '" + variableName + "' is not declared.");
+    throw std::runtime_error(llvm::formatv("Semantic error: Variable '{0}' is not declared.", variableName).str());
 }
 
 VariableLoader::VariableLoader(ContextGenCode* context) 
     : _context(context), _addressor(context), _extractor(context) {}
 
-Symbol VariableLoader::load(const std::string& variableName) {
+Symbol VariableLoader::load(llvm::StringRef variableName) {
     Symbol symbol = _addressor.getAddress(variableName);
     llvm::Value* memoryAddress = symbol.getAddress();
     
@@ -89,7 +90,7 @@ Symbol VariableLoader::load(const std::string& variableName) {
     return symbol;
 }
 
-Symbol VariableLoader::loadUnref(const std::string& variableName) {
+auto VariableLoader::loadUnref(llvm::StringRef variableName) -> Symbol {
     Symbol symbol = _addressor.getAddress(variableName);
     llvm::Value* memoryAddress = symbol.getAddress();
     
@@ -101,7 +102,7 @@ Symbol VariableLoader::loadUnref(const std::string& variableName) {
     }
     
     if (memoryAddress == nullptr) {
-        throw std::runtime_error("Semantic error: Variable '" + variableName + "' is not declared.");
+        throw std::runtime_error(llvm::formatv("Semantic error: Variable '{0}' is not declared.", variableName).str());
     }
 
     if(valueType->isPointerTy()) {   
@@ -124,7 +125,7 @@ Symbol VariableLoader::loadUnref(const std::string& variableName) {
 
         symbol = Symbol(loadedSecondJump, symbol.getType(), symbol.getPointedElementType());
     } else {
-        throw std::runtime_error("Semantic error: Variable '" + variableName + "' is not a pointer. Unref can only be applied to pointers.");
+        throw std::runtime_error(llvm::formatv("Semantic error: Variable '{0}' is not a pointer. Unref can only be applied to pointers.", variableName).str());
     }
 
     return symbol;
@@ -132,7 +133,7 @@ Symbol VariableLoader::loadUnref(const std::string& variableName) {
 
 VariableAllocator::VariableAllocator(ContextGenCode* context) : _context(context) {}
 
-llvm::AllocaInst* VariableAllocator::allocate(llvm::Type* type, const std::string& variableName) {
+llvm::AllocaInst* VariableAllocator::allocate(llvm::Type* type, llvm::StringRef variableName) {
     llvm::BasicBlock* insertBlock = _context->getBackend()->getBuilder().GetInsertBlock();
     _context->getBackend()->setInsertionPointAfterAllocation();
 

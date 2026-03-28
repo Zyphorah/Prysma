@@ -2,6 +2,7 @@
 #define F2141F07_2C85_4ADB_9BC9_A909EBD34394
 
 #include "registry_generic.h"
+#include <llvm-18/llvm/ADT/StringRef.h>
 #include <llvm-18/llvm/IR/Function.h>
 #include <mutex>
 #include <string>
@@ -61,7 +62,7 @@ public:
     ~RegistryFunctionGlobal() override = default;
 };
 
-class RegistryFunctionLocal : public RegistryGeneric<std::string, std::unique_ptr<IFunctionSymbolRegistry>>
+class RegistryFunctionLocal : public RegistryGeneric<llvm::StringRef, std::unique_ptr<IFunctionSymbolRegistry>>
 {
 public:
     RegistryFunctionLocal() = default;
