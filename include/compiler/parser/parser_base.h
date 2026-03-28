@@ -2,7 +2,8 @@
 #define DD335087_6EDE_4036_872C_8BD586E26251
 
 #include "compiler/ast/interfaces/i_builder_tree.h"
-#include "compiler/ast/nodes/interfaces/i_instruction.h"
+#include "compiler/ast/nodes/interfaces/i_node.h"
+#include <llvm/ADT/ArrayRef.h>
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <vector>
@@ -14,7 +15,7 @@ protected:
     // Consumes a token of the expected type, throws if not found
     static auto consume(std::vector<Token>& tokens, int& index, TokenType expectedType, const std::string& errorMessage) -> Token;
     // Consumes the child body until the end token
-    static void consumeChildBody(std::vector<Token>& tokens, int& index, IInstruction* parent, IBuilderTree* builderTree, TokenType end);
+    static auto consumeChildBody(std::vector<Token>& tokens, int& index, IBuilderTree* builderTree, TokenType end) -> llvm::ArrayRef<INode*>;
 };
 
 #endif /* DD335087_6EDE_4036_872C_8BD586E26251 */

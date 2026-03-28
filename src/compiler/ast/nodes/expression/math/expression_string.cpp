@@ -7,6 +7,7 @@
 #include "compiler/ast/registry/context_expression.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
+#include <llvm/ADT/SmallVector.h>
 #include <cstddef>
 #include <stdexcept>
 #include <string>
@@ -21,7 +22,7 @@ ExpressionString::~ExpressionString()
 
 auto ExpressionString::build(std::vector<Token>& equation) -> INode*
 {
-    std::vector<INode*> stringElements;
+    llvm::SmallVector<INode*, 16> stringElements;
 
     int index = 0;
     if (equation.empty() || equation[0].type != TOKEN_QUOTE) {
@@ -56,7 +57,9 @@ auto ExpressionString::build(std::vector<Token>& equation) -> INode*
     tokenZero.column = str.column;
     stringElements.push_back(_context.getBuilderTreeEquation()->allocate<NodeLiteral>(tokenZero)); 
 
-    return _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(stringElements);
+    return _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
+        _context.getBuilderTreeEquation()->allocateArray<INode*>(stringElements)
+    );
 }
 
 #endif /* EXPRESSION_STRING_CPP */

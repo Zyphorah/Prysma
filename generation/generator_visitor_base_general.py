@@ -1,4 +1,3 @@
-
 import re
 def to_snake_case(name):
     if '.' in name:
@@ -26,16 +25,11 @@ class GeneratorVisitorBaseGeneral(EngineGeneration):
 
     def generate(self):
         nodes = self._loadr_nodes_yaml()
-        noms = list(nodes.keys()) + ["Instruction"]
+        noms = list(nodes.keys())
         self._rendre_et_ecrire("visitor_base_general.h.j2", self._fichier_entete, nodes=noms)
         nodes_avec_champs = {}
         for nom, definition in nodes.items():
             champs = definition.get("champs", {}) if definition else {}
-            if definition and definition.get("parent") == "NodeInstruction":
-                champs_copie = dict(champs)
-                champs_copie["children"] = "std::vector<INode*>"
-                champs = champs_copie
             nodes_avec_champs[nom] = champs
-        nodes_avec_champs["Instruction"] = {"children": "std::vector<INode*>"}
         methodes = {nom: self._extraire_traversables(champs) for nom, champs in nodes_avec_champs.items()}
         self._rendre_et_ecrire("visitor_base_general.cpp.j2", self._fichier_source, methodes=methodes)

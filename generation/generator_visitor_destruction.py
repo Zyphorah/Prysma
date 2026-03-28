@@ -21,5 +21,5 @@ class GeneratorVisitorDestruction(EngineGeneration):
     
     def generate(self):
         nodes = self._loadr_nodes_yaml()
-        noms = list(nodes.keys()) + ["Instruction"]
+        noms = list(set(list(nodes.keys())))
         self._rendre_et_ecrire("visitor_destruction.h.j2", self._fichier_entete, nodes=noms)

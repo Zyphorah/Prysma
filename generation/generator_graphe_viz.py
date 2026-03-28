@@ -1,4 +1,3 @@
-
 import re
 def to_snake_case(name):
     if '.' in name:
@@ -30,14 +29,15 @@ class GeneratorGraphViz(EngineGeneration):
 
     def generate(self):
         nodes = self._loadr_nodes_yaml()
-        config = self._loadr_config_graphviz()
-        noms = list(nodes.keys()) + ["Instruction"]
-        self._rendre_et_ecrire(
-            "visitor_graphviz.h.j2",
-            os.path.join(self._dossier_entete, "general_visitor_graph_viz.h"),
-            nodes=noms
-        )
+        noms = list(nodes.keys())
+        self._rendre_et_ecrire("visitor_graphviz.h.j2", os.path.join(self._dossier_entete, "general_visitor_graph_viz.h"), nodes=noms)
+
+        methodes = self._preparer_methodes(nodes)
+        self._rendre_et_ecrire("visitor_graphviz.cpp.j2", os.path.join(self._dossier_source, "general_visitor_graph_viz.cpp"), methodes=methodes)
+
+    def _preparer_methodes(self, nodes):
         methodes = []
+        config = self._loadr_config_graphviz()
         for nom, definition in nodes.items():
             definition = definition or {}
             champs = definition.get("champs", {})
@@ -46,11 +46,7 @@ class GeneratorGraphViz(EngineGeneration):
             for e in config["childs_herites"].get(nom, []):
                 traversables.append((e["getter"], e["type"]))
             methodes.append((nom, label, traversables))
-        self._rendre_et_ecrire(
-            "visitor_graphviz.cpp.j2",
-            os.path.join(self._dossier_source, "general_visitor_graph_viz.cpp"),
-            methodes=methodes
-        )
+        return methodes
 
     def _loadr_config_graphviz(self):
         if not os.path.exists(self._fichier_graphviz_yaml):

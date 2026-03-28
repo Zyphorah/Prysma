@@ -1,10 +1,9 @@
 #ifndef PARSER_IF_CPP
 #define PARSER_IF_CPP
 
-#include "compiler/instruction/parser_if.h"
+#include "compiler/condition/parser_if.h"
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
-#include "compiler/ast/nodes/node_instruction.h"
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
@@ -30,23 +29,23 @@ auto ParserIf::parse(std::vector<Token>& tokens, int& index) -> INode*
   consume(tokens, index, TOKEN_PAREN_CLOSE, "Error, token is not ')'! ");
 
   // Create the IF block node
-  auto* nodeBlockIf = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>();
   consume(tokens, index, TOKEN_BRACE_OPEN, "Error, token is not '{'");
-  consumeChildBody(tokens, index, nodeBlockIf, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
+  auto ifChildren = consumeChildBody(tokens, index, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
+  INode* nodeBlockIf = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(ifChildren);
   consume(tokens, index, TOKEN_BRACE_CLOSE, "Error, token is not '}'");
 
   // Create the ELSE block node if it exists
-  NodeInstruction* nodeBlockElse = nullptr;
+  INode* nodeBlockElse = nullptr;
   if (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type == TOKEN_ELSE) {
       consume(tokens, index, TOKEN_ELSE, "Error, token is not 'else'! ");
-      nodeBlockElse = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>();
       consume(tokens, index, TOKEN_BRACE_OPEN, "Error, token is not '{'");
-      consumeChildBody(tokens, index, nodeBlockElse, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
+      auto elseChildren = consumeChildBody(tokens, index, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
+      nodeBlockElse = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(elseChildren);
       consume(tokens, index, TOKEN_BRACE_CLOSE, "Error, token is not '}'");
   }
 
   // Create the ENDIF block node
-  auto* nodeBlockEndif = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>();
+  auto* nodeBlockEndif = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(llvm::ArrayRef<INode*>{});
 
   auto* nodeIf = _contextParser.getBuilderTreeInstruction()->allocate<NodeIf>(condition, nodeBlockIf, nodeBlockElse, nodeBlockEndif);
 

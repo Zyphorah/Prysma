@@ -1,10 +1,15 @@
 Node:
+  Core:
+    Instruction:
+      engine: []
+      champs:
+        children: "llvm::ArrayRef<INode*>"
   Function:
     CallFunction:
       engine: [parser, expression]
-      parent: "NodeInstruction"
       champs:
         nomFunction: "Token"
+        children: "llvm::ArrayRef<INode*>"
     ArgFunction:
       engine: [parser]
       champs:
@@ -16,7 +21,7 @@ Node:
         visibilite: "Token"
         typeReturn: "IType*"
         nom: "Token"
-        arguments: "std::vector<INode*>"
+        arguments: "llvm::ArrayRef<INode*>"
         body: "INode*"
     Return:
       engine: [parser]
@@ -60,7 +65,7 @@ Node:
     ArrayInitialization:
       engine: [expression]
       champs:
-        elements: "std::vector<INode*>"
+        elements: "llvm::ArrayRef<INode*>"
     ReadingArray:
       engine: []
       champs:
@@ -71,16 +76,16 @@ Node:
     Class:
       engine: [parser]
       champs: 
-        Heritage: "std::vector<INode*>"
-        listMembers: "std::vector<INode*>"
-        builder: "std::vector<INode*>"
+        Heritage: "llvm::ArrayRef<INode*>"
+        listMembers: "llvm::ArrayRef<INode*>"
+        builder: "llvm::ArrayRef<INode*>"
         nomClass: "Token"
     CallObject:
       engine: [parser, expression]
-      parent: "NodeInstruction"
       champs:
         nomObject: "Token"
         nomMethode: "Token"
+        children: "llvm::ArrayRef<INode*>"
     AccesAttribute:
       engine: []
       champs:
@@ -92,36 +97,38 @@ Node:
         nomObject: "Token"
         typeObject: "IType*"
         
-  Instruction:
+  Condition:
     If:
       engine: [parser]
-      parent: "NodeInstruction"
       champs:
         nodeCondition: "INode*"
         nodeBlocIf: "INode*"
         nodeBlocElse: "INode*"
         nodeBlocEndif: "INode*"
-
-    While:
-      engine: [parser]
-      parent: "NodeInstruction"
-      champs:
-        nodeCondition: "INode*"
-        nodeBlocWhile: "INode*"
-        nodeBlocFinWhile: "INode*"
+  ControlMemory:
     New:
       engine: [expression]
       champs:
-        arguments: "std::vector<INode*>"
+        arguments: "llvm::ArrayRef<INode*>"
         nomType: "Token"
     Delete:
       engine: [parser]
       champs:
         nomType: "Token"
+        
+  IncludeModule:
     Include:
       engine: [parser]
       champs:
         path: "Token"
+
+  Loops:
+    While:
+      engine: [parser]
+      champs:
+        nodeCondition: "INode*"
+        nodeBlocWhile: "INode*"
+        nodeBlocFinWhile: "INode*"
     
   Math:
     Operation:
@@ -131,7 +138,6 @@ Node:
         token: "Token"
         gauche: "INode*"
         droite: "INode*"
-
     Literal:
       engine: [expression]
       champs:

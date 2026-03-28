@@ -1,11 +1,12 @@
 #include "compiler/ast/builder_tree_instruction.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
-#include "compiler/ast/nodes/node_instruction.h"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/registry/registry_instruction.h"
 #include "compiler/parser/interfaces/i_parser.h"
 #include "compiler/manager_error.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
+#include "llvm/ADT/SmallVector.h"
 #include <cstddef>
 #include <llvm/Support/Allocator.h>
 #include <vector>
@@ -34,16 +35,16 @@ auto BuilderTreeInstruction::build(std::vector<Token>& tokens, int& index) -> IN
 auto BuilderTreeInstruction::build(std::vector<Token>& tokens) -> INode*
 {
     int index = 0; 
-    // Create a global container for the whole file
-    auto* globalProgram = allocate<NodeInstruction>();
+    llvm::SmallVector<INode*, 64> children;
     
     while (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != TOKEN_EOF) {
         INode* child = build(tokens, index);
         if (child != nullptr) {
-            globalProgram->addInstruction(child);
+            children.push_back(child);
         }
     }
-    return globalProgram;
+    
+    return allocate<NodeInstruction>(allocateArray<INode*>(children));
 }
 
 auto BuilderTreeInstruction::getArena() -> llvm::BumpPtrAllocator&

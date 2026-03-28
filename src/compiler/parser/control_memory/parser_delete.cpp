@@ -1,7 +1,7 @@
 #ifndef PARSER_DELETE_CPP
 #define PARSER_DELETE_CPP
 
-#include "compiler/instruction/parser_delete.h"
+#include "compiler/control_memory/parser_delete.h"
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"

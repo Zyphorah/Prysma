@@ -6,7 +6,6 @@
 #include <vector>
 #include <llvm-18/llvm/Support/Allocator.h>
 #include <llvm/Support/TargetSelect.h>
-#include "compiler/ast/nodes/node_instruction.h"
 #include "compiler/ast/registry/registry_type.h"
 #include "compiler/lexer/token_type.h"
 #include "catch.hpp"
@@ -41,9 +40,9 @@
 #include "compiler/variable/parser_un_ref_variable.h"
 #include "compiler/function/parser_return.h"
 #include "compiler/function/parser_arg_function.h"
-#include "compiler/instruction/parser_if.h"
-#include "compiler/instruction/parser_while.h"
-#include "compiler/instruction/parser_include.h"
+#include "compiler/condition/parser_if.h"
+#include "compiler/loops/parser_while.h"
+#include "compiler/include_module/parser_include.h"
 
 using namespace std;
 

@@ -4,11 +4,11 @@
 #include "compiler/function/parser_declaration_function.h"
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
-#include "compiler/ast/nodes/node_instruction.h"
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
+#include <llvm/ADT/SmallVector.h>
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -33,7 +33,7 @@ auto ParserDeclarationFunction::parse(std::vector<Token>& tokens, int& index) ->
   // Parse arguments inside parentheses
   consume(tokens, index, TOKEN_PAREN_OPEN, "Error: not an opening parenthesis '('");
   
-  std::vector<INode*> arguments;
+  llvm::SmallVector<INode*, 4> arguments;
   while(index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != TOKEN_PAREN_CLOSE)
   {
       if(tokens[static_cast<size_t>(index)].type == TOKEN_COMMA)
@@ -51,13 +51,13 @@ auto ParserDeclarationFunction::parse(std::vector<Token>& tokens, int& index) ->
   // Parse the body in a strict NodeScope
   consume(tokens, index, TOKEN_BRACE_OPEN, "Error: not an opening brace '{' ");
 
-  auto* body = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>();
-  consumeChildBody(tokens, index, body, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
+  auto bodyChildren = consumeChildBody(tokens, index, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
+  auto* body = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(bodyChildren);
 
   consume(tokens, index, TOKEN_BRACE_CLOSE, "Error: not a closing brace '}'");
 
   auto* nodeFunction = 
-      _contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(Token{}, typeReturn, tokenFunctionName, arguments, body);
+      _contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(Token{}, typeReturn, tokenFunctionName, _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(arguments), body);
 
   return nodeFunction; 
 }

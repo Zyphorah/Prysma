@@ -5,30 +5,20 @@
 #include "compiler/lexer/lexer.h"
 #include "llvm/Support/Allocator.h"
 #include <cstddef>
+#include <llvm/ADT/SmallVector.h>
 #include <new>
 #include <utility>
 #include <vector>
 
 class IBuilderTree
 {
-private:
-    struct Finalizer {
-        void (*destroy)(void*);
-        void* pointer;
-    };
-    std::vector<Finalizer> finalizers; // TODO: replace with an llvm::StringRef-based solution as destruction is currently temporary, I want to use the power of the bump allocator
 public:
+virtual ~IBuilderTree() = default;
     IBuilderTree() = default;
     IBuilderTree(const IBuilderTree&) = delete;
     auto operator=(const IBuilderTree&) -> IBuilderTree& = delete;
     IBuilderTree(IBuilderTree&&) = delete;
     auto operator=(IBuilderTree&&) -> IBuilderTree& = delete;
-
-    virtual ~IBuilderTree() {
-        for (auto it = finalizers.rbegin(); it != finalizers.rend(); ++it) {
-            it->destroy(it->pointer);
-        }
-    }
     
     virtual auto build(std::vector<Token>& tokens) -> INode* = 0;
     virtual auto build(std::vector<Token>& tokens, int& index) -> INode* = 0;
@@ -38,8 +28,22 @@ public:
     auto allocate(Args&&... args) -> T* {
         void* mem = getArena().Allocate(sizeof(T), alignof(T));
         T* obj = new (mem) T(std::forward<Args>(args)...); // NOLINT(cppcoreguidelines-owning-memory)
-        finalizers.push_back({[](void* ptr) { static_cast<T*>(ptr)->~T(); }, mem});
         return obj;
+    }
+
+    // We need to copy the values of the array into the bump allocator because we do not know in advance the memory size it will take; it is a vector that can grow and take more elements depending on the circumstances.
+    // We must make this choice to gain performance in the future during data destruction and also for data immutability, a single copy for future reading
+    // Two fundamental advantages of this pattern: cache locality (fast reading thanks to memory contiguity) and global deallocation (Arena destruction in O(1)).
+    template<typename T>
+    auto allocateArray(llvm::ArrayRef<T> elements) -> llvm::ArrayRef<T> {
+        if (elements.empty()) 
+        { 
+            return {};
+
+        }
+        T* mem = static_cast<T*>(getArena().Allocate(elements.size() * sizeof(T), alignof(T)));
+        std::uninitialized_copy(elements.begin(), elements.end(), mem);
+        return llvm::ArrayRef<T>(mem, elements.size());
     }
 
     static constexpr std::size_t kArenaAlignment = 8;

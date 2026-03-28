@@ -1,13 +1,17 @@
 #include "compiler/parser/parser_base.h"
 #include "compiler/ast/interfaces/i_builder_tree.h"
-#include "compiler/ast/nodes/interfaces/i_instruction.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include "compiler/manager_error.h"
+#include <llvm/ADT/SmallVector.h>
 #include <cstddef>
 #include <string>
 #include <vector>
+
+namespace {
+    constexpr int DEFAULT_CHILDREN_CAPACITY = 32;
+}
 
 auto ParserBase::consume(std::vector<Token>& tokens, int& index, TokenType expectedType, const std::string& errorMessage) -> Token
 {
@@ -20,8 +24,9 @@ auto ParserBase::consume(std::vector<Token>& tokens, int& index, TokenType expec
     return tokens[static_cast<size_t>(index++)];
 }
 
-void ParserBase::consumeChildBody(std::vector<Token>& tokens, int& index , IInstruction* parent, IBuilderTree* builderTree, TokenType end)
+auto ParserBase::consumeChildBody(std::vector<Token>& tokens, int& index , IBuilderTree* builderTree, TokenType end) -> llvm::ArrayRef<INode*>
 {
+    llvm::SmallVector<INode*, DEFAULT_CHILDREN_CAPACITY> children;
     while(index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != end)
     {
         // Ignore commas between elements
@@ -32,6 +37,7 @@ void ParserBase::consumeChildBody(std::vector<Token>& tokens, int& index , IInst
         }
         
         INode* child = builderTree->build(tokens, index);
-        parent->addInstruction(child);
+        children.push_back(child);
     }
+    return builderTree->allocateArray<INode*>(children);
 }

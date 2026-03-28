@@ -1,14 +1,14 @@
 #ifndef PARSER_WHILE_CPP
 #define PARSER_WHILE_CPP
 
-#include "compiler/instruction/parser_while.h"
+#include "compiler/loops/parser_while.h"
 #include "compiler/ast/ast_genere.h"
-#include "compiler/ast/nodes/interfaces/i_instruction.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
-#include "compiler/ast/nodes/node_instruction.h"
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
+#include "compiler/visitor/interfaces/i_visitor.h"
+#include <llvm/ADT/ArrayRef.h>
 #include <vector>
 
 
@@ -18,7 +18,7 @@ ParserWhile::ParserWhile(ContextParser& contextParser)
 
 ParserWhile::~ParserWhile() = default;
 
-INode* ParserWhile::parse(std::vector<Token>& tokens, int& index)
+auto ParserWhile::parse(std::vector<Token>& tokens, int& index) -> INode*
 {
     consume(tokens, index, TOKEN_WHILE, "Error, expected token 'while' ");
 
@@ -28,14 +28,14 @@ INode* ParserWhile::parse(std::vector<Token>& tokens, int& index)
 
     consume(tokens, index, TOKEN_PAREN_CLOSE, "Error, token is not ')'! ");
 
-    IInstruction* nodeBlockWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>();
     consume(tokens, index, TOKEN_BRACE_OPEN, "Error, token is not '{'");
-    consumeChildBody(tokens, index, nodeBlockWhile, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
+    auto blockWhileChildren = consumeChildBody(tokens, index, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
+    INode* nodeBlockWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(blockWhileChildren);
     consume(tokens, index, TOKEN_BRACE_CLOSE, "Error, token is not '}'");
 
-    IInstruction* nodeBlockEndWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>();
+    INode* nodeBlockEndWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(llvm::ArrayRef<INode*>{});
 
-    IInstruction* nodeWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeWhile>(condition, nodeBlockWhile, nodeBlockEndWhile);
+    INode* nodeWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeWhile>(condition, nodeBlockWhile, nodeBlockEndWhile);
 
     return nodeWhile;
 }

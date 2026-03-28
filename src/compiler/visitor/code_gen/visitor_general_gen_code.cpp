@@ -1,6 +1,6 @@
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
-#include "compiler/ast/nodes/node_instruction.h"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/registry/context_gen_code.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/types/type_complex.h"

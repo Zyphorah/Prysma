@@ -1,7 +1,7 @@
 #ifndef PARSER_INCLUDE_CPP
 #define PARSER_INCLUDE_CPP
 
-#include "compiler/instruction/parser_include.h"
+#include "compiler/include_module/parser_include.h"
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"

@@ -3,7 +3,6 @@
 
 #include "compiler/object/parser_call_object.h"
 #include "compiler/ast/ast_genere.h"
-#include "compiler/ast/nodes/interfaces/i_instruction.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/lexer/lexer.h"
@@ -17,7 +16,7 @@ ParserCallObject::ParserCallObject(ContextParser& contextParser)
 {}
 
 ParserCallObject::~ParserCallObject()
-{}
+= default;
 
 auto ParserCallObject::parse(std::vector<Token>& tokens, int& index) -> INode*
 {
@@ -29,9 +28,8 @@ auto ParserCallObject::parse(std::vector<Token>& tokens, int& index) -> INode*
   Token methodName = consume(tokens, index, TOKEN_IDENTIFIER, "Error: method identifier expected");
   consume(tokens, index, TOKEN_PAREN_OPEN, "Error: '(' expected");
 
-  IInstruction* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallObject>(objectName, methodName);
-
-  consumeChildBody(tokens, index, nodeCall, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_CLOSE);
+  auto children = consumeChildBody(tokens, index, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_CLOSE);
+  INode* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallObject>(objectName, methodName, children);
 
   consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: ')' expected");
 

@@ -1,5 +1,5 @@
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "compiler/ast/nodes/node_instruction.h"
+#include "compiler/ast/ast_genere.h"
 
 void GeneralVisitorGenCode::visiter(NodeInstruction* instruction)
 {

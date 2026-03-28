@@ -13,8 +13,8 @@
 #include "compiler/ast/registry/registry_type.h"
 #include "compiler/ast/registry/types/type_simple.h"
 #include "compiler/ast/builder_tree_instruction.h"
-#include "compiler/instruction/parser_delete.h"
-#include "compiler/instruction/parser_include.h"
+#include "compiler/control_memory/parser_delete.h"
+#include "compiler/include_module/parser_include.h"
 #include "compiler/builder/equation/builder_equation_flottante.h"
 #include "compiler/parser/parser_type.h"
 
@@ -40,8 +40,8 @@
 #include "compiler/variable/parser_un_ref_variable.h"
 #include "compiler/function/parser_return.h"
 #include "compiler/function/parser_arg_function.h"
-#include "compiler/instruction/parser_if.h"
-#include "compiler/instruction/parser_while.h"
+#include "compiler/condition/parser_if.h"
+#include "compiler/loops/parser_while.h"
 
 #include "compiler/lexer/token_type.h"
 #include "compiler/object/parser_class.h"

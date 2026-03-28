@@ -7,6 +7,7 @@
 #include "compiler/ast/registry/context_expression.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
+#include <llvm/ADT/SmallVector.h>
 #include <cstddef>
 #include <vector>
 
@@ -19,7 +20,7 @@ ExpressionArrayInitialization::~ExpressionArrayInitialization()
 
 auto ExpressionArrayInitialization::build(std::vector<Token>& equation) -> INode*
 {
-    std::vector<INode*> arrayElements;
+    llvm::SmallVector<INode*, 8> arrayElements;
     std::vector<Token> subEquation;
     size_t index = 1;
 
@@ -45,7 +46,9 @@ auto ExpressionArrayInitialization::build(std::vector<Token>& equation) -> INode
         }
     }
 
-    return _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(arrayElements);
+    return _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
+        _context.getBuilderTreeEquation()->allocateArray<INode*>(arrayElements)
+    );
 }
 
 #endif /* EXPRESSION_ARRAYINITIALIZATION_CPP */

@@ -101,7 +101,7 @@ class EngineGeneration:
     def _extraire_traversables(champs):
         resultats = []
         for nom_champ, type_champ in champs.items():
-            if type_champ in ("INode*", "std::vector<INode*>"):
+            if type_champ in ("INode*", "llvm::ArrayRef<INode*>"):
                 getter = "get" + nom_champ[0].upper() + nom_champ[1:]
                 resultats.append((getter, type_champ))
         return resultats

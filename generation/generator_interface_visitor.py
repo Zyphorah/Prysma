@@ -21,5 +21,5 @@ class GeneratorInterfaceVisitor(EngineGeneration):
         self._fichier_ivisitor = os.path.join(dossier, "interfaces", "i_visitor.h")
 
     def generate(self):
-        noms = list(self._loadr_nodes_yaml().keys()) + ["Instruction"]
+        noms = list(self._loadr_nodes_yaml().keys())
         self._rendre_et_ecrire("ivisitor.h.j2", self._fichier_ivisitor, nodes=noms)

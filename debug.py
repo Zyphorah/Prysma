@@ -4,7 +4,6 @@ import subprocess
 from generation.generator_ast import GeneratorAST
 from generation.generator_interface_visitor import GeneratorInterfaceVisitor
 from generation.generator_visitor_base_general import GeneratorVisitorBaseGeneral
-from generation.generator_visitor_destruction import GeneratorVisitorDestruction
 from generation.generator_graphe_viz import GeneratorGraphViz
 from generation.generator_expression import GeneratorExpression
 from generation.generator_parser import GeneratorParser
@@ -19,7 +18,6 @@ def main():
     GeneratorGraphViz(dossier_script).generate()
     GeneratorExpression(dossier_script).generate()
     GeneratorParser(dossier_script).generate()
-    GeneratorVisitorDestruction(dossier_script).generate()
 
     cxxflags = (
         "-fno-rtti -g3 -O0 " # Debug info max, aucune optimisation

@@ -39,6 +39,7 @@
 
 // Prouver mathématiquement que mon système est infaillible pour la compilation comme Coq, Isabelle/HOL ou TLA+, reécrire le compiler dans un langage mathématique
 // Engine de Réflexion LLVM génération automatique du code llvm 
+// Pool string, registre afin d'éviter la dupplication et permettre la comparaison par pointeur. 
 
 // Améliorations possibles performance : 
 // DFA pour le lexer permet de gagner 10 à 20 fois supérieur en vitesse de tokenisation par rapport à l'approche de base 
@@ -54,6 +55,10 @@
 // shard de la map pour les functions. Pour un gain d'environ 70 pourcents en vitesse d'exécution pour les project avec beaucoup de function.
 
 // FUTAMURA projection pour faire un compiler qui se compile lui même
+
+
+// Calculer le nombre d'octet d'un fichier pour déterminer la taille d'un vecteur en mémoire évite la copy lors qu'il grandi. 
+// MemoryBuffer lecture ultra rapide des fichiers permet de faire corespondre directement le binaire. 
 
 auto main(int argc, char* argv[]) -> int
 {

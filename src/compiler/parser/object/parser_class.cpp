@@ -11,10 +11,12 @@
 #include "compiler/lexer/token_type.h"
 #include "compiler/visitor/interfaces/i_visitor.h"
 #include "compiler/utils/prysma_cast.h"
+#include <llvm/ADT/SmallVector.h>
 #include <vector>
 
 namespace
 {
+  constexpr int DEFAULT_CLASS_VECTOR_SIZE = 8;
   struct TokenClassName { Token t; };
   struct TokenVisibility { Token t; };
 
@@ -34,8 +36,8 @@ namespace
   void classifyClassNode(INode* node,
               const ClassParameters& param, 
               ContextParser& contextParser,
-              std::vector<INode*>& memberList,
-              std::vector<INode*>& builders)
+              llvm::SmallVectorImpl<INode*>& memberList,
+              llvm::SmallVectorImpl<INode*>& builders)
   {
     if (node == nullptr) {
       return;
@@ -113,13 +115,12 @@ auto ParserClass::parse(std::vector<Token>& tokens, int& index) -> INode*
     Token classNameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Expected an identifier after 'class' for the class name.");
     
     // Inheritance management: class ClassName : Parent
-    Token parentToken;
-    std::vector<INode*> inheritance; // TODO: handle multiple inheritance 
+    llvm::SmallVector<INode*, DEFAULT_CLASS_VECTOR_SIZE> inheritance; // TODO: handle multiple inheritance 
     
     
     consume(tokens, index, TOKEN_BRACE_OPEN, "Expected '{' after the class name.");
-    std::vector<INode*> memberList;
-    std::vector<INode*> builders;
+    llvm::SmallVector<INode*, DEFAULT_CLASS_VECTOR_SIZE> memberList;
+    llvm::SmallVector<INode*, DEFAULT_CLASS_VECTOR_SIZE> builders;
     
     // By default, start in PRIVATE section if no visibility keyword
     Token current_visibility;
@@ -152,16 +153,22 @@ auto ParserClass::parse(std::vector<Token>& tokens, int& index) -> INode*
 
         // If no visibility keyword, parse members in the current section (private by default)
         INode* node = _contextParser.getBuilderTreeInstruction()->build(tokens, index);
-        classifyClassNode(node, ClassParameters{TokenClassName{classNameToken}, TokenVisibility{current_visibility}}, _contextParser, memberList, builders);
+        TokenClassName tokenClassName;
+        tokenClassName.t = classNameToken;
+        TokenVisibility tokenVisibility{current_visibility};
+        ClassParameters classParameters(tokenClassName, tokenVisibility);
+
+        classifyClassNode(node, classParameters, _contextParser, memberList, builders);
     }
 
     consume(tokens, index, TOKEN_BRACE_CLOSE, "Expected '}' at the end of the class declaration.");
 
-    return _contextParser.getBuilderTreeInstruction()->allocate<NodeClass>(inheritance,
-                                                                              memberList,
-                                                                              builders,
-                                                                              classNameToken);
-
+    return _contextParser.getBuilderTreeInstruction()->allocate<NodeClass>(
+        _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(inheritance), 
+        _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(memberList), 
+        _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(builders), 
+        classNameToken
+    );
 }
 
 #endif /* PARSER_CLASS_CPP */

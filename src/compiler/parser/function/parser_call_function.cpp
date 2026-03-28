@@ -3,7 +3,6 @@
 
 #include "compiler/function/parser_call_function.h"
 #include "compiler/ast/ast_genere.h"
-#include "compiler/ast/nodes/interfaces/i_instruction.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/lexer/lexer.h"
@@ -27,9 +26,8 @@ INode* ParserCallFunction::parse(std::vector<Token>& tokens, int& index)
   Token functionName = consume(tokens, index, TOKEN_IDENTIFIER, "Error: function identifier expected");
   consume(tokens, index, TOKEN_PAREN_OPEN, "Error: '(' expected");
   
-  IInstruction* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallFunction>(functionName);
-  
-  consumeChildBody(tokens, index, nodeCall, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_CLOSE);
+  auto children = consumeChildBody(tokens, index, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_CLOSE);
+  INode* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallFunction>(functionName, children);
 
   consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: ')' expected");
 

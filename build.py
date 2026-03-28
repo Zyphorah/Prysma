@@ -4,7 +4,6 @@ import subprocess
 from generation.generator_ast import GeneratorAST
 from generation.generator_interface_visitor import GeneratorInterfaceVisitor
 from generation.generator_visitor_base_general import GeneratorVisitorBaseGeneral
-from generation.generator_visitor_destruction import GeneratorVisitorDestruction
 from generation.generator_graphe_viz import GeneratorGraphViz
 from generation.generator_expression import GeneratorExpression
 from generation.generator_parser import GeneratorParser
@@ -16,7 +15,6 @@ def main():
     GeneratorAST(script_dir).generate()
     GeneratorInterfaceVisitor(script_dir).generate()
     GeneratorVisitorBaseGeneral(script_dir).generate()
-    GeneratorVisitorDestruction(script_dir).generate()
     GeneratorGraphViz(script_dir).generate()
     GeneratorExpression(script_dir).generate()
     GeneratorParser(script_dir).generate()

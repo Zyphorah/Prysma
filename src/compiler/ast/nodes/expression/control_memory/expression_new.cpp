@@ -8,6 +8,7 @@
 #include "compiler/manager_error.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
+#include <llvm/ADT/SmallVector.h>
 #include <cstddef>
 #include <vector>
 
@@ -45,7 +46,7 @@ auto ExpressionNew::build(std::vector<Token>& equation) -> INode*
     }
 
     // We need to fill the arguments of new (e.g., new MyClass(arg1, arg2)) by adding the childs of nodeNew
-    std::vector<INode*> arguments;
+    llvm::SmallVector<INode*, 4> arguments;
     if (typeName.type == TOKEN_IDENTIFIER) {
         index++; // Skip the type name
         
@@ -65,7 +66,10 @@ auto ExpressionNew::build(std::vector<Token>& equation) -> INode*
         }
     }
 
-    return _context.getBuilderTreeEquation()->allocate<NodeNew>(arguments, typeName);
+    return _context.getBuilderTreeEquation()->allocate<NodeNew>(
+        _context.getBuilderTreeEquation()->allocateArray<INode*>(arguments), 
+        typeName
+    );
 }
 
 #endif /* EXPRESSION_NEW_CPP */
