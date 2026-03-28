@@ -7,6 +7,7 @@
 #include "compiler/ast/registry/context_expression.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
+#include <cstring>
 #include <llvm/ADT/SmallVector.h>
 #include <cstddef>
 #include <llvm/ADT/StringRef.h>

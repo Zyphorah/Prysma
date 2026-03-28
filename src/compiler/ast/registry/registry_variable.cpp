@@ -3,10 +3,8 @@
 #include "compiler/manager_error.h"
 #include <llvm-18/llvm/ADT/StringMap.h>
 #include <llvm-18/llvm/IR/Instructions.h>
-#include <map>
 #include <stack>
 #include <string>
-#include <utility>
 
 RegistryVariable::RegistryVariable()
 {
@@ -31,7 +29,7 @@ void RegistryVariable::registerVariable(const Token& token, Symbol symbol)
 }
 
 // Retrieve a variable, throws if not found
-Symbol RegistryVariable::getVariable(const Token& token)
+auto RegistryVariable::getVariable(const Token& token) -> Symbol
 {
     if(_variables.empty())
     {
@@ -75,7 +73,7 @@ void RegistryVariable::clearTop()
 }
 
 // Check if a variable exists in any scope
-bool RegistryVariable::variableExists(const std::string& name)
+auto RegistryVariable::variableExists(const std::string& name) -> bool
 {
     if(_variables.empty()) { return false;}
     

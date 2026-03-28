@@ -17,8 +17,8 @@
 #include <string>
 
 
-OrchestratorInclude::OrchestratorInclude(RegistryFunctionGlobal* registryFunctionGlobale, FileRegistry* fileRegistry, std::mutex* mutex, bool enableGraphViz)
-    : _mutex(mutex), _registryFunctionGlobal(registryFunctionGlobale), _registryFile(fileRegistry), _enableGraphViz(enableGraphViz)
+OrchestratorInclude::OrchestratorInclude(RegistryFunctionGlobal* registryFunctionGlobale, FileRegistry* registryFile, std::mutex* mutex, bool enableGraphViz)
+    : _mutex(mutex), _registryFunctionGlobal(registryFunctionGlobale), _registryFile(registryFile), _enableGraphViz(enableGraphViz)
 {}
 
 OrchestratorInclude::~OrchestratorInclude()
