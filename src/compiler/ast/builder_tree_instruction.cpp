@@ -23,7 +23,7 @@ BuilderTreeInstruction::~BuilderTreeInstruction()
 auto BuilderTreeInstruction::build(std::vector<Token>& tokens, int& index) -> INode*
 {
     if (!_registryInstructions->exists(tokens[static_cast<size_t>(index)].type)) {
-        throw CompilationError("Unknown instruction: '" + tokens[static_cast<size_t>(index)].value + "'", Line(tokens[static_cast<size_t>(index)].line), Column(tokens[static_cast<size_t>(index)].column));
+        throw CompilationError("Unknown instruction: '" + tokens[static_cast<size_t>(index)].value.str() + "'", Line(tokens[static_cast<size_t>(index)].line), Column(tokens[static_cast<size_t>(index)].column));
     }
     IParser* parentNode = _registryInstructions->get(tokens[static_cast<size_t>(index)].type);
     INode* child = parentNode->parse(tokens, index);

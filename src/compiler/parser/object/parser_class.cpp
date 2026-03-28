@@ -66,7 +66,7 @@ namespace
               declarationFunction->getBody()
           );
         }      auto* newDeclarationFunction = prysma::cast<NodeDeclarationFunction>(node);
-      if (newDeclarationFunction != nullptr && newDeclarationFunction->getNom().value == param.classNameToken().value) {
+      if (newDeclarationFunction != nullptr && newDeclarationFunction->getNom().value.str() == param.classNameToken().value.str()) {
         builders.push_back(node);
         return;
       }
@@ -74,7 +74,7 @@ namespace
       return;
     }
 
-    throw CompilationError("Invalid class member: '" + param.classNameToken().value + "'", Line(param.classNameToken().line), Column(param.classNameToken().column));
+    throw CompilationError("Invalid class member: '" + param.classNameToken().value.str() + "'", Line(param.classNameToken().line), Column(param.classNameToken().column));
   }
 }
 

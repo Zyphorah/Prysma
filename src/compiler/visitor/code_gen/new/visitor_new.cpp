@@ -25,8 +25,8 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
     Class* classInfo = nullptr;
 
     if (nodeNew->getNomType().type == TOKEN_IDENTIFIER) {
-        classInfo = _contextGenCode->getRegistryClass()->get(nodeNew->getNomType().value).get();
-        classInfo = ErrorHelper::verifyNotNull(classInfo, "Class '" + nodeNew->getNomType().value + "' not found");
+        classInfo = _contextGenCode->getRegistryClass()->get(nodeNew->getNomType().value.str()).get();
+        classInfo = ErrorHelper::verifyNotNull(classInfo, "Class '" + nodeNew->getNomType().value.str() + "' not found");
         targetType = classInfo->getStructType();
     } else {
         targetType = _contextGenCode->getRegistryType()->get(nodeNew->getNomType().type);
@@ -122,7 +122,7 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
 
     // Build the builder with arguments
     if (classInfo != nullptr) {
-        std::string builderName = nodeNew->getNomType().value;
+        std::string builderName = nodeNew->getNomType().value.str();
         if (classInfo->getRegistryFunctionLocal()->exists(builderName)) {
             const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(builderName);
             if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {

@@ -10,7 +10,7 @@
 void FillingVisitorRegistry::visiter(NodeDeclarationFunction* nodeDeclarationFunction)
 {
     IType* returnType = nodeDeclarationFunction->getTypeReturn();
-    std::string functionName = nodeDeclarationFunction->getNom().value;
+    std::string functionName = nodeDeclarationFunction->getNom().value.str();
     
     if (_contextGenCode->getCurrentClassName() != "") {
         // class context (method)

@@ -68,6 +68,6 @@ class GeneratorGraphViz(EngineGeneration):
             if type_champ == "std::string":
                 return f'"{nom_node}: " + node->{getter}()'
             if type_champ == "Token":
-                return f'node->{getter}().value'
+                return f'node->{getter}().value.str()'
 
         return f'"{nom_node}"'

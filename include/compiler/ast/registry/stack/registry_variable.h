@@ -3,6 +3,7 @@
 
 #include "compiler/lexer/lexer.h"
 #include "compiler/ast/registry/types/i_type.h"
+#include <llvm-18/llvm/ADT/StringMap.h>
 #include <llvm-18/llvm/IR/Value.h>
 #include <map>
 #include <stack>
@@ -32,7 +33,7 @@ public:
 class RegistryVariable 
 {
 private: 
-    std::stack<std::map<std::string, Symbol >>  _variables; 
+    std::stack<llvm::StringMap<Symbol>>  _variables; 
 
 public:
     RegistryVariable();
@@ -57,7 +58,7 @@ public:
 
     auto variableExists(const std::string& name) -> bool;
 
-    auto getGlobalVariables() -> std::map<std::string, Symbol>& {
+    auto getGlobalVariables() -> llvm::StringMap<Symbol>& {
         return _variables.top();
     }
 };

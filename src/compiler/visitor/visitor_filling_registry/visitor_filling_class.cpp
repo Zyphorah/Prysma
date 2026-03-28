@@ -21,7 +21,7 @@ void FillingVisitorRegistry::visiter(NodeClass* nodeClass)
 {
     // 1. Retrieve the class name from the declaration node
     const Token& classNameToken = nodeClass->getNomClass();
-    std::string className = classNameToken.value;
+    std::string className = classNameToken.value.str();
 
     // 2. Create the "Opaque" type in LLVM
     llvm::StructType* opaqueTypeLLVM = llvm::StructType::create(
@@ -69,7 +69,7 @@ void FillingVisitorRegistry::visiter(NodeClass* nodeClass)
             classInfoPtr->getRegistryVariable()->registerVariable(token, Symbol(nullptr, declVar->getType()));
             
             if (declVar->getExpression() != nullptr) {
-                classInfoPtr->getMemberInitializers()[declVar->getNom().value] = declVar->getExpression();
+                classInfoPtr->getMemberInitializers()[declVar->getNom().value.str()] = declVar->getExpression();
             }
         }
     }

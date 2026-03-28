@@ -78,4 +78,7 @@ target_compile_options(Prysma PRIVATE
     -Wshadow                
     -Wnon-virtual-dtor      
     -Wnull-dereference      
+    
+    # LLVM XRay instrumentation (Debug only)
+    $<$<CONFIG:Debug>:-fxray-instrument;-fxray-instruction-threshold=1>
 )

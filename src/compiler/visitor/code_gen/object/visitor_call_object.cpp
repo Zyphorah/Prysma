@@ -18,10 +18,10 @@
 void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
 {
     // Retrieve the object name (e.g., "dog")
-    std::string objectName = nodeCallObject->getNomObject().value;
+    std::string objectName = nodeCallObject->getNomObject().value.str();
 
     // Retrieve the called method name (e.g., "bark")
-    std::string methodName = nodeCallObject->getNomMethode().value;
+    std::string methodName = nodeCallObject->getNomMethode().value.str();
 
     VariableLoader loader(_contextGenCode);
     

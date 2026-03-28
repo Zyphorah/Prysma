@@ -44,9 +44,12 @@
 #include "compiler/loops/parser_while.h"
 #include "compiler/include_module/parser_include.h"
 
+#include <list>
+
 using namespace std;
 
 struct EnvironnementAST {
+    std::list<std::string> codes;
     llvm::BumpPtrAllocator arena;
     std::unique_ptr<RegistryInstruction> registryInstruction;
     std::unique_ptr<RegistryExpression> registryExpression;
@@ -168,8 +171,9 @@ struct EnvironnementAST {
 
 /// Construit un tree d'équation à partir d'une string de code source.
 INode* construireEquationDepuisString(EnvironnementAST& env, const std::string& code) {
+    env.codes.push_back(code);
     Lexer lexer;
-    std::vector<Token> tokens = lexer.tokenize(code);
+    std::vector<Token> tokens = lexer.tokenize(env.codes.back());
 
     // Retirer le token EOF ajouté par le Lexer
     if (!tokens.empty() && tokens.back().type == TOKEN_EOF) {
@@ -181,8 +185,9 @@ INode* construireEquationDepuisString(EnvironnementAST& env, const std::string& 
 
 /// Construit un tree d'instructions à partir d'une string de code source.
 INode* construireTreeDepuisString(EnvironnementAST& env, const std::string& code) {
+    env.codes.push_back(code);
     Lexer lexer;
-    std::vector<Token> tokens = lexer.tokenize(code);
+    std::vector<Token> tokens = lexer.tokenize(env.codes.back());
     return env.builderTree->build(tokens);
 }
 

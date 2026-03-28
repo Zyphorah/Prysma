@@ -9,7 +9,9 @@
 #include "compiler/lexer/token_type.h"
 #include <llvm/ADT/SmallVector.h>
 #include <cstddef>
+#include <llvm/ADT/StringRef.h>
 #include <stdexcept>
+#include <string.h>
 #include <string>
 #include <vector>
 
@@ -44,7 +46,13 @@ auto ExpressionString::build(std::vector<Token>& equation) -> INode*
         int ascii = static_cast<unsigned char>(str.value[charIndex]);
         Token token;
         token.type = TOKEN_LIT_INT;
-        token.value = std::to_string(ascii);
+        std::string asciiStr = std::to_string(ascii);
+        
+        auto& arena = _context.getBuilderTreeEquation()->getArena();
+        char* arr = static_cast<char*>(arena.Allocate(asciiStr.size() + 1, 1));
+        std::memcpy(arr, asciiStr.c_str(), asciiStr.size() + 1);
+        
+        token.value = llvm::StringRef(arr, asciiStr.size());
         token.line = str.line;
         token.column = str.column;
         stringElements.push_back(_context.getBuilderTreeEquation()->allocate<NodeLiteral>(token)); 

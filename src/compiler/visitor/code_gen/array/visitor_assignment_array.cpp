@@ -22,7 +22,7 @@ void GeneralVisitorGenCode::visiter(NodeAssignmentArray* nodeAssignmentArray)
     llvm::Value* expressionResult = evaluateExpression(nodeAssignmentArray->getExpression()).getAddress();
 
     // Retrieve the array
-    std::string arrayNameStr = nodeAssignmentArray->getToken().value;
+    std::string arrayNameStr = nodeAssignmentArray->getToken().value.str();
     Symbol symbol;
     llvm::Value* value = nullptr;
 

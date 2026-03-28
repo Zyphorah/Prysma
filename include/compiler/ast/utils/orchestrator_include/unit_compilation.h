@@ -32,6 +32,7 @@ private:
     ContextGenCode* _context;
     INode* _tree;
     std::string _originalFilePath;
+    std::string _sourceDocument;
 
 public: 
     UnitCompilation(OrchestratorInclude* orchestrator, FileRegistry* registry, std::string filePath, RegistryFunctionGlobal* registryFunctionGlobal);

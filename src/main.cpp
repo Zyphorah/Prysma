@@ -60,6 +60,9 @@
 // Calculer le nombre d'octet d'un fichier pour déterminer la taille d'un vecteur en mémoire évite la copy lors qu'il grandi. 
 // MemoryBuffer lecture ultra rapide des fichiers permet de faire corespondre directement le binaire. 
 
+// KCachegrind pour déterminer les performances 
+// Recyclage des noeuds de l'AST pour éviter les allocations sur des noeuds existants, pas très bien pour les performances
+
 auto main(int argc, char* argv[]) -> int
 {
     if (argc < 2) {

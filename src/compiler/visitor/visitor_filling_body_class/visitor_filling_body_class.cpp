@@ -27,7 +27,7 @@ FillingVisitorBodyClass::~FillingVisitorBodyClass()
 
 void FillingVisitorBodyClass::visiter(NodeClass* nodeClass)
 {
-    std::string className = nodeClass->getNomClass().value;
+    std::string className = nodeClass->getNomClass().value.str();
 
     MembersExtractorClass classExtractor;
     for (INode* member : nodeClass->getListMembers()) {
@@ -119,7 +119,7 @@ void FillingVisitorBodyClass::visiter(NodeClass* nodeClass)
         if (variableType != nullptr) {
             classBodyElements.push_back(variableType);
             // Register the index for Pass 3
-            classInfo->getMemberIndices()[declarationVariable->getNom().value] = currentIndex;
+            classInfo->getMemberIndices()[declarationVariable->getNom().value.str()] = currentIndex;
             currentIndex++;
         }
     }

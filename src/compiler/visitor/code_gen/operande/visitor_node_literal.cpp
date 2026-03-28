@@ -19,7 +19,7 @@ void GeneralVisitorGenCode::visiter(NodeLiteral* nodeLiteral)
 
     if (token.type == TOKEN_IDENTIFIER) {
         VariableLoader loader(_contextGenCode);
-        _contextGenCode->setTemporaryValue(loader.load(token.value));
+        _contextGenCode->setTemporaryValue(loader.load(token.value.str()));
         return; 
     }
 
@@ -32,12 +32,14 @@ void GeneralVisitorGenCode::visiter(NodeLiteral* nodeLiteral)
         llvmValue = llvm::ConstantInt::get(llvmType, value ? 1 : 0);
     }
     else if (token.type == TOKEN_LIT_BOOL) {
-        long long value = std::stoll(token.value);
+        std::string str_val = token.value.str(); 
+        long long value = std::stoll(str_val);
         llvmType = llvm::Type::getInt1Ty(context);
         llvmValue = llvm::ConstantInt::get(llvmType, value != 0 ? 1 : 0);
     }
     else if (token.type == TOKEN_LIT_INT) { 
-        long long value = std::stoll(token.value); 
+        std::string str_val = token.value.str(); 
+        long long value = std::stoll(str_val); 
         // By default, if it exceeds 32 bits, we could allocate it as 64-bit,
         // but for now we allocate at least 64 bits or follow the original code with 'stoll' instead of 'stoi'
         // to avoid crashing in C++. The type will be adapted later during the operator (createAutoCast handles this).
@@ -45,12 +47,12 @@ void GeneralVisitorGenCode::visiter(NodeLiteral* nodeLiteral)
         llvmValue = llvm::ConstantInt::get(llvmType, static_cast<uint64_t>(value), true);
     }
     else if (token.type == TOKEN_LIT_FLOAT) { 
-        float value = std::stof(token.value); 
+        float value = std::stof(token.value.str()); 
         llvmType = llvm::Type::getFloatTy(context);
         llvmValue = llvm::ConstantFP::get(llvmType, value);
     }
     else {
-        ErrorHelper::compilationError("Unsupported literal type (" + token.value + ")");
+        ErrorHelper::compilationError("Unsupported literal type (" + token.value.str() + ")");
     }
 
     _contextGenCode->setTemporaryValue(Symbol(llvmValue, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));

@@ -42,7 +42,7 @@ FunctionDeclarationGenerator::FunctionDeclarationGenerator(ContextGenCode* conte
 
 auto StandardFunctionDeclarationGenerator::createFunction() -> llvm::Function*
 {
-    std::string functionName = getNodeDeclarationFunction()->getNom().value;
+    std::string functionName = getNodeDeclarationFunction()->getNom().value.str();
     
     const auto& symbolPtr = getContextGenCode()->getRegistryFunctionLocal()->get(functionName);
     if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
@@ -60,7 +60,7 @@ auto StandardFunctionDeclarationGenerator::createFunction() -> llvm::Function*
 
 auto MethodFunctionDeclarationGenerator::createFunction() -> llvm::Function*
 {
-    std::string functionName = getNodeDeclarationFunction()->getNom().value;
+    std::string functionName = getNodeDeclarationFunction()->getNom().value.str();
     std::string className = getContextGenCode()->getCurrentClassName();
     auto const& classInfo = getContextGenCode()->getRegistryClass()->get(className);
     const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(functionName);
@@ -244,7 +244,7 @@ const SymbolFunctionLocal* StandardFunctionCallGenerator::getLocalFunction(const
 
 void FunctionCallGenerator::generateCallFunction(NodeCallFunction* nodeCallFunction)
 {
-    std::string functionName = nodeCallFunction->getNomFunction().value;
+    std::string functionName = nodeCallFunction->getNomFunction().value.str();
 
     if (RegistryBuiltIns::isBuiltIn(functionName)) {
         RegistryBuiltIns::generateCall(functionName, nodeCallFunction, getContextGenCode(), _visitorGeneralCodeGen);

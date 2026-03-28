@@ -9,8 +9,8 @@
 
 void GeneralVisitorGenCode::visiter(NodeAccesAttribute* nodeAccessAttribute)
 {
-    std::string objectName = nodeAccessAttribute->getNomObject().value;
-    std::string attributeName = nodeAccessAttribute->getNomAttribute().value;
+    std::string objectName = nodeAccessAttribute->getNomObject().value.str();
+    std::string attributeName = nodeAccessAttribute->getNomAttribute().value.str();
 
     VariableLoader loader(_contextGenCode);
     Symbol objectSymbol = loader.load(objectName);

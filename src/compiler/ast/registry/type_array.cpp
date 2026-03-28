@@ -34,7 +34,7 @@ auto TypeArray::generateLLVMType(llvm::LLVMContext& context) -> llvm::Type*
         throw std::runtime_error("Error: the array size must be an integer literal");
     }
 
-    auto size = static_cast<uint64_t>(std::stoull(literal->getToken().value));
+    auto size = static_cast<uint64_t>(std::stoull(literal->getToken().value.str()));
     return llvm::ArrayType::get(elementType, size);
 }
 

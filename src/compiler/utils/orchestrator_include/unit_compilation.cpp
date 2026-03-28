@@ -69,7 +69,11 @@ void UnitCompilation::pass1() {
     FileReading fileReading(resolvedPath);
     std::string document = fileReading.getInput();
 
-    std::vector<Token> tokens = Lexer::tokenize(document);
+    // The lexer uses StringRef which points into the source memory
+    // To fix heap-use-after-free, we MUST retain the document in UnitCompilation
+    _sourceDocument = std::move(document);
+
+    std::vector<Token> tokens = Lexer::tokenize(_sourceDocument);
 
     _tree = builderTreeInstruction->build(tokens);
 

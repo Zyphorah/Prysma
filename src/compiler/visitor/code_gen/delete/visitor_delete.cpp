@@ -16,19 +16,19 @@ void GeneralVisitorGenCode::visiter(NodeDelete* nodeDelete)
     // Search for the variable in the variable registry to determine if it exists
     Symbol symbol = _contextGenCode->getRegistryVariable()->getVariable(variableToken);
 
-    ErrorHelper::verifyNotNull(symbol.getAddress(), "Variable '" + variableToken.value + "' not declared");
+    ErrorHelper::verifyNotNull(symbol.getAddress(), "Variable '" + variableToken.value.str() + "' not declared");
     
     llvm::Value* memoryAddress = symbol.getAddress();
     llvm::Type* dataType = memoryAddress->getType();
 
     if (!dataType->isPointerTy()) {
-        ErrorHelper::compilationError("Variable '" + variableToken.value + "' is not a pointer (delete requires a pointer)");
+        ErrorHelper::compilationError("Variable '" + variableToken.value.str() + "' is not a pointer (delete requires a pointer)");
     }
 
     llvm::Value* addressToFree = builder.CreateLoad(
         dataType,
         memoryAddress,
-        "pointer_" + variableToken.value
+        "pointer_" + variableToken.value.str()
     );
 
     // Retrieve the prysma_free function from the module

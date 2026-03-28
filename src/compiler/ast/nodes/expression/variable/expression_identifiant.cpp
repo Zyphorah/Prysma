@@ -8,7 +8,11 @@
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <cstddef>
+#include <llvm/ADT/StringRef.h>
+#include <string.h>
+#include <string>
 #include <vector>
+#include <cstring>
 
 ExpressionIdentifiant::ExpressionIdentifiant(ContextExpression& expressionContext)
     : _context(expressionContext)
@@ -45,7 +49,13 @@ auto ExpressionIdentifiant::build(std::vector<Token>& equation) -> INode*
 
         if (bracketIndex == 3 && equation[1].type == TOKEN_DOT) {
             Token combinedName;
-            combinedName.value = equation[0].value + "." + equation[2].value;
+            std::string tempStr = equation[0].value.str() + "." + equation[2].value.str();
+            
+            auto& arena = _context.getBuilderTreeEquation()->getArena();
+            char* arr = static_cast<char*>(arena.Allocate(tempStr.size() + 1, 1));
+            std::memcpy(arr, tempStr.c_str(), tempStr.size() + 1);
+
+            combinedName.value = llvm::StringRef(arr, tempStr.size());
             combinedName.type = TOKEN_IDENTIFIER;
             return _context.getBuilderTreeEquation()->allocate<NodeReadingArray>(indexExpr, combinedName);
         }

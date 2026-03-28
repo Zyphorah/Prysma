@@ -1,6 +1,7 @@
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/manager_error.h"
+#include <llvm-18/llvm/ADT/StringMap.h>
 #include <llvm-18/llvm/IR/Instructions.h>
 #include <map>
 #include <stack>
@@ -23,9 +24,9 @@ void RegistryVariable::registerVariable(const Token& token, Symbol symbol)
         auto it = _variables.top().find(token.value);
         if (it != _variables.top().end())
         {
-            throw CompilationError("Variable '" + token.value + "' already declared", Line(token.line), Column(token.column));
+            throw CompilationError("Variable '" + token.value.str() + "' already declared", Line(token.line), Column(token.column));
         }
-        _variables.top()[token.value] = symbol;
+        _variables.top()[token.value.str()] = symbol;
     }
 }
 
@@ -34,20 +35,20 @@ Symbol RegistryVariable::getVariable(const Token& token)
 {
     if(_variables.empty())
     {
-        throw CompilationError("The variable stack is empty! Variable not available: '" + token.value + "'", Line(token.line), Column(token.column));
+        throw CompilationError("The variable stack is empty! Variable not available: '" + token.value.str() + "'", Line(token.line), Column(token.column));
     }
 
-    std::stack<std::map<std::string, Symbol>> tempStack = _variables;
+    std::stack<llvm::StringMap<Symbol>> tempStack = _variables;
     while(!tempStack.empty())
     {
-        auto it = tempStack.top().find(token.value);
+        auto it = tempStack.top().find(token.value.str());
         if (it != tempStack.top().end())
         {
             return it->second;
         }
         tempStack.pop();
     }
-    throw CompilationError("Variable '" + token.value + "' not declared", Line(token.line), Column(token.column));
+    throw CompilationError("Variable '" + token.value.str() + "' not declared", Line(token.line), Column(token.column));
 }
 
 // Push a new variable scope
@@ -78,7 +79,7 @@ bool RegistryVariable::variableExists(const std::string& name)
 {
     if(_variables.empty()) { return false;}
     
-    std::stack<std::map<std::string, Symbol>> tempStack = _variables;
+    std::stack<llvm::StringMap<Symbol>> tempStack = _variables;
     while(!tempStack.empty())
     {
         auto it = tempStack.top().find(name);

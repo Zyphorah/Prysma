@@ -3,6 +3,7 @@
 #include "token_type.h"
 #include <array>
 #include <cstddef>
+#include <llvm-18/llvm/ADT/StringRef.h>
 #include <string>
 #include <utility>
 #include <vector>
@@ -13,7 +14,7 @@ using namespace std;
 
 struct Token {
     TokenType type;
-    string value;
+    llvm::StringRef value;
     int line;
     int column;
 };
@@ -58,7 +59,7 @@ class Lexer {
     }};
 
     // Private functions for tokenization
-    static void addCurrentWord(const string& currentWord, vector<Token>& tokens, int line, int column);
+    static void addCurrentWord(llvm::StringRef currentWord, vector<Token>& tokens, int line, int column);
     static void handleOperatorsAndDelimiters(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens, int line, int& column);
     static void handleMathOperators(char current, vector<Token>& tokens, int line, int column);
     static void handleDelimiters(char current, vector<Token>& tokens, int line, int column);
@@ -67,8 +68,6 @@ class Lexer {
     static void handleComments(const string& sourceCode, size_t& pos);
     static void handleNumber(const string& sourceCode, size_t& pos, vector<Token>& tokens, int line, int& column);
     static auto isNegativeNumberContext(const vector<Token>& tokens) -> bool;
-    static auto handleNegativeOrPositiveNumber(char current, const string& sourceCode, size_t& pos, vector<Token>& tokens,
-                                        string& currentWord, int line, int& column, int& columnCurrentWord) -> bool;
 
     public:
     static auto tokenize(const string& sourceCode) -> vector<Token>;

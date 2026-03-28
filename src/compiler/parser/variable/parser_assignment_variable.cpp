@@ -23,12 +23,12 @@ auto ParserAssignmentVariable::parse(std::vector<Token>& tokens, int& index) -> 
 {
     consume(tokens, index, TOKEN_ASSIGN, "Error: 'aff' expected");
     Token nameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Error: variable name expected");
-    std::string variableName = nameToken.value;
+    std::string variableName = nameToken.value.str();
 
     if (tokens[static_cast<size_t>(index)].type == TOKEN_DOT) {
         consume(tokens, index, TOKEN_DOT, "Error '.'");
         Token attributeToken = consume(tokens, index, TOKEN_IDENTIFIER, "Error: attribute expected");
-        variableName += "." + attributeToken.value;
+        variableName += "." + attributeToken.value.str();
     }
 
     INode* indexExpression = nullptr;

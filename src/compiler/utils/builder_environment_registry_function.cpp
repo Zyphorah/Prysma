@@ -26,7 +26,7 @@ void BuilderEnvironmentRegistryFunction::buildVTable(Class* classInfo, const std
     
     // Add the parent's function pointers to the vtable, in the same order
     for (NodeDeclarationFunction* parentMethodDecl : parentMethodList) {
-        std::string parentMethodName = parentMethodDecl->getNom().value;
+        std::string parentMethodName = parentMethodDecl->getNom().value.str();
         
         // Search for the corresponding method in the current class
         llvm::Function* functionImpl = nullptr;

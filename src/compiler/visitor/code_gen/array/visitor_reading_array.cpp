@@ -16,7 +16,7 @@
 
 void GeneralVisitorGenCode::visiter(NodeReadingArray* nodeReadingArray)
 {
-    std::string arrayNameStr = nodeReadingArray->getNomArray().value;
+    std::string arrayNameStr = nodeReadingArray->getNomArray().value.str();
     Symbol symbol;
     llvm::Value* arrayAddress = nullptr;
 
