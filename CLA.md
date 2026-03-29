@@ -26,6 +26,13 @@ You represent that You are legally entitled to grant the above license. If your 
 
 You are providing Your Contributions on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied, including, without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE.
 
-## 6. Sublicensing and Relicensing
+## 6. Future Licensing and Evolution
 
-You acknowledge and agree that the Maintainer has the right to re-license the Program and Your Contributions under any other license, including without limitation open source licenses (such as MIT, Apache 2.0, or GPL) and proprietary licenses, at the Maintainer's sole discretion.
+The Maintainer has the explicit right to change the license of the Program and all Contributions to any permissive open source license approved by the Open Source Initiative (OSI) (such as MIT, Apache 2.0, or BSD) without requiring additional consent from Contributors.
+
+Changing the license to a copyleft license (such as GPL, AGPL, or LGPL) requires:
+  a) A public vote open to all Contributors for a period of 30 days;
+  b) An affirmative approval by Contributors representing at least two-thirds (66%) of the non-trivial code contributions (defined as >100 lines of substantive code) merged in the preceding 24 months;
+  c) Written notice to all Contributors at least 14 days prior to the vote.
+
+The Maintainer shall never change the license of the Program or Contributions to any proprietary, closed-source, or non-OSI-approved license.
