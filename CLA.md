@@ -10,6 +10,8 @@ This license is for your protection as a Contributor as well as the protection o
 
 "Contribution" shall mean any source code, documentation, or other material submitted by You to the Prysma project for inclusion in, or documentation of, any of the products owned or managed by the Maintainer.
 
+"Program" shall mean the Prysma software, compiler, and associated tools managed by the Maintainer.
+
 ## 2. Grant of Copyright License
 
 Subject to the terms and conditions of this Agreement, You hereby grant to the Maintainer and to recipients of software distributed by the Maintainer a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute Your Contributions and such derivative works.
@@ -36,5 +38,3 @@ Changing the license to a copyleft license (such as GPL, AGPL, or LGPL) requires
   c) Written notice to all Contributors at least 14 days prior to the vote.
 
 The Maintainer shall never change the license of the Program or Contributions to any proprietary, closed-source, or non-OSI-approved license.
-
-"Program" shall mean the Prysma software, compiler, and associated tools managed by the Maintainer.
