@@ -37,4 +37,4 @@ Changing the license to a copyleft license (such as GPL, AGPL, or LGPL) requires
 
 The Maintainer shall never change the license of the Program or Contributions to any proprietary, closed-source, or non-OSI-approved license.
 
-Program" shall mean the Prysma software, compiler, and associated tools managed by the Maintainer.
+"Program" shall mean the Prysma software, compiler, and associated tools managed by the Maintainer.
