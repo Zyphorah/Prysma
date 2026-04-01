@@ -236,7 +236,8 @@ void ConfigurationFacadeEnvironment::createContextParser()
         _builderTreeInstruction,
         _parserType,
         _registryVariable.get(),
-        _registryType.get()
+        _registryType.get(),
+        _nodeComponentRegistry.get()
     };
     _contextParser = new (_arena.Allocate<ContextParser>()) ContextParser(deps); // NOLINT(cppcoreguidelines-owning-memory)
 }

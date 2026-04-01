@@ -23,8 +23,8 @@ private:
 public:
     ContextExpression(
         IBuilderTree* p_builderTreeEquation,
-        IBuilderTree* p_builderTreeInstruction,
         TypeParser* p_parserType,
+        IBuilderTree* p_builderTreeInstruction,
         ContextParser* p_contextParser,
         llvm::BumpPtrAllocator* p_arena,
         RegistryVariable* p_registryVariable,

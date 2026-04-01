@@ -22,7 +22,6 @@ private:
     Token _lastToken;
 
 public:
-  
     BuilderTreeEquation(
         ChainOfResponsibility* chainOfResponsibility,
         RegistrySymbol* symbolRegistry,

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <utility>
+#include "/compiler/macros/prysma_nodiscard.h"
 
 using node_id_t = std::size_t;
 
@@ -43,17 +44,17 @@ private:
 
 template<>
 struct NodeComponentRegistry::mapper<NODEGEN_TYPE_COMPONENT_TAG> {
-    static decltype(auto) get(NodeComponentRegistry& reg);
+    PRYSMA_NODISCARD static decltype(auto) get(NodeComponentRegistry& reg);
 };
 
 template<>
 struct NodeComponentRegistry::mapper<NAME_COMPONENT_TAG> {
-    static decltype(auto) get(NodeComponentRegistry& reg);
+    PRYSMA_NODISCARD static decltype(auto) get(NodeComponentRegistry& reg);
 };
 
 template<>
 struct NodeComponentRegistry::mapper<CHILD_COMPONENT_TAG> {
-    static decltype(auto) get(NodeComponentRegistry& reg);
+    PRYSMA_NODISCARD static decltype(auto) get(NodeComponentRegistry& reg);
 };
 
 
