@@ -55,6 +55,13 @@
 // KCachegrind pour déterminer les performances 
 // Recyclage des noeuds de l'AST pour éviter les allocations sur des noeuds existants, pas très bien pour les performances
 
+// Le compilateur clang utilise une approche sema pour la vérification de type, c'est à dire qu'il construit une table de symboles pour 
+// Les vérifications de type et les résolutions de noms, c'est là partie d'analyse sémantique du compilateur la logique qui dicte les règles de typage
+// Est-ce que c'est légal de mettre une string dans une variable int ou inversément. 
+// Il utilise cette technique pour les peformances et pour résoudre un problème spécifique de type pour réduire la complexité de la logique de leur arbre syntaxique 
+// Abstrait. 
+// Par contre, le coup c'est que le code est plus entrelacé donc plus rigide et plus difficile à maintenir. 
+
 auto main(int argc, char* argv[]) -> int
 {
     if (argc < 2) {
