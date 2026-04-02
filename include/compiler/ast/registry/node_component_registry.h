@@ -1,20 +1,23 @@
 #pragma once
 
+#include <llvm-18/llvm/ADT/ArrayRef.h>
 #include <utility>
+#include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/macros/prysma_nodiscard.h"
+#include "compiler/lexer/lexer.h"
+
+#include "compiler/data_structures/sparse_set.h"
 
 using node_id_t = std::size_t;
-
-template<typename T>
-class sparse_set {}; // TEMPORAIRE EN ATTENDANT D'AJOUTER LE SPARSE SET
 
 struct NODEGEN_TYPE_COMPONENT_TAG;
 struct NAME_COMPONENT_TAG;
 struct CHILD_COMPONENT_TAG;
 
-struct of_nodegen_types;
-struct of_names;
-struct of_children;
+using of_names = Token;
+using of_children = llvm::ArrayRef<INode*>;
+using of_nodegen_types = NodeTypeGenerated;
+
 
 struct NodeComponentRegistry {
     NodeComponentRegistry() = default;
@@ -23,7 +26,7 @@ public:
     template<typename COMPONENT_TAG> struct mapper;
 
 public:
-    template<typename T, typename COMPONENT_TAG>
+    template<typename COMPONENT_TAG, typename T>
     auto insert(node_id_t id, T&& component) noexcept -> void;
 
     template<typename COMPONENT_TAG>
@@ -35,6 +38,12 @@ public:
     template<typename COMPONENT_TAG>
     auto remove(node_id_t id) noexcept -> void;
 
+public:
+    auto getNextId() noexcept -> node_id_t;
+
+private:
+    node_id_t currentId = 0;
+
 private:
     sparse_set<of_nodegen_types> nodegen_types;
     sparse_set<of_names> names;
@@ -44,36 +53,36 @@ private:
 
 template<>
 struct NodeComponentRegistry::mapper<NODEGEN_TYPE_COMPONENT_TAG> {
-    PRYSMA_NODISCARD static decltype(auto) get(NodeComponentRegistry& reg);
+    PRYSMA_NODISCARD static sparse_set<of_nodegen_types>& get(NodeComponentRegistry& reg);
 };
 
 template<>
 struct NodeComponentRegistry::mapper<NAME_COMPONENT_TAG> {
-    PRYSMA_NODISCARD static decltype(auto) get(NodeComponentRegistry& reg);
+    PRYSMA_NODISCARD static sparse_set<of_names>& get(NodeComponentRegistry& reg);
 };
 
 template<>
 struct NodeComponentRegistry::mapper<CHILD_COMPONENT_TAG> {
-    PRYSMA_NODISCARD static decltype(auto) get(NodeComponentRegistry& reg);
+    PRYSMA_NODISCARD static sparse_set<of_children>& get(NodeComponentRegistry& reg);
 };
 
 
-template<typename T, typename COMPONENT_TAG>
+template<typename COMPONENT_TAG, typename T>
 auto NodeComponentRegistry::insert(node_id_t id, T&& component) noexcept -> void {
-    //mapper<COMPONENT_TAG>::get(*this).insert(id, std::forward<T>(component));
+    mapper<COMPONENT_TAG>::get(*this).insert(id, std::forward<T>(component));
 }
 
 template<typename COMPONENT_TAG>
 auto NodeComponentRegistry::emplace(node_id_t id) noexcept -> void {
-    //mapper<COMPONENT_TAG>::get(*this).emplace(id);
+    mapper<COMPONENT_TAG>::get(*this).emplace(id);
 }
 
 template<typename COMPONENT_TAG>
 auto NodeComponentRegistry::get(node_id_t id) noexcept -> decltype(auto) {
-    //return mapper<COMPONENT_TAG>::get(*this).get(id);
+    return mapper<COMPONENT_TAG>::get(*this).get(id);
 }
 
 template<typename COMPONENT_TAG>
 auto NodeComponentRegistry::remove(node_id_t id) noexcept -> void {
-    //mapper<COMPONENT_TAG>::get(*this).remove(id);
+    mapper<COMPONENT_TAG>::get(*this).remove(id);
 }

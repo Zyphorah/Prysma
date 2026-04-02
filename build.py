@@ -12,7 +12,7 @@ def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     os.chdir(script_dir)
 
-    GeneratorAST(script_dir).generate()
+    #GeneratorAST(script_dir).generate() # pour tester les maquettes des noeuds, il faudra modifier les scripts Jinja2
     GeneratorInterfaceVisitor(script_dir).generate()
     GeneratorVisitorBaseGeneral(script_dir).generate()
     GeneratorGraphViz(script_dir).generate()

@@ -2,6 +2,7 @@
 #include "compiler/llvm/gestion_function.h"
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/registry/context_gen_code.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/lexer/lexer.h"
@@ -12,6 +13,7 @@
 #include "compiler/utils/prysma_cast.h"
 #include <cstddef>
 #include <cstdint>
+#include <llvm-18/llvm/ADT/ArrayRef.h>
 #include <llvm-18/llvm/ADT/StringRef.h>
 #include <llvm-18/llvm/IR/Function.h>
 #include <llvm/IR/Argument.h>
@@ -245,7 +247,7 @@ auto StandardFunctionCallGenerator::getLocalFunction(llvm::StringRef functionNam
 
 void FunctionCallGenerator::generateCallFunction(NodeCallFunction* nodeCallFunction)
 {
-    llvm::StringRef functionName = nodeCallFunction->getNomFunction().value;
+    llvm::StringRef functionName = _contextGenCode->getNodeComponentRegistry()->get<NAME_COMPONENT_TAG>(nodeCallFunction->getNodeId())->value;
 
     if (RegistryBuiltIns::isBuiltIn(functionName)) {
         RegistryBuiltIns::generateCall(functionName, nodeCallFunction, getContextGenCode(), _visitorGeneralCodeGen);
@@ -257,9 +259,11 @@ void FunctionCallGenerator::generateCallFunction(NodeCallFunction* nodeCallFunct
     const SymbolFunctionLocal* symbolFunction = getLocalFunction(functionName);
     llvm::Function* targetFunction = symbolFunction->function;
     llvm::FunctionType* functionType = targetFunction->getFunctionType();
+
+    decltype(auto) nodeChildren = *_contextGenCode->getNodeComponentRegistry()->get<CHILD_COMPONENT_TAG>(nodeCallFunction->getNodeId());
     
     unsigned int paramIndex = 0; 
-    for (INode* argumentChild : nodeCallFunction->getChildren()) 
+    for (INode* argumentChild : nodeChildren) 
     {
         argumentChild->accept(_visitorGeneralCodeGen);
         llvm::Value* argumentValue = getContextGenCode()->getTemporaryValue().getAddress();
@@ -305,12 +309,14 @@ bool RegistryBuiltIns::isBuiltIn(llvm::StringRef name) {
 }
 
 void RegistryBuiltIns::generateCall(llvm::StringRef name, NodeCallFunction* nodeCallFunction, ContextGenCode* context, IVisitor* visitor) {
+    decltype(auto) nodeChildren = *context->getNodeComponentRegistry()->get<CHILD_COMPONENT_TAG>(nodeCallFunction->getNodeId());
+
     if (name == "print") {
-        if (nodeCallFunction->getChildren().empty()) {
+        if (nodeChildren.empty()) {
             return;
         }
 
-        nodeCallFunction->getChildren()[0]->accept(visitor);
+        nodeChildren[0]->accept(visitor);
         llvm::Value* argumentValue = context->getTemporaryValue().getAddress();
         IType* argumentType = context->getTemporaryValue().getType();
         
