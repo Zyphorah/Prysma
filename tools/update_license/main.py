@@ -15,33 +15,35 @@ def check_license_file(path: Path):
     return " - Brief description of the file -------*- C++ -*-===//" in lignes[0]
 
 
-def update_license(path : Path, lignes):
+def update_license(path : Path, current_content):
 
     env = Environment(loader=FileSystemLoader(str(template_path)))
     template = env.get_template(template_name)
+    file_lines = current_content.splitlines()
 
     context = {
         "path_file": path.name
     }
+    header = template.render(**context)
+    new_header_lines = header.splitlines()
 
-    if check_license_file(path) is not True:      
-        with open(path, 'w') as f:
-            header = template.render(**context)
-            f.write(header + "\n\n" + lignes)
+    if check_license_file(path) is not True:   
+        if path.resolve() != (template_path / template_name).resolve():
+            with open(path, 'w') as f:
+                f.write(header + "\n\n" + current_content)
     else:
-        header = template.render(**context)
-        
-        for i in range(header.len()):
-            lignes[i] = header[i]
-        with open(path,'w') as f: 
-            f.write(header + "\n\n" + lignes)
-            
+        if path.resolve() != (template_path / template_name).resolve():
+            nb_lines_to_replace = len(new_header_lines)
+            file_lines[:nb_lines_to_replace] = new_header_lines
+            path.write_text("\n".join(file_lines) + "\n", encoding="utf-8")
+            print(f"[UPDATED] {path.name}")
+
 def main():
 
     for path in base_path.rglob('*'):
         if path.is_file() and path.suffix in extensions:
-            lignes = path.read_text("utf-8")
-            update_license(path, lignes)
+            current_content = path.read_text("utf-8")
+            update_license(path, current_content)
           
 if __name__ == "__main__":
     main()
