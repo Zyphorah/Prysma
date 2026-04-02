@@ -58,6 +58,14 @@
             "program": "${workspaceFolder}/Tests/main.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "update_license Python",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/tools/update_license/main.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
