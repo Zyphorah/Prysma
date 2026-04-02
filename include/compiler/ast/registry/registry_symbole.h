@@ -1,5 +1,6 @@
 #pragma once
 
+#include "compiler/macros/prysma_nodiscard.h"
 #include "compiler/ast/registry/registry_generic.h"
 #include "compiler/ast/registry/interfaces/i_registry_symbole.h"
 #include "compiler/lexer/lexer.h"
@@ -33,17 +34,17 @@ public:
         return provider(token);
     }
 
-    [[nodiscard]] auto isOperator(TokenType symbol) const -> bool override {
+    PRYSMA_NODISCARD auto isOperator(TokenType symbol) const -> bool override {
         return exists(symbol);
     }
 
-    [[nodiscard]] auto getSymbols() const -> std::set<TokenType> override {
+    PRYSMA_NODISCARD auto getSymbols() const -> std::set<TokenType> override {
         return getKeys();
     }
 
 protected:
     using RegistryGeneric<TokenType, std::function<IExpression*(Token)>>::generateErrorMessage;
-    [[nodiscard]] auto generateErrorMessage(const TokenType& key) const -> std::string override {
+    PRYSMA_NODISCARD auto generateErrorMessage(const TokenType& key) const -> std::string override {
         return RegistryGeneric::generateErrorMessage(key);
     }
 };

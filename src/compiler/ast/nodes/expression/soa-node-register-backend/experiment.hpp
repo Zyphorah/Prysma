@@ -14,7 +14,7 @@
 /*******************************************/
 
 #if __cplusplus >= 201703L
-    #define PRYSMA_NODISCARD [[nodiscard]]
+    #define PRYSMA_NODISCARD PRYSMA_NODISCARD
 #elif defined(__GNUC__) || defined(__clang__)
     #define PRYSMA_NODISCARD __attribute__((warn_unused_result)) inline
 #else
@@ -453,15 +453,15 @@ private:
 //         //visitor->visiter(this);
 //     }
 
-//     [[nodiscard]] NodeTypeGenerated getGeneratedType() const override {
+//     PRYSMA_NODISCARD NodeTypeGenerated getGeneratedType() const override {
 //         return _nodeTypeGenerated;
 //     }
 
-//     [[nodiscard]] static bool classof(const INode* node) {
+//     PRYSMA_NODISCARD static bool classof(const INode* node) {
 //         return node->getGeneratedType() == NodeTypeGenerated::CallFunction;
 //     }
-//     [[nodiscard]] const Token& getNomFunction() const { return _nomFunction; }
-//     [[nodiscard]] llvm::ArrayRef<INode*> getChildren() const { return _children; }
+//     PRYSMA_NODISCARD const Token& getNomFunction() const { return _nomFunction; }
+//     PRYSMA_NODISCARD llvm::ArrayRef<INode*> getChildren() const { return _children; }
 // };
 
 /*******************************************/

@@ -1,6 +1,7 @@
 #ifndef D3A3E436_A6F0_4651_9DE8_DD58645AE33C
 #define D3A3E436_A6F0_4651_9DE8_DD58645AE33C
 
+#include "compiler/macros/prysma_nodiscard.h"
 #include "compiler/visitor/visitor_base_generale.h"
 #include <vector>
 #include <string>
@@ -17,9 +18,9 @@ private:
     std::string className;
 
 public:
-    [[nodiscard]] auto getMethods() const -> const std::vector<NodeDeclarationFunction*>& { return methods; }
-    [[nodiscard]] auto getVariables() const -> const std::vector<NodeDeclarationVariable*>& { return variables; }
-    [[nodiscard]] auto getClassName() const -> const std::string& { return className; }
+    PRYSMA_NODISCARD auto getMethods() const -> const std::vector<NodeDeclarationFunction*>& { return methods; }
+    PRYSMA_NODISCARD auto getVariables() const -> const std::vector<NodeDeclarationVariable*>& { return variables; }
+    PRYSMA_NODISCARD auto getClassName() const -> const std::string& { return className; }
     using VisitorBaseGenerale::visiter;
     void visiter(NodeDeclarationFunction* node) override;
     void visiter(NodeDeclarationVariable* node) override;

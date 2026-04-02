@@ -3,13 +3,14 @@
 
 #include <string>
 #include <stdexcept>
+#include "compiler/macros/prysma_nodiscard.h"
 
 struct Line {
 private:
     int value;
 public:
     explicit Line(int val) : value(val) {}
-    [[nodiscard]] auto getValue() const -> int { return value; }
+    PRYSMA_NODISCARD auto getValue() const -> int { return value; }
 };
 
 struct Column {
@@ -17,7 +18,7 @@ private:
     int value;
 public:
     explicit Column(int val) : value(val) {}
-    [[nodiscard]] auto getValue() const -> int { return value; }
+    PRYSMA_NODISCARD auto getValue() const -> int { return value; }
 };
 
 class CompilationError : public std::runtime_error
@@ -27,8 +28,8 @@ private:
     Column column;
 
 public:
-    [[nodiscard]] auto getLine() const -> int { return line.getValue(); }
-    [[nodiscard]] auto getColumn() const -> int { return column.getValue(); }
+    PRYSMA_NODISCARD auto getLine() const -> int { return line.getValue(); }
+    PRYSMA_NODISCARD auto getColumn() const -> int { return column.getValue(); }
 
     CompilationError(const std::string& message, Line lin, Column col)
         : std::runtime_error(message), line(lin), column(col)

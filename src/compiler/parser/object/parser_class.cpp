@@ -1,8 +1,8 @@
 #ifndef PARSER_CLASS_CPP
 #define PARSER_CLASS_CPP
 
+#include "compiler/macros/prysma_nodiscard.h"
 #include "compiler/manager_error.h"
-#include <cstddef>
 #include "compiler/object/parser_class.h"
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
@@ -14,6 +14,7 @@
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/Support/FormatVariadic.h>
 #include <vector>
+#include <cstddef>
 
 namespace
 {
@@ -26,8 +27,8 @@ namespace
     ClassParameters(const TokenClassName& classNameToken, const TokenVisibility& currentVisibility)
         : classNameToken_(classNameToken.t), current_visibility_(currentVisibility.t) {}
 
-    [[nodiscard]] auto classNameToken() const -> const Token& { return classNameToken_; }
-    [[nodiscard]] auto current_visibility() const -> const Token& { return current_visibility_; }
+    PRYSMA_NODISCARD auto classNameToken() const -> const Token& { return classNameToken_; }
+    PRYSMA_NODISCARD auto current_visibility() const -> const Token& { return current_visibility_; }
 
   private:
     Token classNameToken_;

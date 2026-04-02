@@ -1,7 +1,7 @@
 #pragma once
 
 #include <utility>
-#include "/compiler/macros/prysma_nodiscard.h"
+#include "compiler/macros/prysma_nodiscard.h"
 
 using node_id_t = std::size_t;
 
