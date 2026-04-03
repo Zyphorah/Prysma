@@ -7,6 +7,7 @@
 #include "compiler/lexer/lexer.h"
 #include "compiler/parser/equation/chain_of_responsibility.h"
 #include "compiler/parser/equation/interfaces/i_manager_parenthesis.h"
+#include <cstddef>
 #include <llvm/Support/Allocator.h>
 #include <vector>
 
@@ -31,6 +32,6 @@ public:
     );
     
     auto build(std::vector<Token> &tokens) -> INode* override;
-    auto build(std::vector<Token>& tokens, int& index) -> INode* override;
+    auto build(std::vector<Token>& tokens, std::size_t index) -> INode* override;
     auto getArena() -> llvm::BumpPtrAllocator& override;
 };

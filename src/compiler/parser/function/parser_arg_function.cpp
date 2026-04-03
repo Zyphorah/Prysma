@@ -8,6 +8,7 @@
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
+#include <cstddef>
 #include <vector>
 
 
@@ -18,7 +19,7 @@ ParserArgFunction::ParserArgFunction(ContextParser& contextParser)
 ParserArgFunction::~ParserArgFunction()
 = default;
 
-auto ParserArgFunction::parse(std::vector<Token>& tokens, int& index) -> INode* 
+auto ParserArgFunction::parse(std::vector<Token>& tokens, std::size_t index) -> INode* 
 {
   consume(tokens, index, TOKEN_ARG, "Error: token is not 'arg'!");
 

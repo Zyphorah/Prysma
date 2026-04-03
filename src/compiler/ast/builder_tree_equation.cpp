@@ -58,7 +58,7 @@ auto BuilderTreeEquation::build(std::vector<Token> &tokens) -> INode* {
     return node;
 }
 
-auto BuilderTreeEquation::build(std::vector<Token>& tokens, int& index) -> INode* {
+auto BuilderTreeEquation::build(std::vector<Token>& tokens, std::size_t index) -> INode* {
 
     // Save the current token position for error messages
     if (index < static_cast<int>(tokens.size())) {

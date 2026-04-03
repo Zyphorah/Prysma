@@ -5,17 +5,20 @@
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/ast/registry/registry_instruction.h"
+#include "compiler/ast/registry/node_component_registry.h"
+#include <cstddef>
 #include <llvm/Support/Allocator.h>
 #include <vector>
 
 class BuilderTreeInstruction : public IBuilderTree
 {
 private: 
+    NodeComponentRegistry* _nodeComponentRegistry;
     RegistryInstruction* _registryInstructions;
     llvm::BumpPtrAllocator& _arena;
 public: 
 
-    BuilderTreeInstruction(RegistryInstruction* registryInstructions, llvm::BumpPtrAllocator& arena);
+    BuilderTreeInstruction(NodeComponentRegistry* nodeComponentRegistry, RegistryInstruction* registryInstructions, llvm::BumpPtrAllocator& arena);
     ~BuilderTreeInstruction() override;
 
     // Delete copy and move constructors and assignment operators
@@ -25,7 +28,7 @@ public:
     auto operator=(BuilderTreeInstruction&&) -> BuilderTreeInstruction& = delete;
 
     auto build(std::vector<Token>& tokens) -> INode* override;  
-    auto build(std::vector<Token>& tokens, int& index) -> INode* override;
+    auto build(std::vector<Token>& tokens, std::size_t index) -> INode* override;
     auto getArena() -> llvm::BumpPtrAllocator& override;
 
 };

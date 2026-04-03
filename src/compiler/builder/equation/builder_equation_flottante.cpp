@@ -9,6 +9,7 @@
 #include "compiler/parser/equation/manager_operator.h"
 #include "compiler/parser/equation/service_parenthesis.h"
 #include "compiler/lexer/token_type.h"
+#include <cstddef>
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/Support/Allocator.h>
 #include <memory>
@@ -124,7 +125,7 @@ auto BuilderFloatEquation::getBuilderTree() const -> IBuilderTree*
     return _builderTree;
 }
 
-auto BuilderFloatEquation::build(std::vector<Token>& tokens, int& index) -> INode*
+auto BuilderFloatEquation::build(std::vector<Token>& tokens, std::size_t index) -> INode*
 {
     return _builderTree->build(tokens, index);
 }

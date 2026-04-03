@@ -246,7 +246,7 @@ void ConfigurationFacadeEnvironment::registerExpressions()
 {
     // Build the orchestrators of the abstract syntax tree
     _builderTreeInstruction = new (_arena) // NOLINT(cppcoreguidelines-owning-memory)
-        BuilderTreeInstruction(_registryInstruction.get(), _arena); 
+        BuilderTreeInstruction(_nodeComponentRegistry.get(), _registryInstruction.get(), _arena); 
 
     _registryExpression = new (_arena.Allocate<RegistryExpression>()) RegistryExpression(); // NOLINT(cppcoreguidelines-owning-memory)
 

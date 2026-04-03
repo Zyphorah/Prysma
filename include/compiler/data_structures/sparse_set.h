@@ -37,7 +37,7 @@ private:
     PRYSMA_NORETURN void error_entity_has_no_component(std::size_t entity_id);
     PRYSMA_NORETURN void error_entity_already_has_component(std::size_t entity_id);
 
-    bool is_valid_entity_id(std::size_t entity_id) const noexcept;
+    bool is_valid_entity_id(std::size_t entity_id) const noexcept; // n'est pas constexpr avant C++20
 
 public:
     sparse_set(std::size_t init_dense_capacity = DEFAULT_DENSE_CAPACITY,

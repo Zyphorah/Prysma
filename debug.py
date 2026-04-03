@@ -15,9 +15,9 @@ def main():
     #GeneratorAST(dossier_script).generate() # pour tester les maquettes des noeuds, il faudra modifier les scripts Jinja2
     GeneratorInterfaceVisitor(dossier_script).generate()
     GeneratorVisitorBaseGeneral(dossier_script).generate()
-    GeneratorGraphViz(dossier_script).generate()
-    GeneratorExpression(dossier_script).generate()
-    GeneratorParser(dossier_script).generate()
+    #GeneratorGraphViz(dossier_script).generate() # il faut injecter le registre de noeuds dans le visiteur graphviz
+    #GeneratorExpression(dossier_script).generate()
+    #GeneratorParser(dossier_script).generate() # en attendant, il faut changer les parametres par std::size_t au lieu de INT
     
     cxxflags = (
         "-fno-rtti -g3 -O0 " # Debug info max, aucune optimisation

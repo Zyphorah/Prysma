@@ -1,6 +1,7 @@
 #ifndef FLOATEQUATIONBUILDER_H
 #define FLOATEQUATIONBUILDER_H
 
+#include <cstddef>
 #include <llvm/Support/Allocator.h>
 #include <memory>
 #include <vector>
@@ -56,7 +57,7 @@ public:
     auto operator=(BuilderFloatEquation&&) -> BuilderFloatEquation& = delete;
 
     auto build(std::vector<Token>& tokens) -> INode* override;
-    auto build(std::vector<Token>& tokens, int& index) -> INode* override;
+    auto build(std::vector<Token>& tokens, std::size_t index) -> INode* override;
     auto getArena() -> llvm::BumpPtrAllocator& override;
     
     PRYSMA_NODISCARD auto getBuilderTree() const -> IBuilderTree*;

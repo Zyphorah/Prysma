@@ -5,6 +5,7 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
@@ -20,46 +21,56 @@ ParserDeclarationFunction::ParserDeclarationFunction(ContextParser& contextParse
 
 ParserDeclarationFunction::~ParserDeclarationFunction() = default;
 
-auto ParserDeclarationFunction::parse(std::vector<Token>& tokens, int& index) -> INode*
+auto ParserDeclarationFunction::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
 {
-  consume(tokens, index, TOKEN_FUNCTION, "Error: not the correct token! 'fn'");
+    consume(tokens, index, TOKEN_FUNCTION, "Error: not the correct token! 'fn'");
 
-  Token tokenTypeReturn = tokens[static_cast<size_t>(index)];
-  IType* typeReturn = _contextParser.getTypeParser()->parse(tokens, index);
-  
-  Token tokenFunctionName = tokens[static_cast<size_t>(index)];
-  consume(tokens, index, TOKEN_IDENTIFIER, "Error: invalid identifier, must be a function name");
+    Token tokenTypeReturn = tokens[index];
+    IType* typeReturn = _contextParser.getTypeParser()->parse(tokens, index);
+    
+    Token tokenFunctionName = tokens[index];
+    consume(tokens, index, TOKEN_IDENTIFIER, "Error: invalid identifier, must be a function name");
 
-  // Parse arguments inside parentheses
-  consume(tokens, index, TOKEN_PAREN_OPEN, "Error: not an opening parenthesis '('");
-  
-  llvm::SmallVector<INode*, 4> arguments;
-  while(index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != TOKEN_PAREN_CLOSE)
-  {
-      if(tokens[static_cast<size_t>(index)].type == TOKEN_COMMA)
-      {
-          index++;
-          continue;
-      }
-      
-      INode* child = _contextParser.getBuilderTreeInstruction()->build(tokens, index);
-      arguments.push_back(child);
-  }
+    // Parse arguments inside parentheses
+    consume(tokens, index, TOKEN_PAREN_OPEN, "Error: not an opening parenthesis '('");
+    
+    llvm::SmallVector<INode*, 4> arguments;
+    while(index < tokens.size() && tokens[index].type != TOKEN_PAREN_CLOSE)
+    {
+        if(tokens[index].type == TOKEN_COMMA)
+        {
+            index++;
+            continue;
+        }
+        
+        INode* child = _contextParser.getBuilderTreeInstruction()->build(tokens, index);
+        arguments.push_back(child);
+    }
 
-  consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: not a closing parenthesis ')'");
+    consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: not a closing parenthesis ')'");
 
-  // Parse the body in a strict NodeScope
-  consume(tokens, index, TOKEN_BRACE_OPEN, "Error: not an opening brace '{' ");
+    // Parse the body in a strict NodeScope
+    consume(tokens, index, TOKEN_BRACE_OPEN, "Error: not an opening brace '{' ");
 
-  auto bodyChildren = consumeChildBody(tokens, index, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
-  auto* body = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(bodyChildren);
 
-  consume(tokens, index, TOKEN_BRACE_CLOSE, "Error: not a closing brace '}'");
+    auto bodyChildren = consumeChildBody(tokens, index, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
 
-  auto* nodeFunction = 
-      _contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(Token{}, typeReturn, tokenFunctionName, _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(arguments), body);
+    auto* body_node = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    ); 
+    _contextParser.getNodeComponentRegistry()->insert<AST_CHILD_COMPONENT>(body_node->getNodeId(), bodyChildren);
 
-  return nodeFunction; 
+
+    consume(tokens, index, TOKEN_BRACE_CLOSE, "Error: not a closing brace '}'");
+
+    auto* nodeFunction = 
+        _contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(
+            Token{}, typeReturn, tokenFunctionName, _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(
+                arguments
+            ), body_node
+        );
+
+    return nodeFunction; 
 }
 
 #endif /* PARSER_DECLARATIONFUNCTION_CPP */

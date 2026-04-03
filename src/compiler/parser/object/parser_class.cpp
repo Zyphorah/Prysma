@@ -111,7 +111,7 @@ ParserClass::~ParserClass()
 //                  }
 //           }
 
-auto ParserClass::parse(std::vector<Token>& tokens, int& index) -> INode*
+auto ParserClass::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
 {
     consume(tokens, index, TOKEN_CLASS, "Expected 'class' at the beginning of the class declaration.");
     Token classNameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Expected an identifier after 'class' for the class name.");
@@ -129,25 +129,25 @@ auto ParserClass::parse(std::vector<Token>& tokens, int& index) -> INode*
     current_visibility.type = TOKEN_PRIVATE;
     current_visibility.value = "private";
 
-    while (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != TOKEN_BRACE_CLOSE) {
-        TokenType tokenType = tokens[static_cast<size_t>(index)].type;
+    while (index < static_cast<int>(tokens.size()) && tokens[index].type != TOKEN_BRACE_CLOSE) {
+        TokenType tokenType = tokens[index].type;
 
         if (tokenType == TOKEN_PUBLIC) {
-            current_visibility = tokens[static_cast<size_t>(index)];
+            current_visibility = tokens[index];
             consume(tokens, index, TOKEN_PUBLIC, "Expected 'public' for the public section of the class.");
             consume(tokens, index, TOKEN_COLON, "Expected ':' after 'public'.");
             continue;
         }
 
         if (tokenType == TOKEN_PRIVATE) {
-            current_visibility = tokens[static_cast<size_t>(index)];
+            current_visibility = tokens[index];
             consume(tokens, index, TOKEN_PRIVATE, "Expected 'private' for the private section of the class.");
             consume(tokens, index, TOKEN_COLON, "Expected ':' after 'private'.");
             continue;
         }
 
         if (tokenType == TOKEN_PROTECTED) {
-          current_visibility = tokens[static_cast<size_t>(index)];
+          current_visibility = tokens[index];
           consume(tokens, index, TOKEN_PROTECTED, "Expected 'protected' for the protected section of the class.");
           consume(tokens, index, TOKEN_COLON, "Expected ':' after 'protected'.");
           continue;

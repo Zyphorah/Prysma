@@ -7,6 +7,7 @@
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -19,7 +20,7 @@ ParserUnRefVariable::~ParserUnRefVariable()
 = default;
 
 // Example: unref variable
-auto ParserUnRefVariable::parse(std::vector<Token>& tokens, int& index) -> INode* 
+auto ParserUnRefVariable::parse(std::vector<Token>& tokens, std::size_t index) -> INode* 
 {
     consume(tokens, index, TOKEN_UNREF, "Error: 'unref' expected");
     

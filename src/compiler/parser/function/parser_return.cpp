@@ -17,13 +17,13 @@ ParserReturn::ParserReturn(ContextParser& contextParser)
 
 ParserReturn::~ParserReturn() = default;
 
-auto ParserReturn::parse(std::vector<Token>& tokens, int& index) -> INode*
+auto ParserReturn::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
 {
   consume(tokens, index, TOKEN_RETURN, "Error: not the correct token! 'return'");
 
   INode* returnValue = nullptr;
 
-  if (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != TOKEN_SEMICOLON) {
+  if (index < tokens.size() && tokens[index].type != TOKEN_SEMICOLON) {
       returnValue = _contextParser.getBuilderTreeEquation()->build(tokens, index);
   } else {
       consume(tokens, index, TOKEN_SEMICOLON, "Error: semicolon expected after return");

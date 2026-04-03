@@ -3,6 +3,7 @@
 
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/lexer/lexer.h"
+#include <cstddef>
 #include <vector>
 
 class IParser
@@ -14,7 +15,7 @@ public:
     auto operator=(const IParser&) -> IParser& = delete;
     IParser(IParser&&) = delete;
     auto operator=(IParser&&) -> IParser& = delete;
-    virtual auto parse(std::vector<Token>& tokens, int& index) -> INode* = 0;
+    virtual auto parse(std::vector<Token>& tokens, std::size_t index) -> INode* = 0;
 };
 
 #endif /* A32B33F7_0073_416C_873A_6FF7F40419F8 */
