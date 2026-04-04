@@ -1,4 +1,4 @@
-//===-- error_helper.cpp - Brief description of the file -------*- C++ -*-===//
+//===-- error_helper.cpp -------------------------------------------*- C++ -*-===//
 //
 // Part of the Prysma Project, under the GNU GPL v3.0 or later.
 // See LICENSE at the project root for license information.

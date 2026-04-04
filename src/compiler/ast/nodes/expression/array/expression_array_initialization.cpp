@@ -1,4 +1,4 @@
-//===-- expression_array_initialization.cpp - Brief description of the file -------*- C++ -*-===//
+//===-- expression_array_initialization.cpp -------------------------------------------*- C++ -*-===//
 //
 // Part of the Prysma Project, under the GNU GPL v3.0 or later.
 // See LICENSE at the project root for license information.

@@ -1,4 +1,4 @@
-//===-- visitor_general_gen_code.cpp - Brief description of the file -------*- C++ -*-===//
+//===-- visitor_general_gen_code.cpp -------------------------------------------*- C++ -*-===//
 //
 // Part of the Prysma Project, under the GNU GPL v3.0 or later.
 // See LICENSE at the project root for license information.

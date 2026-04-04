@@ -1,4 +1,4 @@
-//===-- gestion_variable.h - Brief description of the file -------*- C++ -*-===//
+//===-- gestion_variable.h -------------------------------------------*- C++ -*-===//
 //
 // Part of the Prysma Project, under the GNU GPL v3.0 or later.
 // See LICENSE at the project root for license information.

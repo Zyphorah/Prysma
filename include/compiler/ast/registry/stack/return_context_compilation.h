@@ -1,4 +1,4 @@
-//===-- return_context_compilation.h - Brief description of the file -------*- C++ -*-===//
+//===-- return_context_compilation.h -------------------------------------------*- C++ -*-===//
 //
 // Part of the Prysma Project, under the GNU GPL v3.0 or later.
 // See LICENSE at the project root for license information.

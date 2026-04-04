@@ -1,4 +1,4 @@
-//===-- i_manager_parenthesis.h - Brief description of the file -------*- C++ -*-===//
+//===-- i_manager_parenthesis.h -------------------------------------------*- C++ -*-===//
 //
 // Part of the Prysma Project, under the GNU GPL v3.0 or later.
 // See LICENSE at the project root for license information.

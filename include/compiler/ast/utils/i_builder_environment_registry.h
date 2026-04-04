@@ -1,4 +1,4 @@
-//===-- i_builder_environment_registry.h - Brief description of the file -------*- C++ -*-===//
+//===-- i_builder_environment_registry.h -------------------------------------------*- C++ -*-===//
 //
 // Part of the Prysma Project, under the GNU GPL v3.0 or later.
 // See LICENSE at the project root for license information.

@@ -1,4 +1,4 @@
-//===-- registry_instruction.h - Brief description of the file -------*- C++ -*-===//
+//===-- registry_instruction.h -------------------------------------------*- C++ -*-===//
 //
 // Part of the Prysma Project, under the GNU GPL v3.0 or later.
 // See LICENSE at the project root for license information.
