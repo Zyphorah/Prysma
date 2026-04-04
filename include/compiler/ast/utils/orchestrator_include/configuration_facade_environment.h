@@ -2,6 +2,7 @@
 #define D8FAA486_F5BA_43FB_BFFC_AB9990B46458
 
 #include "compiler/macros/prysma_nodiscard.h"
+#include "compiler/macros/prysma_maybe_unused.h"
 #include "compiler/ast/registry/context_gen_code.h"
 #include "compiler/ast/registry/context_expression.h"
 #include "compiler/ast/registry/context_parser.h"
@@ -59,7 +60,7 @@ private:
     void registerInstructions();
 
 public:
-    explicit ConfigurationFacadeEnvironment(RegistryFunctionGlobal* registryFunctionGlobal, [[maybe_unused]] FileRegistry* registryFile);
+    explicit ConfigurationFacadeEnvironment(RegistryFunctionGlobal* registryFunctionGlobal, PRYSMA_MAYBE_UNUSED FileRegistry* registryFile);
     ~ConfigurationFacadeEnvironment();
 
     ConfigurationFacadeEnvironment(const ConfigurationFacadeEnvironment&) = delete;

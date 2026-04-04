@@ -1,4 +1,5 @@
 #include "compiler/ast/utils/orchestrator_include/configuration_facade_environment.h"
+#include "compiler/macros/prysma_maybe_unused.h"
 
 #include "compiler/ast/registry/context_gen_code.h"
 #include "compiler/ast/registry/context_expression.h"
@@ -58,7 +59,7 @@
 
 // NOLINTBEGIN(cppcoreguidelines-owning-memory)
 
-ConfigurationFacadeEnvironment::ConfigurationFacadeEnvironment(RegistryFunctionGlobal* registryFunctionGlobale, [[maybe_unused]] FileRegistry* fileRegistry)
+ConfigurationFacadeEnvironment::ConfigurationFacadeEnvironment(RegistryFunctionGlobal* registryFunctionGlobale, PRYSMA_MAYBE_UNUSED FileRegistry* fileRegistry)
     : _registryFunctionGlobal(registryFunctionGlobale),
       // _registryFile(fileRegistry),
       _registryExpression(nullptr),
