@@ -6,8 +6,8 @@ set(CMAKE_C_COMPILER clang)
 
 project(Prysma)
 
-# setup C++17
-set(CMAKE_CXX_STANDARD 17)
+# setup C++26
+set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # so my editor understands the code and underlines errors directly
