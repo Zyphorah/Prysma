@@ -15,7 +15,7 @@
 #include "compiler/utils/prysma_cast.h"
 #include "compiler/llvm/llvm_backend.h"
 
-#include <llvm-18/llvm/IR/DerivedTypes.h>
+#include <llvm-22/llvm/IR/DerivedTypes.h>
 #include <memory>
 #include <string>
 #include <utility>

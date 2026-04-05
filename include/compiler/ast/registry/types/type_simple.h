@@ -14,10 +14,13 @@
 
 class TypeSimple : public IType {
 private:
-    llvm::Type* _llvmType;
+    llvm::Type::TypeID _typeID;
+    unsigned int _integerBitWidth;
+    unsigned int _pointerAddressSpace;
 
 public:
     explicit TypeSimple(llvm::Type* llvmType);
+    explicit TypeSimple(llvm::Type::TypeID typeID, unsigned int bitWidth = 0, unsigned int addressSpace = 0);
     ~TypeSimple() override = default;
 
     TypeSimple(const TypeSimple&) = delete;

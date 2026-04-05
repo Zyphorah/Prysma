@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Prysma-exception-1.0
 //
 //===----------------------------------------------------------------------===//
+
 #include "compiler/ast/utils/orchestrator_include/configuration_facade_environment.h"
 #include "compiler/ast/utils/orchestrator_include/orchestrator_include.h"
 #include "compiler/file_processing/builder_systeme.h"
@@ -13,9 +14,9 @@
 #include "compiler/registry/registry_file.h"
 #include <exception>
 #include <iostream>
-#include <llvm-18/llvm/IR/DerivedTypes.h>
-#include <llvm-18/llvm/IR/Instructions.h>
-#include <llvm-18/llvm/IR/Value.h>
+#include <llvm-22/llvm/IR/DerivedTypes.h>
+#include <llvm-22/llvm/IR/Instructions.h>
+#include <llvm-22/llvm/IR/Value.h>
 #include <filesystem>
 #include <cstdlib>
 #include <memory>
@@ -23,7 +24,6 @@
 #include <llvm/Support/TargetSelect.h>
 #include <string>
 #include <vector>
-
 
 // Polyspace analyse static prouvé mathématiquement que l'execution d'une function ne cause pas de null pointer ou certaine catégorie de crash
 
@@ -80,8 +80,8 @@
 auto main(int argc, char* argv[]) -> int
 {
     if (argc < 2) {
-        std::cerr << "Error: Aucun fichier spécifié" << std::endl;
-        std::cerr << "Usage: Prysma <fichier.p> [--graphviz]" << std::endl;
+        std::cerr << "Error: Aucun fichier spécifié" << '\n';
+        std::cerr << "Usage: Prysma <fichier.p> [--graphviz]" << '\n';
         return 1;
     }
     
@@ -98,7 +98,7 @@ auto main(int argc, char* argv[]) -> int
     }
 
     if (cheminFile.empty()) {
-        std::cerr << "Error: Aucun fichier spécifié" << std::endl;
+        std::cerr << "Error: Aucun fichier spécifié" << '\n';
         return 1;
     }
 
@@ -127,24 +127,24 @@ auto main(int argc, char* argv[]) -> int
 
         std::unique_ptr<RegistryFunctionGlobal> registryFunctionGlobale = std::make_unique<RegistryFunctionGlobal>();
         std::unique_ptr<FileRegistry> registryFiles = std::make_unique<FileRegistry>();
-        std::unique_ptr<ConfigurationFacadeEnvironment> facadeConfigurationEnvironnement = std::make_unique<ConfigurationFacadeEnvironment>(registryFunctionGlobale.get(), registryFiles.get());
+        std::unique_ptr<ConfigurationFacadeEnvironment> facadeConfigurationEnvironnement = std::make_unique<ConfigurationFacadeEnvironment>(*registryFunctionGlobale, *registryFiles);
         
-        OrchestratorInclude orchestratorInclude(registryFunctionGlobale.get(), registryFiles.get(), mutex.get(), activerGraphViz);
+        OrchestratorInclude orchestratorInclude(*registryFunctionGlobale, *registryFiles, *mutex, activerGraphViz);
         orchestratorInclude.compileProject(cheminFile);
 
         if (orchestratorInclude.hasErrors()) {
-            std::cerr << "Error: La compilation a échoué, arrêt du processus." << std::endl;
+            std::cerr << "Error: La compilation a échoué, arrêt du processus." << '\n';
             return 1;
         }
 
         std::string nomExecutable = std::filesystem::path(cheminFile).stem().string();
 
         BuilderSystem::BuilderParams params = {
-            srcLib,
-            objLib,
-            buildDir.string(),
-            registryFiles->getAllFiles(),
-            nomExecutable
+            .libPath=srcLib,
+            .libObjDir=objLib,
+            .buildDir=buildDir.string(),
+            .outputLL=registryFiles->getAllFiles(),
+            .executable=nomExecutable
         };
         BuilderSystem builder(params);
         builder.compileLib();
@@ -154,11 +154,13 @@ auto main(int argc, char* argv[]) -> int
         std::cerr << nomFile << ":" 
                   << error.getLine() << ":" 
                   << error.getColumn() << ": Error: " 
-                  << error.what() << std::endl;
+                  << error.what() << '\n';
         return 1;
     }
     catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "Error: " << e.what() << '\n';
         return 1;
     }
 }
+
+

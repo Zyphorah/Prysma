@@ -7,7 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "compiler/visitor/code_gen/helper/control_flow_helper.h"
-#include <llvm-18/llvm/IR/BasicBlock.h>
+#include <llvm-22/llvm/IR/BasicBlock.h>
 #include <string>
 
 auto ControlFlowHelper::createControlBlocks(

@@ -14,9 +14,10 @@
 #include "compiler/visitor/visitor_base_generale.h"
 #include "compiler/visitor/extractors/members_extractor_class.h"
 #include "compiler/utils/prysma_cast.h"
-#include <llvm-18/llvm/IR/Function.h>
-#include <llvm-18/llvm/IR/GlobalVariable.h>
-#include <llvm-18/llvm/IR/Metadata.h>
+#include <llvm-22/llvm/ADT/StringRef.h>
+#include <llvm-22/llvm/IR/Function.h>
+#include <llvm-22/llvm/IR/GlobalVariable.h>
+#include <llvm-22/llvm/IR/Metadata.h>
 #include <llvm/IR/Constant.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/DerivedTypes.h>
@@ -60,8 +61,8 @@ void FillingVisitorBodyClass::visiter(NodeClass* nodeClass)
 
     // Make the vpointer at address zero
     classBodyElements.push_back(llvm::PointerType::get(
-        llvm::Type::getInt8Ty(
-        _contextGenCode->getBackend()->getContext()),
+
+        _contextGenCode->getBackend()->getContext(),
          0
         ));
 
@@ -125,7 +126,8 @@ void FillingVisitorBodyClass::visiter(NodeClass* nodeClass)
         if (variableType != nullptr) {
             classBodyElements.push_back(variableType);
             // Register the index for Pass 3
-            classInfo->getMemberIndices()[std::string(declarationVariable->getNom().value)] = currentIndex;
+            llvm::StringRef nomDeclarationVariable = declarationVariable->getNom().value;
+            classInfo->getMemberIndices()[nomDeclarationVariable] = currentIndex;
             currentIndex++;
         }
     }

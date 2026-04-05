@@ -36,6 +36,6 @@ void FillingVisitorRegistry::visiter(NodeDeclarationFunction* nodeDeclarationFun
         functionSymbol->returnType = returnType;
         functionSymbol->node = nodeDeclarationFunction;
 
-        _contextGenCode->getRegistryFunctionGlobal()->registerElement(std::string(functionName), std::move(functionSymbol));
+        _contextGenCode->getRegistryFunctionGlobal().registerElement(std::string(functionName), std::move(functionSymbol));
     }
 }

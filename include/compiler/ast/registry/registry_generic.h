@@ -41,17 +41,17 @@ public:
     auto operator=(RegistryGeneric&&) -> RegistryGeneric& = delete;
    
     void setErrorMessage(std::function<std::string(TKey)>&& callback) {
-        std::lock_guard<TLock> guard(_lock);
+        std::scoped_lock guard(_lock);
         _errorMessageCallback = std::move(callback);
     }
 
     void registerElement(const TKey& key, TValue value) {
-        std::lock_guard<TLock> guard(_lock);
+        std::scoped_lock guard(_lock);
         _elements[key] = std::move(value);
     }
 
     auto get(const TKey& key) const -> const TValue& {
-        std::lock_guard<TLock> guard(_lock);
+        std::scoped_lock guard(_lock);
         auto iterator = _elements.find(key);
         if (iterator == _elements.end()) {
             throw std::invalid_argument(generateInternalErrorMessage(key));
@@ -60,12 +60,12 @@ public:
     }
 
     auto exists(const TKey& key) const -> bool {
-        std::lock_guard<TLock> guard(_lock);
+        std::scoped_lock guard(_lock);
         return _elements.count(key) > 0;
     }
 
     auto getKeys() const -> std::set<TKey> {
-        std::lock_guard<TLock> guard(_lock);
+        std::scoped_lock guard(_lock);
         std::set<TKey> keys;
         for (const auto& pair : _elements) {
             keys.insert(pair.first);
@@ -75,7 +75,7 @@ public:
 
 protected:
     virtual auto generateErrorMessage(const TKey& key) const -> std::string {
-        std::lock_guard<TLock> guard(_lock);
+        std::scoped_lock guard(_lock);
         return generateInternalErrorMessage(key);
     }
 
@@ -87,8 +87,10 @@ private:
         std::stringstream stringStream;
         if constexpr (std::is_same_v<TKey, llvm::StringRef>) {
             stringStream << "Unknown element in registry: " << key.str();
-        } else {
+        } else if constexpr (std::is_same_v<TKey, std::string>) {
             stringStream << "Unknown element in registry: " << key;
+        } else {
+            stringStream << "Unknown element in registry: " << static_cast<unsigned int>(key);
         }
         return stringStream.str();
     }

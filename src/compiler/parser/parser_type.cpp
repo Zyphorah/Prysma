@@ -20,6 +20,7 @@
 #include "compiler/lexer/token_type.h"
 #include <cstddef>
 #include <llvm/IR/Type.h>
+#include <string>
 #include <vector>
 
 TypeParser::TypeParser(RegistryType* registryType, IBuilderTree* builderTree)
@@ -39,7 +40,8 @@ auto TypeParser::parse(std::vector<Token>& tokens, int& index) -> IType*
     if (tokens[static_cast<size_t>(index)].type == TOKEN_IDENTIFIER) {
         type = _builderTree->allocate<TypeComplex>(std::string(tokens[static_cast<size_t>(index)].value));
     } else {
-        llvm::Type* typeLLVM = _registryType->get(tokens[static_cast<size_t>(index)].type);
+        llvm::Type* typeLLVM = _registryType->get(tokens[static_cast<size_t>(index)].type);  //TODO: On ne devrais pas directement avoir llvm::Type dans le parseur seulement 
+        // Dans les visiteurs car le parseur est couplé à llvm ce qui n'est pas propre, je dois réfléchir à une solution plus élégante. 
         type = _builderTree->allocate<TypeSimple>(typeLLVM);
     }
     index++;

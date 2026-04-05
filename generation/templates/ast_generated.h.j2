@@ -40,17 +40,17 @@ public:
         visitor->visiter(this);
     }
 
-    [[nodiscard]] NodeTypeGenerated getGeneratedType() const override {
+    [[nodiscard]] auto getGeneratedType() const -> NodeTypeGenerated override {
         return _nodeTypeGenerated;
     }
 
-    [[nodiscard]] static bool classof(const INode* node) {
+    [[nodiscard]] static auto classof(const INode* node) -> bool {
         return node->getGeneratedType() == NodeTypeGenerated::{{ classe.nom }};
     }
 
 {%- if classe.parent == 'IExpression' %}
 
-    IExpression* addExpression(INode* left, INode* right) override {
+    auto addExpression(INode* left, INode* right) -> IExpression* override {
 {%- if 'gauche' in classe.champs %}
         _gauche = left;
 {%- endif %}
@@ -62,7 +62,7 @@ public:
 {%- endif %}
 
 {% for nom_champ, type_champ in classe.champs.items() %}
-    [[nodiscard]] {{ classe.getters[nom_champ] }} get{{ nom_champ[0]|upper }}{{ nom_champ[1:] }}() const { return _{{ nom_champ }}; }
+    [[nodiscard]] auto get{{ nom_champ[0]|upper }}{{ nom_champ[1:] }}() const -> {{ classe.getters[nom_champ] }} { return _{{ nom_champ }}; }
 {% endfor %}
 };
 

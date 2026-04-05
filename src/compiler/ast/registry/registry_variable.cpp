@@ -9,9 +9,9 @@
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/manager_error.h"
-#include <llvm-18/llvm/ADT/StringMap.h>
-#include <llvm-18/llvm/IR/Instructions.h>
-#include <llvm-18/llvm/Support/FormatVariadic.h>
+#include <llvm-22/llvm/ADT/StringMap.h>
+#include <llvm-22/llvm/IR/Instructions.h>
+#include <llvm-22/llvm/Support/FormatVariadic.h>
 #include <stack>
 #include <string>
 

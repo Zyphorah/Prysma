@@ -16,8 +16,8 @@
 #include "compiler/llvm/gestion_variable.h"
 #include "compiler/utils/prysma_cast.h"
 #include <cstddef>
-#include <llvm-18/llvm/ADT/StringRef.h>
-#include <llvm-18/llvm/IR/Value.h>
+#include <llvm-22/llvm/ADT/StringRef.h>
+#include <llvm-22/llvm/IR/Value.h>
 #include <llvm/Support/Casting.h>
 #include <string>
 #include <vector>

@@ -7,9 +7,28 @@
 sudo apt install llvm-dev llvm
 ```
 
+# Download the script
+wget https://apt.llvm.org/llvm.sh
+
+# Make the script executable
+chmod +x llvm.sh
+
+# Install the current stable version (ex: 22)
+sudo ./llvm.sh 22
+
+# To install all components (clang, lld, polly)
+sudo ./llvm.sh 22 all
+
+
 ### Installing Bear (for generating compile_commands.json)
 ```bash
 sudo apt-get update && sudo apt-get install -y bear
+```
+
+### Installing zlib (used by LLVM for compression)
+
+```bash
+sudo apt-get update && sudo apt-get install -y zlib1g-dev
 ```
 
 ### Installing Graphviz (for graph visualization)

@@ -9,7 +9,7 @@
 #ifndef LLVMSERIALIZER_H
 #define LLVMSERIALIZER_H
 
-#include <llvm-18/llvm/Support/raw_ostream.h>
+#include <llvm-22/llvm/Support/raw_ostream.h>
 #include "llvm/IR/Module.h"
 #include "llvm/IR/LLVMContext.h"
 #include <string>

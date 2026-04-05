@@ -22,6 +22,7 @@
 #include <llvm/Target/TargetOptions.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/TargetParser/Host.h>
+#include <llvm/TargetParser/Triple.h>
 #include <memory>
 #include <string>
 #include <vector>
@@ -33,21 +34,22 @@ LlvmBackend::LlvmBackend() {
     _context = std::make_unique<LLVMContext>();
     _module = std::make_unique<Module>("output", *_context);
     _builder = std::make_unique<IRBuilder<NoFolder>>(*_context);
-
-    std::string targetTriple = sys::getDefaultTargetTriple();
-    _module->setTargetTriple(targetTriple);
+    
+    llvm::Triple triple(llvm::sys::getDefaultTargetTriple());
+    std::string tripleStr = triple.normalize();
+    _module->setTargetTriple(triple);
     
     std::string error;
-    const auto *target = TargetRegistry::lookupTarget(targetTriple, error);
+    const auto *target = llvm::TargetRegistry::lookupTarget(tripleStr, error);
     if (target == nullptr) {
         errs() << error;
     }
 
     TargetOptions opt;
-    _targetMachine.reset(target->createTargetMachine(targetTriple, "generic", "", opt, Reloc::Model::PIC_));
+    _targetMachine.reset(target->createTargetMachine(triple, "generic", "", opt, Reloc::Model::PIC_));
 }
 
-llvm::Value* LlvmBackend::createAutoCast(llvm::Value* sourceValue, llvm::Type* targetType)
+auto LlvmBackend::createAutoCast(llvm::Value* sourceValue, llvm::Type* targetType) -> llvm::Value*
 {
     if (sourceValue->getType() == targetType)
     {

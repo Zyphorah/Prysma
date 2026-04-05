@@ -5,7 +5,7 @@
 [![CI](https://github.com/Zyphorah/Prysma/actions/workflows/ci.yml/badge.svg)](https://github.com/Zyphorah/Prysma/actions/workflows/ci.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![C++](https://img.shields.io/badge/C++-17-blue.svg)](https://isocpp.org/)
-[![LLVM](https://img.shields.io/badge/LLVM-18-red.svg)](https://llvm.org/)
+[![LLVM](https://img.shields.io/badge/llvm-22-red.svg)](https://llvm.org/)
 
 Prysma est un langage de programmation système à hautes performances, compilé vers l'infrastructure **LLVM 18**. Le project privilégie un contrôle déterministe des ressources et une architecture modulaire robuste.
 

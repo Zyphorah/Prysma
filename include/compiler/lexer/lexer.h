@@ -11,7 +11,7 @@
 #include "token_type.h"
 #include <array>
 #include <cstddef>
-#include <llvm-18/llvm/ADT/StringRef.h>
+#include <llvm-22/llvm/ADT/StringRef.h>
 #include <string>
 #include <utility>
 #include <vector>

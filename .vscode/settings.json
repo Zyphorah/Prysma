@@ -1,8 +1,10 @@
 {
     // ===== Clangd Configuration =====
+    "clangd.path": "/usr/bin/clangd-22",
     "clangd.arguments": [
         "--background-index",
         "--clang-tidy",
+        "--clang-tidy-checks=*",
         "--completion-style=bundled",
         "--header-insertion=iwyu",
         "--pch-storage=memory",
@@ -11,6 +13,7 @@
     ],
     "clangd.checkUpdates": false,
     "clangd.onConfigChanged": "restart",
+    "clangd.fallbackFlags": ["-std=c++26", "-Wall", "-Wextra"],
 
     // ===== C++ Configuration =====
     "C_Cpp.default.cppStandard": "c++17",

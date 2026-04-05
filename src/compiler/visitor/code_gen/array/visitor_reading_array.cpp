@@ -18,8 +18,8 @@
 #include "compiler/utils/prysma_cast.h"
 #include "compiler/visitor/code_gen/helper/error_helper.h"
 #include <cstddef>
-#include <llvm-18/llvm/IR/Instructions.h>
-#include <llvm-18/llvm/Support/Casting.h>
+#include <llvm-22/llvm/IR/Instructions.h>
+#include <llvm-22/llvm/Support/Casting.h>
 #include <string>
 
 void GeneralVisitorGenCode::visiter(NodeReadingArray* nodeReadingArray)

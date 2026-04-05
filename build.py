@@ -20,20 +20,19 @@ def main():
     GeneratorParser(script_dir).generate()
 
     cxxflags_list = [
-        "-O3",                  # Raw speed (maximum optimization)
-        "-march=native",        # Fully exploit your CPU's instructions
-        "-ffast-math",          # Aggressive math calculations
-        "-fno-rtti",            # No runtime type information (RTTI off)
+        "-O3",                  # Maximum optimization for speed
+        "-march=native",        # Fully utilize your CPU's instruction set
+        "-fno-rtti",            # Disable runtime type information (RTTI)
         "-fomit-frame-pointer", # Free up a CPU register
         "-flto",                # Link Time Optimization (LTO)
-        "-DNDEBUG"              # Completely disable assertions
+        "-DNDEBUG",             # Completely disable assertions
+        "-std=c++26",           # C++26 standard
     ]
     
     ldflags_list = [
         "-flto",
         "-Wl,--gc-sections",
-        "-Wl,-s",
-        "-fuse-ld=lld"
+        "-Wl,-s"
     ]
 
     cxxflags = " ".join(cxxflags_list)
@@ -47,6 +46,8 @@ def main():
         f"-DCMAKE_MODULE_LINKER_FLAGS={ldflags}",
         f"-DCMAKE_SHARED_LINKER_FLAGS={ldflags}",
         "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DZLIB_LIBRARY=/usr/lib/x86_64-linux-gnu/libz.so",
+        "-DZLIB_INCLUDE_DIR=/usr/include",
     ], check=True)
 
     os.makedirs("build", exist_ok=True)

@@ -1,14 +1,17 @@
 cmake_minimum_required(VERSION 3.12)
 
-# absolutely force clang HERE before project()
-set(CMAKE_CXX_COMPILER clang++)
-set(CMAKE_C_COMPILER clang)
+# MUST force clang BEFORE project() to use it for feature detection
+set(CMAKE_CXX_COMPILER /usr/bin/clang++-22)
+set(CMAKE_C_COMPILER /usr/bin/clang-22)
 
-project(Prysma)
+project(Prysma LANGUAGES CXX C)
 
 # setup C++26
 set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# finding llvm and its paths automatically (specific version)
+find_package(LLVM 22.1.3 EXACT REQUIRED CONFIG)
 
 # so my editor understands the code and underlines errors directly
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -20,15 +23,26 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # LLVM
+# Sync RTTI with LLVM's configuration to avoid link errors
+if(NOT LLVM_ENABLE_RTTI)
+    add_compile_options(-fno-rtti)
+endif()
+
 # let cmake handle finding llvm and its paths automatically
-find_package(LLVM REQUIRED CONFIG)
 llvm_map_components_to_libnames(llvm_libs 
     core 
     support 
     irreader 
     bitwriter 
+    native
     ${LLVM_TARGETS_TO_BUILD}
 )
+
+# Clang-Tidy integration
+find_program(CLANG_TIDY_EXE NAMES clang-tidy-22 clang-tidy)
+if(CLANG_TIDY_EXE)
+    set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE};-checks=-*,bugprone-*,modernize-*,performance-*,readability-*")
+endif()
 
 # my source files
 # get all my .cpp files (CONFIGURE_DEPENDS avoids having to wipe the build folder when adding a file)
@@ -64,7 +78,7 @@ target_link_libraries(Prysma PRIVATE ${llvm_libs})
 # my compile flags
 target_compile_options(Prysma PRIVATE
     # no optimization in Debug, max optimization in Release
-    $<$<CONFIG:Debug>:-g;-O0;-fno-omit-frame-pointer;-fstandalone-debug>
+    $<$<CONFIG:Debug>:-g3;-O0;-fno-omit-frame-pointer;-fstandalone-debug>
     $<$<NOT:$<CONFIG:Debug>>:-O2>
     
     # to read errors without a headache (colors, 3 errors max, small caret)
@@ -77,7 +91,14 @@ target_compile_options(Prysma PRIVATE
     -Wall -Wextra -Wpedantic 
     -Wshadow                
     -Wnon-virtual-dtor      
-    -Wnull-dereference      
+    -Wold-style-cast
+    -Wcast-align
+    -Wunused
+    -Woverloaded-virtual
+    -Wconversion
+    -Wsign-conversion
+    -Wnull-dereference
+    -Wformat=2
     
     # LLVM XRay instrumentation (Debug only)
     $<$<CONFIG:Debug>:-fxray-instrument;-fxray-instruction-threshold=1>

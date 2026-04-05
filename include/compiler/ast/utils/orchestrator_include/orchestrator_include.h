@@ -13,11 +13,10 @@
 #include <atomic>
 #include <mutex>
 #include <string>
-#include <thread>
 #include <vector>
 #include <set>
 #include <memory>
-#include <llvm-18/llvm/Support/ThreadPool.h>
+#include <llvm-22/llvm/Support/ThreadPool.h>
 
 struct ContextGenCode;
 class INode;
@@ -27,10 +26,10 @@ class FileRegistry;
 class OrchestratorInclude
 {
 private: 
-   std::mutex* _mutex;
-   RegistryFunctionGlobal* _registryFunctionGlobal;
-   FileRegistry* _registryFile;
-   llvm::ThreadPool _threads;
+   std::mutex& _mutex;
+   RegistryFunctionGlobal& _registryFunctionGlobal;
+   FileRegistry& _registryFile;
+   llvm::StdThreadPool _threads;
    std::vector<std::unique_ptr<UnitCompilation>> _compilationUnits;
    
    // A registry dedicated to source files (.p)
@@ -43,7 +42,7 @@ private:
    bool _enableGraphViz;
 
 public:
-    OrchestratorInclude(RegistryFunctionGlobal* registryFunctionGlobal, FileRegistry* registryFile, std::mutex* mutex, bool enableGraphViz = false);
+    OrchestratorInclude(RegistryFunctionGlobal& registryFunctionGlobal, FileRegistry& registryFile, std::mutex& mutex, bool enableGraphViz = false);
     ~OrchestratorInclude();
 
     OrchestratorInclude(const OrchestratorInclude&) = delete;
@@ -53,7 +52,7 @@ public:
     
    void compileProject(const std::string& filePath);
    void includeFile(const std::string& absolutePath);
-   static void waitForPassEnd(llvm::ThreadPool& threads);
+   static void waitForPassEnd(llvm::StdThreadPool& threads);
    [[nodiscard]] auto hasErrors() const -> bool;
    [[nodiscard]] auto isGraphVizEnabled() const -> bool;
 };

@@ -10,8 +10,9 @@
 #define F2141F07_2C85_4ADB_9BC9_A909EBD34394
 
 #include "registry_generic.h"
-#include <llvm-18/llvm/ADT/StringRef.h>
-#include <llvm-18/llvm/IR/Function.h>
+#include <llvm-22/llvm/ADT/StringRef.h>
+#include <llvm-22/llvm/IR/Function.h>
+#include <llvm/ADT/StringRef.h>
 #include <mutex>
 #include <string>
 #include <memory>
@@ -29,7 +30,7 @@ class IFunctionSymbolRegistry
         IFunctionSymbolRegistry(IFunctionSymbolRegistry&&) = delete;
         auto operator=(IFunctionSymbolRegistry&&) -> IFunctionSymbolRegistry& = delete;
         virtual ~IFunctionSymbolRegistry() = default;
-        [[nodiscard]] virtual SymbolType getType() const = 0;
+        [[nodiscard]] virtual auto getType() const -> SymbolType = 0;
 };
 
 // Acts as a struct to store global functions

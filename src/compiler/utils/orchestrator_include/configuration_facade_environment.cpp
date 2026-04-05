@@ -54,9 +54,10 @@
 #include "compiler/lexer/token_type.h"
 #include "compiler/object/parser_class.h"
 
-#include <llvm-18/llvm/IR/DerivedTypes.h>
-#include <llvm-18/llvm/IR/Instructions.h>
-#include <llvm-18/llvm/IR/Value.h>
+#include <iostream>
+#include <llvm-22/llvm/IR/DerivedTypes.h>
+#include <llvm-22/llvm/IR/Instructions.h>
+#include <llvm-22/llvm/IR/Value.h>
 #include <llvm/Support/Allocator.h>
 #include <memory>
 #include <stdexcept>
@@ -66,8 +67,8 @@
 
 // NOLINTBEGIN(cppcoreguidelines-owning-memory)
 
-ConfigurationFacadeEnvironment::ConfigurationFacadeEnvironment(RegistryFunctionGlobal* registryFunctionGlobale, [[maybe_unused]] FileRegistry* fileRegistry)
-    : _registryFunctionGlobal(registryFunctionGlobale),
+ConfigurationFacadeEnvironment::ConfigurationFacadeEnvironment(RegistryFunctionGlobal& registryFunctionGlobal, [[maybe_unused]] FileRegistry& registryFile)
+    : _registryFunctionGlobal(registryFunctionGlobal),
       // _registryFile(fileRegistry),
       _registryExpression(nullptr),
       _builderTreeInstruction(nullptr),
@@ -128,7 +129,7 @@ void ConfigurationFacadeEnvironment::createContext(const std::string& filePath)
     tempValue = Symbol(nullptr, tempValue.getType(), tempValue.getPointedElementType());
     tempValue = Symbol(tempValue.getAddress(), nullptr, tempValue.getPointedElementType());
 
-    _context = std::make_unique<ContextGenCode>(
+        _context = std::make_unique<ContextGenCode>(
         _registryType.get(),
         _backend.get(),
         _registryInstruction.get(),
@@ -146,20 +147,17 @@ void ConfigurationFacadeEnvironment::createContext(const std::string& filePath)
 
 void ConfigurationFacadeEnvironment::registerExternalFunctions()
 {
-    // Create a real Void type for Prysma
-    IType* prysmaVoidType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::getVoidTy(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
-
     // backSlashN
     _context->getBackend()->declareExternal("backSlashN", llvm::Type::getVoidTy(_context->getBackend()->getContext()), {});
     {
         auto symBackSlashNGlobal = std::make_unique<SymbolFunctionGlobal>();
-        symBackSlashNGlobal->returnType = prysmaVoidType;
+        symBackSlashNGlobal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::getVoidTy(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
         symBackSlashNGlobal->node = nullptr;
-        _context->getRegistryFunctionGlobal()->registerElement("backSlashN", std::move(symBackSlashNGlobal));
+        _context->getRegistryFunctionGlobal().registerElement("backSlashN", std::move(symBackSlashNGlobal));
 
         auto symBackSlashNLocal = std::make_unique<SymbolFunctionLocal>();
         symBackSlashNLocal->function = _context->getBackend()->getModule().getFunction("backSlashN");
-        symBackSlashNLocal->returnType = prysmaVoidType;
+        symBackSlashNLocal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::getVoidTy(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
         symBackSlashNLocal->node = nullptr;
         _context->getRegistryFunctionLocal()->registerElement("backSlashN", std::move(symBackSlashNLocal));
     }
@@ -171,13 +169,13 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
     llvm::Function* printFunc = llvm::Function::Create(print_type, llvm::Function::ExternalLinkage, "print", _context->getBackend()->getModule());
     {
         auto symPrintGlobal = std::make_unique<SymbolFunctionGlobal>();
-        symPrintGlobal->returnType = prysmaVoidType;
+        symPrintGlobal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::getVoidTy(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
         symPrintGlobal->node = nullptr;
-        _context->getRegistryFunctionGlobal()->registerElement("print", std::move(symPrintGlobal));
+        _context->getRegistryFunctionGlobal().registerElement("print", std::move(symPrintGlobal));
 
         auto symPrintLocal = std::make_unique<SymbolFunctionLocal>();
         symPrintLocal->function = printFunc;
-        symPrintLocal->returnType = prysmaVoidType;
+        symPrintLocal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::getVoidTy(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
         symPrintLocal->node = nullptr;
         _context->getRegistryFunctionLocal()->registerElement("print", std::move(symPrintLocal));
     }
@@ -189,13 +187,18 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
     llvm::Function* mallocFunc = llvm::Function::Create(malloc_type, llvm::Function::ExternalLinkage, "prysma_malloc", _context->getBackend()->getModule());
     {
         auto symMallocGlobal = std::make_unique<SymbolFunctionGlobal>();
-        symMallocGlobal->returnType = static_cast<TypeSimple*>(static_cast<void*>(new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::PointerType::getUnqual(_context->getBackend()->getContext()))));
+
+        auto *ptrTy = llvm::PointerType::getUnqual(_context->getBackend()->getContext());  // TODO: problème pointeur poisoned
+        // Peut être le contexte qui est détruit mais toujours présent en mémoire 
+        // Je dois annalyser l'ensemble pour déterminer s'il n'y a pas de destruction avant 
+
+        symMallocGlobal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(ptrTy); // NOLINT(cppcoreguidelines-owning-memory)
         symMallocGlobal->node = nullptr;
-        _context->getRegistryFunctionGlobal()->registerElement("prysma_malloc", std::move(symMallocGlobal));
+        _context->getRegistryFunctionGlobal().registerElement("prysma_malloc", std::move(symMallocGlobal));
 
         auto symMallocLocal = std::make_unique<SymbolFunctionLocal>();
         symMallocLocal->function = mallocFunc;
-        symMallocLocal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::PointerType::getUnqual(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
+        symMallocLocal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(ptrTy); // NOLINT(cppcoreguidelines-owning-memory)
         symMallocLocal->node = nullptr;
         _context->getRegistryFunctionLocal()->registerElement("prysma_malloc", std::move(symMallocLocal));
     }
@@ -207,13 +210,13 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
     llvm::Function* freeFunc = llvm::Function::Create(free_type, llvm::Function::ExternalLinkage, "prysma_free", _context->getBackend()->getModule());
     {
         auto symFreeGlobal = std::make_unique<SymbolFunctionGlobal>();
-        symFreeGlobal->returnType = prysmaVoidType;
+        symFreeGlobal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::getVoidTy(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
         symFreeGlobal->node = nullptr;
-        _context->getRegistryFunctionGlobal()->registerElement("prysma_free", std::move(symFreeGlobal));
+        _context->getRegistryFunctionGlobal().registerElement("prysma_free", std::move(symFreeGlobal));
 
         auto symFreeLocal = std::make_unique<SymbolFunctionLocal>();
         symFreeLocal->function = freeFunc;
-        symFreeLocal->returnType = prysmaVoidType;
+        symFreeLocal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::getVoidTy(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
         symFreeLocal->node = nullptr;
         _context->getRegistryFunctionLocal()->registerElement("prysma_free", std::move(symFreeLocal));
     }
@@ -238,11 +241,11 @@ void ConfigurationFacadeEnvironment::createContextParser()
     }
 
     ContextParser::Dependencies deps = {
-        _builderEquation->getBuilderTree(),
-        _builderTreeInstruction,
-        _parserType,
-        _registryVariable.get(),
-        _registryType.get()
+        .builderTreeEquation=_builderEquation->getBuilderTree(),
+        .builderTreeInstruction=_builderTreeInstruction,
+        .parserType=_parserType,
+        .registryVariable=_registryVariable.get(),
+        .registryType=_registryType.get()
     };
     _contextParser = new (_arena.Allocate<ContextParser>()) ContextParser(deps); // NOLINT(cppcoreguidelines-owning-memory)
 }

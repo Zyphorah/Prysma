@@ -13,7 +13,8 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/utils/prysma_cast.h"
 #include "compiler/visitor/extractors/members_extractor_class.h"
-#include <llvm-18/llvm/IR/Function.h>
+#include <llvm-22/llvm/IR/Function.h>
+#include <llvm-22/llvm/IR/GlobalVariable.h>
 #include <llvm/ADT/StringRef.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/DerivedTypes.h>
@@ -53,7 +54,7 @@ void BuilderEnvironmentRegistryFunction::buildVTable(Class* classInfo, const std
         if (functionImpl != nullptr) {
             vtableElements.push_back(llvm::ConstantExpr::getBitCast(
                 functionImpl,
-                llvm::PointerType::get(llvm::Type::getInt8Ty(_contextGenCode->getBackend()->getContext()), 0)
+                llvm::PointerType::get(_contextGenCode->getBackend()->getContext(), 0)
             ));
             classInfo->getMethodIndices()[parentMethodName.str()] = static_cast<unsigned int>(vtableElements.size() - 1);
         }
@@ -83,7 +84,7 @@ void BuilderEnvironmentRegistryFunction::buildVTable(Class* classInfo, const std
             if (localSymbol->function != nullptr) {
                 vtableElements.push_back(llvm::ConstantExpr::getBitCast(
                     localSymbol->function,
-                    llvm::PointerType::get(llvm::Type::getInt8Ty(_contextGenCode->getBackend()->getContext()), 0)
+                    llvm::PointerType::get(_contextGenCode->getBackend()->getContext(), 0)
                 ));
                 classInfo->getMethodIndices()[std::string(methodName)] = static_cast<unsigned int>(vtableElements.size() - 1);
             }
@@ -92,7 +93,7 @@ void BuilderEnvironmentRegistryFunction::buildVTable(Class* classInfo, const std
     
     // Create a constant array for the vtable
     llvm::ArrayType* vtableType = llvm::ArrayType::get(
-        llvm::PointerType::get(llvm::Type::getInt8Ty(_contextGenCode->getBackend()->getContext()), 0),
+        llvm::PointerType::get(_contextGenCode->getBackend()->getContext(), 0),
         vtableElements.size()
     );
     llvm::Constant* vtableInitializer = llvm::ConstantArray::get(vtableType, vtableElements);
@@ -113,9 +114,9 @@ void BuilderEnvironmentRegistryFunction::buildVTable(Class* classInfo, const std
 void BuilderEnvironmentRegistryFunction::fill()
 {   
     // 1. Fill global functions
-    for(const auto& key : _contextGenCode->getRegistryFunctionGlobal()->getKeys())
+    for(const auto& key : _contextGenCode->getRegistryFunctionGlobal().getKeys())
     {
-        const auto& oldSymbolUniquePtr = _contextGenCode->getRegistryFunctionGlobal()->get(key);
+        const auto& oldSymbolUniquePtr = _contextGenCode->getRegistryFunctionGlobal().get(key);
         const auto* oldSymbol = prysma::cast<const SymbolFunctionGlobal>(oldSymbolUniquePtr.get());
         
         if (oldSymbol->node == nullptr) { continue;}

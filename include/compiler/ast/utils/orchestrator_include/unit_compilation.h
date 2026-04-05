@@ -26,7 +26,7 @@ private:
 
     // Global data group for the compilation unit
     // Recursive orchestrator for includes, uses a mutex system to protect shared data
-    OrchestratorInclude* _orchestrator;
+    OrchestratorInclude& _orchestrator;
 
     // Separate context for each compilation unit to avoid conflicts with nested includes
     // Note: never share, always copy this data to avoid race condition problems
@@ -36,14 +36,14 @@ private:
     std::string _oldDirectory;
     std::string _currentDirectory;
 
-    FileRegistry* _fileRegistry;
+    FileRegistry& _fileRegistry;
     ContextGenCode* _context;
     INode* _tree;
     std::string _originalFilePath;
     std::string _sourceDocument;
 
 public: 
-    UnitCompilation(OrchestratorInclude* orchestrator, FileRegistry* registry, std::string filePath, RegistryFunctionGlobal* registryFunctionGlobal);
+    UnitCompilation(OrchestratorInclude& orchestrator, FileRegistry& registry, std::string filePath, RegistryFunctionGlobal& registryFunctionGlobal);
     ~UnitCompilation();
 
     UnitCompilation(const UnitCompilation&) = delete;

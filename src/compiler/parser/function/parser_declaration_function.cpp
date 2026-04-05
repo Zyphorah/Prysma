@@ -32,7 +32,6 @@ auto ParserDeclarationFunction::parse(std::vector<Token>& tokens, int& index) ->
 {
   consume(tokens, index, TOKEN_FUNCTION, "Error: not the correct token! 'fn'");
 
-  Token tokenTypeReturn = tokens[static_cast<size_t>(index)];
   IType* typeReturn = _contextParser.getTypeParser()->parse(tokens, index);
   
   Token tokenFunctionName = tokens[static_cast<size_t>(index)];

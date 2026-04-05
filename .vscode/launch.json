@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/Prysma",
-            "args": ["${workspaceFolder}/src/prysma_code_tests/main.p"],
+            "args": ["${workspaceFolder}/tests/prysma_code_tests/project_test_edge_case/test_functional_variable_bool/test_logical_not_and_variable.p"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "sourceFileMap": {

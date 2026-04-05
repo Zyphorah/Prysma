@@ -7,7 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "compiler/llvm/llvm_serializer.h"
-#include <llvm-18/llvm/Support/raw_ostream.h>
+#include <llvm-22/llvm/Support/raw_ostream.h>
 #include <string>
 
 void LlvmSerializer::SaveLLVMCode(const string& path)

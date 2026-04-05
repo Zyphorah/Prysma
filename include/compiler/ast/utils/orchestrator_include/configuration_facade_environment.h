@@ -34,7 +34,7 @@ class TypeParser;
 class ConfigurationFacadeEnvironment
 {
 private:
-    RegistryFunctionGlobal* _registryFunctionGlobal;
+    RegistryFunctionGlobal& _registryFunctionGlobal;
 
     llvm::BumpPtrAllocator _arena;
 
@@ -64,7 +64,7 @@ private:
     void registerInstructions();
 
 public:
-    explicit ConfigurationFacadeEnvironment(RegistryFunctionGlobal* registryFunctionGlobal, [[maybe_unused]] FileRegistry* registryFile);
+    explicit ConfigurationFacadeEnvironment(RegistryFunctionGlobal& registryFunctionGlobal, [[maybe_unused]] FileRegistry& registryFile);
     ~ConfigurationFacadeEnvironment();
 
     ConfigurationFacadeEnvironment(const ConfigurationFacadeEnvironment&) = delete;

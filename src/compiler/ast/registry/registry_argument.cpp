@@ -7,7 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "compiler/ast/registry/registry_argument.h"
-#include <llvm-18/llvm/IR/Value.h>
+#include <llvm-22/llvm/IR/Value.h>
 #include <vector>
 
 RegistryArgument::RegistryArgument()

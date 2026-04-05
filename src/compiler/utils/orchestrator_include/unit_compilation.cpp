@@ -20,9 +20,9 @@
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/visitor/visitor_filling_body_class/visitor_filling_body_class.h"
 #include "compiler/visitor/visitor_filling_registry/visitor_filling_registry.h"
-#include <llvm-18/llvm/IR/DerivedTypes.h>
-#include <llvm-18/llvm/IR/Instructions.h>
-#include <llvm-18/llvm/IR/Value.h>
+#include <llvm-22/llvm/IR/DerivedTypes.h>
+#include <llvm-22/llvm/IR/Instructions.h>
+#include <llvm-22/llvm/IR/Value.h>
 #include <cstdlib>
 #include <memory>
 #include <string>
@@ -31,7 +31,7 @@
 #include <utility>
 #include <vector>
 
-UnitCompilation::UnitCompilation(OrchestratorInclude* orchestrator, FileRegistry* registry, std::string filePath, RegistryFunctionGlobal* registryFunctionGlobale) 
+UnitCompilation::UnitCompilation(OrchestratorInclude& orchestrator, FileRegistry& registry, std::string filePath, RegistryFunctionGlobal& registryFunctionGlobale)
     : _orchestrator(orchestrator), 
       _fileRegistry(registry),
       _context(nullptr),
@@ -41,7 +41,6 @@ UnitCompilation::UnitCompilation(OrchestratorInclude* orchestrator, FileRegistry
     // Initialization of the separate context (the private bubble)
     _facadeConfigurationEnvironment = std::make_unique<ConfigurationFacadeEnvironment>(registryFunctionGlobale, _fileRegistry);
 }
-
 UnitCompilation::~UnitCompilation() 
 {
     _tree = nullptr; 
@@ -67,11 +66,12 @@ void UnitCompilation::pass1() {
     std::string parentName = absolutePath.parent_path().filename().string();
     _fileName = parentName + "_" + baseName;
 
-    _fileRegistry->addFile("programme/" + _fileName + ".ll");
+    _fileRegistry.addFile("programme/" + _fileName + ".ll");
 
     _facadeConfigurationEnvironment->initialize(resolvedPath);
 
-    _context = _facadeConfigurationEnvironment->getContext();
+    _context = _facadeConfigurationEnvironment->getContext(); // TODO : bug possible, je get le context qui est géré par LLVMBackend problème, poisoned memory
+    
     BuilderTreeInstruction* builderTreeInstruction = _facadeConfigurationEnvironment->getBuilderTreeInstruction();
 
     FileReading fileReading(resolvedPath);
@@ -81,7 +81,7 @@ void UnitCompilation::pass1() {
 
     _tree = builderTreeInstruction->build(tokens);
 
-    FillingVisitorRegistry visitorFillingRegistry(_context, _orchestrator);
+    FillingVisitorRegistry visitorFillingRegistry(_context, &_orchestrator);
     _tree->accept(&visitorFillingRegistry);
     FillingVisitorBodyClass visitorFillingBodyClass(_context);
     _tree->accept(&visitorFillingBodyClass);
@@ -103,10 +103,10 @@ void UnitCompilation::pass2() {
     std::string pathProgram = (buildDir / "programme/").string();
     std::string pathGraph = (buildDir / "graphe/").string();
 
-    GeneralVisitorGenCode visitor(_context, _orchestrator);
+    GeneralVisitorGenCode visitor(_context, &_orchestrator);
     _tree->accept(&visitor);
 
-    if (_orchestrator->isGraphVizEnabled()) {
+    if (_orchestrator.isGraphVizEnabled()) {
         OutputVisualGraphText outputVisualGraph(pathGraph + _fileName + ".dot");
         auto visitorGraphViz = std::make_unique<GeneralVisitorGraphViz>(std::move(outputVisualGraph));
         _tree->accept(visitorGraphViz.get());

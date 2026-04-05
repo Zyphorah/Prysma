@@ -9,7 +9,9 @@
 #ifndef F738FE90_52E0_4F82_9BB5_5833C5E4D2CB
 #define F738FE90_52E0_4F82_9BB5_5833C5E4D2CB
 
-enum TokenType {
+#include <cstdint>
+
+enum TokenType : std::uint8_t {
     // End of file
     TOKEN_EOF,
 

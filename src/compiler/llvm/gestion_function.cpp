@@ -20,8 +20,8 @@
 #include "compiler/utils/prysma_cast.h"
 #include <cstddef>
 #include <cstdint>
-#include <llvm-18/llvm/ADT/StringRef.h>
-#include <llvm-18/llvm/IR/Function.h>
+#include <llvm-22/llvm/ADT/StringRef.h>
+#include <llvm-22/llvm/IR/Function.h>
 #include <llvm/IR/Argument.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Instructions.h>

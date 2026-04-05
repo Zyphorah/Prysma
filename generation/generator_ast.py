@@ -92,8 +92,18 @@ class GeneratorAST(EngineGeneration):
 
     @staticmethod
     def _analyser_parametre(type_c):
-        if "std::" in type_c or type_c == "Token":
+        # Token et les types primitifs sont trivially-copyable, pas besoin de std::move
+        trivially_copyable = {"Token", "int", "float", "double", "bool", "char", "unsigned int", "unsigned long"}
+        
+        if type_c in trivially_copyable:
+            # Pas de std::move pour les types trivially-copyable
+            return type_c, "{nom}"
+        
+        if "std::" in type_c and "*" not in type_c:
+            # std::move pour les types std:: non-pointeurs (move-only ou move-friendly)
             return type_c, "std::move({nom})"
+        
+        # Pas de std::move pour les pointeurs
         return type_c, "{nom}"
 
     @staticmethod

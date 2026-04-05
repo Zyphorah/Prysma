@@ -32,7 +32,7 @@ private:
     LlvmBackend* backend;
     RegistryInstruction* registryInstruction;
     RegistryVariable* registryVariable;
-    RegistryFunctionGlobal* registryFunctionGlobal;
+    RegistryFunctionGlobal& registryFunctionGlobal;
     RegistryFunctionLocal* registryFunctionLocal;
     ReturnContextCompilation* returnContextCompilation;
     RegistryArgument* registryArgument;
@@ -47,7 +47,7 @@ public:
         LlvmBackend* p_backend,
         RegistryInstruction* p_registryInstruction,
         RegistryVariable* p_registryVariable,
-        RegistryFunctionGlobal* p_registryFunctionGlobal,
+        RegistryFunctionGlobal& p_registryFunctionGlobal,
         RegistryFunctionLocal* p_registryFunctionLocal,
         ReturnContextCompilation* p_returnContextCompilation,
         RegistryArgument* p_registryArgument,
@@ -55,10 +55,21 @@ public:
         Symbol p_temporaryValue,
         llvm::BumpPtrAllocator* p_arena,
         std::string p_currentFilePath
-    ) 
+    ) : registryType(p_registryType),
+        temporaryValue(p_temporaryValue),
+        backend(p_backend),
+        registryInstruction(p_registryInstruction),
+        registryVariable(p_registryVariable),
+        registryFunctionGlobal(p_registryFunctionGlobal),
+        registryFunctionLocal(p_registryFunctionLocal),
+        returnContextCompilation(p_returnContextCompilation),
+        registryArgument(p_registryArgument),
+        registryClass(p_registryClass),
+        arena(p_arena),
+        currentFilePath(std::move(p_currentFilePath))
     {
         try {
-            if (p_currentFilePath.empty()) {
+            if (currentFilePath.empty()) {
                 throw std::invalid_argument("The current file path cannot be empty");
             }
             if (p_registryType == nullptr)
@@ -73,9 +84,6 @@ public:
             }
             if (p_registryVariable == nullptr) {
                 throw std::invalid_argument("The variable registry cannot be null");
-            }
-            if (p_registryFunctionGlobal == nullptr) {
-                throw std::invalid_argument("The global function registry cannot be null");
             }
             if (p_registryFunctionLocal == nullptr) {
                 throw std::invalid_argument("The local function registry cannot be null");
@@ -96,22 +104,9 @@ public:
                 throw std::invalid_argument("The class registry cannot be null");
             }
         } catch (const std::invalid_argument& e) {
-            std::cerr << "Error during code generation context creation: " << e.what() << std::endl;
+            std::cerr << "Error during code generation context creation: " << e.what() << '\n';
             throw;
         }
-        this->registryType = p_registryType;
-        this->currentFilePath = std::move(p_currentFilePath);
-        this->backend = p_backend;
-        this->registryInstruction = p_registryInstruction;
-        this->registryVariable = p_registryVariable;
-        this->registryFunctionGlobal = p_registryFunctionGlobal;
-        this->registryFunctionLocal = p_registryFunctionLocal;
-        this->registryType = p_registryType;
-        this->returnContextCompilation = p_returnContextCompilation;
-        this->registryArgument = p_registryArgument;
-        this->registryClass = p_registryClass;
-        this->temporaryValue = p_temporaryValue;
-        this->arena = p_arena;
     }
 
     
@@ -124,7 +119,7 @@ public:
     [[nodiscard]] auto getBackend() const -> LlvmBackend* { return backend; }
     [[nodiscard]] auto getRegistryInstruction() const -> RegistryInstruction* { return registryInstruction; }
     [[nodiscard]] auto getRegistryVariable() const -> RegistryVariable* { return registryVariable; }
-    [[nodiscard]] auto getRegistryFunctionGlobal() const -> RegistryFunctionGlobal* { return registryFunctionGlobal; }
+    [[nodiscard]] auto getRegistryFunctionGlobal() const -> RegistryFunctionGlobal& { return registryFunctionGlobal; }
     [[nodiscard]] auto getRegistryFunctionLocal() const -> RegistryFunctionLocal* { return registryFunctionLocal; }
     [[nodiscard]] auto getReturnContextCompilation() const -> ReturnContextCompilation* { return returnContextCompilation; }
     [[nodiscard]] auto getRegistryArgument() const -> RegistryArgument* { return registryArgument; }

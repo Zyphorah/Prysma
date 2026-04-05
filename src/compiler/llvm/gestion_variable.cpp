@@ -10,7 +10,7 @@
 #include "compiler/ast/registry/context_gen_code.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/lexer/lexer.h"
-#include <llvm-18/llvm/IR/Type.h>
+#include <llvm-22/llvm/IR/Type.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/Support/Casting.h>
 #include <stdexcept>
