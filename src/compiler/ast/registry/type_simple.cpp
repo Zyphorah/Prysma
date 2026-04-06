@@ -1,4 +1,4 @@
-#include <iostream>
+
 //===-- type_simple.cpp -----------------------------------------*- C++ -*-===//
 //
 // Part of the Prysma Project, under the GNU GPL v3.0 or later.
@@ -12,13 +12,6 @@
 #include <llvm/IR/Type.h>
 #include <stdexcept>
 #include <string>
-
-TypeSimple::TypeSimple(llvm::Type* llvmType)
-    : _typeID(llvmType->getTypeID()), // TODO : poisoned memory dans le llvmType->getTypeID() accès interdit
-      _integerBitWidth(llvmType->isIntegerTy() ? llvmType->getIntegerBitWidth() : 0),
-      _pointerAddressSpace(llvmType->isPointerTy() ? llvmType->getPointerAddressSpace() : 0)
-{
-}
 
 TypeSimple::TypeSimple(llvm::Type::TypeID typeID, unsigned int bitWidth, unsigned int addressSpace)
     : _typeID(typeID), _integerBitWidth(bitWidth), _pointerAddressSpace(addressSpace)

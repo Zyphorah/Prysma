@@ -38,7 +38,8 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
         classInfo = ErrorHelper::verifyNotNull(classInfo, llvm::formatv("Class '{0}' not found", nodeNew->getNomType().value).str());
         targetType = classInfo->getStructType();
     } else {
-        targetType = _contextGenCode->getRegistryType()->get(nodeNew->getNomType().type);
+        auto* abstractType = _contextGenCode->getRegistryType()->get(nodeNew->getNomType().type);
+        targetType = abstractType->generateLLVMType(_contextGenCode->getBackend()->getContext());
     }
 
     targetType = ErrorHelper::verifyNotNull(targetType, "Target type not determined for 'new'");

@@ -65,5 +65,9 @@ void GeneralVisitorGenCode::visiter(NodeLiteral* nodeLiteral)
     }
 
     _contextGenCode->setTemporaryValue(Symbol(llvmValue, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
-    _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(llvmType), _contextGenCode->getTemporaryValue().getPointedElementType()));
+    auto typeID = llvmType->getTypeID();
+    unsigned int bitWidth = llvmType->isIntegerTy() ? llvmType->getIntegerBitWidth() : 0;
+    unsigned int addressSpace = llvmType->isPointerTy() ? llvmType->getPointerAddressSpace() : 0;
+
+    _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(typeID, bitWidth, addressSpace), _contextGenCode->getTemporaryValue().getPointedElementType()));
 }

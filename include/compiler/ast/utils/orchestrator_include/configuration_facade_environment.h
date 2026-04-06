@@ -48,12 +48,12 @@ private:
     std::unique_ptr<RegistryClass> _registryClass;
     std::unique_ptr<ContextGenCode> _context;
 
-    RegistryExpression* _registryExpression;
-    BuilderTreeInstruction* _builderTreeInstruction;
-    BuilderFloatEquation* _builderEquation;
-    TypeParser* _parserType;
-    ContextParser* _contextParser;
-    ContextExpression* _contextExpression;
+    std::unique_ptr<RegistryExpression> _registryExpression;
+    std::unique_ptr<BuilderTreeInstruction> _builderTreeInstruction;
+    std::unique_ptr<BuilderFloatEquation> _builderEquation;
+    std::unique_ptr<TypeParser> _parserType;
+    std::unique_ptr<ContextParser> _contextParser;
+    std::unique_ptr<ContextExpression> _contextExpression;
 
     void createRegistries();
     void createContext(const std::string& filePath);

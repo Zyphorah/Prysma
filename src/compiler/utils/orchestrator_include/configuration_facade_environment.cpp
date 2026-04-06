@@ -54,7 +54,6 @@
 #include "compiler/lexer/token_type.h"
 #include "compiler/object/parser_class.h"
 
-#include <iostream>
 #include <llvm-22/llvm/IR/DerivedTypes.h>
 #include <llvm-22/llvm/IR/Instructions.h>
 #include <llvm-22/llvm/IR/Value.h>
@@ -80,26 +79,7 @@ ConfigurationFacadeEnvironment::ConfigurationFacadeEnvironment(RegistryFunctionG
 }
 
 ConfigurationFacadeEnvironment::~ConfigurationFacadeEnvironment()
-{
-    if (_contextExpression != nullptr) {
-        _contextExpression->~ContextExpression();
-    }
-    if (_contextParser != nullptr) {
-        _contextParser->~ContextParser();
-    }
-    if (_parserType != nullptr) {
-        _parserType->~TypeParser();
-    }
-    if (_builderEquation != nullptr) {
-        _builderEquation->~BuilderFloatEquation();
-    }
-    if (_builderTreeInstruction != nullptr) {
-        _builderTreeInstruction->~BuilderTreeInstruction();
-    }
-    if (_registryExpression != nullptr) {
-        _registryExpression->~RegistryExpression();
-    }
-}
+= default;
 
 void ConfigurationFacadeEnvironment::initialize(const std::string& filePath)
 {
@@ -151,13 +131,13 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
     _context->getBackend()->declareExternal("backSlashN", llvm::Type::getVoidTy(_context->getBackend()->getContext()), {});
     {
         auto symBackSlashNGlobal = std::make_unique<SymbolFunctionGlobal>();
-        symBackSlashNGlobal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::getVoidTy(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
+        symBackSlashNGlobal->returnType = new TypeSimple(llvm::Type::VoidTyID); // NOLINT(cppcoreguidelines-owning-memory)
         symBackSlashNGlobal->node = nullptr;
         _context->getRegistryFunctionGlobal().registerElement("backSlashN", std::move(symBackSlashNGlobal));
 
         auto symBackSlashNLocal = std::make_unique<SymbolFunctionLocal>();
         symBackSlashNLocal->function = _context->getBackend()->getModule().getFunction("backSlashN");
-        symBackSlashNLocal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::getVoidTy(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
+        symBackSlashNLocal->returnType = new TypeSimple(llvm::Type::VoidTyID); // NOLINT(cppcoreguidelines-owning-memory)
         symBackSlashNLocal->node = nullptr;
         _context->getRegistryFunctionLocal()->registerElement("backSlashN", std::move(symBackSlashNLocal));
     }
@@ -169,13 +149,13 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
     llvm::Function* printFunc = llvm::Function::Create(print_type, llvm::Function::ExternalLinkage, "print", _context->getBackend()->getModule());
     {
         auto symPrintGlobal = std::make_unique<SymbolFunctionGlobal>();
-        symPrintGlobal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::getVoidTy(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
+        symPrintGlobal->returnType = new TypeSimple(llvm::Type::VoidTyID); // NOLINT(cppcoreguidelines-owning-memory)
         symPrintGlobal->node = nullptr;
         _context->getRegistryFunctionGlobal().registerElement("print", std::move(symPrintGlobal));
 
         auto symPrintLocal = std::make_unique<SymbolFunctionLocal>();
         symPrintLocal->function = printFunc;
-        symPrintLocal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::getVoidTy(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
+        symPrintLocal->returnType = new TypeSimple(llvm::Type::VoidTyID); // NOLINT(cppcoreguidelines-owning-memory)
         symPrintLocal->node = nullptr;
         _context->getRegistryFunctionLocal()->registerElement("print", std::move(symPrintLocal));
     }
@@ -188,17 +168,13 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
     {
         auto symMallocGlobal = std::make_unique<SymbolFunctionGlobal>();
 
-        auto *ptrTy = llvm::PointerType::getUnqual(_context->getBackend()->getContext());  // TODO: problème pointeur poisoned
-        // Peut être le contexte qui est détruit mais toujours présent en mémoire 
-        // Je dois annalyser l'ensemble pour déterminer s'il n'y a pas de destruction avant 
-
-        symMallocGlobal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(ptrTy); // NOLINT(cppcoreguidelines-owning-memory)
+        symMallocGlobal->returnType = new TypeSimple(llvm::Type::PointerTyID); // NOLINT(cppcoreguidelines-owning-memory)
         symMallocGlobal->node = nullptr;
         _context->getRegistryFunctionGlobal().registerElement("prysma_malloc", std::move(symMallocGlobal));
 
         auto symMallocLocal = std::make_unique<SymbolFunctionLocal>();
         symMallocLocal->function = mallocFunc;
-        symMallocLocal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(ptrTy); // NOLINT(cppcoreguidelines-owning-memory)
+        symMallocLocal->returnType = new TypeSimple(llvm::Type::PointerTyID); // NOLINT(cppcoreguidelines-owning-memory)
         symMallocLocal->node = nullptr;
         _context->getRegistryFunctionLocal()->registerElement("prysma_malloc", std::move(symMallocLocal));
     }
@@ -210,13 +186,13 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
     llvm::Function* freeFunc = llvm::Function::Create(free_type, llvm::Function::ExternalLinkage, "prysma_free", _context->getBackend()->getModule());
     {
         auto symFreeGlobal = std::make_unique<SymbolFunctionGlobal>();
-        symFreeGlobal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::getVoidTy(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
+        symFreeGlobal->returnType = new TypeSimple(llvm::Type::VoidTyID); // NOLINT(cppcoreguidelines-owning-memory)
         symFreeGlobal->node = nullptr;
         _context->getRegistryFunctionGlobal().registerElement("prysma_free", std::move(symFreeGlobal));
 
         auto symFreeLocal = std::make_unique<SymbolFunctionLocal>();
         symFreeLocal->function = freeFunc;
-        symFreeLocal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::getVoidTy(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
+        symFreeLocal->returnType = new TypeSimple(llvm::Type::VoidTyID); // NOLINT(cppcoreguidelines-owning-memory)
         symFreeLocal->node = nullptr;
         _context->getRegistryFunctionLocal()->registerElement("prysma_free", std::move(symFreeLocal));
     }
@@ -224,14 +200,14 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
 
 void ConfigurationFacadeEnvironment::registerBaseTypes()
 {
-    _context->getRegistryType()->registerElement(TOKEN_TYPE_STRING, llvm::Type::getInt8Ty(_context->getBackend()->getContext()));
-    _context->getRegistryType()->registerElement(TOKEN_TYPE_CHAR, llvm::Type::getInt8Ty(_context->getBackend()->getContext()));
-    _context->getRegistryType()->registerElement(TOKEN_TYPE_INT64, llvm::Type::getInt64Ty(_context->getBackend()->getContext()));
-    _context->getRegistryType()->registerElement(TOKEN_TYPE_INT32, llvm::Type::getInt32Ty(_context->getBackend()->getContext()));
-    _context->getRegistryType()->registerElement(TOKEN_TYPE_FLOAT, llvm::Type::getFloatTy(_context->getBackend()->getContext()));
-    _context->getRegistryType()->registerElement(TOKEN_TYPE_BOOL, llvm::Type::getInt1Ty(_context->getBackend()->getContext()));
-    _context->getRegistryType()->registerElement(TOKEN_TYPE_VOID, llvm::Type::getVoidTy(_context->getBackend()->getContext()));
-    _context->getRegistryType()->registerElement(TOKEN_TYPE_PTR, llvm::PointerType::getUnqual(_context->getBackend()->getContext()));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_STRING, new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::IntegerTyID, 8, 0));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_CHAR, new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::IntegerTyID, 8, 0));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_INT64, new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::IntegerTyID, 64, 0));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_INT32, new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::IntegerTyID, 32, 0));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_FLOAT, new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::FloatTyID));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_BOOL, new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::IntegerTyID, 1, 0));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_VOID, new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::VoidTyID));
+    _context->getRegistryType()->registerElement(TOKEN_TYPE_PTR, new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::Type::PointerTyID));
 }
 
 void ConfigurationFacadeEnvironment::createContextParser()
@@ -242,38 +218,35 @@ void ConfigurationFacadeEnvironment::createContextParser()
 
     ContextParser::Dependencies deps = {
         .builderTreeEquation=_builderEquation->getBuilderTree(),
-        .builderTreeInstruction=_builderTreeInstruction,
-        .parserType=_parserType,
+        .builderTreeInstruction=_builderTreeInstruction.get(),
+        .parserType=_parserType.get(),
         .registryVariable=_registryVariable.get(),
         .registryType=_registryType.get()
     };
-    _contextParser = new (_arena.Allocate<ContextParser>()) ContextParser(deps); // NOLINT(cppcoreguidelines-owning-memory)
+    _contextParser = std::make_unique<ContextParser>(deps); // NOLINT(cppcoreguidelines-owning-memory)
 }
 
 void ConfigurationFacadeEnvironment::registerExpressions()
 {
     // Build the orchestrators of the abstract syntax tree
-    _builderTreeInstruction = new (_arena) // NOLINT(cppcoreguidelines-owning-memory)
-        BuilderTreeInstruction(_registryInstruction.get(), _arena); 
+    _builderTreeInstruction = std::make_unique<BuilderTreeInstruction>(_registryInstruction.get(), _arena);
 
-    _registryExpression = new (_arena.Allocate<RegistryExpression>()) RegistryExpression(); // NOLINT(cppcoreguidelines-owning-memory)
+    _registryExpression = std::make_unique<RegistryExpression>();
 
-    _builderEquation = new (_arena) // NOLINT(cppcoreguidelines-owning-memory)
-        BuilderFloatEquation(_registryExpression, _arena);
+    _builderEquation = std::make_unique<BuilderFloatEquation>(_registryExpression.get(), _arena);
 
     // Create the TypeParser with the registry
-    _parserType = new (_arena.Allocate<TypeParser>()) // NOLINT(cppcoreguidelines-owning-memory)
-        TypeParser(_context->getRegistryType(), _builderEquation->getBuilderTree());
+    _parserType = std::make_unique<TypeParser>(_context->getRegistryType(), _builderEquation->getBuilderTree());
 
     if (_contextParser == nullptr) {
         createContextParser();
     }
 
-    _contextExpression = new (_arena.Allocate<ContextExpression>()) ContextExpression( // NOLINT(cppcoreguidelines-owning-memory)
+    _contextExpression = std::make_unique<ContextExpression>(
         _builderEquation->getBuilderTree(),
-        _builderTreeInstruction,
-        _parserType,
-        _contextParser,
+        _builderTreeInstruction.get(),
+        _parserType.get(),
+        _contextParser.get(),
         &_arena,
         _registryVariable.get(),
         _registryType.get()
@@ -367,11 +340,11 @@ auto ConfigurationFacadeEnvironment::getArena() -> llvm::BumpPtrAllocator&
 
 auto ConfigurationFacadeEnvironment::getBuilderTreeInstruction() const -> BuilderTreeInstruction*
 {
-    return _builderTreeInstruction;
+    return _builderTreeInstruction.get();
 }
 
 auto ConfigurationFacadeEnvironment::getBuilderEquation() const -> BuilderFloatEquation*
 {
-    return _builderEquation;
+    return _builderEquation.get();
 }
 // NOLINTEND(cppcoreguidelines-owning-memory)

@@ -11,9 +11,9 @@
 
 #include "compiler/ast/registry/registry_generic.h"
 #include "compiler/lexer/token_type.h"
-#include <llvm/IR/Type.h>
+#include "compiler/ast/registry/types/i_type.h"
 
-class IRegistryType : public RegistryGeneric<TokenType, llvm::Type*> {
+class IRegistryType : public RegistryGeneric<TokenType, IType*> {
 public:
     IRegistryType() = default;
     IRegistryType(const IRegistryType&) = delete;

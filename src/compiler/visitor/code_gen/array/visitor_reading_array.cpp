@@ -101,6 +101,11 @@ void GeneralVisitorGenCode::visiter(NodeReadingArray* nodeReadingArray)
     llvm::Value* elementValue = _contextGenCode->getBackend()->getBuilder().CreateLoad(elementType, elementAddress, nodeReadingArray->getNomArray().value);
 
     _contextGenCode->setTemporaryValue(Symbol(elementValue, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
-    _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(elementType), _contextGenCode->getTemporaryValue().getPointedElementType()));
+    // TODO: Determine elementTypeID based on elementType
+    auto typeID = elementType->getTypeID();
+    unsigned int bitWidth = elementType->isIntegerTy() ? elementType->getIntegerBitWidth() : 0;
+    unsigned int addressSpace = elementType->isPointerTy() ? elementType->getPointerAddressSpace() : 0;
+
+    _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(typeID, bitWidth, addressSpace), _contextGenCode->getTemporaryValue().getPointedElementType()));
 }
 

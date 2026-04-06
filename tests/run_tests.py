@@ -12,8 +12,8 @@ def main():
 
     print("[2/5] Configuring and building C++ unit tests (PrysmaTests)...")
     subprocess.run(["cmake", "-S", ".", "-B", "build"], cwd=tests_dir, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    subprocess.run(["cmake", "--build", "build", "-j", str(max(1, os.cpu_count() or 1))], cwd=tests_dir, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
+    subprocess.run(["cmake", "--build", "build", "-j", str(max(1, os.cpu_count() or 1))], cwd=tests_dir, check=True)
+    
     print("[3/5] Running C++ unit tests (Catch2)...")
     test_exe = Path(tests_dir) / "build" / "PrysmaTests"
     if test_exe.exists():

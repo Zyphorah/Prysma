@@ -19,7 +19,6 @@ private:
     unsigned int _pointerAddressSpace;
 
 public:
-    explicit TypeSimple(llvm::Type* llvmType);
     explicit TypeSimple(llvm::Type::TypeID typeID, unsigned int bitWidth = 0, unsigned int addressSpace = 0);
     ~TypeSimple() override = default;
 

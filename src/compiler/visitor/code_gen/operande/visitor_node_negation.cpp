@@ -6,6 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/registry/types/type_simple.h"
@@ -36,5 +37,5 @@ void GeneralVisitorGenCode::visiter(NodeNegation* node)
     llvm::Value* result = builder.CreateNot(operandVal, "not");
 
     _contextGenCode->setTemporaryValue(Symbol(result, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
-    _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(llvm::Type::getInt1Ty(context)), _contextGenCode->getTemporaryValue().getPointedElementType()));
+    _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(llvm::Type::IntegerTyID, 1, 0), _contextGenCode->getTemporaryValue().getPointedElementType()));
 }

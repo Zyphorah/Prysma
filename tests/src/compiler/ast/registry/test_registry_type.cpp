@@ -9,6 +9,7 @@
 #include "catch.hpp"
 #include "compiler/ast/registry/registry_type.h"
 #include "compiler/lexer/token_type.h"
+#include "compiler/ast/registry/types/type_simple.h"
 #include <llvm/IR/Type.h>
 
 using namespace std;
@@ -16,21 +17,21 @@ using namespace std;
 TEST_CASE("RegistryType - Enregistryr et get multiples types", "[RegistryType]") {
     RegistryType registry;
 
-    llvm::Type* type1 = reinterpret_cast<llvm::Type*>(0x1000);
-    llvm::Type* type2 = reinterpret_cast<llvm::Type*>(0x2000);
-    llvm::Type* type3 = reinterpret_cast<llvm::Type*>(0x3000);
+    TypeSimple type1(llvm::Type::IntegerTyID, 32, 0);
+    TypeSimple type2(llvm::Type::IntegerTyID, 64, 0);
+    TypeSimple type3(llvm::Type::FloatTyID);
 
-    registry.registerElement(TOKEN_IDENTIFIER, type1);
-    registry.registerElement(TOKEN_LIT_INT, type2);
-    registry.registerElement(TOKEN_LIT_FLOAT, type3);
+    registry.registerElement(TOKEN_IDENTIFIER, &type1);
+    registry.registerElement(TOKEN_LIT_INT, &type2);
+    registry.registerElement(TOKEN_LIT_FLOAT, &type3);
 
     CHECK(registry.exists(TOKEN_IDENTIFIER));
     CHECK(registry.exists(TOKEN_LIT_INT));
     CHECK(registry.exists(TOKEN_LIT_FLOAT));
 
-    CHECK(registry.get(TOKEN_IDENTIFIER) == type1);
-    CHECK(registry.get(TOKEN_LIT_INT) == type2);
-    CHECK(registry.get(TOKEN_LIT_FLOAT) == type3);
+    CHECK(registry.get(TOKEN_IDENTIFIER)->isFloating() == type1.isFloating());
+    CHECK(registry.get(TOKEN_LIT_INT)->isFloating() == type2.isFloating());
+    CHECK(registry.get(TOKEN_LIT_FLOAT)->isFloating() == type3.isFloating());
 }
 
 TEST_CASE("RegistryType - Type inexistant lance exception", "[RegistryType]") {
@@ -43,23 +44,28 @@ TEST_CASE("RegistryType - Type inexistant lance exception", "[RegistryType]") {
 TEST_CASE("RegistryType - Surload remplace le type existant", "[RegistryType]") {
     RegistryType registry;
 
-    llvm::Type* type1 = reinterpret_cast<llvm::Type*>(0x1000);
-    llvm::Type* type2 = reinterpret_cast<llvm::Type*>(0x2000);
+    TypeSimple type1(llvm::Type::IntegerTyID, 32, 0);
+    TypeSimple type2(llvm::Type::IntegerTyID, 64, 0);
 
-    registry.registerElement(TOKEN_IDENTIFIER, type1);
-    CHECK(registry.get(TOKEN_IDENTIFIER) == type1);
+    registry.registerElement(TOKEN_IDENTIFIER, &type1);
+    CHECK(registry.get(TOKEN_IDENTIFIER) == &type1);
 
-    registry.registerElement(TOKEN_IDENTIFIER, type2);
-    CHECK(registry.get(TOKEN_IDENTIFIER) == type2);
+    registry.registerElement(TOKEN_IDENTIFIER, &type2);
+    CHECK(registry.get(TOKEN_IDENTIFIER) == &type2);
 }
 
 TEST_CASE("RegistryType - Obtenir toutes les cles", "[RegistryType]") {
     RegistryType registry;
 
-    registry.registerElement(TOKEN_IDENTIFIER, reinterpret_cast<llvm::Type*>(0x1000));
-    registry.registerElement(TOKEN_LIT_INT, reinterpret_cast<llvm::Type*>(0x2000));
-    registry.registerElement(TOKEN_LIT_FLOAT, reinterpret_cast<llvm::Type*>(0x3000));
-    registry.registerElement(TOKEN_LIT_BOOL, reinterpret_cast<llvm::Type*>(0x4000));
+    TypeSimple type1(llvm::Type::IntegerTyID, 32, 0);
+    TypeSimple type2(llvm::Type::IntegerTyID, 64, 0);
+    TypeSimple type3(llvm::Type::FloatTyID);
+    TypeSimple type4(llvm::Type::IntegerTyID, 1, 0);
+
+    registry.registerElement(TOKEN_IDENTIFIER, &type1);
+    registry.registerElement(TOKEN_LIT_INT, &type2);
+    registry.registerElement(TOKEN_LIT_FLOAT, &type3);
+    registry.registerElement(TOKEN_LIT_BOOL, &type4);
 
     auto cles = registry.getKeys();
     CHECK(cles.size() == 4);
@@ -72,12 +78,13 @@ TEST_CASE("RegistryType - Obtenir toutes les cles", "[RegistryType]") {
 TEST_CASE("RegistryType - Enregistryr null et get sans exception", "[RegistryType][SadTest]") {
     RegistryType registry;
 
-    llvm::Type* typeValid = reinterpret_cast<llvm::Type*>(0x2000);
+    TypeSimple typeValid(llvm::Type::IntegerTyID, 64, 0);
+    TypeSimple typeBool(llvm::Type::IntegerTyID, 1, 0);
 
     registry.registerElement(TOKEN_IDENTIFIER, nullptr);
-    registry.registerElement(TOKEN_LIT_INT, typeValid);
+    registry.registerElement(TOKEN_LIT_INT, &typeValid);
     registry.registerElement(TOKEN_LIT_FLOAT, nullptr);
-    registry.registerElement(TOKEN_LIT_BOOL, reinterpret_cast<llvm::Type*>(0x4000));
+    registry.registerElement(TOKEN_LIT_BOOL, &typeBool);
 
     CHECK(registry.exists(TOKEN_IDENTIFIER));
     CHECK(registry.exists(TOKEN_LIT_INT));
@@ -85,9 +92,9 @@ TEST_CASE("RegistryType - Enregistryr null et get sans exception", "[RegistryTyp
     CHECK(registry.exists(TOKEN_LIT_BOOL));
 
     CHECK(registry.get(TOKEN_IDENTIFIER) == nullptr);
-    CHECK(registry.get(TOKEN_LIT_INT) == typeValid);
+    CHECK(registry.get(TOKEN_LIT_INT) == &typeValid);
     CHECK(registry.get(TOKEN_LIT_FLOAT) == nullptr);
-    CHECK(registry.get(TOKEN_LIT_BOOL) == reinterpret_cast<llvm::Type*>(0x4000));
+    CHECK(registry.get(TOKEN_LIT_BOOL) == &typeBool);
 
     CHECK_THROWS_AS(registry.get(TOKEN_PLUS), std::invalid_argument);
     CHECK(registry.getKeys().size() == 4);

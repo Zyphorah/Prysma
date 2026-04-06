@@ -97,5 +97,9 @@ void GeneralVisitorGenCode::visiter(NodeOperation* node)
     result = ErrorHelper::verifyNotNull(result, "Unknown operation");
 
     _contextGenCode->setTemporaryValue(Symbol(result, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
-    _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(resultType), _contextGenCode->getTemporaryValue().getPointedElementType()));
+    auto typeID = resultType->getTypeID();
+    unsigned int bitWidth = resultType->isIntegerTy() ? resultType->getIntegerBitWidth() : 0;
+    unsigned int addressSpace = resultType->isPointerTy() ? resultType->getPointerAddressSpace() : 0;
+
+    _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(typeID, bitWidth, addressSpace), _contextGenCode->getTemporaryValue().getPointedElementType()));
 }
