@@ -88,7 +88,7 @@ if (a > b) {
 The condition is evaluated before each iteration.
 
 ```rust
-dec int32 i = 0;
+dec int32 i = 0; // This 'dec' is equavilent of a 'let' or similar in other languages. 
 while (i < 10) {
     aff i = i + 1;
 }
