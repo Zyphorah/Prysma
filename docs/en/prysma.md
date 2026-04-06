@@ -11,7 +11,7 @@ Prysma is a compiled system language via LLVM, offering low-level control with a
   * **End of Statement:** Each line of code must end with a semicolon (`;`).
   * **Delimitation:** Code blocks (functions, classes, loops) use curly braces `{ }`.
   * **Identifiers:** Case-sensitive.
-
+  * **Please note there is no floating point types currently, nor unsigned types, everything is a signed interger.
 -----
 
 ## Data Types
@@ -25,7 +25,6 @@ Prysma is a compiled system language via LLVM, offering low-level control with a
 | `void` | Absence of type (function return only) |
 | `T[]` | Array of type `T` (e.g., `int32[]`) |
 
-    Please note there is no floating point types currently, nor unsigned types, everything is a signed interger.
 -----
 
 ## Memory Management
