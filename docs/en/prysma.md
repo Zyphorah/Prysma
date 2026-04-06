@@ -40,7 +40,7 @@ Prysma uses **manual** memory management on the heap.
 
 ```rust
 // Allocating an object
-dec MaClasse instance = new MaClasse();
+dec MaClasse instance = new MaClasse(); // This 'dec' is equavilent of a 'let' or similar in other languages. 
 
 // Release
 delete instance;
@@ -64,7 +64,7 @@ fn int32 factorielle(arg int32 n) {
     if (n <= 1) {
         return 1;
     }
-    dec int32 suivant = n - 1;
+    dec int32 suivant = n - 1; // This 'dec' is equavilent of a 'let' or similar in other languages. 
     return n * call factorielle(suivant);
 }
 ```
@@ -115,7 +115,7 @@ while (i < 10) {
 ```rust
 fn void test_array() {
     // Declaration of a 5-integer array on the stack
-    dec int32[5] notes = [10, 15, 20, 12, 18];
+    dec int32[5] notes = [10, 15, 20, 12, 18]; // This 'dec' is equavilent of a 'let' or similar in other languages. 
     
     // Modification
     aff notes[0] = 20;
@@ -129,7 +129,7 @@ fn void test_array() {
 ```rust
 fn void main() {
     // Heap allocation
-    dec Chien mon_chien = new Chien();
+    dec Chien mon_chien = new Chien(); // This 'dec' is equavilent of a 'let' or similar in other languages. 
     
     call mon_chien.set_nom("Rex");
     call mon_chien.aboyer();
