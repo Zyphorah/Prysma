@@ -18,7 +18,7 @@ Prysma is a compiled system language via LLVM, offering low-level control with a
 
 | Type | Description |
 | :--- | :--- |
-| `int32` | Signed 32-bit integer |
+| `int32` | Signed 32-bit integer** |
 | `float` | Floating-point number 32/64 bits |
 | `bool` | Logical value (`true`, `false`) |
 | `string` | Native character string |
