@@ -76,7 +76,7 @@ Node:
     Class:
       engine: [parser]
       champs: 
-        Heritage: "llvm::ArrayRef<INode*>"
+        heritage: "llvm::ArrayRef<INode*>"
         listMembers: "llvm::ArrayRef<INode*>"
         builder: "llvm::ArrayRef<INode*>"
         nomClass: "Token"

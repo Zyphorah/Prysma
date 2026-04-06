@@ -110,7 +110,7 @@ auto main(int argc, char* argv[]) -> int
         llvm::InitializeAllTargetMCs();
         llvm::InitializeAllAsmPrinters();
         
-        std::unique_ptr<std::mutex> mutex = std::make_unique<std::mutex>();
+        std::unique_ptr<std::recursive_mutex> mutex = std::make_unique<std::recursive_mutex>();
       
         std::filesystem::path exePath = std::filesystem::canonical("/proc/self/exe");
         std::filesystem::path buildDir = exePath.parent_path();

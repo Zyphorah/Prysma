@@ -25,7 +25,7 @@
 #include <string>
 
 
-OrchestratorInclude::OrchestratorInclude(RegistryFunctionGlobal& registryFunctionGlobale, FileRegistry& registryFile, std::mutex& mutex, bool enableGraphViz)
+OrchestratorInclude::OrchestratorInclude(RegistryFunctionGlobal& registryFunctionGlobale, FileRegistry& registryFile, std::recursive_mutex& mutex, bool enableGraphViz)
     : _mutex(mutex), _registryFunctionGlobal(registryFunctionGlobale), _registryFile(registryFile), _enableGraphViz(enableGraphViz)
 {}
 
@@ -66,8 +66,8 @@ void OrchestratorInclude::compileProject(const std::string& filePath)
 
 void OrchestratorInclude::includeFile(const std::string& absolutePath)
 {
-    std::lock_guard<std::mutex> lock(_mutex);
-    if (_alreadyIncludedFiles.find(absolutePath) != _alreadyIncludedFiles.end()) {
+    std::lock_guard<std::recursive_mutex> lock(_mutex);
+    if (_alreadyIncludedFiles.contains(absolutePath)) {
         return; // File already included, ignore to avoid multiple inclusions
     }
     _alreadyIncludedFiles.insert(absolutePath);
