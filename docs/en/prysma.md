@@ -54,6 +54,8 @@ Declared with `fn` and called via `call`.
 
   * **Syntax:** `fn returnType functionName(arg type argName)`
   * **Call:** `call functionName(arguments)`
+  * A quick tip, it follows this syntex: `fn <type of data> <function name> { <opening brace, insert code here, assuming like rust style ish> <closing brace> }`
+  * The end of a function has no semi-colon (;)
 
 ### Recursion (Factorial Correction)
 
