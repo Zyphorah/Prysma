@@ -67,7 +67,7 @@ void OrchestratorInclude::compileProject(const std::string& filePath)
 void OrchestratorInclude::includeFile(const std::string& absolutePath)
 {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
-    if (_alreadyIncludedFiles.contains(absolutePath)) {
+    if (_alreadyIncludedFiles.find(absolutePath) != _alreadyIncludedFiles.end()) {
         return; // File already included, ignore to avoid multiple inclusions
     }
     _alreadyIncludedFiles.insert(absolutePath);
