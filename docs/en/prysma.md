@@ -25,7 +25,7 @@ Prysma is a compiled system language via LLVM, offering low-level control with a
 | `void` | Absence of type (function return only) |
 | `T[]` | Array of type `T` (e.g., `int32[]`) |
 
-    * Please note there is no floating point types currently, nor unsigned types, everything is a signed interger.
+    Please note there is no floating point types currently, nor unsigned types, everything is a signed interger.
 -----
 
 ## Memory Management
