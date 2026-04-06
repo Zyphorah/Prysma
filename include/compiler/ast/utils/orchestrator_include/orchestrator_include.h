@@ -26,7 +26,7 @@ class FileRegistry;
 class OrchestratorInclude
 {
 private: 
-   std::mutex& _mutex;
+   std::recursive_mutex& _mutex;
    RegistryFunctionGlobal& _registryFunctionGlobal;
    FileRegistry& _registryFile;
    llvm::StdThreadPool _threads;
@@ -42,7 +42,7 @@ private:
    bool _enableGraphViz;
 
 public:
-    OrchestratorInclude(RegistryFunctionGlobal& registryFunctionGlobal, FileRegistry& registryFile, std::mutex& mutex, bool enableGraphViz = false);
+    OrchestratorInclude(RegistryFunctionGlobal& registryFunctionGlobal, FileRegistry& registryFile, std::recursive_mutex& mutex, bool enableGraphViz = false);
     ~OrchestratorInclude();
 
     OrchestratorInclude(const OrchestratorInclude&) = delete;

@@ -32,7 +32,7 @@ def main():
         "-ffunction-sections -fdata-sections " # section pour le code mort 
     )
 
-    # 2. Les sanitizers doivent aussi être passés au Linker
+    # Les sanitizers doivent aussi être passés au Linker
     ldflags = "-fsanitize=address -fsanitize=undefined"
 
     subprocess.run([
