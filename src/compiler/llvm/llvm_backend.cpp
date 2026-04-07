@@ -23,21 +23,19 @@
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/TargetParser/Host.h>
 #include <llvm/TargetParser/Triple.h>
-#include <memory>
 #include <string>
 #include <vector>
 
 using namespace llvm;
 
-LlvmBackend::LlvmBackend() {
-
-    _context = std::make_unique<LLVMContext>();
-    _module = std::make_unique<Module>("output", *_context);
-    _builder = std::make_unique<IRBuilder<NoFolder>>(*_context);
-    
+LlvmBackend::LlvmBackend()
+    : _context(), 
+      _module("output", _context), 
+      _builder(_context)
+{
     llvm::Triple triple(llvm::sys::getDefaultTargetTriple());
     std::string tripleStr = triple.normalize();
-    _module->setTargetTriple(triple);
+    _module.setTargetTriple(triple);
     
     std::string error;
     const auto *target = llvm::TargetRegistry::lookupTarget(tripleStr, error);
@@ -46,7 +44,9 @@ LlvmBackend::LlvmBackend() {
     }
 
     TargetOptions opt;
-    _targetMachine.reset(target->createTargetMachine(triple, "generic", "", opt, Reloc::Model::PIC_));
+    if (target != nullptr) {
+        _targetMachine = target->createTargetMachine(triple, "generic", "", opt, Reloc::Model::PIC_);
+    }
 }
 
 auto LlvmBackend::createAutoCast(llvm::Value* sourceValue, llvm::Type* targetType) -> llvm::Value*
@@ -58,10 +58,10 @@ auto LlvmBackend::createAutoCast(llvm::Value* sourceValue, llvm::Type* targetTyp
     // Check if it's an array
     if(targetType->isArrayTy() && sourceValue->getType()->isPointerTy())
     {
-        llvm::Value* zero = _builder->getInt32(0);
+        llvm::Value* zero = _builder.getInt32(0);
         std::vector<llvm::Value*> indices = { zero, zero };
 
-        return _builder->CreateInBoundsGEP(
+        return _builder.CreateInBoundsGEP(
             targetType,      
             sourceValue, 
             indices,       
@@ -76,13 +76,13 @@ auto LlvmBackend::createAutoCast(llvm::Value* sourceValue, llvm::Type* targetTyp
         true      
     );
 
-    return _builder->CreateCast(opcode, sourceValue, targetType, "autocast");
+    return _builder.CreateCast(opcode, sourceValue, targetType, "autocast");
 }
 
 void LlvmBackend::declareExternal(const std::string& name, llvm::Type* ret, const std::vector<llvm::Type*>& args)
 {
     llvm::FunctionType* type = llvm::FunctionType::get(ret, args, false);
-    llvm::Function::Create(type, llvm::Function::ExternalLinkage, name, *_module);
+    llvm::Function::Create(type, llvm::Function::ExternalLinkage, name, _module);
 }
 
 auto LlvmBackend::loadValue(llvm::Value* memoryAddress, const std::string& variableName) -> llvm::Value*
@@ -96,7 +96,7 @@ auto LlvmBackend::loadValue(llvm::Value* memoryAddress, const std::string& varia
         
         llvm::Type* storedType = allocaInst->getAllocatedType();
 
-        return _builder->CreateLoad(storedType, allocaInst, variableName);
+        return _builder.CreateLoad(storedType, allocaInst, variableName);
     }
     return memoryAddress;
 }
@@ -104,7 +104,7 @@ auto LlvmBackend::loadValue(llvm::Value* memoryAddress, const std::string& varia
 // Create allocation at the beginning of the entry block (but after other allocas): simple position manager, moves the LLVM cursor
 void LlvmBackend::setInsertionPointAfterAllocation()
 {
-    llvm::BasicBlock* insertBlock = _builder->GetInsertBlock();
+    llvm::BasicBlock* insertBlock = _builder.GetInsertBlock();
     llvm::Instruction* insertionPosition = nullptr;
     
     if (insertBlock != nullptr) {
@@ -117,15 +117,15 @@ void LlvmBackend::setInsertionPointAfterAllocation()
         if (insertionPosition != nullptr) {
             llvm::Instruction* nextNode = insertionPosition->getNextNode();
             if (nextNode != nullptr) {
-                _builder->SetInsertPoint(nextNode);
+                _builder.SetInsertPoint(nextNode);
             } else {
-                _builder->SetInsertPoint(insertBlock);
+                _builder.SetInsertPoint(insertBlock);
             }
         } else {
             if (insertBlock->empty()) {
-                _builder->SetInsertPoint(insertBlock);
+                _builder.SetInsertPoint(insertBlock);
             } else {
-                _builder->SetInsertPoint(&insertBlock->front());
+                _builder.SetInsertPoint(&insertBlock->front());
             }
         }
     }

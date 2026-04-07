@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <iostream>
 #include <llvm/IR/Value.h>
 #include <memory>
 #include <string>
@@ -22,10 +23,10 @@
 
 class LlvmBackend {
 private:
-    std::unique_ptr<llvm::LLVMContext> _context;
-    std::unique_ptr<llvm::Module> _module;
-    std::unique_ptr<llvm::IRBuilder<llvm::NoFolder>> _builder;
-    std::unique_ptr<llvm::TargetMachine> _targetMachine;
+    llvm::LLVMContext _context;
+    llvm::Module _module;
+    llvm::IRBuilder<llvm::NoFolder> _builder;
+    llvm::TargetMachine* _targetMachine = nullptr;
 
 public:
 
@@ -36,11 +37,14 @@ public:
     LlvmBackend(LlvmBackend&&) = delete;
     auto operator=(LlvmBackend&&) -> LlvmBackend& = delete;
 
-    ~LlvmBackend() = default;
+    ~LlvmBackend()
+    {
+        std::cout << "Destruction de LlvmBackend" << '\n';
+    }
 
-    auto getContext() -> llvm::LLVMContext& { return *_context; }
-    auto getModule() -> llvm::Module& { return *_module; }
-    auto getBuilder() -> llvm::IRBuilder<llvm::NoFolder>& { return *_builder; }
+    auto getContext() -> llvm::LLVMContext& { return _context; }
+    auto getModule() -> llvm::Module& { return _module; }
+    auto getBuilder() -> llvm::IRBuilder<llvm::NoFolder>& { return _builder; }
 
     auto createAutoCast(llvm::Value* sourceValue, llvm::Type* targetType) -> llvm::Value*;
     void declareExternal(const std::string& name, llvm::Type* ret, const std::vector<llvm::Type*>& args);

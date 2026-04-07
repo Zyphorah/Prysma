@@ -47,7 +47,7 @@ void OrchestratorInclude::compileProject(const std::string& filePath)
 
     for(const auto& unit : _compilationUnits) {
         UnitCompilation* ptrUnit = unit.get();
-        _threads.async([this, ptrUnit] {
+        _threads.async([this, ptrUnit] -> void {
             try {
                 ptrUnit->pass2();
             } catch (const CompilationError& e) {
