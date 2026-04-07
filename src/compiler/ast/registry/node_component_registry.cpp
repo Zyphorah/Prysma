@@ -9,6 +9,11 @@ NodeComponentRegistry::mapper<AST_NODEGEN_TYPE_COMPONENT>::get(NodeComponentRegi
     return reg.nodegen_types;
 }
 
+sparse_set<of_itypes>&
+NodeComponentRegistry::mapper<AST_ITYPE_COMPONENT>::get(NodeComponentRegistry& reg) {
+    return reg.itypes;
+}
+
 sparse_set<of_names>&
 NodeComponentRegistry::mapper<AST_NAME_COMPONENT>::get(NodeComponentRegistry& reg) {
     return reg.names;

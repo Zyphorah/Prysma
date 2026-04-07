@@ -1,5 +1,6 @@
 #include "compiler/ast/utils/builder_environment_registry_function.h"
 #include "compiler/ast/registry/context_gen_code.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/ast/registry/registry_class.h"
 #include "compiler/ast/ast_genere.h"
@@ -117,7 +118,9 @@ void BuilderEnvironmentRegistryFunction::fill()
         std::vector<llvm::Type*> paramTypes;
         for (auto* arg : oldSymbol->node->getArguments()) {
             auto* argFunction = prysma::cast<NodeArgFunction>(arg);
-            paramTypes.push_back(argFunction->getType()->generateLLVMType(_contextGenCode->getBackend()->getContext()));
+            auto* from_node_itype = *_contextGenCode->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(argFunction->getNodeId());
+
+            paramTypes.push_back(from_node_itype->generateLLVMType(_contextGenCode->getBackend()->getContext()));
         }
 
         llvm::FunctionType* funcType = llvm::FunctionType::get(retType, paramTypes, false);
@@ -168,7 +171,9 @@ void BuilderEnvironmentRegistryFunction::fill()
 
             for (auto* arg : symbol->node->getArguments()) {
                 auto* argFunction = prysma::cast<NodeArgFunction>(arg);
-                paramTypes.push_back(argFunction->getType()->generateLLVMType(_contextGenCode->getBackend()->getContext()));
+                auto* from_node_itype = *_contextGenCode->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(argFunction->getNodeId());
+
+                paramTypes.push_back(from_node_itype->generateLLVMType(_contextGenCode->getBackend()->getContext()));
             }
 
             llvm::FunctionType* funcType = llvm::FunctionType::get(retType, paramTypes, false);

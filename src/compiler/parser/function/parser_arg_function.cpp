@@ -5,6 +5,7 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
@@ -27,7 +28,12 @@ auto ParserArgFunction::parse(std::vector<Token>& tokens, std::size_t index) -> 
 
   Token name = consume(tokens, index, TOKEN_IDENTIFIER, "Error: not an identifier!");
 
-  return _contextParser.getBuilderTreeEquation()->allocate<NodeArgFunction>(type, name);
+  std::size_t node_id = _contextParser.getNodeComponentRegistry()->getNextId();
+
+  _contextParser.getNodeComponentRegistry()->insert<AST_ITYPE_COMPONENT>(node_id, type);
+  _contextParser.getNodeComponentRegistry()->insert<AST_NAME_COMPONENT>(node_id, name);
+
+  return _contextParser.getBuilderTreeEquation()->allocate<NodeArgFunction>(node_id);
 }
 
 #endif /* PARSER_ARGFUNCTION_CPP */
