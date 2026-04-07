@@ -23,6 +23,7 @@
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/TargetParser/Host.h>
 #include <llvm/TargetParser/Triple.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -30,12 +31,13 @@ using namespace llvm;
 
 LlvmBackend::LlvmBackend()
     : _context(), 
-      _module("output", _context), 
+      _targetMachine(nullptr),
+      _module(std::make_unique<llvm::Module>("output", _context)), 
       _builder(_context)
 {
     llvm::Triple triple(llvm::sys::getDefaultTargetTriple());
     std::string tripleStr = triple.normalize();
-    _module.setTargetTriple(triple);
+    _module->setTargetTriple(triple);
     
     std::string error;
     const auto *target = llvm::TargetRegistry::lookupTarget(tripleStr, error);
@@ -45,7 +47,7 @@ LlvmBackend::LlvmBackend()
 
     TargetOptions opt;
     if (target != nullptr) {
-        _targetMachine = target->createTargetMachine(triple, "generic", "", opt, Reloc::Model::PIC_);
+        _targetMachine.reset(target->createTargetMachine(triple, "generic", "", opt, Reloc::Model::PIC_));
     }
 }
 
@@ -82,7 +84,7 @@ auto LlvmBackend::createAutoCast(llvm::Value* sourceValue, llvm::Type* targetTyp
 void LlvmBackend::declareExternal(const std::string& name, llvm::Type* ret, const std::vector<llvm::Type*>& args)
 {
     llvm::FunctionType* type = llvm::FunctionType::get(ret, args, false);
-    llvm::Function::Create(type, llvm::Function::ExternalLinkage, name, _module);
+    llvm::Function::Create(type, llvm::Function::ExternalLinkage, name, _module.get());
 }
 
 auto LlvmBackend::loadValue(llvm::Value* memoryAddress, const std::string& variableName) -> llvm::Value*

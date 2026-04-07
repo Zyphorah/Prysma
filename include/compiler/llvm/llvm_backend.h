@@ -24,9 +24,9 @@
 class LlvmBackend {
 private:
     llvm::LLVMContext _context;
-    llvm::Module _module;
-    llvm::IRBuilder<llvm::NoFolder> _builder;
-    llvm::TargetMachine* _targetMachine = nullptr;
+    std::unique_ptr<llvm::TargetMachine> _targetMachine;
+    std::unique_ptr<llvm::Module> _module;
+    llvm::IRBuilder<> _builder;
 
 public:
 
@@ -43,8 +43,8 @@ public:
     }
 
     auto getContext() -> llvm::LLVMContext& { return _context; }
-    auto getModule() -> llvm::Module& { return _module; }
-    auto getBuilder() -> llvm::IRBuilder<llvm::NoFolder>& { return _builder; }
+    auto getModule() -> llvm::Module& { return *_module; }
+    auto getBuilder() -> llvm::IRBuilder<>& { return _builder; }
 
     auto createAutoCast(llvm::Value* sourceValue, llvm::Type* targetType) -> llvm::Value*;
     void declareExternal(const std::string& name, llvm::Type* ret, const std::vector<llvm::Type*>& args);
