@@ -269,7 +269,8 @@ void ConfigurationFacadeEnvironment::registerExpressions()
         _contextParser,
         &_arena,
         _registryVariable.get(),
-        _registryType.get()
+        _registryType.get(),
+        _nodeComponentRegistry.get()
     );
 
     auto* exprLitInt = new (_arena.Allocate<ExpressionLiteral>()) ExpressionLiteral(*_contextExpression); // // NOLINT(cppcoreguidelines-owning-memory)
