@@ -11,8 +11,8 @@
 
 #include "compiler/lexer/lexer.h"
 #include "compiler/ast/registry/types/i_type.h"
-#include <llvm-22/llvm/ADT/StringMap.h>
-#include <llvm-22/llvm/IR/Value.h>
+#include <llvm/ADT/StringMap.h>
+#include <llvm/IR/Value.h>
 #include <map>
 #include <stack>
 #include <string>

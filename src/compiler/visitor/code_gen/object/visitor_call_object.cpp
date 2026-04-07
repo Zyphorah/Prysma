@@ -15,7 +15,7 @@
 #include "compiler/visitor/code_gen/helper/error_helper.h"
 #include "compiler/visitor/code_gen/helper/v_table_navigator.h"
 #include "compiler/utils/prysma_cast.h"
-#include <llvm-22/llvm/IR/Value.h>
+#include <llvm/IR/Value.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/Support/Casting.h>

@@ -11,8 +11,8 @@
 
 #include "compiler/ast/registry/context_gen_code.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
-#include <llvm-22/llvm/IR/Instructions.h>
-#include <llvm-22/llvm/IR/Value.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Value.h>
 #include <string>
 
 class VariableTypeExtractor {

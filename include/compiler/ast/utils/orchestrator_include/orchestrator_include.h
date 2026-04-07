@@ -16,7 +16,7 @@
 #include <vector>
 #include <set>
 #include <memory>
-#include <llvm-22/llvm/Support/ThreadPool.h>
+#include <llvm/Support/ThreadPool.h>
 
 struct ContextGenCode;
 class INode;

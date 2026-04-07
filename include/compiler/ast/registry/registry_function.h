@@ -10,8 +10,8 @@
 #define F2141F07_2C85_4ADB_9BC9_A909EBD34394
 
 #include "registry_generic.h"
-#include <llvm-22/llvm/ADT/StringRef.h>
-#include <llvm-22/llvm/IR/Function.h>
+#include <llvm/ADT/StringRef.h>
+#include <llvm/IR/Function.h>
 #include <llvm/ADT/StringRef.h>
 #include <mutex>
 #include <string>

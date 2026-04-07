@@ -20,9 +20,9 @@
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/visitor/visitor_filling_body_class/visitor_filling_body_class.h"
 #include "compiler/visitor/visitor_filling_registry/visitor_filling_registry.h"
-#include <llvm-22/llvm/IR/DerivedTypes.h>
-#include <llvm-22/llvm/IR/Instructions.h>
-#include <llvm-22/llvm/IR/Value.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Value.h>
 #include <cstdlib>
 #include <memory>
 #include <string>

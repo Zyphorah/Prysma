@@ -13,9 +13,9 @@
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/ast/registry/registry_generic.h"
-#include <llvm-22/llvm/ADT/StringRef.h>
-#include <llvm-22/llvm/IR/DerivedTypes.h>
-#include <llvm-22/llvm/IR/GlobalVariable.h>
+#include <llvm/ADT/StringRef.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/GlobalVariable.h>
 #include <string>
 #include <map>
 

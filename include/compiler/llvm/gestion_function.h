@@ -12,8 +12,8 @@
 #include "compiler/ast/registry/context_gen_code.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/visitor/interfaces/i_visitor.h"
-#include <llvm-22/llvm/ADT/StringRef.h>
-#include <llvm-22/llvm/IR/Function.h>
+#include <llvm/ADT/StringRef.h>
+#include <llvm/IR/Function.h>
 #include <llvm/IR/Type.h>
 #include <memory>
 #include <vector>

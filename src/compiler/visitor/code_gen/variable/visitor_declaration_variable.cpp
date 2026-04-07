@@ -16,7 +16,7 @@
 #include "compiler/ast/registry/types/type_array.h"
 #include <cstddef>
 #include <cstdint>
-#include <llvm-22/llvm/IR/DerivedTypes.h>
+#include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/Support/Casting.h>

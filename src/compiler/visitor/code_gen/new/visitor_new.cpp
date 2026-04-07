@@ -17,7 +17,7 @@
 #include "compiler/utils/prysma_cast.h"
 #include <cstddef>
 #include <cstdint>
-#include <llvm-22/llvm/IR/Value.h>
+#include <llvm/IR/Value.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/Support/Casting.h>
 #include <llvm/Support/FormatVariadic.h>

@@ -10,7 +10,7 @@
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/visitor/code_gen/helper/control_flow_helper.h"
-#include <llvm-22/llvm/IR/Function.h>
+#include <llvm/IR/Function.h>
 #include <llvm/IR/Value.h>
 
 void GeneralVisitorGenCode::visiter(NodeWhile* nodeWhile) 

@@ -14,12 +14,12 @@
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/visitor/visitor_filling_registry/visitor_filling_registry.h"
 #include <iostream>
-#include <llvm-22/llvm/IR/DerivedTypes.h>
-#include <llvm-22/llvm/IR/Instructions.h>
-#include <llvm-22/llvm/IR/Value.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Value.h>
 #include <cstdlib>
 
-#include <llvm-22/llvm/Support/ThreadPool.h>
+#include <llvm/Support/ThreadPool.h>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -43,8 +43,13 @@ auto OrchestratorInclude::hasErrors() const -> bool {
 void OrchestratorInclude::compileProject(const std::string& filePath) 
 {
     includeFile(filePath);
-    _threads.wait(); // Wait for all threads to finish pass 1
+   // _threads.wait(); // Wait for all threads to finish pass 1
 
+   for (const auto& unit: _compilationUnits)
+   {
+        unit->pass2();
+   }
+/*
     for(const auto& unit : _compilationUnits) {
         UnitCompilation* ptrUnit = unit.get();
         _threads.async([this, ptrUnit] -> void {
@@ -58,6 +63,7 @@ void OrchestratorInclude::compileProject(const std::string& filePath)
         });
     }
     _threads.wait(); // Wait for all threads to finish pass 2
+    */
 }
 
 void OrchestratorInclude::includeFile(const std::string& absolutePath)
@@ -71,8 +77,9 @@ void OrchestratorInclude::includeFile(const std::string& absolutePath)
    // Fill the compilation unit vector 
     _compilationUnits.push_back(std::make_unique<UnitCompilation>(*this, _registryFile, absolutePath, _registryFunctionGlobal));
     auto *ptrNewUnit = _compilationUnits.back().get();
+    ptrNewUnit->pass1(); // Execute pass1 in the current thread to ensure that includes are processed sequential
     // Fill the thread pool 
-
+/*
     _threads.async([this, ptrNewUnit, absolutePath] -> void {
         try {
             ptrNewUnit->pass1();
@@ -82,4 +89,5 @@ void OrchestratorInclude::includeFile(const std::string& absolutePath)
             std::cerr << "Error in file '" << absolutePath << "': " << e.what() << '\n';
         }
     });
+    */
 }

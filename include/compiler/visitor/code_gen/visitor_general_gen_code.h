@@ -9,7 +9,7 @@
 #ifndef FDDB5968_6DEF_49B0_AD11_8791D523278A
 #define FDDB5968_6DEF_49B0_AD11_8791D523278A
 
-#include <llvm-22/llvm/IR/Value.h>
+#include <llvm/IR/Value.h>
 #include <string>
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_gen_code.h"

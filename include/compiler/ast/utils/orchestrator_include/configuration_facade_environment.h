@@ -25,6 +25,7 @@
 #include "compiler/parser/parser_type.h"
 #include "compiler/llvm/llvm_backend.h"
 #include "compiler/registry/registry_file.h"
+#include <llvm/IR/LLVMContext.h>
 #include <llvm/Support/Allocator.h>
 #include <memory>
 #include <string>

@@ -54,9 +54,9 @@
 #include "compiler/lexer/token_type.h"
 #include "compiler/object/parser_class.h"
 
-#include <llvm-22/llvm/IR/DerivedTypes.h>
-#include <llvm-22/llvm/IR/Instructions.h>
-#include <llvm-22/llvm/IR/Value.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Value.h>
 #include <llvm/Support/Allocator.h>
 #include <memory>
 #include <stdexcept>

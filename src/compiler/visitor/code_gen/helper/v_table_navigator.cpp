@@ -8,8 +8,8 @@
 
 #include "compiler/visitor/code_gen/helper/v_table_navigator.h"
 #include <cstdint>
-#include <llvm-22/llvm/IR/IRBuilder.h>
-#include <llvm-22/llvm/IR/Value.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Value.h>
 #include <vector>
 
 VTableNavigator::VTableNavigator(llvm::IRBuilderBase* p_builder) : builder(p_builder) {}

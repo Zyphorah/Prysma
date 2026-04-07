@@ -13,8 +13,8 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/utils/prysma_cast.h"
 #include "compiler/visitor/extractors/members_extractor_class.h"
-#include <llvm-22/llvm/IR/Function.h>
-#include <llvm-22/llvm/IR/GlobalVariable.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/GlobalVariable.h>
 #include <llvm/ADT/StringRef.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/DerivedTypes.h>

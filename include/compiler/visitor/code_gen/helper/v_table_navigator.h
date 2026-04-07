@@ -9,8 +9,8 @@
 #ifndef VTABLE_NAVIGATOR_H
 #define VTABLE_NAVIGATOR_H
 
-#include <llvm-22/llvm/IR/Value.h>
-#include <llvm-22/llvm/IR/IRBuilder.h>
+#include <llvm/IR/Value.h>
+#include <llvm/IR/IRBuilder.h>
 
 class VTableNavigator {
 private:

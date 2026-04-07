@@ -11,6 +11,7 @@
 
 #include "compiler/ast/utils/orchestrator_include/configuration_facade_environment.h"
 #include "configuration_facade_environment.h"
+#include <llvm/IR/LLVMContext.h>
 #include <string>
 #include <memory>
 

@@ -12,7 +12,7 @@
 #include <tuple>
 #include <utility>
 #include <vector>
-#include <llvm-22/llvm/Support/Allocator.h>
+#include <llvm/Support/Allocator.h>
 #include <llvm/Support/TargetSelect.h>
 #include "compiler/ast/registry/registry_type.h"
 #include "compiler/lexer/token_type.h"

@@ -11,7 +11,7 @@
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/registry/types/type_simple.h"
-#include <llvm-22/llvm/IR/Value.h>
+#include <llvm/IR/Value.h>
 #include <llvm/IR/Type.h>
 
 #include "compiler/visitor/code_gen/helper/error_helper.h"
