@@ -39,7 +39,7 @@ UnitCompilation::UnitCompilation(OrchestratorInclude& orchestrator, FileRegistry
       _originalFilePath(std::move(filePath)) 
 {
     // Initialization of the separate context (the private bubble)
-    _facadeConfigurationEnvironment = std::make_unique<ConfigurationFacadeEnvironment>(registryFunctionGlobale, _fileRegistry);
+    _facadeConfigurationEnvironment = std::make_unique<ConfigurationFacadeEnvironment>(registryFunctionGlobale);
 }
 UnitCompilation::~UnitCompilation() 
 {

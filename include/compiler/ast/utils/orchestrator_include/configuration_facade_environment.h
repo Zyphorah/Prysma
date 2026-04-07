@@ -64,7 +64,7 @@ private:
     void registerInstructions();
 
 public:
-    explicit ConfigurationFacadeEnvironment(RegistryFunctionGlobal& registryFunctionGlobal, [[maybe_unused]] FileRegistry& registryFile);
+    explicit ConfigurationFacadeEnvironment(RegistryFunctionGlobal& registryFunctionGlobal);
     ~ConfigurationFacadeEnvironment();
 
     ConfigurationFacadeEnvironment(const ConfigurationFacadeEnvironment&) = delete;

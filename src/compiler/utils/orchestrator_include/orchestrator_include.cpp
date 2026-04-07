@@ -43,25 +43,21 @@ auto OrchestratorInclude::hasErrors() const -> bool {
 void OrchestratorInclude::compileProject(const std::string& filePath) 
 {
     includeFile(filePath);
-   // _threads.wait(); // Wait for all threads to finish pass 1
+    _threads.wait(); // Wait for all threads to finish pass 1
 
-    for(const auto& unit: _compilationUnits)
-    {
-        unit->pass2();
-    }
-   /* for(const auto& unit : _compilationUnits) {
+    for(const auto& unit : _compilationUnits) {
         UnitCompilation* ptrUnit = unit.get();
         _threads.async([this, ptrUnit] {
             try {
                 ptrUnit->pass2();
             } catch (const CompilationError& e) {
-                std::lock_guard<std::mutex> lock(_mutex);
+                std::lock_guard<std::recursive_mutex> lock(_mutex);
                 _hasErrors = true;
-                std::cerr << "Error in file '" << ptrUnit->getPath() << "': " << e.what() << std::endl;
+                std::cerr << "Error in file '" << ptrUnit->getPath() << "': " << e.what() << '\n';
             }
         });
-    }*/
-   // _threads.wait(); // Wait for all threads to finish pass 2
+    }
+    _threads.wait(); // Wait for all threads to finish pass 2
 }
 
 void OrchestratorInclude::includeFile(const std::string& absolutePath)
@@ -75,17 +71,15 @@ void OrchestratorInclude::includeFile(const std::string& absolutePath)
    // Fill the compilation unit vector 
     _compilationUnits.push_back(std::make_unique<UnitCompilation>(*this, _registryFile, absolutePath, _registryFunctionGlobal));
     auto *ptrNewUnit = _compilationUnits.back().get();
-    ptrNewUnit->pass1();
     // Fill the thread pool 
-    /*
-    _threads.async([this, ptrNewUnit, absolutePath] {
+
+    _threads.async([this, ptrNewUnit, absolutePath] -> void {
         try {
             ptrNewUnit->pass1();
         } catch (const CompilationError& e) {
-            std::lock_guard<std::mutex> lock(_mutex);
+            std::lock_guard<std::recursive_mutex> lock(_mutex);
             _hasErrors = true;
-            std::cerr << "Error in file '" << absolutePath << "': " << e.what() << std::endl;
+            std::cerr << "Error in file '" << absolutePath << "': " << e.what() << '\n';
         }
-    });*/
-
+    });
 }

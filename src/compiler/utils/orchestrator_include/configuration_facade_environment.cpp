@@ -66,9 +66,8 @@
 
 // NOLINTBEGIN(cppcoreguidelines-owning-memory)
 
-ConfigurationFacadeEnvironment::ConfigurationFacadeEnvironment(RegistryFunctionGlobal& registryFunctionGlobal, [[maybe_unused]] FileRegistry& registryFile)
+ConfigurationFacadeEnvironment::ConfigurationFacadeEnvironment(RegistryFunctionGlobal& registryFunctionGlobal)
     : _registryFunctionGlobal(registryFunctionGlobal),
-      // _registryFile(fileRegistry),
       _registryExpression(nullptr),
       _builderTreeInstruction(nullptr),
       _builderEquation(nullptr),
@@ -93,14 +92,38 @@ void ConfigurationFacadeEnvironment::initialize(const std::string& filePath)
 
 void ConfigurationFacadeEnvironment::createRegistries()
 {
-    _backend = std::make_unique<LlvmBackend>();
-    _registryInstruction = std::make_unique<RegistryInstruction>();
-    _registryVariable = std::make_unique<RegistryVariable>();
-    _registryFunctionLocal = std::make_unique<RegistryFunctionLocal>();
-    _registryType = std::make_unique<RegistryType>();
-    _returnContextCompilation = std::make_unique<ReturnContextCompilation>();
-    _registryArgument = std::make_unique<RegistryArgument>();
-    _registryClass = std::make_unique<RegistryClass>();
+    if (_backend == nullptr)
+    {
+        _backend = std::make_unique<LlvmBackend>();
+    }
+    if (_registryInstruction == nullptr)
+    {
+        _registryInstruction = std::make_unique<RegistryInstruction>();
+    }
+    if ( _registryVariable == nullptr)
+    {
+        _registryVariable = std::make_unique<RegistryVariable>();
+    }
+    if ( _registryFunctionLocal == nullptr)
+    {   
+         _registryFunctionLocal = std::make_unique<RegistryFunctionLocal>();
+    }
+    if ( _registryType == nullptr)
+    {
+         _registryType = std::make_unique<RegistryType>();
+    }
+    if ( _returnContextCompilation == nullptr)
+    {   
+        _returnContextCompilation = std::make_unique<ReturnContextCompilation>();
+    }
+    if ( _registryArgument == nullptr)
+    {
+        _registryArgument = std::make_unique<RegistryArgument>();
+    }
+    if ( _registryClass == nullptr)
+    {
+        _registryClass = std::make_unique<RegistryClass>();
+    }
 }
 
 void ConfigurationFacadeEnvironment::createContext(const std::string& filePath)
@@ -346,5 +369,6 @@ auto ConfigurationFacadeEnvironment::getBuilderTreeInstruction() const -> Builde
 auto ConfigurationFacadeEnvironment::getBuilderEquation() const -> BuilderFloatEquation*
 {
     return _builderEquation.get();
+
 }
 // NOLINTEND(cppcoreguidelines-owning-memory)

@@ -77,6 +77,11 @@
 // Vitesse de flux de contrôle par switch case, hypothèse à analyser. 
 
 
+// Je crois avoir une piste, il est possible que ce sois un problème de destruction des instance par exemple si j'ai un fichier A qui inclu le fichier B mais la destruction du fichier B n'est pas 
+// fait au même moment que le fichier A, il est possible que le contexte globale pointe vers des adresses mémoire qui devrais être libéré mais on été empoisonné f7 par llvm adresse sanitizer. 
+
+
+
 auto main(int argc, char* argv[]) -> int
 {
     if (argc < 2) {
@@ -127,7 +132,7 @@ auto main(int argc, char* argv[]) -> int
 
         std::unique_ptr<RegistryFunctionGlobal> registryFunctionGlobale = std::make_unique<RegistryFunctionGlobal>();
         std::unique_ptr<FileRegistry> registryFiles = std::make_unique<FileRegistry>();
-        std::unique_ptr<ConfigurationFacadeEnvironment> facadeConfigurationEnvironnement = std::make_unique<ConfigurationFacadeEnvironment>(*registryFunctionGlobale, *registryFiles);
+        std::unique_ptr<ConfigurationFacadeEnvironment> facadeConfigurationEnvironnement = std::make_unique<ConfigurationFacadeEnvironment>(*registryFunctionGlobale);
         
         OrchestratorInclude orchestratorInclude(*registryFunctionGlobale, *registryFiles, *mutex, activerGraphViz);
         orchestratorInclude.compileProject(cheminFile);

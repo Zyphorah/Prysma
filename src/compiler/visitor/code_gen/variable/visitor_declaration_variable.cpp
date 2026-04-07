@@ -64,7 +64,7 @@ void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVari
         createdAlloca = allocaInstArray;
 
         // Initialize each element of the array
-        auto* typeArrayLLVM = llvm::dyn_cast<llvm::ArrayType>(variableType);
+        auto* typeArrayLLVM = llvm::dyn_cast<llvm::ArrayType>(variableType); // AddressSanitizer: use-after-poison, 
         for (size_t i = 0; i < arrayInit->getElements().size(); ++i) {
             std::vector<llvm::Value*> indices = {
                 _contextGenCode->getBackend()->getBuilder().getInt32(0),
