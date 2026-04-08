@@ -1,3 +1,4 @@
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/registry_class.h"
 #include "compiler/ast/registry/registry_function.h"
@@ -85,14 +86,16 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
                             llvm::Type* elementType = typeArrayLLVM->getElementType();
                             llvm::Value* memberPtr = builder.CreateStructGEP(targetType, allocatedAddress, idx, memberName + "_ptrinit");
                             
-                            for (size_t i = 0; i < arrayInit->getElements().size(); ++i) {
+                            auto* node_elements = _contextGenCode->getNodeComponentRegistry()->get<AST_ARRAY_ELEMENT_COMPONENT>(arrayInit->getNodeId());
+
+                            for (size_t i = 0; i < node_elements->size(); ++i) {
                                 std::vector<llvm::Value*> indices = {
                                     builder.getInt32(0),
                                     builder.getInt32(static_cast<uint32_t>(i))
                                 }; 
                                 llvm::Value* ptrElement = builder.CreateGEP(typeArrayLLVM, memberPtr, indices, "ptr_element");
-                                
-                                INode* element = arrayInit->getElements()[i];
+                    
+                                INode* element = node_elements->operator[](i);
                                 element->accept(this);
                                 llvm::Value* expressionVal = _contextGenCode->getTemporaryValue().getAddress();
                                 

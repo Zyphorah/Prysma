@@ -5,6 +5,7 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_expression.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <llvm/ADT/SmallVector.h>
@@ -46,9 +47,13 @@ auto ExpressionArrayInitialization::build(std::vector<Token>& equation) -> INode
         }
     }
 
-    return _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
-        _context.getBuilderTreeEquation()->allocateArray<INode*>(arrayElements)
+    std::size_t node_id = _context.getNodeComponentRegistry()->getNextId();
+
+    _context.getNodeComponentRegistry()->insert<AST_ARRAY_ELEMENT_COMPONENT>(
+        node_id, _context.getBuilderTreeEquation()->allocateArray<INode*>(arrayElements)
     );
+
+    return _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(node_id);
 }
 
 #endif /* EXPRESSION_ARRAYINITIALIZATION_CPP */

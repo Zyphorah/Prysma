@@ -18,13 +18,23 @@ struct CHILD_COMPONENT_TAG;
 struct AST_NODEGEN_TYPE_COMPONENT;
 struct AST_ITYPE_COMPONENT;
 struct AST_NAME_COMPONENT;
-struct AST_CHILD_COMPONENT;
+
+struct AST_CHILD_COMPONENT;         // POUR SÉPARER LES ELEMENTS DES ENFANTS DU SYSTÈME
+struct AST_ARRAY_ELEMENT_COMPONENT; // AFIN DE PERMETTRE ITÉRER SUR L'ARRAY DES CHILD DU SYSTÈME PAR EX
 
 using of_nodegen_types = NodeTypeGenerated;
 using of_itypes = IType*; // sont alloc dans le pool de bump alloc donc c'est good
 
 using of_names = Token;
 using of_children = llvm::ArrayRef<INode*>; // les enfants sont alloc dans pool de bump alloc
+using of_arr_elements = llvm::ArrayRef<INode*>; 
+
+#if 0
+using of_NodeTypeGenerated = NodeTypeGenerated;
+using of_IType = IType*;
+
+using of_Token = Token;
+#endif
 
 
 struct NodeComponentRegistry {
@@ -57,7 +67,9 @@ private:
     sparse_set<of_itypes> itypes;
 
     sparse_set<of_names> names;
+
     sparse_set<of_children> children;
+    sparse_set<of_arr_elements> arr_elements;
 };
 
 
@@ -82,6 +94,10 @@ struct NodeComponentRegistry::mapper<AST_CHILD_COMPONENT> {
     PRYSMA_NODISCARD static sparse_set<of_children>& get(NodeComponentRegistry& reg);
 };
 
+template<>
+struct NodeComponentRegistry::mapper<AST_ARRAY_ELEMENT_COMPONENT> {
+    PRYSMA_NODISCARD static sparse_set<of_arr_elements>& get(NodeComponentRegistry& reg);
+};
 
 
 template<typename COMPONENT_TAG, typename T>

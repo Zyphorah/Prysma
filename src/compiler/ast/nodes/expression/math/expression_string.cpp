@@ -5,6 +5,7 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_expression.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <cstring>
@@ -27,23 +28,23 @@ auto ExpressionString::build(std::vector<Token>& equation) -> INode*
 {
     llvm::SmallVector<INode*, 16> stringElements;
 
-    int index = 0;
+    std::size_t index = 0;
     if (equation.empty() || equation[0].type != TOKEN_QUOTE) {
         throw std::runtime_error("Error: a string must start with a quote");
     }
     index++;
 
-    if (index >= static_cast<int>(equation.size()) || equation[static_cast<size_t>(index)].type != TOKEN_IDENTIFIER) {
+    if (index >= equation.size() || equation[index].type != TOKEN_IDENTIFIER) {
         throw std::runtime_error("Error: a string must be composed of alphanumeric characters");
     }
-    Token str = equation[static_cast<size_t>(index)];
+    Token str = equation[index];
     index++;
 
-    if (index >= static_cast<int>(equation.size()) || equation[static_cast<size_t>(index)].type != TOKEN_QUOTE) {
+    if (index >= equation.size() || equation[index].type != TOKEN_QUOTE) {
         throw std::runtime_error("Error: a string must end with a quote");
     }
 
-    for (size_t charIndex = 0; charIndex < str.value.size(); charIndex++) {
+    for (std::size_t charIndex = 0; charIndex < str.value.size(); charIndex++) {
         int ascii = static_cast<unsigned char>(str.value[charIndex]);
         Token token;
         token.type = TOKEN_LIT_INT;
@@ -66,9 +67,13 @@ auto ExpressionString::build(std::vector<Token>& equation) -> INode*
     tokenZero.column = str.column;
     stringElements.push_back(_context.getBuilderTreeEquation()->allocate<NodeLiteral>(tokenZero)); 
 
-    return _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
-        _context.getBuilderTreeEquation()->allocateArray<INode*>(stringElements)
+    std::size_t node_id = _context.getNodeComponentRegistry()->getNextId();
+
+    _context.getNodeComponentRegistry()->insert<AST_ARRAY_ELEMENT_COMPONENT>(
+        node_id, _context.getBuilderTreeEquation()->allocateArray<INode*>(stringElements)
     );
+
+    return _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(node_id);
 }
 
 #endif /* EXPRESSION_STRING_CPP */

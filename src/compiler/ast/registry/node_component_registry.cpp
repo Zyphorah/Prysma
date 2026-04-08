@@ -23,3 +23,8 @@ sparse_set<of_children>&
 NodeComponentRegistry::mapper<AST_CHILD_COMPONENT>::get(NodeComponentRegistry& reg) {
     return reg.children;
 }
+
+sparse_set<of_arr_elements>&
+NodeComponentRegistry::mapper<AST_ARRAY_ELEMENT_COMPONENT>::get(NodeComponentRegistry& reg) {
+    return reg.arr_elements;
+}
