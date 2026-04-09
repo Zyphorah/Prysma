@@ -22,7 +22,7 @@ GeneralVisitorGenCode::~GeneralVisitorGenCode()
 
 void GeneralVisitorGenCode::traverseChild(NodeInstruction* node)
 {
-    auto& children = *_contextGenCode->getNodeComponentRegistry()->get<AST_CHILD_COMPONENT>(node->getNodeId());
+    auto& children = _contextGenCode->getNodeComponentRegistry()->get<AST_CHILD_COMPONENT>(node->getNodeId());
 
     for (const auto& child : children) {
         child->accept(this);

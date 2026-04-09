@@ -13,8 +13,6 @@ void FillingVisitorRegistry::visiter(NodeInclude* nodeInclude)
 
     std::filesystem::path absolutePath2 = parentDirectory / std::string(nodeInclude->getPath().value);
 
-    //_contextGenCode->getNodeComponentRegistry()->get<>()
-
     _orchestrator->includeFile(absolutePath.string());
 }
 

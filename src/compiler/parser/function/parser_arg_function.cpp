@@ -22,18 +22,20 @@ ParserArgFunction::~ParserArgFunction()
 
 auto ParserArgFunction::parse(std::vector<Token>& tokens, std::size_t index) -> INode* 
 {
-  consume(tokens, index, TOKEN_ARG, "Error: token is not 'arg'!");
+    consume(tokens, index, TOKEN_ARG, "Error: token is not 'arg'!");
 
-  IType* type = _contextParser.getTypeParser()->parse(tokens, index);
+    IType* type = _contextParser.getTypeParser()->parse(tokens, index);
 
-  Token name = consume(tokens, index, TOKEN_IDENTIFIER, "Error: not an identifier!");
+    Token name = consume(tokens, index, TOKEN_IDENTIFIER, "Error: not an identifier!");
 
-  std::size_t node_id = _contextParser.getNodeComponentRegistry()->getNextId();
+    auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeArgFunction>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    );
+    
+    _contextParser.getNodeComponentRegistry()->insert<AST_ITYPE_COMPONENT>(new_node->getNodeId(), type);
+    _contextParser.getNodeComponentRegistry()->insert<AST_NAME_COMPONENT>(new_node->getNodeId(), name);
 
-  _contextParser.getNodeComponentRegistry()->insert<AST_ITYPE_COMPONENT>(node_id, type);
-  _contextParser.getNodeComponentRegistry()->insert<AST_NAME_COMPONENT>(node_id, name);
-
-  return _contextParser.getBuilderTreeEquation()->allocate<NodeArgFunction>(node_id);
+    return new_node;
 }
 
 #endif /* PARSER_ARGFUNCTION_CPP */

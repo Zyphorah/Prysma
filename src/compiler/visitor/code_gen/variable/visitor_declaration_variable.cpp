@@ -25,7 +25,7 @@ void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVari
        
     // Check if the expression is an array initialization
     auto* arrayInit = prysma::dyn_cast<NodeArrayInitialization>(expression);
-    auto* node_elements = _contextGenCode->getNodeComponentRegistry()->get<AST_ARRAY_ELEMENT_COMPONENT>(arrayInit->getNodeId());
+    auto& node_elements = _contextGenCode->getNodeComponentRegistry()->get<AST_ARRAY_ELEMENT_COMPONENT>(arrayInit->getNodeId());
     
     llvm::AllocaInst* createdAlloca = nullptr; 
     
@@ -39,7 +39,7 @@ void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVari
         
         if (typeArrayDecl != nullptr && typeArrayDecl->getSize() == nullptr) {
 
-            size_t realSize = node_elements->size();
+            std::size_t realSize = node_elements.size();
 
             elementType = typeArrayDecl->getChildType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
             variableType = llvm::ArrayType::get(elementType, realSize);
@@ -61,14 +61,14 @@ void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVari
 
         // Initialize each element of the array
         auto* typeArrayLLVM = llvm::dyn_cast<llvm::ArrayType>(variableType);
-        for (size_t i = 0; i < node_elements->size(); ++i) {
+        for (std::size_t i = 0; i < node_elements.size(); ++i) {
             std::vector<llvm::Value*> indices = {
                 _contextGenCode->getBackend()->getBuilder().getInt32(0),
                 _contextGenCode->getBackend()->getBuilder().getInt32(static_cast<uint32_t>(i))
             }; 
             llvm::Value* ptrElement = _contextGenCode->getBackend()->getBuilder().CreateGEP(typeArrayLLVM, allocaInstArray, indices, "ptr_element");
             
-            INode* element = node_elements->operator[](i); 
+            INode* element = node_elements[i]; 
             Symbol symbolElement = evaluateExpression(element);
             llvm::Value* castedValue = _contextGenCode->getBackend()->createAutoCast(symbolElement.getAddress(), elementType);
             _contextGenCode->getBackend()->getBuilder().CreateStore(castedValue, ptrElement);
@@ -100,7 +100,7 @@ void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVari
             auto* typeArrayDecl = prysma::dyn_cast<TypeArray>(typeDecl);
             if (typeArrayDecl != nullptr && arrayInit != nullptr) {
                 // Recalculate from the initialization
-                size_t realSize = node_elements->size();
+                std::size_t realSize = node_elements.size();
                 llvm::Type* elementType = typeArrayDecl->getChildType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
                 variableType = llvm::ArrayType::get(elementType, realSize);
             } else {

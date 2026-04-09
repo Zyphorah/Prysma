@@ -5,6 +5,7 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <cstddef>
@@ -19,20 +20,35 @@ ParserReturn::~ParserReturn() = default;
 
 auto ParserReturn::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
 {
-  consume(tokens, index, TOKEN_RETURN, "Error: not the correct token! 'return'");
+    consume(tokens, index, TOKEN_RETURN, "Error: not the correct token! 'return'");
 
-  INode* returnValue = nullptr;
+    INode* returnValue = nullptr;
 
-  if (index < tokens.size() && tokens[index].type != TOKEN_SEMICOLON) {
-      returnValue = _contextParser.getBuilderTreeEquation()->build(tokens, index);
-  } else {
-      consume(tokens, index, TOKEN_SEMICOLON, "Error: semicolon expected after return");
-      return _contextParser.getBuilderTreeEquation()->allocate<NodeReturn>(returnValue);
-  }
-  
-  consume(tokens, index, TOKEN_SEMICOLON, "Error: ';' expected at the end of return");
+    if (index < tokens.size() && tokens[index].type != TOKEN_SEMICOLON) {
+        returnValue = _contextParser.getBuilderTreeEquation()->build(tokens, index);
+    } else {
+        consume(tokens, index, TOKEN_SEMICOLON, "Error: semicolon expected after return");
 
-  return _contextParser.getBuilderTreeEquation()->allocate<NodeReturn>(returnValue);
+        auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeReturn>(
+            _contextParser.getNodeComponentRegistry()->getNextId()
+        );
+
+        _contextParser.getNodeComponentRegistry()->insert<AST_NODE_RETURN_COMPONENT>(
+            new_node->getNodeId(),
+            returnValue
+        );
+
+        return new_node;
+    }
+    
+    consume(tokens, index, TOKEN_SEMICOLON, "Error: ';' expected at the end of return");
+
+    auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeReturn>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    );
+    _contextParser.getNodeComponentRegistry()->insert<AST_NODE_RETURN_COMPONENT>(new_node->getNodeId(), returnValue);
+
+    return new_node;
 }
 
 #endif /* PARSER_RETURN_CPP */

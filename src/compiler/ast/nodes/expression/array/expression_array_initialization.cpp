@@ -23,7 +23,7 @@ auto ExpressionArrayInitialization::build(std::vector<Token>& equation) -> INode
 {
     llvm::SmallVector<INode*, 8> arrayElements;
     std::vector<Token> subEquation;
-    size_t index = 1;
+    std::size_t index = 1;
 
     while (index < equation.size() && equation[index].type != TOKEN_BRACKET_CLOSE) {
         if (equation[index].type == TOKEN_COMMA) {
@@ -46,14 +46,17 @@ auto ExpressionArrayInitialization::build(std::vector<Token>& equation) -> INode
             arrayElements.push_back(element);
         }
     }
-
-    std::size_t node_id = _context.getNodeComponentRegistry()->getNextId();
-
-    _context.getNodeComponentRegistry()->insert<AST_ARRAY_ELEMENT_COMPONENT>(
-        node_id, _context.getBuilderTreeEquation()->allocateArray<INode*>(arrayElements)
+    
+    auto* new_node = _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
+        _context.getNodeComponentRegistry()->getNextId()
     );
 
-    return _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(node_id);
+    _context.getNodeComponentRegistry()->insert<AST_ARRAY_ELEMENT_COMPONENT>(
+        new_node->getNodeId(),
+        _context.getBuilderTreeEquation()->allocateArray<INode*>(arrayElements)
+    );
+
+    return new_node;
 }
 
 #endif /* EXPRESSION_ARRAYINITIALIZATION_CPP */

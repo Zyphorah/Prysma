@@ -67,13 +67,16 @@ auto ExpressionString::build(std::vector<Token>& equation) -> INode*
     tokenZero.column = str.column;
     stringElements.push_back(_context.getBuilderTreeEquation()->allocate<NodeLiteral>(tokenZero)); 
 
-    std::size_t node_id = _context.getNodeComponentRegistry()->getNextId();
-
-    _context.getNodeComponentRegistry()->insert<AST_ARRAY_ELEMENT_COMPONENT>(
-        node_id, _context.getBuilderTreeEquation()->allocateArray<INode*>(stringElements)
+    auto* new_node = _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
+        _context.getNodeComponentRegistry()->getNextId()
     );
 
-    return _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(node_id);
+    _context.getNodeComponentRegistry()->insert<AST_ARRAY_ELEMENT_COMPONENT>(
+        new_node->getNodeId(),
+        _context.getBuilderTreeEquation()->allocateArray<INode*>(stringElements)
+    );
+
+    return new_node;
 }
 
 #endif /* EXPRESSION_STRING_CPP */

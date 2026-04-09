@@ -86,16 +86,16 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
                             llvm::Type* elementType = typeArrayLLVM->getElementType();
                             llvm::Value* memberPtr = builder.CreateStructGEP(targetType, allocatedAddress, idx, memberName + "_ptrinit");
                             
-                            auto* node_elements = _contextGenCode->getNodeComponentRegistry()->get<AST_ARRAY_ELEMENT_COMPONENT>(arrayInit->getNodeId());
+                            auto& node_elements = _contextGenCode->getNodeComponentRegistry()->get<AST_ARRAY_ELEMENT_COMPONENT>(arrayInit->getNodeId());
 
-                            for (size_t i = 0; i < node_elements->size(); ++i) {
+                            for (std::size_t i = 0; i < node_elements.size(); ++i) {
                                 std::vector<llvm::Value*> indices = {
                                     builder.getInt32(0),
                                     builder.getInt32(static_cast<uint32_t>(i))
                                 }; 
                                 llvm::Value* ptrElement = builder.CreateGEP(typeArrayLLVM, memberPtr, indices, "ptr_element");
                     
-                                INode* element = node_elements->operator[](i);
+                                INode* element = node_elements[i];
                                 element->accept(this);
                                 llvm::Value* expressionVal = _contextGenCode->getTemporaryValue().getAddress();
                                 

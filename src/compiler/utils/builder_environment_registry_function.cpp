@@ -118,7 +118,7 @@ void BuilderEnvironmentRegistryFunction::fill()
         std::vector<llvm::Type*> paramTypes;
         for (auto* arg : oldSymbol->node->getArguments()) {
             auto* argFunction = prysma::cast<NodeArgFunction>(arg);
-            auto* from_node_itype = *_contextGenCode->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(argFunction->getNodeId());
+            auto& from_node_itype = _contextGenCode->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(argFunction->getNodeId());
 
             paramTypes.push_back(from_node_itype->generateLLVMType(_contextGenCode->getBackend()->getContext()));
         }
@@ -171,7 +171,7 @@ void BuilderEnvironmentRegistryFunction::fill()
 
             for (auto* arg : symbol->node->getArguments()) {
                 auto* argFunction = prysma::cast<NodeArgFunction>(arg);
-                auto* from_node_itype = *_contextGenCode->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(argFunction->getNodeId());
+                auto& from_node_itype = _contextGenCode->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(argFunction->getNodeId());
 
                 paramTypes.push_back(from_node_itype->generateLLVMType(_contextGenCode->getBackend()->getContext()));
             }

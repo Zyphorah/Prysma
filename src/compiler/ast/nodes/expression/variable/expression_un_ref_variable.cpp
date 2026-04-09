@@ -24,9 +24,16 @@ auto ExpressionUnRefVariable::build(std::vector<Token>& equation) -> INode*
         throw std::runtime_error("Error: 'unref' must be followed by an identifier");
     }
 
-    std::size_t node_id = _context.getNodeComponentRegistry()->getNextId();
-    _context.getNodeComponentRegistry()->insert<AST_NAME_COMPONENT>(node_id, equation[1]);
-    return _context.getBuilderTreeEquation()->allocate<NodeUnRefVariable>(node_id); 
+    auto* new_node = _context.getBuilderTreeEquation()->allocate<NodeUnRefVariable>(
+        _context.getNodeComponentRegistry()->getNextId()
+    );
+
+    _context.getNodeComponentRegistry()->insert<AST_NAME_COMPONENT>(
+        new_node->getNodeId(),
+        equation[1]
+    );
+
+    return new_node;
 }
 
 #endif /* EXPRESSION_UNREFVARIABLE_CPP */

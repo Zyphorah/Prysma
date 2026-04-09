@@ -27,10 +27,13 @@ auto ParserRefVariable::parse(std::vector<Token>& tokens, std::size_t index) -> 
     
     Token nameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Error: variable name expected after 'ref'");
 
-    std::size_t node_id = _contextParser.getNodeComponentRegistry()->getNextId();
-    _contextParser.getNodeComponentRegistry()->insert<AST_NAME_COMPONENT>(node_id, nameToken);
+    auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeRefVariable>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    );
+
+    _contextParser.getNodeComponentRegistry()->insert<AST_NAME_COMPONENT>(new_node->getNodeId(), nameToken);
     
-    return _contextParser.getBuilderTreeEquation()->allocate<NodeRefVariable>(node_id);
+    return new_node;
 }
 
 #endif /* PARSER_REFVARIABLE_CPP */

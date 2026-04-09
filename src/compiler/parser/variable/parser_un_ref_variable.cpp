@@ -27,10 +27,13 @@ auto ParserUnRefVariable::parse(std::vector<Token>& tokens, std::size_t index) -
     
     Token nameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Error: variable name expected after 'unref'");
     
+    auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeUnRefVariable>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    );
 
-    std::size_t node_id = _contextParser.getNodeComponentRegistry()->getNextId();
-    _contextParser.getNodeComponentRegistry()->insert<AST_NAME_COMPONENT>(node_id, nameToken);
-    return _contextParser.getBuilderTreeEquation()->allocate<NodeUnRefVariable>(node_id); 
+    _contextParser.getNodeComponentRegistry()->insert<AST_NAME_COMPONENT>(new_node->getNodeId(), nameToken);
+
+    return new_node;
 }
 
 #endif /* PARSER_UNREFVARIABLE_CPP */

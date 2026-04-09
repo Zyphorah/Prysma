@@ -1,3 +1,4 @@
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/ast/ast_genere.h"
@@ -6,11 +7,16 @@
 
 void GeneralVisitorGenCode::visiter(NodeReturn* nodeReturn)
 {
-    nodeReturn->getValeurReturn()->accept(this);
+    auto& return_value = _contextGenCode->getNodeComponentRegistry()->get<AST_NODE_RETURN_COMPONENT>(nodeReturn->getNodeId());
+    return_value->accept(this);
+
     llvm::Value* evaluatedValue = _contextGenCode->getTemporaryValue().getAddress();
     IType* returnTypeObj = _contextGenCode->getReturnContextCompilation()->getContext();
     llvm::Type* returnTypeLLVM = returnTypeObj->generateLLVMType(_contextGenCode->getBackend()->getContext());
     llvm::Value* returnValue = _contextGenCode->getBackend()->createAutoCast(evaluatedValue, returnTypeLLVM);
+
     _contextGenCode->getBackend()->getBuilder().CreateRet(returnValue);
     _contextGenCode->setTemporaryValue(Symbol(returnValue, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
 }
+
+/*il faut que je return des références car sinon, le user peut littéralement modifier les ptr présents dans les sparse sets, ce qui est vraiment bad.*/

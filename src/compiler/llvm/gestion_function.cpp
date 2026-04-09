@@ -105,8 +105,8 @@ void MethodFunctionDeclarationGenerator::handleConstructedArguments(llvm::Functi
     }
 
     for (auto* nodeArg : args.arguments) {
-        auto& node_arg_name = *getContextGenCode()->getNodeComponentRegistry()->get<AST_NAME_COMPONENT>(nodeArg->getNodeId());
-        auto& node_arg_type = *getContextGenCode()->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(nodeArg->getNodeId());
+        auto& node_arg_name = getContextGenCode()->getNodeComponentRegistry()->get<AST_NAME_COMPONENT>(nodeArg->getNodeId());
+        auto& node_arg_type = getContextGenCode()->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(nodeArg->getNodeId());
 
         llvm::Argument* arg = function->getArg(static_cast<unsigned int>(argIndex));
         arg->setName(node_arg_name.value);
@@ -133,8 +133,8 @@ void StandardFunctionDeclarationGenerator::handleConstructedArguments(llvm::Func
     std::size_t argIndex = 0;
 
     for (auto* nodeArg : args.arguments) {
-        auto& node_arg_name = *getContextGenCode()->getNodeComponentRegistry()->get<AST_NAME_COMPONENT>(nodeArg->getNodeId());
-        auto& node_arg_type = *getContextGenCode()->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(nodeArg->getNodeId());
+        auto& node_arg_name = getContextGenCode()->getNodeComponentRegistry()->get<AST_NAME_COMPONENT>(nodeArg->getNodeId());
+        auto& node_arg_type = getContextGenCode()->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(nodeArg->getNodeId());
 
         llvm::Argument* arg = function->getArg(static_cast<unsigned int>(argIndex));
         arg->setName(node_arg_name.value);
@@ -168,7 +168,7 @@ void FunctionDeclarationGenerator::declareFunction()
             if (extractor.getArg() != nullptr) {
                 argumentsCodeGen.arguments.push_back(extractor.getArg());
 
-                auto* extract_arg_type = *_contextGenCode->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(extractor.getArg()->getNodeId());
+                auto& extract_arg_type = _contextGenCode->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(extractor.getArg()->getNodeId());
                 llvm::Type* argType = extract_arg_type->generateLLVMType(getContextGenCode()->getBackend()->getContext());
 
                 argumentsCodeGen.argTypes.push_back(argType);
@@ -256,7 +256,8 @@ auto StandardFunctionCallGenerator::getLocalFunction(llvm::StringRef functionNam
 
 void FunctionCallGenerator::generateCallFunction(NodeCallFunction* nodeCallFunction)
 {
-    llvm::StringRef functionName = _contextGenCode->getNodeComponentRegistry()->get<AST_NAME_COMPONENT>(nodeCallFunction->getNodeId())->value;
+    auto& node_name = _contextGenCode->getNodeComponentRegistry()->get<AST_NAME_COMPONENT>(nodeCallFunction->getNodeId());
+    llvm::StringRef functionName = node_name.value;
 
     if (RegistryBuiltIns::isBuiltIn(functionName)) {
         RegistryBuiltIns::generateCall(functionName, nodeCallFunction, getContextGenCode(), _visitorGeneralCodeGen);
@@ -269,7 +270,7 @@ void FunctionCallGenerator::generateCallFunction(NodeCallFunction* nodeCallFunct
     llvm::Function* targetFunction = symbolFunction->function;
     llvm::FunctionType* functionType = targetFunction->getFunctionType();
 
-    decltype(auto) nodeChildren = *_contextGenCode->getNodeComponentRegistry()->get<AST_CHILD_COMPONENT>(nodeCallFunction->getNodeId());
+    auto& nodeChildren = _contextGenCode->getNodeComponentRegistry()->get<AST_CHILD_COMPONENT>(nodeCallFunction->getNodeId());
     
     unsigned int paramIndex = 0; 
     for (INode* argumentChild : nodeChildren) 
@@ -318,7 +319,7 @@ bool RegistryBuiltIns::isBuiltIn(llvm::StringRef name) {
 }
 
 void RegistryBuiltIns::generateCall(llvm::StringRef name, NodeCallFunction* nodeCallFunction, ContextGenCode* context, IVisitor* visitor) {
-    decltype(auto) nodeChildren = *context->getNodeComponentRegistry()->get<AST_CHILD_COMPONENT>(nodeCallFunction->getNodeId());
+    auto& nodeChildren = context->getNodeComponentRegistry()->get<AST_CHILD_COMPONENT>(nodeCallFunction->getNodeId());
 
     if (name == "print") {
         if (nodeChildren.empty()) {
