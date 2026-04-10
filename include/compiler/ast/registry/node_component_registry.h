@@ -133,6 +133,9 @@ auto NodeComponentRegistry::get(node_id_t id) noexcept -> auto& {
         return *ptr; // ou std::optional tout dépendamment ce que j'opterai
     throw std::out_of_range("AST component not found"); // crash manuel
 
+    // la logique est parfait mais c'est surtout de savoir si le sparse set
+    // return un ptr ou une ref.
+    
     // C'EST UN PATCH TEMPORAIRE EN ATTENDANT QUE LE SPARSE SET SOIT STABLE
     // ON RETOURNE UNE RÉFÉRENCE VERS LA RESSOURCE POINTÉ. DANS L'IDÉAL, IL 
     // FAUDRAIT PROBABLEMENT QUE LE SPARSE SET RETOURNE UNE RÉFÉRENCE AU LIEU
