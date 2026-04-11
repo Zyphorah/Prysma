@@ -1,3 +1,15 @@
+extern crate alloc;
+
+use core::ptr;
+use core::ffi::{CStr, c_char};
+use core::arch::asm;
+use alloc::string::String;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
+use ryu;
+
+use lib::*;
+
 ///INPUT: A math string (ex, "2 + 3 * 4").
 ///RETURNS: `mut c_char`, showing solved steps.
 //The API that a external executable, or app (Like prysma, yes I did copy paste that from the repo I refuse to spell it).
