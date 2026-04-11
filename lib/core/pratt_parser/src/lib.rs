@@ -69,6 +69,9 @@ THOU are to be responsible and liable for calling free_result on that pointer wh
 
 #![no_std]
 
+pub mod ffi;
+pub mod tests;
+
 extern crate alloc;
 
 use core::ptr;
