@@ -21,7 +21,7 @@ endif()
 
 # LLVM
 # let cmake handle finding llvm and its paths automatically
-find_package(LLVM REQUIRED CONFIG)
+find_package(LLVM 18.1.3 REQUIRED CONFIG)
 llvm_map_components_to_libnames(llvm_libs 
     core 
     support 
