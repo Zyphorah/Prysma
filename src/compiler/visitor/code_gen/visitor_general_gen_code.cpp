@@ -22,9 +22,9 @@ GeneralVisitorGenCode::~GeneralVisitorGenCode()
 
 void GeneralVisitorGenCode::traverseChild(NodeInstruction* node)
 {
-    auto& children = _contextGenCode->getNodeComponentRegistry()->get<AST_CHILD_COMPONENT>(node->getNodeId());
-
-    for (const auto& child : children) {
+    auto& component = _contextGenCode->getNodeComponentRegistry()->get<NodeInstructionComponents>(node->getNodeId());
+    
+    for (const auto& child : component.children) {
         child->accept(this);
     }
 }

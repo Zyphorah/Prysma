@@ -11,6 +11,8 @@
 // C'est du vieux code de Décembre 2025, il faudrait éventuellement le refaire.
 // Il est évidemment bien trop complexe.
 
+// Le std::cout est un goulot d'étranglement, faire un #ifdef PRYSMA_DEBUG serait intelligent
+
 template<typename T>
 struct is_index_type {
     static constexpr bool value =
@@ -57,8 +59,11 @@ public:
     auto batch_insert(Ts... entity_ids, const U& component) noexcept ->
         std::enable_if_t<(is_index_type_v<Ts> && ...) && (sizeof...(Ts) > 0), void>;
 
-    auto emplace(std::size_t entity_id) noexcept ->
-        std::enable_if_t<std::is_default_constructible_v<T>, void>;
+    // auto emplace(std::size_t entity_id) noexcept ->
+    //     std::enable_if_t<std::is_default_constructible_v<T>, void>;
+
+    template<typename... Args>
+    auto emplace(std::size_t entity_id, Args&&... args) noexcept;
 
     template<typename... Ts>
     auto batch_emplace(Ts... entity_ids) noexcept ->
@@ -172,9 +177,32 @@ auto sparse_set<T>::batch_insert(Ts... entity_ids, const U& component) noexcept
     (insert(entity_ids, component), ...);
 }
 
+// template<typename T>
+// auto sparse_set<T>::emplace(std::size_t entity_id) noexcept
+// -> std::enable_if_t<std::is_default_constructible_v<T>, void> {
+//     if (!is_valid_entity_id(entity_id)) {
+//         error_not_enough_capacity("Sparse vector too small", entity_id + 1, sparse_.size());
+//         return;
+//     }
+
+//     std::cout << "Emplacing new component for entity " << entity_id << std::endl;
+
+//     if (contains(entity_id)) {
+//         error_entity_already_has_component(entity_id);
+//         return;
+//     }
+
+//     dense_.emplace_back();
+//     std::size_t component_index = dense_.size() - 1;
+
+//     sparse_[entity_id] = component_index;
+//     reverse_.push_back(entity_id);
+// }
+
+
 template<typename T>
-auto sparse_set<T>::emplace(std::size_t entity_id) noexcept
--> std::enable_if_t<std::is_default_constructible_v<T>, void> {
+template<typename... Args>
+auto sparse_set<T>::emplace(std::size_t entity_id, Args&&... args) noexcept {
     if (!is_valid_entity_id(entity_id)) {
         error_not_enough_capacity("Sparse vector too small", entity_id + 1, sparse_.size());
         return;
@@ -187,7 +215,7 @@ auto sparse_set<T>::emplace(std::size_t entity_id) noexcept
         return;
     }
 
-    dense_.emplace_back();
+    dense_.emplace_back(std::forward<Args>(args)...);
     std::size_t component_index = dense_.size() - 1;
 
     sparse_[entity_id] = component_index;

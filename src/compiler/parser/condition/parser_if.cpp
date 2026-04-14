@@ -9,6 +9,7 @@
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <cstddef>
+#include <llvm/ADT/ArrayRef.h>
 #include <vector>
 
 
@@ -38,7 +39,7 @@ auto ParserIf::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
     auto* nodeBlockIf = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
         _contextParser.getNodeComponentRegistry()->getNextId()
     ); 
-    _contextParser.getNodeComponentRegistry()->insert<AST_CHILD_COMPONENT>(nodeBlockIf->getNodeId(), ifChildren);
+    _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBlockIf->getNodeId(), ifChildren);
 
 
     consume(tokens, index, TOKEN_BRACE_CLOSE, "Error, token is not '}'");
@@ -55,7 +56,7 @@ auto ParserIf::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
         auto* nodeBlockElse = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
             _contextParser.getNodeComponentRegistry()->getNextId()
         ); 
-        _contextParser.getNodeComponentRegistry()->insert<AST_CHILD_COMPONENT>(nodeBlockElse->getNodeId(), elseChildren);
+        _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBlockElse->getNodeId(), elseChildren);
 
 
         consume(tokens, index, TOKEN_BRACE_CLOSE, "Error, token is not '}'");
@@ -66,7 +67,7 @@ auto ParserIf::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
     auto* nodeBlockEndif = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
         _contextParser.getNodeComponentRegistry()->getNextId()
     ); 
-    _contextParser.getNodeComponentRegistry()->insert<AST_CHILD_COMPONENT>(nodeBlockEndif->getNodeId(), llvm::ArrayRef<INode*>{});
+    _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBlockEndif->getNodeId(), llvm::ArrayRef<INode*>{});
 
     auto* nodeIf = _contextParser.getBuilderTreeInstruction()->allocate<NodeIf>(condition, nodeBlockIf, nodeBlockElse, nodeBlockEndif);
 

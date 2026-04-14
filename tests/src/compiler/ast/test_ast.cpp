@@ -403,7 +403,9 @@ TEST_CASE("Construction Tree If simple avec else", "[AST][Branch]")
 
     // 1. Racine = NodeInstruction qui contient le if
     auto* racine = dynamic_cast<NodeInstruction*>(tree);
-    auto& children = *env.nodeComponentRegistry->get<AST_CHILD_COMPONENT>(racine->getNodeId());
+    auto& component = _contextGenCode->getNodeComponentRegistry()->get<NodeInstructionComponents>(instruction->getNodeId());
+
+    auto& children = component.children;
 
     REQUIRE(racine != nullptr);
 

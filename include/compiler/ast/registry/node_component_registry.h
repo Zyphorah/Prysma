@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <llvm-18/llvm/ADT/ArrayRef.h>
 #include <stdexcept>
 #include <utility>
@@ -40,49 +41,6 @@ struct CHILD_COMPONENT_TAG;
 // et ensuite, on ajoute l'élément dans le sparse set en question.
 
 
-/*
-namespace prysma::rtag {
-
-struct node_id {};
-struct token {};
-
-struct name {};
-struct type {};
-
-struct visibility {};
-
-struct expression {};
-struct condition {};
-
-struct index {};
-struct index_expression {};
-
-struct arguments {};
-
-struct left {};
-struct right {};
-struct operand {};
-
-struct body {};
-
-struct block_if {};
-struct block_else {};
-struct block_end {};
-
-struct heritage {};
-struct members {};
-struct constructors {};
-
-struct object_name {};
-struct method_name {};
-struct attribute_name {};
-
-struct path {};
-
-struct return_type {};
-
-}
-*/
 
 namespace prysma::rtag {
     struct node_id {};
@@ -135,188 +93,292 @@ namespace prysma::rtag {
 // maintenant, il s'agirait peut-être de faire un pool ou quelque
 // chose a coté et pointer avec les sparse set, je ne sais pas.
 
+// Les données sont immuables et accessibles sans getter. C'est réfléchit
+// et la décision est logique, elle améliore la lisibilité et l'extensibilité.
+
 // LISTE DES COMPONSANTES DU SYSTÈME
 
 struct NodeInstructionComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::Instruction;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Instruction;
+    const llvm::ArrayRef<INode*> children;
 
-    llvm::ArrayRef<INode*> _children;
+    explicit NodeInstructionComponents(llvm::ArrayRef<INode*> p_children)
+        : children(p_children) {}
 };
 
 struct NodeCallFunctionComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::CallFunction;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::CallFunction;
 
-    Token _nomFunction;
-    llvm::ArrayRef<INode*> _children;
+    const Token nomFunction;
+    const llvm::ArrayRef<INode*> children;
+
+    NodeCallFunctionComponents(Token p_nomFunction, llvm::ArrayRef<INode*> p_children)
+        : nomFunction(p_nomFunction), children(p_children) {}
 };
 
 struct NodeArgFunctionComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::ArgFunction;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::ArgFunction;
 
-    IType* _type;
-    Token _nom;
+    const IType* type;
+    const Token nom;
+
+    NodeArgFunctionComponents(IType* p_type, Token p_nom)
+        : type(p_type), nom(p_nom) {}
 };
 
 struct NodeDeclarationFunctionComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::DeclarationFunction;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::DeclarationFunction;
 
-    Token _visibilite;
-    IType* _typeReturn;
-    Token _nom;
-    llvm::ArrayRef<INode*> _arguments;
-    INode* _body;
+    const Token visibilite;
+    const IType* typeReturn;
+    const Token nom;
+    const llvm::ArrayRef<INode*> arguments;
+    const INode* body;
+
+    NodeDeclarationFunctionComponents(Token p_visibilite, IType* p_typeReturn, Token p_nom,
+                                      llvm::ArrayRef<INode*> p_arguments, INode* p_body)
+        : visibilite(p_visibilite),
+          typeReturn(p_typeReturn),
+          nom(p_nom),
+          arguments(p_arguments),
+          body(p_body) {}
 };
 
 struct NodeReturnComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::Return;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Return;
 
-    INode* _valeurReturn;
+    const INode* valeurReturn;
+
+    NodeReturnComponents(INode* p_valeurReturn)
+        : valeurReturn(p_valeurReturn) {}
 };
 
 struct NodeAssignmentVariableComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::AssignmentVariable;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::AssignmentVariable;
 
-    Token _nom;
-    INode* _expression;
-    Token _token;
+    const Token nom;
+    const INode* expression;
+    const Token token;
+
+    NodeAssignmentVariableComponents(Token p_nom, INode* p_expression, Token p_token)
+        : nom(p_nom), expression(p_expression), token(p_token) {}
 };
 
 struct NodeDeclarationVariableComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::DeclarationVariable;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::DeclarationVariable;
 
-    Token _visibilite; 
-    Token _nom;
-    IType* _type;
-    INode* _expression; 
+    const Token visibilite;
+    const Token nom;
+    const IType* type;
+    const INode* expression;
+
+    NodeDeclarationVariableComponents(Token p_visibilite, Token p_nom, IType* p_type, INode* p_expression)
+        : visibilite(p_visibilite), nom(p_nom), type(p_type), expression(p_expression) {}
 };
 
 struct NodeRefVariableComponents {
-     NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::RefVariable;
-     Token _nomVariable;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::RefVariable;
+
+    const Token nomVariable;
+
+    NodeRefVariableComponents(Token p_nomVariable)
+        : nomVariable(p_nomVariable) {}
 };
 
 struct NodeUnRefVariableComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::UnRefVariable;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::UnRefVariable;
 
-    Token _nomVariable;
+    const Token nomVariable;
+
+    NodeUnRefVariableComponents(Token p_nomVariable)
+        : nomVariable(p_nomVariable) {}
 };
 
 struct NodeIdentifiantComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::Identifiant;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Identifiant;
+
+    NodeIdentifiantComponents() = default;
 };
 
 struct NodeAssignmentArrayComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::AssignmentArray;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::AssignmentArray;
 
-    Token _nom; 
-    INode* _expressionIndex;
-    INode* _expression;
-    Token _token;
+    const Token nom;
+    const INode* expressionIndex;
+    const INode* expression;
+    const Token token;
+
+    NodeAssignmentArrayComponents(Token p_nom, INode* p_expressionIndex,
+                                  INode* p_expression, Token p_token)
+        : nom(p_nom),
+          expressionIndex(p_expressionIndex),
+          expression(p_expression),
+          token(p_token) {}
 };
 
 struct NodeArrayInitializationComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::ArrayInitialization;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::ArrayInitialization;
 
-    llvm::ArrayRef<INode*> _elements;
+    const llvm::ArrayRef<INode*> elements;
+
+    NodeArrayInitializationComponents(llvm::ArrayRef<INode*> p_elements)
+        : elements(p_elements) {}
 };
 
 struct NodeReadingArrayComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::ReadingArray;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::ReadingArray;
 
-    INode* _indexEquation;
-    Token _nomArray;
+    const INode* indexEquation;
+    const Token nomArray;
+
+    NodeReadingArrayComponents(INode* p_indexEquation, Token p_nomArray)
+        : indexEquation(p_indexEquation), nomArray(p_nomArray) {}
 };
 
 struct NodeClassComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::Class;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Class;
 
-    llvm::ArrayRef<INode*> _Heritage;
-    llvm::ArrayRef<INode*> _listMembers;
-    llvm::ArrayRef<INode*> _builder;
-    Token _nomClass;
+    const llvm::ArrayRef<INode*> heritage;
+    const llvm::ArrayRef<INode*> listMembers;
+    const llvm::ArrayRef<INode*> builder;
+    const Token nomClass;
+
+    NodeClassComponents(llvm::ArrayRef<INode*> p_heritage,
+                        llvm::ArrayRef<INode*> p_listMembers,
+                        llvm::ArrayRef<INode*> p_builder,
+                        Token p_nomClass)
+        : heritage(p_heritage),
+          listMembers(p_listMembers),
+          builder(p_builder),
+          nomClass(p_nomClass) {}
 };
 
 struct NodeCallObjectComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::CallObject;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::CallObject;
 
-    Token _nomObject;
-    Token _nomMethode;
-    llvm::ArrayRef<INode*> _children;
+    const Token nomObject;
+    const Token nomMethode;
+    const llvm::ArrayRef<INode*> children;
+
+    NodeCallObjectComponents(Token p_nomObject, Token p_nomMethode,
+                             llvm::ArrayRef<INode*> p_children)
+        : nomObject(p_nomObject),
+          nomMethode(p_nomMethode),
+          children(p_children) {}
 };
 
 struct NodeAccesAttributeComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::AccesAttribute;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::AccesAttribute;
 
-    Token _nomObject;
-    Token _nomAttribute;
+    const Token nomObject;
+    const Token nomAttribute;
+
+    NodeAccesAttributeComponents(Token p_nomObject, Token p_nomAttribute)
+        : nomObject(p_nomObject), nomAttribute(p_nomAttribute) {}
 };
 
 struct NodeDeclarationObjectComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::DeclarationObject;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::DeclarationObject;
 
-    Token _nomObject;
-    IType* _typeObject;
+    const Token nomObject;
+    const IType* typeObject;
+
+    NodeDeclarationObjectComponents(Token p_nomObject, IType* p_typeObject)
+        : nomObject(p_nomObject), typeObject(p_typeObject) {}
 };
 
 struct NodeIfComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::If;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::If;
 
-    INode* _nodeCondition;
-    INode* _nodeBlocIf;
-    INode* _nodeBlocElse;
-    INode* _nodeBlocEndif;
+    const INode* nodeCondition;
+    const INode* nodeBlocIf;
+    const INode* nodeBlocElse;
+    const INode* nodeBlocEndif;
+
+    NodeIfComponents(INode* p_nodeCondition, INode* p_nodeBlocIf,
+                     INode* p_nodeBlocElse, INode* p_nodeBlocEndif)
+        : nodeCondition(p_nodeCondition),
+          nodeBlocIf(p_nodeBlocIf),
+          nodeBlocElse(p_nodeBlocElse),
+          nodeBlocEndif(p_nodeBlocEndif) {}
 };
 
 struct NodeNewComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::New;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::New;
 
-    llvm::ArrayRef<INode*> _arguments;
-    Token _nomType;
+    const llvm::ArrayRef<INode*> arguments;
+    const Token nomType;
+
+    NodeNewComponents(llvm::ArrayRef<INode*> p_arguments, Token p_nomType)
+        : arguments(p_arguments), nomType(p_nomType) {}
 };
 
 struct NodeDeleteComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::Delete;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Delete;
 
-    Token _nomType;
+    const Token nomType;
+
+    NodeDeleteComponents(Token p_nomType)
+        : nomType(p_nomType) {}
 };
 
 struct NodeIncludeComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::Include;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Include;
 
-    Token _path;
+    const Token path;
+
+    NodeIncludeComponents(Token p_path)
+        : path(p_path) {}
 };
 
 struct NodeWhileComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::While;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::While;
 
-    INode* _nodeCondition;
-    INode* _nodeBlocWhile;
-    INode* _nodeBlocFinWhile;
+    const INode* nodeCondition;
+    const INode* nodeBlocWhile;
+    const INode* nodeBlocFinWhile;
+
+    NodeWhileComponents(INode* p_nodeCondition, INode* p_nodeBlocWhile,
+                        INode* p_nodeBlocFinWhile)
+        : nodeCondition(p_nodeCondition),
+          nodeBlocWhile(p_nodeBlocWhile),
+          nodeBlocFinWhile(p_nodeBlocFinWhile) {}
 };
 
 struct NodeOperationComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::Operation;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Operation;
 
-    Token _token;
-    INode* _gauche;
-    INode* _droite;
+    const Token token;
+    const INode* gauche;
+    const INode* droite;
+
+    NodeOperationComponents(Token p_token, INode* p_gauche, INode* p_droite)
+        : token(p_token), gauche(p_gauche), droite(p_droite) {}
 };
 
 struct NodeLiteralComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::Literal;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Literal;
 
-    Token _token;
+    const Token token;
+
+    NodeLiteralComponents(Token p_token)
+        : token(p_token) {}
 };
 
 struct NodeNegationComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::Negation;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Negation;
 
-    Token _operateur;
-    INode* _operande;
+    const Token operateur;
+    const INode* operande;
+
+    NodeNegationComponents(Token p_operateur, INode* p_operande)
+        : operateur(p_operateur), operande(p_operande) {}
 };
 
 struct NodeStringComponents {
-    NodeTypeGenerated _nodeTypeGenerated = NodeTypeGenerated::String;
+    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::String;
+
+    NodeStringComponents() = default;
 };
 
 // FIN DE LA SECTION
@@ -325,55 +387,89 @@ struct NodeStringComponents {
 
 
 
-// namespace prysma::rtag {
-//     struct source {};
+// // namespace prysma::rtag {
+// //     struct source {};
 
-//     struct child {};
-//     struct name {};
+// //     struct child {};
+// //     struct name {};
 
-//     struct condition_node {};
+// //     struct condition_node {};
 
-//     struct return_node {};
+// //     struct return_node {};
 
-//     //struct node_return {};
-//     struct node_gen_type {};
-//     struct itype {};
-//     struct array_element {};
-// }
+// //     //struct node_return {};
+// //     struct node_gen_type {};
+// //     struct itype {};
+// //     struct array_element {};
+// // }
 
 
-struct AST_NODEGEN_TYPE_COMPONENT;
-struct AST_ITYPE_COMPONENT;
-struct AST_NAME_COMPONENT;
+// struct AST_NODEGEN_TYPE_COMPONENT;
+// struct AST_ITYPE_COMPONENT;
+// struct AST_NAME_COMPONENT;
 
-struct AST_CHILD_COMPONENT;         // POUR SÉPARER LES ELEMENTS DES ENFANTS DU SYSTÈME
-struct AST_ARRAY_ELEMENT_COMPONENT; // AFIN DE PERMETTRE ITÉRER SUR L'ARRAY DES CHILD DU SYSTÈME PAR EX
+// struct AST_CHILD_COMPONENT;         // POUR SÉPARER LES ELEMENTS DES ENFANTS DU SYSTÈME
+// struct AST_ARRAY_ELEMENT_COMPONENT; // AFIN DE PERMETTRE ITÉRER SUR L'ARRAY DES CHILD DU SYSTÈME PAR EX
 
-struct AST_NODE_RETURN_COMPONENT;
+// struct AST_NODE_RETURN_COMPONENT;
+
+
+// /************************************************************************/
+
+
+// using of_nodegen_types = NodeTypeGenerated;
+// using of_itypes = IType*; // sont alloc dans le pool de bump alloc donc c'est good
+
+// using of_names = Token;
+// using of_children = llvm::ArrayRef<INode*>; // les enfants sont alloc dans pool de bump alloc
+// using of_arr_elements = llvm::ArrayRef<INode*>; 
+
+// using of_return_nodes = INode*;
+
+
+// /************************************************************************/
+
+
+// #if 0
+// using of_NodeTypeGenerated = NodeTypeGenerated;
+// using of_IType = IType*;
+
+// using of_Token = Token;
+// #endif
 
 
 /************************************************************************/
 
+// À GÉNÉRER AVEC JINJA2
 
-using of_nodegen_types = NodeTypeGenerated;
-using of_itypes = IType*; // sont alloc dans le pool de bump alloc donc c'est good
-
-using of_names = Token;
-using of_children = llvm::ArrayRef<INode*>; // les enfants sont alloc dans pool de bump alloc
-using of_arr_elements = llvm::ArrayRef<INode*>; 
-
-using of_return_nodes = INode*;
-
-
-/************************************************************************/
-
-
-#if 0
-using of_NodeTypeGenerated = NodeTypeGenerated;
-using of_IType = IType*;
-
-using of_Token = Token;
-#endif
+using NodeComponentStorage = std::tuple<
+    sparse_set<NodeInstructionComponents>,
+    sparse_set<NodeCallFunctionComponents>,
+    sparse_set<NodeArgFunctionComponents>,
+    sparse_set<NodeDeclarationFunctionComponents>,
+    sparse_set<NodeReturnComponents>,
+    sparse_set<NodeAssignmentVariableComponents>,
+    sparse_set<NodeDeclarationVariableComponents>,
+    sparse_set<NodeRefVariableComponents>,
+    sparse_set<NodeUnRefVariableComponents>,
+    sparse_set<NodeIdentifiantComponents>,
+    sparse_set<NodeAssignmentArrayComponents>,
+    sparse_set<NodeArrayInitializationComponents>,
+    sparse_set<NodeReadingArrayComponents>,
+    sparse_set<NodeClassComponents>,
+    sparse_set<NodeCallObjectComponents>,
+    sparse_set<NodeAccesAttributeComponents>,
+    sparse_set<NodeDeclarationObjectComponents>,
+    sparse_set<NodeIfComponents>,
+    sparse_set<NodeNewComponents>,
+    sparse_set<NodeDeleteComponents>,
+    sparse_set<NodeIncludeComponents>,
+    sparse_set<NodeWhileComponents>,
+    sparse_set<NodeOperationComponents>,
+    sparse_set<NodeLiteralComponents>,
+    sparse_set<NodeNegationComponents>,
+    sparse_set<NodeStringComponents>
+>;
 
 
 /************************************************************************/
@@ -383,26 +479,26 @@ struct NodeComponentRegistry {
     NodeComponentRegistry() = default;
 
 public:
-    template<typename COMPONENT_TAG> struct resolve;
+    template<typename StoredType> struct resolve;
 
 public:
-    template<typename COMPONENT_TAG, typename T>
+    template<typename StoredType, typename T>
     auto insert(node_id_t id, T&& component) noexcept -> void;
 
-    template<typename COMPONENT_TAG>
-    auto emplace(node_id_t id) noexcept -> void;
+    template<typename StoredType, typename... Args>
+    auto emplace(node_id_t id, Args&&... args) noexcept -> void;
 
-    template<typename COMPONENT_TAG>
+    template<typename StoredType>
     auto get(node_id_t id) noexcept -> auto&;
 
-    template<typename COMPONENT_TAG>
+    template<typename StoredType>
     auto remove(node_id_t id) noexcept -> void;
 
 public:
     auto getNextId() noexcept -> node_id_t;
 
 private:
-    node_id_t currentId = 0; 
+    node_id_t globalId = 0; 
     // chaques threads ont leur compteur, deux registres de deux
     // threads peuvent avoir les mêmes ids mais qui sont destinés 
     // à des éléments différents. dans le cas ou il faudrait que les
@@ -411,96 +507,66 @@ private:
     // est thread safe afin d'éviter les race ou les incrémentations invalides
 
 private:
-    sparse_set<of_nodegen_types> nodegen_types;
-    sparse_set<of_itypes> itypes;
+    NodeComponentStorage storage_; // FAIRE RESERVE UN MOMENT DONNÉ
 
-    sparse_set<of_names> names;
-
-    sparse_set<of_children> children;
-    sparse_set<of_arr_elements> arr_elements;
-
-    sparse_set<of_return_nodes> return_nodes;
-
-private:
-    // STOCKER LES SPARSE SET PAR TYPES
-
-    // ENSUITE, FAIRE UN VECTOR<ID> POUR CHACUNS DES CATÉGORIES
-    // PAR EXEMPLE, VECTOR<ID> NAME, QUI STOCKE TOUS LES ID DE NOMS
-
-    // C'EST TOUT SIMPLEMENT IMPOSSIBLE CAR UN NOEUD DOIT POUVOIR AVOIR
-    // PLUS QUE UN ÉLÉMENT DE CHAQUE TYPES, CE QUI OBLIGE D'UTILISER 
-    // DES SPARSE SETS
 };
 
 
-// faire une genre de table compile time ou MACRO pour éviter le boilerplate
-// faut aussi garder en tête qu'on utilise Jinja2 pour la génération, donc pas fin du monde
+/************************************************************************/
 
-template<>
-struct NodeComponentRegistry::resolve<AST_NODEGEN_TYPE_COMPONENT> {
-    PRYSMA_NODISCARD static sparse_set<of_nodegen_types>& get(NodeComponentRegistry& reg);
-};
 
-template<>
-struct NodeComponentRegistry::resolve<prysma::rtag::array_element> {
-    PRYSMA_NODISCARD static sparse_set<of_nodegen_types>& get(NodeComponentRegistry& reg);
-};
-
-template<>
-struct NodeComponentRegistry::resolve<AST_ITYPE_COMPONENT> {
-    PRYSMA_NODISCARD static sparse_set<of_itypes>& get(NodeComponentRegistry& reg);
-};
-
-template<>
-struct NodeComponentRegistry::resolve<AST_NAME_COMPONENT> {
-    PRYSMA_NODISCARD static sparse_set<of_names>& get(NodeComponentRegistry& reg);
-};
-
-template<>
-struct NodeComponentRegistry::resolve<AST_CHILD_COMPONENT> {
-    PRYSMA_NODISCARD static sparse_set<of_children>& get(NodeComponentRegistry& reg);
-};
-
-template<>
-struct NodeComponentRegistry::resolve<AST_ARRAY_ELEMENT_COMPONENT> {
-    PRYSMA_NODISCARD static sparse_set<of_arr_elements>& get(NodeComponentRegistry& reg);
-};
-
-template<>
-struct NodeComponentRegistry::resolve<AST_NODE_RETURN_COMPONENT> {
-    PRYSMA_NODISCARD static sparse_set<of_return_nodes>& get(NodeComponentRegistry& reg);
+template<typename StoredType>
+struct NodeComponentRegistry::resolve {
+    PRYSMA_NODISCARD static sparse_set<StoredType>& on(NodeComponentRegistry& reg);
 };
 
 
-template<typename COMPONENT_TAG, typename T>
+template<typename StoredType, typename T>
 auto NodeComponentRegistry::insert(node_id_t id, T&& component) noexcept -> void {
-    resolve<COMPONENT_TAG>::get(*this).insert(id, std::forward<T>(component));
+    resolve<StoredType>::on(*this).insert(id, std::forward<T>(component));
 }
 
-template<typename COMPONENT_TAG>
-auto NodeComponentRegistry::emplace(node_id_t id) noexcept -> void {
-    resolve<COMPONENT_TAG>::get(*this).emplace(id);
+template<typename StoredType, typename... Args>
+auto NodeComponentRegistry::emplace(node_id_t id, Args&&... args) noexcept -> void {
+    resolve<StoredType>::on(*this).emplace(id, std::forward<Args>(args)...);
 }
 
-template<typename COMPONENT_TAG>
-auto NodeComponentRegistry::get(node_id_t id) noexcept -> auto& {
-    auto* ptr = resolve<COMPONENT_TAG>::get(*this).get(id);
+template<typename StoredType>
+PRYSMA_NODISCARD auto NodeComponentRegistry::get(std::size_t id) noexcept -> auto& {
+    auto* ptr = resolve<StoredType>::on(*this).get(id);
 
-    if (ptr) PRYSMA_LIKELY_BRANCH 
-        return *ptr; // ou std::optional tout dépendamment ce que j'opterai
-    throw std::out_of_range("AST component not found"); // crash manuel
-
-    // la logique est parfait mais c'est surtout de savoir si le sparse set
-    // return un ptr ou une ref.
-    
-    // C'EST UN PATCH TEMPORAIRE EN ATTENDANT QUE LE SPARSE SET SOIT STABLE
-    // ON RETOURNE UNE RÉFÉRENCE VERS LA RESSOURCE POINTÉ. DANS L'IDÉAL, IL 
-    // FAUDRAIT PROBABLEMENT QUE LE SPARSE SET RETOURNE UNE RÉFÉRENCE AU LIEU
-    // D'UN POINTEUR. CE N'EST PAS CLAIR, IL FAUDRAIT EN DISCUTER. 
-    //return mapper<COMPONENT_TAG>::get(*this).get(id);
+    if (ptr) PRYSMA_LIKELY_BRANCH return *ptr;
+    throw std::out_of_range("AST component not found");
 }
 
-template<typename COMPONENT_TAG>
+template<typename StoredType>
 auto NodeComponentRegistry::remove(node_id_t id) noexcept -> void {
-    resolve<COMPONENT_TAG>::get(*this).remove(id);
+    resolve<StoredType>::on(*this).remove(id);
 }
+
+
+
+
+
+
+
+
+
+
+// template<typename COMPONENT_TAG>
+// auto NodeComponentRegistry::get(node_id_t id) noexcept -> auto& {
+//     auto* ptr = resolve<COMPONENT_TAG>::get(*this).get(id);
+
+//     if (ptr) PRYSMA_LIKELY_BRANCH 
+//         return *ptr; // ou std::optional tout dépendamment ce que j'opterai
+//     throw std::out_of_range("AST component not found"); // crash manuel
+
+//     // la logique est parfait mais c'est surtout de savoir si le sparse set
+//     // return un ptr ou une ref.
+    
+//     // C'EST UN PATCH TEMPORAIRE EN ATTENDANT QUE LE SPARSE SET SOIT STABLE
+//     // ON RETOURNE UNE RÉFÉRENCE VERS LA RESSOURCE POINTÉ. DANS L'IDÉAL, IL 
+//     // FAUDRAIT PROBABLEMENT QUE LE SPARSE SET RETOURNE UNE RÉFÉRENCE AU LIEU
+//     // D'UN POINTEUR. CE N'EST PAS CLAIR, IL FAUDRAIT EN DISCUTER. 
+//     //return mapper<COMPONENT_TAG>::get(*this).get(id);
+// }

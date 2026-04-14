@@ -38,7 +38,7 @@ auto ParserWhile::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
     auto* nodeBlockWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
         _contextParser.getNodeComponentRegistry()->getNextId()
     ); 
-    _contextParser.getNodeComponentRegistry()->insert<AST_CHILD_COMPONENT>(nodeBlockWhile->getNodeId(), blockWhileChildren);
+    _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBlockWhile->getNodeId(), blockWhileChildren);
 
 
     consume(tokens, index, TOKEN_BRACE_CLOSE, "Error, token is not '}'");
@@ -47,7 +47,7 @@ auto ParserWhile::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
     auto* nodeBlockEndWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
         _contextParser.getNodeComponentRegistry()->getNextId()
     ); 
-    _contextParser.getNodeComponentRegistry()->insert<AST_CHILD_COMPONENT>(nodeBlockEndWhile->getNodeId(), llvm::ArrayRef<INode*>{});
+    _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBlockEndWhile->getNodeId(), llvm::ArrayRef<INode*>{});
     
     
     INode* nodeWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeWhile>(condition, nodeBlockWhile, nodeBlockEndWhile);

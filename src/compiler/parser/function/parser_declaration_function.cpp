@@ -58,7 +58,7 @@ auto ParserDeclarationFunction::parse(std::vector<Token>& tokens, std::size_t in
     auto* body_node = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
         _contextParser.getNodeComponentRegistry()->getNextId()
     ); 
-    _contextParser.getNodeComponentRegistry()->insert<AST_CHILD_COMPONENT>(body_node->getNodeId(), bodyChildren);
+    _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(body_node->getNodeId(), bodyChildren);
 
 
     consume(tokens, index, TOKEN_BRACE_CLOSE, "Error: not a closing brace '}'");

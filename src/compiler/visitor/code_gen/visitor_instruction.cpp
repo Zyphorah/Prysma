@@ -5,9 +5,9 @@
 void GeneralVisitorGenCode::visiter(NodeInstruction* instruction)
 {
     if (instruction != nullptr) {
-        auto& children = _contextGenCode->getNodeComponentRegistry()->get<AST_CHILD_COMPONENT>(instruction->getNodeId());
+        auto& component = _contextGenCode->getNodeComponentRegistry()->get<NodeInstructionComponents>(instruction->getNodeId());
 
-        for (const auto& child : children) {
+        for (const auto& child : component.children) {
             if (child != nullptr) {
                 child->accept(this);
             }

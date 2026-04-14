@@ -52,7 +52,7 @@ auto BuilderTreeInstruction::build(std::vector<Token>& tokens) -> INode*
     auto* new_node = allocate<NodeInstruction>(_nodeComponentRegistry->getNextId()); // un nouveau noeud d'instruction (INode*) est allocated dans le pool
     llvm::ArrayRef<INode*> arr_ref = allocateArray<INode*>(children); // les noeuds enfants (INode*) sont allocated dans le pool 
 
-    _nodeComponentRegistry->insert<AST_CHILD_COMPONENT>(new_node->getNodeId(), arr_ref); // le llvm::ArrayRef est inséré dans le registre au ID du nouveau noeud
+    _nodeComponentRegistry->emplace<NodeInstructionComponents>(new_node->getNodeId(), arr_ref); // le llvm::ArrayRef est inséré dans le registre au ID du nouveau noeud
 
     return new_node;
 }
