@@ -29,7 +29,7 @@ auto ExpressionRefVariable::build(std::vector<Token>& equation) -> INode*
         _context.getNodeComponentRegistry()->getNextId()
     );
 
-    _context.getNodeComponentRegistry()->insert<AST_NAME_COMPONENT>(
+    _context.getNodeComponentRegistry()->emplace<NodeRefVariableComponents>(
         new_node->getNodeId(),
         equation[1]
     );

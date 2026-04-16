@@ -57,7 +57,13 @@ auto ExpressionString::build(std::vector<Token>& equation) -> INode*
         token.value = llvm::StringRef(arr, asciiStr.size());
         token.line = str.line;
         token.column = str.column;
-        stringElements.push_back(_context.getBuilderTreeEquation()->allocate<NodeLiteral>(token)); 
+
+        auto* new_node_literal = _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
+            _context.getNodeComponentRegistry()->getNextId()
+        );
+        _context.getNodeComponentRegistry()->emplace<NodeLiteralComponents>(new_node_literal->getNodeId(), token);
+
+        stringElements.push_back(new_node_literal); 
     }
 
     Token tokenZero;
@@ -65,13 +71,18 @@ auto ExpressionString::build(std::vector<Token>& equation) -> INode*
     tokenZero.value = "0";
     tokenZero.line = str.line;
     tokenZero.column = str.column;
-    stringElements.push_back(_context.getBuilderTreeEquation()->allocate<NodeLiteral>(tokenZero)); 
+
+    auto* new_node_literal = _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
+        _context.getNodeComponentRegistry()->getNextId()
+    );
+    _context.getNodeComponentRegistry()->emplace<NodeLiteralComponents>(new_node_literal->getNodeId(), tokenZero);
+    stringElements.push_back(new_node_literal); 
 
     auto* new_node = _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
         _context.getNodeComponentRegistry()->getNextId()
     );
 
-    _context.getNodeComponentRegistry()->insert<AST_ARRAY_ELEMENT_COMPONENT>(
+    _context.getNodeComponentRegistry()->emplace<NodeArrayInitializationComponents>(
         new_node->getNodeId(),
         _context.getBuilderTreeEquation()->allocateArray<INode*>(stringElements)
     );

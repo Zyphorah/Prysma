@@ -51,7 +51,7 @@ auto ExpressionArrayInitialization::build(std::vector<Token>& equation) -> INode
         _context.getNodeComponentRegistry()->getNextId()
     );
 
-    _context.getNodeComponentRegistry()->insert<AST_ARRAY_ELEMENT_COMPONENT>(
+    _context.getNodeComponentRegistry()->emplace<NodeArrayInitializationComponents>(
         new_node->getNodeId(),
         _context.getBuilderTreeEquation()->allocateArray<INode*>(arrayElements)
     );

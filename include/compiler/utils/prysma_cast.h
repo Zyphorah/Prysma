@@ -11,7 +11,7 @@ PRYSMA_NODISCARD inline auto isa(const From* val) -> bool {
     if (!val) {
         return false;
     }
-    return To::classof(val);
+    return To::classof(val); // pourra changer lors de la transition vers le crtp en faveur d'un approche évaluée a la compilation
 }
 
 // Casts the value to the target type (static_cast)

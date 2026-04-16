@@ -32,11 +32,7 @@ auto ParserReturn::parse(std::vector<Token>& tokens, std::size_t index) -> INode
         auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeReturn>(
             _contextParser.getNodeComponentRegistry()->getNextId()
         );
-
-        _contextParser.getNodeComponentRegistry()->insert<AST_NODE_RETURN_COMPONENT>(
-            new_node->getNodeId(),
-            returnValue
-        );
+        _contextParser.getNodeComponentRegistry()->emplace<NodeReturnComponents>(new_node->getNodeId(), returnValue);
 
         return new_node;
     }
@@ -46,7 +42,7 @@ auto ParserReturn::parse(std::vector<Token>& tokens, std::size_t index) -> INode
     auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeReturn>(
         _contextParser.getNodeComponentRegistry()->getNextId()
     );
-    _contextParser.getNodeComponentRegistry()->insert<AST_NODE_RETURN_COMPONENT>(new_node->getNodeId(), returnValue);
+    _contextParser.getNodeComponentRegistry()->emplace<NodeReturnComponents>(new_node->getNodeId(), returnValue);
 
     return new_node;
 }

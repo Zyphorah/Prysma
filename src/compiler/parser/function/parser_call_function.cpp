@@ -19,29 +19,28 @@ ParserCallFunction::~ParserCallFunction() = default;
 
 INode* ParserCallFunction::parse(std::vector<Token>& tokens, std::size_t index)
 {
-  const bool callAsInstruction = index == 0 || tokens[index - 1].type != TOKEN_EQUAL;
+    const bool callAsInstruction = index == 0 || tokens[index - 1].type != TOKEN_EQUAL;
 
-  consume(tokens, index, TOKEN_CALL, "Error: 'call' expected");
-  Token functionName = consume(tokens, index, TOKEN_IDENTIFIER, "Error: function identifier expected");
-  consume(tokens, index, TOKEN_PAREN_OPEN, "Error: '(' expected");
-  
-  auto children = consumeChildBody(tokens, index, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_CLOSE);
-
-
-  NodeComponentRegistry* registry = _contextParser.getNodeComponentRegistry();
-  auto* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallFunction>(registry->getNextId());
-
-  registry->insert<AST_NAME_COMPONENT>(nodeCall->getNodeId(), functionName);
-  registry->insert<AST_CHILD_COMPONENT>(nodeCall->getNodeId(), children);       
+    consume(tokens, index, TOKEN_CALL, "Error: 'call' expected");
+    Token functionName = consume(tokens, index, TOKEN_IDENTIFIER, "Error: function identifier expected");
+    consume(tokens, index, TOKEN_PAREN_OPEN, "Error: '(' expected");
+    
+    auto children = consumeChildBody(tokens, index, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_CLOSE);
 
 
-  consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: ')' expected");
+    NodeComponentRegistry* registry = _contextParser.getNodeComponentRegistry();
+    auto* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallFunction>(registry->getNextId());
 
-  if (callAsInstruction && index < tokens.size() && tokens[index].type == TOKEN_SEMICOLON) {
-      consume(tokens, index, TOKEN_SEMICOLON, "Error: ';' expected at the end of the function call");
-  }
+    _contextParser.getNodeComponentRegistry()->emplace<NodeCallFunctionComponents>(nodeCall->getNodeId(), functionName, children);
 
-  return nodeCall;
+    
+    consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: ')' expected");
+
+    if (callAsInstruction && index < tokens.size() && tokens[index].type == TOKEN_SEMICOLON) {
+        consume(tokens, index, TOKEN_SEMICOLON, "Error: ';' expected at the end of the function call");
+    }
+
+    return nodeCall;
 }
 
 #endif /* PARSER_CALLFUNCTION_CPP */

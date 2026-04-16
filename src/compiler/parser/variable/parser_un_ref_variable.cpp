@@ -30,8 +30,7 @@ auto ParserUnRefVariable::parse(std::vector<Token>& tokens, std::size_t index) -
     auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeUnRefVariable>(
         _contextParser.getNodeComponentRegistry()->getNextId()
     );
-
-    _contextParser.getNodeComponentRegistry()->insert<AST_NAME_COMPONENT>(new_node->getNodeId(), nameToken);
+    _contextParser.getNodeComponentRegistry()->emplace<NodeUnRefVariableComponents>(new_node->getNodeId(), nameToken);
 
     return new_node;
 }

@@ -97,44 +97,59 @@ namespace prysma::rtag {
 // et la décision est logique, elle améliore la lisibilité et l'extensibilité.
 
 // LISTE DES COMPONSANTES DU SYSTÈME
-
 struct NodeInstructionComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Instruction;
-    const llvm::ArrayRef<INode*> children;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Instruction; // SUS
+    llvm::ArrayRef<INode*> children;
 
+public:
     explicit NodeInstructionComponents(llvm::ArrayRef<INode*> p_children)
         : children(p_children) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    llvm::ArrayRef<INode*> getChildren() { return children; }
 };
 
 struct NodeCallFunctionComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::CallFunction;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::CallFunction;
+    Token nomFunction;
+    llvm::ArrayRef<INode*> children;
 
-    const Token nomFunction;
-    const llvm::ArrayRef<INode*> children;
-
+public:
     NodeCallFunctionComponents(Token p_nomFunction, llvm::ArrayRef<INode*> p_children)
         : nomFunction(p_nomFunction), children(p_children) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    Token getName() { return nomFunction; }
+    llvm::ArrayRef<INode*> getChildren() { return children; }
 };
 
 struct NodeArgFunctionComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::ArgFunction;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::ArgFunction;
+    IType* type;
+    Token nom;
 
-    const IType* type;
-    const Token nom;
-
+public:
     NodeArgFunctionComponents(IType* p_type, Token p_nom)
         : type(p_type), nom(p_nom) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    IType* getType() { return type; }
+    Token getName() { return nom; }
 };
 
 struct NodeDeclarationFunctionComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::DeclarationFunction;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::DeclarationFunction;
+    Token visibilite;
+    IType* typeReturn;
+    Token nom;
+    llvm::ArrayRef<INode*> arguments;
+    INode* body;
 
-    const Token visibilite;
-    const IType* typeReturn;
-    const Token nom;
-    const llvm::ArrayRef<INode*> arguments;
-    const INode* body;
-
+public:
     NodeDeclarationFunctionComponents(Token p_visibilite, IType* p_typeReturn, Token p_nom,
                                       llvm::ArrayRef<INode*> p_arguments, INode* p_body)
         : visibilite(p_visibilite),
@@ -142,107 +157,146 @@ struct NodeDeclarationFunctionComponents {
           nom(p_nom),
           arguments(p_arguments),
           body(p_body) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    Token getVisibility() { return visibilite; }
+    IType* getReturnType() { return typeReturn; }
+    Token getName() { return nom; }
+    llvm::ArrayRef<INode*> getArguments() { return arguments; }
+    INode* getBody() { return body; }
 };
 
 struct NodeReturnComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Return;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Return;
+    INode* valeurReturn;
 
-    const INode* valeurReturn;
-
+public:
     NodeReturnComponents(INode* p_valeurReturn)
         : valeurReturn(p_valeurReturn) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    INode* getReturnValue() { return valeurReturn; }
 };
 
 struct NodeAssignmentVariableComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::AssignmentVariable;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::AssignmentVariable;
+    Token nom;
+    INode* expression;
+    Token token;
 
-    const Token nom;
-    const INode* expression;
-    const Token token;
-
+public:
     NodeAssignmentVariableComponents(Token p_nom, INode* p_expression, Token p_token)
         : nom(p_nom), expression(p_expression), token(p_token) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    Token getName() { return nom; }
+    INode* getExpression() { return expression; }
+    Token getToken() { return token; }
 };
 
 struct NodeDeclarationVariableComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::DeclarationVariable;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::DeclarationVariable;
+    Token visibilite;
+    Token nom;
+    IType* type;
+    INode* expression;
 
-    const Token visibilite;
-    const Token nom;
-    const IType* type;
-    const INode* expression;
-
+public:
     NodeDeclarationVariableComponents(Token p_visibilite, Token p_nom, IType* p_type, INode* p_expression)
         : visibilite(p_visibilite), nom(p_nom), type(p_type), expression(p_expression) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    Token getVisibility() { return visibilite; }
+    Token getName() { return nom; }
+    IType* getType() { return type; }
+    INode* getExpression() { return expression; }
 };
 
 struct NodeRefVariableComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::RefVariable;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::RefVariable;
+    Token nomVariable;
 
-    const Token nomVariable;
-
+public:
     NodeRefVariableComponents(Token p_nomVariable)
         : nomVariable(p_nomVariable) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    Token getName() { return nomVariable; }
 };
 
 struct NodeUnRefVariableComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::UnRefVariable;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::UnRefVariable;
+    Token nomVariable;
 
-    const Token nomVariable;
-
+public:
     NodeUnRefVariableComponents(Token p_nomVariable)
         : nomVariable(p_nomVariable) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    Token getName() { return nomVariable; }
 };
 
 struct NodeIdentifiantComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Identifiant;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Identifiant;
 
+public:
     NodeIdentifiantComponents() = default;
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
 };
 
 struct NodeAssignmentArrayComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::AssignmentArray;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::AssignmentArray;
+    Token nom;
+    INode* expressionIndex;
+    INode* expression;
+    Token token;
 
-    const Token nom;
-    const INode* expressionIndex;
-    const INode* expression;
-    const Token token;
-
+public:
     NodeAssignmentArrayComponents(Token p_nom, INode* p_expressionIndex,
                                   INode* p_expression, Token p_token)
         : nom(p_nom),
           expressionIndex(p_expressionIndex),
           expression(p_expression),
           token(p_token) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    Token getName() { return nom; }
+    INode* getExpressionIndex() { return expressionIndex; }
+    INode* getExpression() { return expression; }
+    Token getToken() { return token; }
 };
 
 struct NodeArrayInitializationComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::ArrayInitialization;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::ArrayInitialization;
+    llvm::ArrayRef<INode*> elements;
 
-    const llvm::ArrayRef<INode*> elements;
-
+public:
     NodeArrayInitializationComponents(llvm::ArrayRef<INode*> p_elements)
         : elements(p_elements) {}
-};
 
-struct NodeReadingArrayComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::ReadingArray;
-
-    const INode* indexEquation;
-    const Token nomArray;
-
-    NodeReadingArrayComponents(INode* p_indexEquation, Token p_nomArray)
-        : indexEquation(p_indexEquation), nomArray(p_nomArray) {}
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    llvm::ArrayRef<INode*> getElements() { return elements; }
 };
 
 struct NodeClassComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Class;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Class;
 
-    const llvm::ArrayRef<INode*> heritage;
-    const llvm::ArrayRef<INode*> listMembers;
-    const llvm::ArrayRef<INode*> builder;
-    const Token nomClass;
+    llvm::ArrayRef<INode*> heritage;
+    llvm::ArrayRef<INode*> listMembers;
+    llvm::ArrayRef<INode*> builder;
+    Token nomClass;
 
+public:
     NodeClassComponents(llvm::ArrayRef<INode*> p_heritage,
                         llvm::ArrayRef<INode*> p_listMembers,
                         llvm::ArrayRef<INode*> p_builder,
@@ -251,134 +305,216 @@ struct NodeClassComponents {
           listMembers(p_listMembers),
           builder(p_builder),
           nomClass(p_nomClass) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    llvm::ArrayRef<INode*> getInheritance() { return heritage; }
+    llvm::ArrayRef<INode*> getMembers() { return listMembers; }
+    llvm::ArrayRef<INode*> getBuilder() { return builder; }
+    Token getName() { return nomClass; }
+};
+
+struct NodeReadingArrayComponents {
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::ReadingArray;
+    INode* indexEquation;
+    Token nomArray;
+
+public:
+    NodeReadingArrayComponents(INode* p_indexEquation, Token p_nomArray)
+        : indexEquation(p_indexEquation), nomArray(p_nomArray) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    INode* getIndexEquation() { return indexEquation; }
+    Token getName() { return nomArray; }
 };
 
 struct NodeCallObjectComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::CallObject;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::CallObject;
+    Token nomObject;
+    Token nomMethode;
+    llvm::ArrayRef<INode*> children;
 
-    const Token nomObject;
-    const Token nomMethode;
-    const llvm::ArrayRef<INode*> children;
-
+public:
     NodeCallObjectComponents(Token p_nomObject, Token p_nomMethode,
                              llvm::ArrayRef<INode*> p_children)
         : nomObject(p_nomObject),
           nomMethode(p_nomMethode),
           children(p_children) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    Token getObjectName() { return nomObject; }
+    Token getMethodName() { return nomMethode; }
+    llvm::ArrayRef<INode*> getChildren() { return children; }
 };
 
 struct NodeAccesAttributeComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::AccesAttribute;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::AccesAttribute;
+    Token nomObject;
+    Token nomAttribute;
 
-    const Token nomObject;
-    const Token nomAttribute;
-
+public:
     NodeAccesAttributeComponents(Token p_nomObject, Token p_nomAttribute)
         : nomObject(p_nomObject), nomAttribute(p_nomAttribute) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    Token getObjectName() { return nomObject; }
+    Token getAttributeName() { return nomAttribute; }
 };
 
 struct NodeDeclarationObjectComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::DeclarationObject;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::DeclarationObject;
+    Token nomObject;
+    IType* typeObject;
 
-    const Token nomObject;
-    const IType* typeObject;
-
+public:
     NodeDeclarationObjectComponents(Token p_nomObject, IType* p_typeObject)
         : nomObject(p_nomObject), typeObject(p_typeObject) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    Token getObjectName() { return nomObject; }
+    IType* getObjectType() { return typeObject; }
 };
 
 struct NodeIfComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::If;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::If;
+    INode* nodeCondition;
+    INode* nodeBlocIf;
+    INode* nodeBlocElse;
+    INode* nodeBlocEndif;
 
-    const INode* nodeCondition;
-    const INode* nodeBlocIf;
-    const INode* nodeBlocElse;
-    const INode* nodeBlocEndif;
-
+public:
     NodeIfComponents(INode* p_nodeCondition, INode* p_nodeBlocIf,
                      INode* p_nodeBlocElse, INode* p_nodeBlocEndif)
         : nodeCondition(p_nodeCondition),
           nodeBlocIf(p_nodeBlocIf),
           nodeBlocElse(p_nodeBlocElse),
           nodeBlocEndif(p_nodeBlocEndif) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    INode* getNodeCondition() { return nodeCondition; }
+    INode* getNodeBlocIf() { return nodeBlocIf; }
+    INode* getNodeBlocElse() { return nodeBlocElse; }
+    INode* getNodeBlocEndif() { return nodeBlocEndif; }
 };
 
 struct NodeNewComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::New;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::New;
+    llvm::ArrayRef<INode*> arguments;
+    Token nomType;
 
-    const llvm::ArrayRef<INode*> arguments;
-    const Token nomType;
-
+public:
     NodeNewComponents(llvm::ArrayRef<INode*> p_arguments, Token p_nomType)
         : arguments(p_arguments), nomType(p_nomType) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    llvm::ArrayRef<INode*> getArguments() { return arguments; }
+    Token getName() { return nomType; }
 };
 
 struct NodeDeleteComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Delete;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Delete;
+    Token nomType;
 
-    const Token nomType;
-
+public:
     NodeDeleteComponents(Token p_nomType)
         : nomType(p_nomType) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    Token getName() { return nomType; }
 };
 
 struct NodeIncludeComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Include;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Include;
+    Token path;
 
-    const Token path;
-
+public:
     NodeIncludeComponents(Token p_path)
         : path(p_path) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    Token getPath() { return path; }
 };
 
 struct NodeWhileComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::While;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::While;
+    INode* nodeCondition;
+    INode* nodeBlocWhile;
+    INode* nodeBlocFinWhile;
 
-    const INode* nodeCondition;
-    const INode* nodeBlocWhile;
-    const INode* nodeBlocFinWhile;
-
+public:
     NodeWhileComponents(INode* p_nodeCondition, INode* p_nodeBlocWhile,
                         INode* p_nodeBlocFinWhile)
         : nodeCondition(p_nodeCondition),
           nodeBlocWhile(p_nodeBlocWhile),
           nodeBlocFinWhile(p_nodeBlocFinWhile) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    INode* getNodeCondition() { return nodeCondition; }
+    INode* getNodeWhileBlock() { return nodeBlocWhile; }
+    INode* getNodeWhileEndBlock() { return nodeBlocFinWhile; }
 };
 
 struct NodeOperationComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Operation;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Operation;
+    Token token;
+    INode* gauche;
+    INode* droite;
 
-    const Token token;
-    const INode* gauche;
-    const INode* droite;
-
+public:
     NodeOperationComponents(Token p_token, INode* p_gauche, INode* p_droite)
         : token(p_token), gauche(p_gauche), droite(p_droite) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    Token getToken() { return token; }
+    INode* getLeft() { return gauche; }
+    INode* getRight() { return droite; }
 };
 
 struct NodeLiteralComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Literal;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Literal;
+    Token token;
 
-    const Token token;
-
+public:
     NodeLiteralComponents(Token p_token)
         : token(p_token) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    Token getToken() { return token; }
 };
 
 struct NodeNegationComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Negation;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::Negation;
+    Token operateur;
+    INode* operande;
 
-    const Token operateur;
-    const INode* operande;
-
+public:
     NodeNegationComponents(Token p_operateur, INode* p_operande)
         : operateur(p_operateur), operande(p_operande) {}
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
+    Token getOperator() { return operateur; }
+    INode* getOperand() { return operande; }
 };
 
 struct NodeStringComponents {
-    const NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::String;
+private:
+    NodeTypeGenerated nodeTypeGenerated = NodeTypeGenerated::String;
 
+public:
     NodeStringComponents() = default;
+
+    NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
 };
 
 // FIN DE LA SECTION
@@ -441,6 +577,9 @@ struct NodeStringComponents {
 /************************************************************************/
 
 // À GÉNÉRER AVEC JINJA2
+
+// TODO: éliminer les NodeTypeGenerated et IsA<T, U> en faveur d'un approche reliant sur les types
+// TODO: changer les std::size_t en std::size_t& dans les modules concernés
 
 using NodeComponentStorage = std::tuple<
     sparse_set<NodeInstructionComponents>,

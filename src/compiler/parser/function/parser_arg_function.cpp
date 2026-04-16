@@ -31,9 +31,7 @@ auto ParserArgFunction::parse(std::vector<Token>& tokens, std::size_t index) -> 
     auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeArgFunction>(
         _contextParser.getNodeComponentRegistry()->getNextId()
     );
-    
-    _contextParser.getNodeComponentRegistry()->insert<AST_ITYPE_COMPONENT>(new_node->getNodeId(), type);
-    _contextParser.getNodeComponentRegistry()->insert<AST_NAME_COMPONENT>(new_node->getNodeId(), name);
+    _contextParser.getNodeComponentRegistry()->emplace<NodeArgFunctionComponents>(new_node->getNodeId(), type, name);
 
     return new_node;
 }

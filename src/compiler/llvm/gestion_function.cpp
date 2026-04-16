@@ -105,23 +105,22 @@ void MethodFunctionDeclarationGenerator::handleConstructedArguments(llvm::Functi
     }
 
     for (auto* nodeArg : args.arguments) {
-        auto& node_arg_name = getContextGenCode()->getNodeComponentRegistry()->get<AST_NAME_COMPONENT>(nodeArg->getNodeId());
-        auto& node_arg_type = getContextGenCode()->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(nodeArg->getNodeId());
+        auto& nodeData = getContextGenCode()->getNodeComponentRegistry()->get<NodeArgFunctionComponents>(nodeArg->getNodeId());
 
         llvm::Argument* arg = function->getArg(static_cast<unsigned int>(argIndex));
-        arg->setName(node_arg_name.value);
+        arg->setName(nodeData.getName().value);
         
         llvm::Type* argType = arg->getType();
         llvm::AllocaInst* alloca = getContextGenCode()->getBackend()->getBuilder().CreateAlloca(argType);
         getContextGenCode()->getBackend()->getBuilder().CreateStore(arg, alloca);
         
         Token argumentToken;
-        argumentToken.value = node_arg_name.value;
+        argumentToken.value = nodeData.getName().value;
         argumentToken.type = TOKEN_IDENTIFIER;
         
         Symbol symbole;
         symbole = Symbol(alloca, symbole.getType(), symbole.getPointedElementType());
-        symbole = Symbol(symbole.getAddress(), node_arg_type, symbole.getPointedElementType());
+        symbole = Symbol(symbole.getAddress(), nodeData.getType(), symbole.getPointedElementType());
         getContextGenCode()->getRegistryVariable()->registerVariable(argumentToken, symbole);
         
         argIndex++;
@@ -133,23 +132,22 @@ void StandardFunctionDeclarationGenerator::handleConstructedArguments(llvm::Func
     std::size_t argIndex = 0;
 
     for (auto* nodeArg : args.arguments) {
-        auto& node_arg_name = getContextGenCode()->getNodeComponentRegistry()->get<AST_NAME_COMPONENT>(nodeArg->getNodeId());
-        auto& node_arg_type = getContextGenCode()->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(nodeArg->getNodeId());
+        auto& nodeData = getContextGenCode()->getNodeComponentRegistry()->get<NodeArgFunctionComponents>(nodeArg->getNodeId());
 
         llvm::Argument* arg = function->getArg(static_cast<unsigned int>(argIndex));
-        arg->setName(node_arg_name.value);
+        arg->setName(nodeData.getName().value);
         
         llvm::Type* argType = arg->getType();
         llvm::AllocaInst* alloca = getContextGenCode()->getBackend()->getBuilder().CreateAlloca(argType);
         getContextGenCode()->getBackend()->getBuilder().CreateStore(arg, alloca);
         
         Token argumentToken;
-        argumentToken.value = node_arg_name.value;
+        argumentToken.value = nodeData.getName().value;
         argumentToken.type = TOKEN_IDENTIFIER;
         
         Symbol symbole;
         symbole = Symbol(alloca, symbole.getType(), symbole.getPointedElementType());
-        symbole = Symbol(symbole.getAddress(), node_arg_type, symbole.getPointedElementType());
+        symbole = Symbol(symbole.getAddress(), nodeData.getType(), symbole.getPointedElementType());
         getContextGenCode()->getRegistryVariable()->registerVariable(argumentToken, symbole);
         
         argIndex++;
@@ -168,7 +166,9 @@ void FunctionDeclarationGenerator::declareFunction()
             if (extractor.getArg() != nullptr) {
                 argumentsCodeGen.arguments.push_back(extractor.getArg());
 
-                auto& extract_arg_type = _contextGenCode->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(extractor.getArg()->getNodeId());
+                auto& exctracted_arg_comp = _contextGenCode->getNodeComponentRegistry()->get<NodeArgFunctionComponents>(extractor.getArg()->getNodeId());
+                auto *extract_arg_type = exctracted_arg_comp.getType();
+
                 llvm::Type* argType = extract_arg_type->generateLLVMType(getContextGenCode()->getBackend()->getContext());
 
                 argumentsCodeGen.argTypes.push_back(argType);
@@ -256,8 +256,9 @@ auto StandardFunctionCallGenerator::getLocalFunction(llvm::StringRef functionNam
 
 void FunctionCallGenerator::generateCallFunction(NodeCallFunction* nodeCallFunction)
 {
-    auto& node_name = _contextGenCode->getNodeComponentRegistry()->get<AST_NAME_COMPONENT>(nodeCallFunction->getNodeId());
-    llvm::StringRef functionName = node_name.value;
+    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeCallFunctionComponents>(nodeCallFunction->getNodeId());
+    
+    llvm::StringRef functionName = nodeData.getName().value;
 
     if (RegistryBuiltIns::isBuiltIn(functionName)) {
         RegistryBuiltIns::generateCall(functionName, nodeCallFunction, getContextGenCode(), _visitorGeneralCodeGen);
@@ -269,11 +270,9 @@ void FunctionCallGenerator::generateCallFunction(NodeCallFunction* nodeCallFunct
     const SymbolFunctionLocal* symbolFunction = getLocalFunction(functionName);
     llvm::Function* targetFunction = symbolFunction->function;
     llvm::FunctionType* functionType = targetFunction->getFunctionType();
-
-    auto& nodeChildren = _contextGenCode->getNodeComponentRegistry()->get<AST_CHILD_COMPONENT>(nodeCallFunction->getNodeId());
     
     unsigned int paramIndex = 0; 
-    for (INode* argumentChild : nodeChildren) 
+    for (INode* argumentChild : nodeData.getChildren()) 
     {
         argumentChild->accept(_visitorGeneralCodeGen);
         llvm::Value* argumentValue = getContextGenCode()->getTemporaryValue().getAddress();
@@ -319,7 +318,8 @@ bool RegistryBuiltIns::isBuiltIn(llvm::StringRef name) {
 }
 
 void RegistryBuiltIns::generateCall(llvm::StringRef name, NodeCallFunction* nodeCallFunction, ContextGenCode* context, IVisitor* visitor) {
-    auto& nodeChildren = context->getNodeComponentRegistry()->get<AST_CHILD_COMPONENT>(nodeCallFunction->getNodeId());
+    auto& nodeData = context->getNodeComponentRegistry()->get<NodeCallFunctionComponents>(nodeCallFunction->getNodeId());
+    auto nodeChildren = nodeData.getChildren(); 
 
     if (name == "print") {
         if (nodeChildren.empty()) {
