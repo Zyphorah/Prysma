@@ -1,7 +1,7 @@
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/lexer/token_type.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/registry/types/type_simple.h"
 #include <llvm-18/llvm/IR/Value.h>
 #include <llvm/IR/Type.h>

@@ -2,7 +2,7 @@
 #include "compiler/builder/equation/builder_equation_flottante.h"
 #include "compiler/ast/interfaces/i_builder_tree.h"
 #include "compiler/ast/nodes/interfaces/i_expression.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/registry_expression.h"
 #include "compiler/parser/equation/chain_of_responsibility.h"

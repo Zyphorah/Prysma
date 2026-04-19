@@ -1,5 +1,5 @@
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/utils/prysma_cast.h"
 #include <string>
 

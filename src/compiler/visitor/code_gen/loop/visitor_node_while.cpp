@@ -1,4 +1,4 @@
-#include "compiler/ast/ast_genere.h"
+#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/visitor/code_gen/helper/control_flow_helper.h"

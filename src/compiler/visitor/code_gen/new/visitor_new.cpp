@@ -5,7 +5,7 @@
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/visitor/code_gen/helper/error_helper.h"
 #include "compiler/utils/prysma_cast.h"
 #include <cstddef>
@@ -86,16 +86,17 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
                             llvm::Type* elementType = typeArrayLLVM->getElementType();
                             llvm::Value* memberPtr = builder.CreateStructGEP(targetType, allocatedAddress, idx, memberName + "_ptrinit");
                             
-                            auto& node_elements = _contextGenCode->getNodeComponentRegistry()->get<AST_ARRAY_ELEMENT_COMPONENT>(arrayInit->getNodeId());
+                            auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeArrayInitializationComponents>(arrayInit->getNodeId());
+                            auto nodeElements = nodeData.getElements();
 
-                            for (std::size_t i = 0; i < node_elements.size(); ++i) {
+                            for (std::size_t i = 0; i < nodeElements.size(); ++i) {
                                 std::vector<llvm::Value*> indices = {
                                     builder.getInt32(0),
                                     builder.getInt32(static_cast<uint32_t>(i))
                                 }; 
                                 llvm::Value* ptrElement = builder.CreateGEP(typeArrayLLVM, memberPtr, indices, "ptr_element");
                     
-                                INode* element = node_elements[i];
+                                INode* element = nodeElements[i];
                                 element->accept(this);
                                 llvm::Value* expressionVal = _contextGenCode->getTemporaryValue().getAddress();
                                 

@@ -1,5 +1,5 @@
 #include "compiler/ast/registry/types/type_array.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/utils/prysma_cast.h"

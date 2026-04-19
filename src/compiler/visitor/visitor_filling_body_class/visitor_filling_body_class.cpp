@@ -1,6 +1,6 @@
 #include "compiler/visitor/visitor_filling_body_class/visitor_filling_body_class.h"
 #include "compiler/ast/registry/context_gen_code.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/registry/registry_class.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/visitor/visitor_base_generale.h"

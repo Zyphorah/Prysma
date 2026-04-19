@@ -2,7 +2,7 @@
 #define PARSER_INCLUDE_CPP
 
 #include "compiler/include_module/parser_include.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/lexer/lexer.h"

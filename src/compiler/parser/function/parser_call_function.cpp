@@ -2,6 +2,7 @@
 #define PARSER_CALLFUNCTION_CPP
 
 #include "compiler/function/parser_call_function.h"
+#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
@@ -32,7 +33,6 @@ INode* ParserCallFunction::parse(std::vector<Token>& tokens, std::size_t index)
     auto* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallFunction>(registry->getNextId());
 
     _contextParser.getNodeComponentRegistry()->emplace<NodeCallFunctionComponents>(nodeCall->getNodeId(), functionName, children);
-
     
     consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: ')' expected");
 

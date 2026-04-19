@@ -1,5 +1,5 @@
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/registry/types/type_simple.h"
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/LLVMContext.h>

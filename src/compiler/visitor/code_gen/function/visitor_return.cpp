@@ -1,14 +1,15 @@
 #include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/registry/types/i_type.h"
 #include <llvm-18/llvm/IR/Value.h>
 
 void GeneralVisitorGenCode::visiter(NodeReturn* nodeReturn)
 {
-    auto& return_value = _contextGenCode->getNodeComponentRegistry()->get<AST_NODE_RETURN_COMPONENT>(nodeReturn->getNodeId());
-    return_value->accept(this);
+    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeReturnComponents>(nodeReturn->getNodeId());
+
+    nodeData.getReturnValue()->accept(this);
 
     llvm::Value* evaluatedValue = _contextGenCode->getTemporaryValue().getAddress();
     IType* returnTypeObj = _contextGenCode->getReturnContextCompilation()->getContext();

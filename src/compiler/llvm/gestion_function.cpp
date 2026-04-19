@@ -1,6 +1,6 @@
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/llvm/gestion_function.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/registry/context_gen_code.h"
 #include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
@@ -45,7 +45,11 @@ FunctionDeclarationGenerator::FunctionDeclarationGenerator(ContextGenCode* conte
 
 auto StandardFunctionDeclarationGenerator::createFunction() -> llvm::Function*
 {
-    llvm::StringRef functionName = getNodeDeclarationFunction()->getNom().value;
+    auto& nodeData = getContextGenCode()->getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(
+        getNodeDeclarationFunction()->getNodeId()
+    );
+
+    llvm::StringRef functionName = nodeData.getName().value;
 
     const auto& symbolPtr = getContextGenCode()->getRegistryFunctionLocal()->get(functionName);
     if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
@@ -63,7 +67,11 @@ auto StandardFunctionDeclarationGenerator::createFunction() -> llvm::Function*
 
 auto MethodFunctionDeclarationGenerator::createFunction() -> llvm::Function*
 {
-    llvm::StringRef functionName = getNodeDeclarationFunction()->getNom().value;
+    auto& nodeData = getContextGenCode()->getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(
+        getNodeDeclarationFunction()->getNodeId()
+    );
+
+    llvm::StringRef functionName = nodeData.getName().value;
     std::string className = getContextGenCode()->getCurrentClassName();
     auto const& classInfo = getContextGenCode()->getRegistryClass()->get(className);
     const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(functionName);
@@ -156,13 +164,19 @@ void StandardFunctionDeclarationGenerator::handleConstructedArguments(llvm::Func
 
 void FunctionDeclarationGenerator::declareFunction()
 {
-    llvm::Type* returnType = getNodeDeclarationFunction()->getTypeReturn()->generateLLVMType(getContextGenCode()->getBackend()->getContext());
+    auto& nodeData = getContextGenCode()->getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(
+        getNodeDeclarationFunction()->getNodeId()
+    );
+
+    llvm::Type* returnType = nodeData.getReturnType()->generateLLVMType(getContextGenCode()->getBackend()->getContext());
     
     ArgumentsCodeGen argumentsCodeGen;
     if (getNodeDeclarationFunction() != nullptr) {
-        for (INode* node : getNodeDeclarationFunction()->getArguments()) {
+        for (INode* node : nodeData.getArguments()) {
             ArgExtractorFunction extractor;
+
             node->accept(&extractor);
+
             if (extractor.getArg() != nullptr) {
                 argumentsCodeGen.arguments.push_back(extractor.getArg());
 
@@ -178,12 +192,12 @@ void FunctionDeclarationGenerator::declareFunction()
 
     llvm::Function* function = createFunction();
     
-    getContextGenCode()->getReturnContextCompilation()->push(getNodeDeclarationFunction()->getTypeReturn());
+    getContextGenCode()->getReturnContextCompilation()->push(nodeData.getReturnType());
     getContextGenCode()->getRegistryVariable()->push();
     
     handleConstructedArguments(function, argumentsCodeGen);
 
-    getNodeDeclarationFunction()->getBody()->accept(_visitorGeneralCodeGen);
+    nodeData.getBody()->accept(_visitorGeneralCodeGen);
 
     llvm::BasicBlock* currentBlock = getContextGenCode()->getBackend()->getBuilder().GetInsertBlock();
     if (currentBlock != nullptr && returnType->isVoidTy())

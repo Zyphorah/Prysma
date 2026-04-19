@@ -2,7 +2,7 @@
 #define EXPRESSION_LITERAL_CPP
 
 #include "compiler/math/expression_literal.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_expression.h"
 #include "compiler/lexer/lexer.h"

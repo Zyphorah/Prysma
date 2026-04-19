@@ -2,7 +2,7 @@
 #define PARSER_DECLARATIONFUNCTION_CPP
 
 #include "compiler/function/parser_declaration_function.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/ast/registry/node_component_registry.h"

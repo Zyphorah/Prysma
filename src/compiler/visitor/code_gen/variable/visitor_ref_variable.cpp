@@ -1,4 +1,4 @@
-#include "compiler/ast/ast_genere.h"
+#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/lexer/lexer.h"
@@ -7,9 +7,10 @@
 
 void GeneralVisitorGenCode::visiter(NodeRefVariable* nodeRefVariable) 
 {
-    auto& variableToken = _contextGenCode->getNodeComponentRegistry()->get<AST_NAME_COMPONENT>(nodeRefVariable->getNodeId());
+    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeRefVariableComponents>(nodeRefVariable->getNodeId());
+    const auto& nodeToken = nodeData.getName();
 
-    Symbol symbol = _contextGenCode->getRegistryVariable()->getVariable(variableToken);
+    Symbol symbol = _contextGenCode->getRegistryVariable()->getVariable(nodeToken);
     llvm::Value* variable = symbol.getAddress();
     
     _contextGenCode->setTemporaryValue(Symbol(variable, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));

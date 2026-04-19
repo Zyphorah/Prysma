@@ -2,7 +2,7 @@
 #define EXPRESSION_UNREFVARIABLE_CPP
 
 #include "compiler/variable/expression_un_ref_variable.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_expression.h"
 #include "compiler/ast/registry/node_component_registry.h"

@@ -1,6 +1,6 @@
 #include "compiler/lexer/lexer.h"
 #include "compiler/visitor/visitor_filling_registry/visitor_filling_registry.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/registry/registry_class.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/registry_function.h"

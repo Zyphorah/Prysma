@@ -3,7 +3,7 @@
 #include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/ast/registry/registry_class.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/utils/prysma_cast.h"
 #include "compiler/visitor/extractors/members_extractor_class.h"
 #include <llvm-18/llvm/IR/Function.h>
@@ -118,9 +118,9 @@ void BuilderEnvironmentRegistryFunction::fill()
         std::vector<llvm::Type*> paramTypes;
         for (auto* arg : oldSymbol->node->getArguments()) {
             auto* argFunction = prysma::cast<NodeArgFunction>(arg);
-            auto& from_node_itype = _contextGenCode->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(argFunction->getNodeId());
+            auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeArgFunctionComponents>(argFunction->getNodeId());
 
-            paramTypes.push_back(from_node_itype->generateLLVMType(_contextGenCode->getBackend()->getContext()));
+            paramTypes.push_back(nodeData.getType()->generateLLVMType(_contextGenCode->getBackend()->getContext()));
         }
 
         llvm::FunctionType* funcType = llvm::FunctionType::get(retType, paramTypes, false);
@@ -171,9 +171,9 @@ void BuilderEnvironmentRegistryFunction::fill()
 
             for (auto* arg : symbol->node->getArguments()) {
                 auto* argFunction = prysma::cast<NodeArgFunction>(arg);
-                auto& from_node_itype = _contextGenCode->getNodeComponentRegistry()->get<AST_ITYPE_COMPONENT>(argFunction->getNodeId());
+                auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeArgFunctionComponents>(argFunction->getNodeId());
 
-                paramTypes.push_back(from_node_itype->generateLLVMType(_contextGenCode->getBackend()->getContext()));
+                paramTypes.push_back(nodeData.getType()->generateLLVMType(_contextGenCode->getBackend()->getContext()));
             }
 
             llvm::FunctionType* funcType = llvm::FunctionType::get(retType, paramTypes, false);

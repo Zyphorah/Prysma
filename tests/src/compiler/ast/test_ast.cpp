@@ -19,7 +19,7 @@
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 
 // Expressions
 #include "compiler/math/expression_literal.h"

@@ -3,7 +3,7 @@
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/registry/types/type_simple.h"
 #include "compiler/ast/registry/types/type_array.h"
 #include "compiler/llvm/gestion_variable.h"

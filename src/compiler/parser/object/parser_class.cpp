@@ -1,10 +1,11 @@
 #ifndef PARSER_CLASS_CPP
 #define PARSER_CLASS_CPP
 
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/macros/prysma_nodiscard.h"
 #include "compiler/manager_error.h"
 #include "compiler/object/parser_class.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/lexer/lexer.h"
@@ -41,18 +42,38 @@ namespace
               llvm::SmallVectorImpl<INode*>& memberList,
               llvm::SmallVectorImpl<INode*>& builders)
   {
-    if (node == nullptr) {
-      return;
-    }
+      if (node == nullptr) {
+        return;
+      }
+
+      // ce système fonctionne bien mais il repose sur un système de "pseudo_casting" qui coute cher au runtime.
+      // il serait plus judicieux d'utiliser les informations du type courant depuis le wrapper crtp. 
+      // Le truc principal est que ce dyn_cast introduit un static_cast qui pourait être évité avec le crtp.
+
+      // Il faut absolument refactoriser ce bout de code du moment que le crtp est en place. Ça fera du bien.
 
       if (auto* declarationVariable = prysma::dyn_cast<NodeDeclarationVariable>(node)) {
         if (declarationVariable != nullptr) {
+          auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationVariableComponents>(node->getNodeId());
+
           node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationVariable>(
-              param.current_visibility(),
-              declarationVariable->getNom(),
-              declarationVariable->getType(),
-              declarationVariable->getExpression()
+              contextParser.getNodeComponentRegistry()->getNextId() // le compilateur ŝemble complètement perdu, le cast devrait être possible.
           );
+
+          contextParser.getNodeComponentRegistry()->emplace<NodeDeclarationVariableComponents>(
+              node->getNodeId(),
+              param.current_visibility(),
+              nodeData.getName(),
+              nodeData.getType(),
+              nodeData.getExpression()
+          );
+
+          // node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationVariable>(
+          //     param.current_visibility(),
+          //     nodeData.getName(),
+          //     nodeData.getType(),
+          //     nodeData.getExpression()
+          // );
         }
         memberList.push_back(node);
         return;
@@ -60,21 +81,41 @@ namespace
 
       if (auto* declarationFunction = prysma::dyn_cast<NodeDeclarationFunction>(node)) {
         if (declarationFunction != nullptr) {
+          auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(node->getNodeId());
+
           node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(
-              param.current_visibility(),
-              declarationFunction->getTypeReturn(),
-              declarationFunction->getNom(),
-              declarationFunction->getArguments(),
-              declarationFunction->getBody()
+              contextParser.getNodeComponentRegistry()->getNextId() // même chose ici...
           );
-        }      auto* newDeclarationFunction = prysma::cast<NodeDeclarationFunction>(node);
-      if (newDeclarationFunction != nullptr && newDeclarationFunction->getNom().value == param.classNameToken().value) {
-        builders.push_back(node);
+
+          contextParser.getNodeComponentRegistry()->emplace<NodeDeclarationFunctionComponents>(
+              node->getNodeId(),
+              param.current_visibility(),
+              nodeData.getReturnType(),
+              nodeData.getName(),
+              nodeData.getArguments(),
+              nodeData.getBody()
+          );
+
+          // node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(
+          //     param.current_visibility(),
+          //     declarationFunction->getTypeReturn(),
+          //     declarationFunction->getNom(),
+          //     declarationFunction->getArguments(),
+          //     declarationFunction->getBody()
+          // );
+        }
+        
+        auto* newDeclarationFunction = prysma::cast<NodeDeclarationFunction>(node); // très suspect, à changer avec le crtp
+        auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(node->getNodeId());
+
+        if (newDeclarationFunction != nullptr && nodeData.getName().value == param.classNameToken().value) {
+          builders.push_back(node);
+          return;
+        }
+        
+        memberList.push_back(node);
         return;
       }
-      memberList.push_back(node);
-      return;
-    }
 
     throw CompilationError(llvm::formatv("Invalid class member: '{0}'", param.classNameToken().value).str(), Line(param.classNameToken().line), Column(param.classNameToken().column));
   }

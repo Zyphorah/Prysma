@@ -2,9 +2,11 @@
 #define PARSER_CALLOBJECT_CPP
 
 #include "compiler/object/parser_call_object.h"
+#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <cstddef>
@@ -29,7 +31,15 @@ auto ParserCallObject::parse(std::vector<Token>& tokens, std::size_t index) -> I
   consume(tokens, index, TOKEN_PAREN_OPEN, "Error: '(' expected");
 
   auto children = consumeChildBody(tokens, index, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_CLOSE);
-  INode* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallObject>(objectName, methodName, children);
+
+  
+    auto* nodeCall = _contextParser.getBuilderTreeInstruction()->allocate<NodeCallObject>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    ); 
+    _contextParser.getNodeComponentRegistry()->emplace<NodeCallObjectComponents>(
+        nodeCall->getNodeId(), objectName, methodName, children
+    );
+
 
   consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: ')' expected");
 

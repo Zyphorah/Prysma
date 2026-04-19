@@ -1,6 +1,6 @@
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/registry/context_gen_code.h"
 #include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
@@ -24,7 +24,7 @@ void GeneralVisitorGenCode::traverseChild(NodeInstruction* node)
 {
     auto& component = _contextGenCode->getNodeComponentRegistry()->get<NodeInstructionComponents>(node->getNodeId());
     
-    for (const auto& child : component.children) {
+    for (const auto& child : component.getChildren()) {
         child->accept(this);
     }
 }

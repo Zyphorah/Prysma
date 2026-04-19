@@ -1,7 +1,7 @@
 #include "compiler/ast/registry/context_gen_code.h"
 #include "compiler/visitor/visitor_filling_registry/visitor_filling_registry.h"
 #include "compiler/ast/utils/orchestrator_include/orchestrator_include.h" 
-#include "compiler/ast/ast_genere.h" 
+#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt" 
 #include <filesystem>
 #include <string>
 
