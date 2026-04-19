@@ -2,7 +2,7 @@
 #define PARSER_UNREFVARIABLE_CPP
 
 #include "compiler/variable/parser_un_ref_variable.h"
-#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/ast/registry/node_component_registry.h"

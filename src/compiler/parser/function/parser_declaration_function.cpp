@@ -2,7 +2,7 @@
 #define PARSER_DECLARATIONFUNCTION_CPP
 
 #include "compiler/function/parser_declaration_function.h"
-#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/ast/registry/node_component_registry.h"
@@ -63,12 +63,18 @@ auto ParserDeclarationFunction::parse(std::vector<Token>& tokens, std::size_t in
 
     consume(tokens, index, TOKEN_BRACE_CLOSE, "Error: not a closing brace '}'");
 
-    auto* nodeFunction = 
-        _contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(
-            Token{}, typeReturn, tokenFunctionName, _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(
-                arguments
-            ), body_node
-        );
+    
+    auto* nodeFunction = _contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    ); 
+    _contextParser.getNodeComponentRegistry()->emplace<NodeDeclarationFunctionComponents>(
+        nodeFunction->getNodeId(),
+        Token{},
+        typeReturn,
+        tokenFunctionName,
+        _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(arguments),
+        body_node
+    );
 
     return nodeFunction; 
 }

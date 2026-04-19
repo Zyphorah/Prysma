@@ -2,7 +2,7 @@
 #define PARSER_IF_CPP
 
 #include "compiler/condition/parser_if.h"
-#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/ast/registry/node_component_registry.h"
@@ -69,7 +69,13 @@ auto ParserIf::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
     ); 
     _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBlockEndif->getNodeId(), llvm::ArrayRef<INode*>{});
 
-    auto* nodeIf = _contextParser.getBuilderTreeInstruction()->allocate<NodeIf>(condition, nodeBlockIf, nodeBlockElse, nodeBlockEndif);
+
+    auto* nodeIf = _contextParser.getBuilderTreeInstruction()->allocate<NodeIf>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    ); 
+    _contextParser.getNodeComponentRegistry()->emplace<NodeIfComponents>(
+        nodeIf->getNodeId(), condition, nodeBlockIf, nodeBlockElse, nodeBlockEndif
+    );
 
     return nodeIf;
 }

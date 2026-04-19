@@ -4,8 +4,8 @@
 #include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/macros/prysma_nodiscard.h"
 #include "compiler/manager_error.h"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/object/parser_class.h"
-#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/lexer/lexer.h"
@@ -57,7 +57,7 @@ namespace
           auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationVariableComponents>(node->getNodeId());
 
           node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationVariable>(
-              contextParser.getNodeComponentRegistry()->getNextId() // le compilateur ŝemble complètement perdu, le cast devrait être possible.
+              contextParser.getNodeComponentRegistry()->getNextId()
           );
 
           contextParser.getNodeComponentRegistry()->emplace<NodeDeclarationVariableComponents>(
@@ -67,13 +67,6 @@ namespace
               nodeData.getType(),
               nodeData.getExpression()
           );
-
-          // node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationVariable>(
-          //     param.current_visibility(),
-          //     nodeData.getName(),
-          //     nodeData.getType(),
-          //     nodeData.getExpression()
-          // );
         }
         memberList.push_back(node);
         return;
@@ -84,7 +77,7 @@ namespace
           auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(node->getNodeId());
 
           node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(
-              contextParser.getNodeComponentRegistry()->getNextId() // même chose ici...
+              contextParser.getNodeComponentRegistry()->getNextId()
           );
 
           contextParser.getNodeComponentRegistry()->emplace<NodeDeclarationFunctionComponents>(
@@ -95,18 +88,11 @@ namespace
               nodeData.getArguments(),
               nodeData.getBody()
           );
-
-          // node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(
-          //     param.current_visibility(),
-          //     declarationFunction->getTypeReturn(),
-          //     declarationFunction->getNom(),
-          //     declarationFunction->getArguments(),
-          //     declarationFunction->getBody()
-          // );
         }
         
         auto* newDeclarationFunction = prysma::cast<NodeDeclarationFunction>(node); // très suspect, à changer avec le crtp
         auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(node->getNodeId());
+        // il se pourrait que le node data soit empty et que le registre lance un exception (not found). il faudrait peut-être emplace ou revoir l'algo pour être certain...
 
         if (newDeclarationFunction != nullptr && nodeData.getName().value == param.classNameToken().value) {
           builders.push_back(node);

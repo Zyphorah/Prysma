@@ -2,7 +2,6 @@
 #define PARSER_CALLOBJECT_CPP
 
 #include "compiler/object/parser_call_object.h"
-#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
@@ -32,7 +31,7 @@ auto ParserCallObject::parse(std::vector<Token>& tokens, std::size_t index) -> I
 
   auto children = consumeChildBody(tokens, index, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_CLOSE);
 
-  
+
     auto* nodeCall = _contextParser.getBuilderTreeInstruction()->allocate<NodeCallObject>(
         _contextParser.getNodeComponentRegistry()->getNextId()
     ); 

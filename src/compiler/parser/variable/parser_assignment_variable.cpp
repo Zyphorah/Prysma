@@ -2,9 +2,10 @@
 #define PARSER_ASSIGNMENTVARIABLE_CPP
 
 #include "compiler/variable/parser_assignment_variable.h"
-#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <cstddef>
@@ -46,10 +47,24 @@ auto ParserAssignmentVariable::parse(std::vector<Token>& tokens, std::size_t ind
     Token constructedToken = nameToken;
 
     if (indexExpression != nullptr) {
-        return _contextParser.getBuilderTreeEquation()->allocate<NodeAssignmentArray>(constructedToken, indexExpression, expression, nameToken);
+        auto* nodeAssignmentArr = _contextParser.getBuilderTreeInstruction()->allocate<NodeAssignmentArray>(
+            _contextParser.getNodeComponentRegistry()->getNextId()
+        ); 
+        _contextParser.getNodeComponentRegistry()->emplace<NodeAssignmentArrayComponents>(
+            nodeAssignmentArr->getNodeId(), constructedToken, indexExpression, expression, nameToken
+        );
+
+        return nodeAssignmentArr;
     }
-    
-    return _contextParser.getBuilderTreeEquation()->allocate<NodeAssignmentVariable>(constructedToken, expression, nameToken);
+
+    auto* nodeAssignmentVar = _contextParser.getBuilderTreeInstruction()->allocate<NodeAssignmentVariable>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    ); 
+    _contextParser.getNodeComponentRegistry()->emplace<NodeAssignmentVariableComponents>(
+        nodeAssignmentVar->getNodeId(), constructedToken, expression, nameToken
+    );
+
+    return nodeAssignmentVar;
 }
 
 #endif /* PARSER_ASSIGNMENTVARIABLE_CPP */

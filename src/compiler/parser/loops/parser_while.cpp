@@ -2,7 +2,7 @@
 #define PARSER_WHILE_CPP
 
 #include "compiler/loops/parser_while.h"
-#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/ast/registry/node_component_registry.h"
@@ -50,7 +50,15 @@ auto ParserWhile::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
     _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBlockEndWhile->getNodeId(), llvm::ArrayRef<INode*>{});
     
     
-    INode* nodeWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeWhile>(condition, nodeBlockWhile, nodeBlockEndWhile);
+    auto* nodeWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeWhile>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    ); 
+    _contextParser.getNodeComponentRegistry()->emplace<NodeWhileComponents>(
+        nodeBlockEndWhile->getNodeId(),
+        condition, 
+        nodeBlockWhile,
+        nodeBlockEndWhile
+    );
 
     return nodeWhile;
 }
