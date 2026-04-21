@@ -1,5 +1,5 @@
 #include "compiler/visitor/extractors/members_extractor_class.h"
-#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
+#include "compiler/ast/ast_genere.h"
 
 void MembersExtractorClass::visiter(NodeDeclarationFunction* node) { 
     methods.push_back(node); 

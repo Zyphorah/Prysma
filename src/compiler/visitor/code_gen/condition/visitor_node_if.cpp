@@ -1,15 +1,20 @@
-#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/visitor/code_gen/helper/control_flow_helper.h"
 #include <llvm-18/llvm/IR/Value.h>
 
 void GeneralVisitorGenCode::visiter(NodeIf* nodeIf) 
 {
+    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeIfComponents>(
+        nodeIf->getNodeId()
+    );
+
     // Retrieve the condition and blocks from the if node
-    INode* nodeCondition = nodeIf->getNodeCondition();
-    INode* nodeIfBlock = nodeIf->getNodeBlocIf();
-    INode* nodeElseBlock = nodeIf->getNodeBlocElse();
+    INode* nodeCondition = nodeData.getNodeCondition();
+    INode* nodeIfBlock = nodeData.getNodeBlocIf();
+    INode* nodeElseBlock = nodeData.getNodeBlocElse();
 
     // Evaluate the condition
     nodeCondition->accept(this);

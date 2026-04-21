@@ -1,6 +1,7 @@
 #include "compiler/ast/registry/types/type_array.h"
-#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/utils/prysma_cast.h"
 #include <cstdint>
@@ -33,6 +34,10 @@ auto TypeArray::generateLLVMType(llvm::LLVMContext& context) -> llvm::Type*
     if (literal == nullptr) {
         throw std::runtime_error("Error: the array size must be an integer literal");
     }
+
+    auto& nodeData = getContextGenCode()->getNodeComponentRegistry()->get<NodeLiteralComponents>(
+        getNodeDeclarationFunction()->getNodeId() // faut passer le contexte
+    );
 
     auto size = static_cast<uint64_t>(std::stoull(std::string(literal->getToken().value)));
     return llvm::ArrayType::get(elementType, size);

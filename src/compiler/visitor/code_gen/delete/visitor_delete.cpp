@@ -1,7 +1,8 @@
+#include "compiler/ast/ast_genere.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/visitor/code_gen/helper/error_helper.h"
 #include <llvm-18/llvm/IR/Value.h>
 #include <llvm/Support/FormatVariadic.h>
@@ -11,8 +12,12 @@ void GeneralVisitorGenCode::visiter(NodeDelete* nodeDelete)
     auto& module = _contextGenCode->getBackend()->getModule();
     auto& builder = _contextGenCode->getBackend()->getBuilder();
 
+    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeDeleteComponents>(
+        nodeDelete->getNodeId()
+    );
+
     // Retrieve the token of the variable to delete
-    const Token& variableToken = nodeDelete->getNomType();
+    const Token& variableToken = nodeData.getName();
 
     // Search for the variable in the variable registry to determine if it exists
     Symbol symbol = _contextGenCode->getRegistryVariable()->getVariable(variableToken);

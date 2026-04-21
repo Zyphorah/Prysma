@@ -1,7 +1,8 @@
+#include "compiler/ast/ast_genere.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/lexer/token_type.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/registry/types/type_simple.h"
 #include <llvm-18/llvm/IR/Value.h>
 #include <llvm/IR/Type.h>
@@ -10,12 +11,16 @@
 
 void GeneralVisitorGenCode::visiter(NodeOperation* node)
 {
+    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeOperationComponents>(
+        node->getNodeId()
+    );
+
     // Evaluate the left side and SAVE the complete Symbol
-    node->getGauche()->accept(this);
+    nodeData.getLeft()->accept(this);
     Symbol leftSym = _contextGenCode->getTemporaryValue();
 
     // Evaluate the right side (the left temporary value is not overwritten)
-    node->getDroite()->accept(this);
+    nodeData.getRight()->accept(this);
     Symbol rightSym = _contextGenCode->getTemporaryValue();
 
     llvm::Value* leftVal = leftSym.getAddress();
@@ -35,7 +40,7 @@ void GeneralVisitorGenCode::visiter(NodeOperation* node)
         rightVal = _contextGenCode->getBackend()->createAutoCast(rightVal, floatTy);
         resultType = floatTy;
 
-        switch (node->getToken().type) {
+        switch (nodeData.getToken().type) {
             case TOKEN_PLUS:  result = builder.CreateFAdd(leftVal, rightVal, "fadd"); break;
             case TOKEN_MINUS: result = builder.CreateFSub(leftVal, rightVal, "fsub"); break;
             case TOKEN_STAR:  result = builder.CreateFMul(leftVal, rightVal, "fmul"); break;
@@ -66,7 +71,7 @@ void GeneralVisitorGenCode::visiter(NodeOperation* node)
         
         resultType = targetIntTy;
 
-        switch (node->getToken().type) {
+        switch (nodeData.getToken().type) {
             case TOKEN_PLUS:  result = builder.CreateAdd(leftVal, rightVal, "iadd"); break;
             case TOKEN_MINUS: result = builder.CreateSub(leftVal, rightVal, "isub"); break;
             case TOKEN_STAR:  result = builder.CreateMul(leftVal, rightVal, "imul"); break;

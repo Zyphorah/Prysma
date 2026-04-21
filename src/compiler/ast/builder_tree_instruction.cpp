@@ -1,7 +1,6 @@
 #include "compiler/ast/builder_tree_instruction.h"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
-#include "../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
-#include "compiler/ast/registry/context_gen_code.h"
 #include "compiler/ast/registry/registry_instruction.h"
 #include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/parser/interfaces/i_parser.h"
@@ -11,6 +10,7 @@
 #include "llvm/ADT/SmallVector.h"
 #include <cstddef>
 #include <llvm-18/llvm/ADT/ArrayRef.h>
+#include <llvm-18/llvm/IR/Instruction.h>
 #include <llvm/Support/Allocator.h>
 #include <llvm/Support/FormatVariadic.h>
 #include <utility>

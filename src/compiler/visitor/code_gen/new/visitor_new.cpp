@@ -1,3 +1,4 @@
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/registry_class.h"
@@ -5,7 +6,6 @@
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/visitor/code_gen/helper/error_helper.h"
 #include "compiler/utils/prysma_cast.h"
 #include <cstddef>
@@ -23,15 +23,19 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
     auto& module = _contextGenCode->getBackend()->getModule();
     auto& builder = _contextGenCode->getBackend()->getBuilder();
 
+    auto& nodeNewData = _contextGenCode->getNodeComponentRegistry()->get<NodeNewComponents>(
+        nodeNew->getNodeId()
+    );
+
     llvm::Type* targetType = nullptr;
     Class* classInfo = nullptr;
 
-    if (nodeNew->getNomType().type == TOKEN_IDENTIFIER) {
-        classInfo = _contextGenCode->getRegistryClass()->get(std::string(nodeNew->getNomType().value)).get();
-        classInfo = ErrorHelper::verifyNotNull(classInfo, llvm::formatv("Class '{0}' not found", nodeNew->getNomType().value).str());
+    if (nodeNewData.getName().type == TOKEN_IDENTIFIER) {
+        classInfo = _contextGenCode->getRegistryClass()->get(std::string(nodeNewData.getName().value)).get();
+        classInfo = ErrorHelper::verifyNotNull(classInfo, llvm::formatv("Class '{0}' not found", nodeNewData.getName().value).str());
         targetType = classInfo->getStructType();
     } else {
-        targetType = _contextGenCode->getRegistryType()->get(nodeNew->getNomType().type);
+        targetType = _contextGenCode->getRegistryType()->get(nodeNewData.getName().type);
     }
 
     targetType = ErrorHelper::verifyNotNull(targetType, "Target type not determined for 'new'");
@@ -54,7 +58,7 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
     builderArgs.push_back(allocatedAddress);  // this
 
     // Add arguments passed to new (the node's children)
-    for (INode* arg : nodeNew->getArguments()) {
+    for (INode* arg : nodeNewData.getArguments()) {
         arg->accept(this);  // Evaluate the expression (e.g., int = 204)
         builderArgs.push_back(_contextGenCode->getTemporaryValue().getAddress());
     }
@@ -127,7 +131,7 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
 
     // Build the builder with arguments
     if (classInfo != nullptr) {
-        llvm::StringRef builderName = nodeNew->getNomType().value;
+        llvm::StringRef builderName = nodeNewData.getName().value;
         if (classInfo->getRegistryFunctionLocal()->exists(std::string(builderName))) {
             const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(std::string(builderName));
             if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {

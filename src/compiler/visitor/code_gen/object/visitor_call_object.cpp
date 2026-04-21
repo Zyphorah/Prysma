@@ -1,7 +1,8 @@
+#include "compiler/ast/ast_genere.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/llvm/gestion_variable.h"
 #include "compiler/ast/registry/registry_class.h"
 #include "compiler/visitor/code_gen/helper/error_helper.h"
@@ -17,11 +18,15 @@
 
 void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
 {
+    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeCallObjectComponents>(
+        nodeCallObject->getNodeId()
+    );
+
     // Retrieve the object name (e.g., "dog")
-    llvm::StringRef objectName = nodeCallObject->getNomObject().value;
+    llvm::StringRef objectName = nodeData.getObjectName().value;
 
     // Retrieve the called method name (e.g., "bark")
-    llvm::StringRef methodName = nodeCallObject->getNomMethode().value;
+    llvm::StringRef methodName = nodeData.getMethodName().value;
 
     VariableLoader loader(_contextGenCode);
     
@@ -69,7 +74,7 @@ void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
     llvm::FunctionType* functionType = functionSymbol->function->getFunctionType();
 
     unsigned int paramIndex = 1; // 0 is "this"
-    for (INode* argumentChild : nodeCallObject->getChildren()) 
+    for (INode* argumentChild : nodeData.getChildren()) 
     {
         argumentChild->accept(this);
         llvm::Value* argumentValue = _contextGenCode->getTemporaryValue().getAddress();

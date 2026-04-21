@@ -1,20 +1,27 @@
+#include "compiler/ast/ast_genere.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/utils/prysma_cast.h"
+#include "compiler/visitor/interfaces/i_visitor.h"
 #include <string>
 
 void GeneralVisitorGenCode::visiter(NodeClass* nodeClass)
 {
     std::string previousClassName = _contextGenCode->getCurrentClassName();
-    _contextGenCode->setCurrentClassName(std::string(nodeClass->getNomClass().value));
 
-    for (auto* member : nodeClass->getListMembers()) {
+    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeClassComponents>(
+        nodeClass->getNodeId()
+    );
+
+    _contextGenCode->setCurrentClassName(std::string(nodeData.getName().value));
+
+    for (auto* member : nodeData.getMembers()) {
         if (prysma::isa<NodeDeclarationFunction>(member)) {
             member->accept(this);
         }
     }
 
-    for (auto* builder : nodeClass->getBuilder()) {
+    for (auto* builder : nodeData.getBuilder()) {
         builder->accept(this);
     }
 

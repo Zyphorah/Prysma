@@ -1,9 +1,10 @@
+#include "compiler/ast/ast_genere.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/ast/registry/types/type_simple.h"
 #include "compiler/ast/registry/types/type_array.h"
 #include "compiler/llvm/gestion_variable.h"
@@ -16,7 +17,11 @@
 
 void GeneralVisitorGenCode::visiter(NodeReadingArray* nodeReadingArray)
 {
-    llvm::StringRef arrayNameStr = nodeReadingArray->getNomArray().value;
+    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeReadingArrayComponents>(
+        nodeReadingArray->getNodeId()
+    );
+
+    llvm::StringRef arrayNameStr = nodeData.getName().value;
     Symbol symbol;
     llvm::Value* arrayAddress = nullptr;
 
@@ -55,7 +60,7 @@ void GeneralVisitorGenCode::visiter(NodeReadingArray* nodeReadingArray)
     }
     
     // Compute the index from the equation 
-    nodeReadingArray->getIndexEquation()->accept(this);
+    nodeData.getIndexEquation()->accept(this);
     llvm::Value* indexValue = _contextGenCode->getTemporaryValue().getAddress();
     
     llvm::Value* elementAddress = nullptr;
@@ -67,7 +72,7 @@ void GeneralVisitorGenCode::visiter(NodeReadingArray* nodeReadingArray)
             { 
                 _contextGenCode->getBackend()->getBuilder().getInt32(0), 
                 indexValue 
-            }, nodeReadingArray->getNomArray().value);
+            }, nodeData.getName().value);
         elementType = arrayType->getArrayElementType();
     } else {
         // It's a pointer to an array (reference), must load the pointer
@@ -85,12 +90,12 @@ void GeneralVisitorGenCode::visiter(NodeReadingArray* nodeReadingArray)
             elementType, 
             loadedPtr, 
             indexValue,
-            nodeReadingArray->getNomArray().value
+            nodeData.getName().value
         );
     }
         
     // Load the value from the element address
-    llvm::Value* elementValue = _contextGenCode->getBackend()->getBuilder().CreateLoad(elementType, elementAddress, nodeReadingArray->getNomArray().value);
+    llvm::Value* elementValue = _contextGenCode->getBackend()->getBuilder().CreateLoad(elementType, elementAddress, nodeData.getName().value);
 
     _contextGenCode->setTemporaryValue(Symbol(elementValue, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
     _contextGenCode->setTemporaryValue(Symbol(_contextGenCode->getTemporaryValue().getAddress(), new (_contextGenCode->getArena()->Allocate<TypeSimple>()) TypeSimple(elementType), _contextGenCode->getTemporaryValue().getPointedElementType()));

@@ -1,10 +1,10 @@
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 #include "compiler/llvm/gestion_variable.h"
 #include "compiler/ast/registry/types/type_array.h"
 #include <cstddef>
@@ -21,13 +21,18 @@
 void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVariable) 
 {
     VariableAllocator allocator(_contextGenCode);
-    INode* expression = nodeDeclarationVariable->getExpression();
+
+    auto& nodeDeclarationData = _contextGenCode->getNodeComponentRegistry()->get<NodeDeclarationVariableComponents>(
+        nodeDeclarationVariable->getNodeId()
+    );
+
+    INode* expression = nodeDeclarationData.getExpression();
        
     // Check if the expression is an array initialization
     auto* arrayInit = prysma::dyn_cast<NodeArrayInitialization>(expression);
 
-    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeArrayInitializationComponents>(arrayInit->getNodeId());
-    auto nodeElements = nodeData.getElements();
+    auto& nodeArrData = _contextGenCode->getNodeComponentRegistry()->get<NodeArrayInitializationComponents>(arrayInit->getNodeId());
+    auto nodeElements = nodeArrData.getElements();
     
     llvm::AllocaInst* createdAlloca = nullptr; 
     
@@ -36,7 +41,7 @@ void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVari
         llvm::Type* variableType = nullptr;
         llvm::Type* elementType = nullptr;
         
-        IType* typeDecl = nodeDeclarationVariable->getType();
+        IType* typeDecl = nodeDeclarationData.getType();
         auto* typeArrayDecl = prysma::dyn_cast<TypeArray>(typeDecl);
         
         if (typeArrayDecl != nullptr && typeArrayDecl->getSize() == nullptr) {
@@ -46,7 +51,7 @@ void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVari
             elementType = typeArrayDecl->getChildType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
             variableType = llvm::ArrayType::get(elementType, realSize);
         } else {
-            variableType = nodeDeclarationVariable->getType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
+            variableType = nodeDeclarationData.getType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
             if (variableType == nullptr) {
                 ErrorHelper::compilationError("Unable to determine array size");
             }
@@ -58,7 +63,7 @@ void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVari
         }
         
         // Allocate and register the array
-        llvm::AllocaInst* allocaInstArray = allocator.allocate(variableType, nodeDeclarationVariable->getNom().value);
+        llvm::AllocaInst* allocaInstArray = allocator.allocate(variableType, nodeDeclarationData.getName().value);
         createdAlloca = allocaInstArray;
 
         // Initialize each element of the array
@@ -77,8 +82,8 @@ void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVari
         }
     } else {
         // Simple (non-array) variable
-        llvm::Type* variableType = nodeDeclarationVariable->getType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
-        llvm::AllocaInst* allocaInst = allocator.allocate(variableType, nodeDeclarationVariable->getNom().value);
+        llvm::Type* variableType = nodeDeclarationData.getType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
+        llvm::AllocaInst* allocaInst = allocator.allocate(variableType, nodeDeclarationData.getName().value);
         createdAlloca = allocaInst;
         
         llvm::Value* calculatedValue = evaluateExpression(expression).getAddress();
@@ -91,14 +96,14 @@ void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVari
     }
     if (createdAlloca != nullptr) {
         Token token;
-        token.value = nodeDeclarationVariable->getNom().value;
+        token.value = nodeDeclarationData.getName().value;
         
         // Create the symbol with the pointed type if it's a pointer
-        llvm::Type* variableType = nodeDeclarationVariable->getType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
+        llvm::Type* variableType = nodeDeclarationData.getType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
         
         // If we have an array with dynamic size (nullptr), use the real type we calculated
         if (variableType == nullptr) {
-            IType* typeDecl = nodeDeclarationVariable->getType();
+            IType* typeDecl = nodeDeclarationData.getType();
             auto* typeArrayDecl = prysma::dyn_cast<TypeArray>(typeDecl);
             if (typeArrayDecl != nullptr && arrayInit != nullptr) {
                 // Recalculate from the initialization
@@ -119,7 +124,7 @@ void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVari
         
         _contextGenCode->getRegistryVariable()->registerVariable(
             token, 
-            Symbol(createdAlloca, nodeDeclarationVariable->getType(), elementPointerType)
+            Symbol(createdAlloca, nodeDeclarationData.getType(), elementPointerType)
         );
     }
 }
