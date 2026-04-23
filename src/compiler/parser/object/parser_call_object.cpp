@@ -32,27 +32,38 @@ auto ParserCallObject::parse(std::vector<Token>& tokens, int& index) -> INode*
 
   consume(tokens, index, TOKEN_CALL, "Error: 'call' expected");
   Token objectName = consume(tokens, index, TOKEN_IDENTIFIER, "Error: object identifier expected");
-  consume(tokens, index, TOKEN_DOT, "Error: '.' expected after object name");
-  Token methodName = consume(tokens, index, TOKEN_IDENTIFIER, "Error: method identifier expected");
-  consume(tokens, index, TOKEN_PAREN_OPEN, "Error: '(' expected");
 
-  auto children = consumeChildBody(tokens, index, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_CLOSE);
+  // Create the base (the first receiver)
+  INode* currentReceiver = _contextParser.getBuilderTreeEquation()->allocate<NodeRefVariable>(objectName);
 
-  // Note: we set nullptr for the method return type, as it will be resolved later during decoration,
-  // once we have all the necessary information about the argument types and the return type of the called method.
-  // We need this information to correctly resolve the type of the object call, especially in cases where there are method overloads or polymorphic calls.
+  // Chaining loop (as long as there is a '.')
+  while (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type == TOKEN_DOT) {
+      consume(tokens, index, TOKEN_DOT, "Error: '.' expected after object name");
+      Token methodName = consume(tokens, index, TOKEN_IDENTIFIER, "Error: method identifier expected");
+      consume(tokens, index, TOKEN_PAREN_OPEN, "Error: '(' expected");
 
-  // Set the first receiver; it will change depending on the chaining from link a --> b --> c
-  INode* receiverNode = _contextParser.getBuilderTreeEquation()->allocate<NodeRefVariable>(objectName);
-  INode* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallObject>(methodName, nullptr, receiverNode, children);
+      auto children = consumeChildBody(tokens, index, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_CLOSE);
 
-  consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: ')' expected");
+      consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: ')' expected");
+
+      // Note: we set nullptr for the method return type, as it will be resolved later during decoration,
+      // once we have all the necessary information about the argument types and the return type of the called method.
+      // We need this information to correctly resolve the type of the object call, especially in cases where there are method overloads or polymorphic calls.
+
+      // The OLD call becomes the NEW receiver
+      currentReceiver = _contextParser.getBuilderTreeEquation()->allocate<NodeCallObject>(
+          methodName, 
+          nullptr, 
+          currentReceiver, 
+          children
+      );
+  }
 
   if (callAsInstruction && index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type == TOKEN_SEMICOLON) {
       consume(tokens, index, TOKEN_SEMICOLON, "Error: ';' expected at the end of the object call");
   }
 
-  return nodeCall;
+  return currentReceiver;
 }
 
 #endif /* PARSER_CALLOBJECT_CPP */
