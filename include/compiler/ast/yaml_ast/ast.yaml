@@ -83,9 +83,9 @@ Node:
     CallObject:
       engine: [parser, expression]
       champs:
-        nomObject: "Token"
         nomMethode: "Token"
-        typeResolut: "IType*"
+        typeResolut: "TypeResolut*"
+        receiver: "INode*"
         children: "llvm::ArrayRef<INode*>"
     AccesAttribute:
       engine: []

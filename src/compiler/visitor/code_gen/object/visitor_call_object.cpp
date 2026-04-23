@@ -26,7 +26,7 @@
 void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
 {
     // Retrieve the object name (e.g., "dog")
-    llvm::StringRef objectName = nodeCallObject->getNomObject().value;
+    llvm::StringRef objectName = prysma::dyn_cast<NodeRefVariable>(nodeCallObject->getReceiver())->getNomVariable().value;
 
     // Retrieve the called method name (e.g., "bark")
     llvm::StringRef methodName = nodeCallObject->getNomMethode().value;

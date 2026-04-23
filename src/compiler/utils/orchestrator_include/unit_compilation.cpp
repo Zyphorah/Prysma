@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "compiler/ast/utils/orchestrator_include/unit_compilation.h"
+#include "compiler/visitor/semantic_analyzer/resolution_chainage_type/resolution_chainage_type.h"
 #include "compiler/ast/builder_tree_instruction.h"
 #include "compiler/ast/utils/builder_environment_registry_function.h"
 #include "compiler/ast/utils/builder_environment_registry_variable.h"
@@ -103,8 +104,8 @@ void UnitCompilation::pass2() {
     std::string pathProgram = (buildDir / "programme/").string();
     std::string pathGraph = (buildDir / "graphe/").string();
 
-    // TODO class : Ajouter un visiteur pour la décoration, analyseur sémantique spécifiquement pour la sucession d'appel sur un objet ex:
-    //  object-oriented (object.method().method()) 
+    ResolutionChainageType resolutionChainageType(_context->getRegistryClass());
+    _tree->accept(&resolutionChainageType);
 
     GeneralVisitorGenCode visitor(_context, _orchestrator);
     _tree->accept(&visitor);

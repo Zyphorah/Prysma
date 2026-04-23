@@ -41,7 +41,10 @@ auto ParserCallObject::parse(std::vector<Token>& tokens, int& index) -> INode*
   // Note: we set nullptr for the method return type, as it will be resolved later during decoration,
   // once we have all the necessary information about the argument types and the return type of the called method.
   // We need this information to correctly resolve the type of the object call, especially in cases where there are method overloads or polymorphic calls.
-  INode* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallObject>(objectName, methodName, nullptr, children);
+
+  // Set the first receiver; it will change depending on the chaining from link a --> b --> c
+  INode* receiverNode = _contextParser.getBuilderTreeEquation()->allocate<NodeRefVariable>(objectName);
+  INode* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallObject>(methodName, nullptr, receiverNode, children);
 
   consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: ')' expected");
 
@@ -53,7 +56,3 @@ auto ParserCallObject::parse(std::vector<Token>& tokens, int& index) -> INode*
 }
 
 #endif /* PARSER_CALLOBJECT_CPP */
-
-
-
-

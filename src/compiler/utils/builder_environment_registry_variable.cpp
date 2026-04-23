@@ -19,7 +19,7 @@
 BuilderEnvironmentRegistryVariable::BuilderEnvironmentRegistryVariable(ContextGenCode* contextGenCode)
     : _contextGenCode(contextGenCode) {}
 
-BuilderEnvironmentRegistryVariable::~BuilderEnvironmentRegistryVariable() {}
+BuilderEnvironmentRegistryVariable::~BuilderEnvironmentRegistryVariable() = default;
 
 // Currently unused, for the future, another development iteration, it exists for now but is not yet tested
 // A bonus feature
