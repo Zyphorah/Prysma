@@ -20,6 +20,7 @@
 #include "compiler/lexer/token_type.h"
 #include <cstddef>
 #include <llvm/IR/Type.h>
+#include <string>
 #include <vector>
 
 TypeParser::TypeParser(RegistryType* registryType, IBuilderTree* builderTree)

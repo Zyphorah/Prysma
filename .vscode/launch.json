@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/Prysma",
-            "args": ["${workspaceFolder}/src/prysma_code_tests/main.p"],
+            "args": ["${workspaceFolder}/src/prysma_code_tests/class_test/main.p"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "sourceFileMap": {

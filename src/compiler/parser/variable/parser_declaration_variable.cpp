@@ -32,6 +32,7 @@ auto ParserDeclarationVariable::parse(std::vector<Token>& tokens, int& index) ->
     consume(tokens, index, TOKEN_DECL, "Error: expected type 'dec'");
     
     // Use ParserType to analyze the type (simple or array)
+
     IType* type = _contextParser.getTypeParser()->parse(tokens, index);
     
     Token nameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Error: variable name expected");
