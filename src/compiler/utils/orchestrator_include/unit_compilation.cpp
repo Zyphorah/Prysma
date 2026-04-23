@@ -103,6 +103,9 @@ void UnitCompilation::pass2() {
     std::string pathProgram = (buildDir / "programme/").string();
     std::string pathGraph = (buildDir / "graphe/").string();
 
+    // TODO class : Ajouter un visiteur pour la décoration, analyseur sémantique spécifiquement pour la sucession d'appel sur un objet ex:
+    //  object-oriented (object.method().method()) 
+
     GeneralVisitorGenCode visitor(_context, _orchestrator);
     _tree->accept(&visitor);
 

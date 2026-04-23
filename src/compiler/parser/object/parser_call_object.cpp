@@ -37,7 +37,11 @@ auto ParserCallObject::parse(std::vector<Token>& tokens, int& index) -> INode*
   consume(tokens, index, TOKEN_PAREN_OPEN, "Error: '(' expected");
 
   auto children = consumeChildBody(tokens, index, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_CLOSE);
-  INode* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallObject>(objectName, methodName, children);
+
+  // Note: we set nullptr for the method return type, as it will be resolved later during decoration,
+  // once we have all the necessary information about the argument types and the return type of the called method.
+  // We need this information to correctly resolve the type of the object call, especially in cases where there are method overloads or polymorphic calls.
+  INode* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallObject>(objectName, methodName, nullptr, children);
 
   consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: ')' expected");
 

@@ -85,6 +85,7 @@ Node:
       champs:
         nomObject: "Token"
         nomMethode: "Token"
+        typeResolut: "IType*"
         children: "llvm::ArrayRef<INode*>"
     AccesAttribute:
       engine: []
