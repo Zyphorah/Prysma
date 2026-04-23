@@ -25,6 +25,31 @@
  * If I am in the case of getDepthTwo() I need the return type to resolve getDepthTwo() because it is found in a different class from the base test class.
  */
  
+
+ /*                                                                                                                                                                                                                                 
+           ┌─────────────────────────────┌───────────────────────────┐          
+           │NodeCallObject: getDepthTwo()│ TypeResolut (Intermediate)│          
+           └────┬────────▲───────────────└───────────────────────────┘          
+                │        │                                                      
+                │        │                                                      
+                │        │                                                      
+                │        └─────────────────────────┐                            
+            receiver                         provides Type_B                    
+                │                                  │                            
+                │                                  │                            
+                │                                  │                            
+           ┌────▼─────────────────────┌────────────┼──────────────┐             
+           │NodeCallObject: getDepth()│ TypeResolut (Intermediate)│             
+           └────┬────────▲────────────└───────────────────────────┘             
+                │        │                                                      
+            receiver     └────────────────────┐                                 
+                │                      provides Type_A                          
+                │                             │                                 
+           ┌────▼───────────────┌─────────────┼─────────────┐                   
+           │ NodeVariable: test │ TypeResolut (Intermediate)│                   
+           └────────────────────└───────────────────────────┘                                                                                                 
+ */
+ 
 void ResolutionChainageType::visiter(NodeCallObject *nodeCallObject)
 {
     // Recursively resolve the receiver (e.g., 'test' or 'test.getDepth()')
