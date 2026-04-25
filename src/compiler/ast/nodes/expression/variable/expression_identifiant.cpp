@@ -2,9 +2,10 @@
 #define EXPRESSION_IDENTIFIER_CPP
 
 #include "compiler/variable/expression_identifiant.h"
-#include "../../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_expression.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <cstddef>
@@ -58,17 +59,51 @@ auto ExpressionIdentifiant::build(std::vector<Token>& equation) -> INode*
 
             combinedName.value = llvm::StringRef(arr, tempStr.size());
             combinedName.type = TOKEN_IDENTIFIER;
-            return _context.getBuilderTreeEquation()->allocate<NodeReadingArray>(indexExpr, combinedName);
+
+            auto* nodeReadingArr = _context.getBuilderTreeEquation()->allocate<NodeReadingArray>(
+                _context.getNodeComponentRegistry()->getNextId()
+            );
+
+            _context.getNodeComponentRegistry()->emplace<NodeReadingArrayComponents>(
+                nodeReadingArr->getNodeId(), indexExpr, combinedName
+            );
+
+            return nodeReadingArr;
         }
 
-        return _context.getBuilderTreeEquation()->allocate<NodeReadingArray>(indexExpr, equation[0]);
+        auto* nodeReadingArr = _context.getBuilderTreeEquation()->allocate<NodeReadingArray>(
+            _context.getNodeComponentRegistry()->getNextId()
+        );
+
+        _context.getNodeComponentRegistry()->emplace<NodeReadingArrayComponents>(
+            nodeReadingArr->getNodeId(), indexExpr, equation[0]
+        );
+
+        return nodeReadingArr;
     }
 
     if (equation.size() == 3 && equation[1].type == TOKEN_DOT) {
-        return _context.getBuilderTreeEquation()->allocate<NodeAccesAttribute>(equation[0], equation[2]);
+
+        auto* nodeAccessAttr = _context.getBuilderTreeEquation()->allocate<NodeAccesAttribute>(
+            _context.getNodeComponentRegistry()->getNextId()
+        );
+
+        _context.getNodeComponentRegistry()->emplace<NodeAccesAttributeComponents>(
+            nodeAccessAttr->getNodeId(), equation[0], equation[2]
+        );
+
+        return nodeAccessAttr;
     }
 
-    return _context.getBuilderTreeEquation()->allocate<NodeLiteral>(equation[0]);
+    auto* nodeLiteral = _context.getBuilderTreeEquation()->allocate<NodeLiteral>(
+        _context.getNodeComponentRegistry()->getNextId()
+    );
+
+    _context.getNodeComponentRegistry()->emplace<NodeLiteralComponents>(
+        nodeLiteral->getNodeId(), equation[0]
+    );
+
+    return nodeLiteral;
 }
 
 #endif /* EXPRESSION_IDENTIFIER_CPP */

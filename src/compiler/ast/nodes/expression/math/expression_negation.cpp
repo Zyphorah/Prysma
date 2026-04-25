@@ -2,9 +2,10 @@
 #define EXPRESSION_NEGATION_CPP
 
 #include "compiler/math/expression_negation.h"
-#include "../../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_expression.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/lexer/lexer.h"
 #include <stdexcept>
 #include <vector>
@@ -24,7 +25,16 @@ auto ExpressionNegation::build(std::vector<Token>& equation) -> INode*
 
     std::vector<Token> operand(equation.begin() + 1, equation.end());
     INode* exprOperand = _context.getBuilderTreeEquation()->build(operand);
-    return _context.getBuilderTreeEquation()->allocate<NodeNegation>(equation[0], exprOperand);
+
+    auto* nodeNegation = _context.getBuilderTreeEquation()->allocate<NodeNegation>(
+        _context.getNodeComponentRegistry()->getNextId()
+    );
+
+    _context.getNodeComponentRegistry()->emplace<NodeNegationComponents>(
+        nodeNegation->getNodeId(), equation[0], exprOperand
+    );
+
+    return nodeNegation;
 }
 
 #endif /* EXPRESSION_NEGATION_CPP */

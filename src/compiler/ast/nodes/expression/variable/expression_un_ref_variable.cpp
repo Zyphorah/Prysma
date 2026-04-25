@@ -2,7 +2,7 @@
 #define EXPRESSION_UNREFVARIABLE_CPP
 
 #include "compiler/variable/expression_un_ref_variable.h"
-#include "../../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_expression.h"
 #include "compiler/ast/registry/node_component_registry.h"
@@ -24,16 +24,16 @@ auto ExpressionUnRefVariable::build(std::vector<Token>& equation) -> INode*
         throw std::runtime_error("Error: 'unref' must be followed by an identifier");
     }
 
-    auto* new_node = _context.getBuilderTreeEquation()->allocate<NodeUnRefVariable>(
+    auto* nodeUnrefVar = _context.getBuilderTreeEquation()->allocate<NodeUnRefVariable>(
         _context.getNodeComponentRegistry()->getNextId()
     );
 
     _context.getNodeComponentRegistry()->emplace<NodeUnRefVariableComponents>(
-        new_node->getNodeId(),
+        nodeUnrefVar->getNodeId(),
         equation[1]
     );
 
-    return new_node;
+    return nodeUnrefVar;
 }
 
 #endif /* EXPRESSION_UNREFVARIABLE_CPP */

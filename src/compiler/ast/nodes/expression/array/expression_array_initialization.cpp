@@ -2,7 +2,7 @@
 #define EXPRESSION_ARRAYINITIALIZATION_CPP
 
 #include "compiler/array/expression_array_initialization.h"
-#include "../../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_expression.h"
 #include "compiler/ast/registry/node_component_registry.h"
@@ -47,16 +47,16 @@ auto ExpressionArrayInitialization::build(std::vector<Token>& equation) -> INode
         }
     }
     
-    auto* new_node = _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
+    auto* nodeArrayInit = _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
         _context.getNodeComponentRegistry()->getNextId()
     );
 
     _context.getNodeComponentRegistry()->emplace<NodeArrayInitializationComponents>(
-        new_node->getNodeId(),
+        nodeArrayInit->getNodeId(),
         _context.getBuilderTreeEquation()->allocateArray<INode*>(arrayElements)
     );
 
-    return new_node;
+    return nodeArrayInit;
 }
 
 #endif /* EXPRESSION_ARRAYINITIALIZATION_CPP */

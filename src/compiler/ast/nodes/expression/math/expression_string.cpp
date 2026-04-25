@@ -2,7 +2,7 @@
 #define EXPRESSION_STRING_CPP
 
 #include "compiler/math/expression_string.h"
-#include "../../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_expression.h"
 #include "compiler/ast/registry/node_component_registry.h"
@@ -58,12 +58,12 @@ auto ExpressionString::build(std::vector<Token>& equation) -> INode*
         token.line = str.line;
         token.column = str.column;
 
-        auto* new_node_literal = _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
+        auto* nodeLiteral = _context.getBuilderTreeEquation()->allocate<NodeLiteral>(
             _context.getNodeComponentRegistry()->getNextId()
         );
-        _context.getNodeComponentRegistry()->emplace<NodeLiteralComponents>(new_node_literal->getNodeId(), token);
+        _context.getNodeComponentRegistry()->emplace<NodeLiteralComponents>(nodeLiteral->getNodeId(), token);
 
-        stringElements.push_back(new_node_literal); 
+        stringElements.push_back(nodeLiteral); 
     }
 
     Token tokenZero;
@@ -72,22 +72,21 @@ auto ExpressionString::build(std::vector<Token>& equation) -> INode*
     tokenZero.line = str.line;
     tokenZero.column = str.column;
 
-    auto* new_node_literal = _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
+    auto* nodeLiteral = _context.getBuilderTreeEquation()->allocate<NodeLiteral>(
         _context.getNodeComponentRegistry()->getNextId()
     );
-    _context.getNodeComponentRegistry()->emplace<NodeLiteralComponents>(new_node_literal->getNodeId(), tokenZero);
-    stringElements.push_back(new_node_literal); 
+    _context.getNodeComponentRegistry()->emplace<NodeLiteralComponents>(nodeLiteral->getNodeId(), tokenZero);
+    stringElements.push_back(nodeLiteral); 
 
-    auto* new_node = _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
+    auto* nodeArrayInit = _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
         _context.getNodeComponentRegistry()->getNextId()
     );
-
     _context.getNodeComponentRegistry()->emplace<NodeArrayInitializationComponents>(
-        new_node->getNodeId(),
+        nodeArrayInit->getNodeId(),
         _context.getBuilderTreeEquation()->allocateArray<INode*>(stringElements)
     );
 
-    return new_node;
+    return nodeArrayInit;
 }
 
 #endif /* EXPRESSION_STRING_CPP */

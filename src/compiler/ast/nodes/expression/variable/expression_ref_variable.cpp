@@ -2,7 +2,7 @@
 #define EXPRESSION_REFVARIABLE_CPP
 
 #include "compiler/variable/expression_ref_variable.h"
-#include "../../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_expression.h"
 #include "compiler/ast/registry/node_component_registry.h"
@@ -25,16 +25,16 @@ auto ExpressionRefVariable::build(std::vector<Token>& equation) -> INode*
         throw std::runtime_error("Error: 'ref' must be followed by an identifier");
     }
 
-    auto* new_node = _context.getBuilderTreeEquation()->allocate<NodeRefVariable>(
+    auto* nodeRefVar = _context.getBuilderTreeEquation()->allocate<NodeRefVariable>(
         _context.getNodeComponentRegistry()->getNextId()
     );
 
     _context.getNodeComponentRegistry()->emplace<NodeRefVariableComponents>(
-        new_node->getNodeId(),
+        nodeRefVar->getNodeId(),
         equation[1]
     );
 
-    return new_node;
+    return nodeRefVar;
 }
 
 #endif /* EXPRESSION_REFVARIABLE_CPP */
