@@ -13,6 +13,8 @@
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/ast/registry/registry_generic.h"
+#include <cstdint>
+#include <limits>
 #include <llvm-18/llvm/ADT/StringRef.h>
 #include <llvm-18/llvm/IR/DerivedTypes.h>
 #include <llvm-18/llvm/IR/GlobalVariable.h>
@@ -84,12 +86,12 @@ public:
     [[nodiscard]] auto getMemberInitializers() -> std::map<std::string, INode*>& { return memberInitializers; }
     [[nodiscard]] auto getMethodIndices() -> std::map<std::string, unsigned int>& { return methodIndices; }
     
-    [[nodiscard]] auto getMethodIndex(const std::string& methodName) const -> int {
+    [[nodiscard]] auto getMethodIndex(const std::string& methodName) const -> uint32_t {
         auto iterator = methodIndices.find(methodName);
         if (iterator != methodIndices.end()) {
-            return static_cast<int>(iterator->second);
+            return iterator->second;
         }
-        return -1;
+        return std::numeric_limits<uint32_t>::max();
     }
 };
 // TODO: support multi-thread mutex for classes. Otherwise, multi-file is not possible.

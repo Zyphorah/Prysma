@@ -9,6 +9,7 @@
 #ifndef VTABLE_NAVIGATOR_H
 #define VTABLE_NAVIGATOR_H
 
+#include <cstdint>
 #include <llvm-18/llvm/IR/Value.h>
 #include <llvm-18/llvm/IR/IRBuilder.h>
 
@@ -18,7 +19,7 @@ private:
 
 public:
     explicit VTableNavigator(llvm::IRBuilderBase* p_builder);
-    auto getMethodPointer(llvm::Value* vtable, llvm::Type* vtableType, int methodIndex) -> llvm::Value*;
+    auto getMethodPointer(llvm::Value* vtable, llvm::Type* vtableType, uint32_t methodIndex) -> llvm::Value*;
 };
 
 #endif

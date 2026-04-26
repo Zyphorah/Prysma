@@ -6,6 +6,56 @@
 //
 //===----------------------------------------------------------------------===//
 
+/*
+                                                                                                                        
+                                                          class Dog implements IAnimal                                  
+                                                          {                                                             
+                                                              dec int32 age = 5;                                        
+                                                              fn void Dog()                                             
+                                                              {                                                         
+                                                                                                                        
+                                                              }                                                         
+                                                                                                                        
+                                                              fn void makeSound()                                       
+                                                              {                                                         
+                                                                  call print("Woof!");                                  
+                                                              }                                                         
+                                                          }                                                             
+                                                                                                                        
+                                                                                        Struct                          
+                                                                                                                        
+                                                                          0        1        2         3        4        
+                                        points to the data structure  ┌────────┬────────┬────────┬────────┬────────┐    
+                            vPtr                      ┌───────────────►        │        │        │        │        │    
+   ┌─────────────────────────────────┐                │               │ Memory │ Memory │ Memory │Memory  │Memory  │    
+   │                                 │                │               └──┬─────┴───┬────┴────────┴────────┴────────┘    
+   │ dec IAnimal dog = new Dog();    ┼────────────────┘                  │         │                                    
+   │                                 │                                   │         └───────────────┐                    
+   └─────────────────────────────────┘                          Points to│the vtable               ▼                    
+                                                                         │                 dec int32 age = 5;           
+      // The vtable contract is managed by the IAnimal interface         │                                              
+                                                                         │                                              
+         Interface IAnimal                                               │0        1        2         3        4        
+         {                                                            ┌──▼─────┬────────┬────────┬────────┬────────┐    
+             fn void makeSound(); ──────────────────────────►         │        │        │        │        │        │    
+         }                                                     vtable │ Memory │Memory  │Memory  │Memory  │Memory  │    
+                                                                      └───┬────┴────┬───┴────────┴────────┴────────┘    
+                                                                          │         │                                   
+                                                                          │         │                                   
+                                                                          │         │                                   
+                                                                          │         │                                   
+                                                                          ▼         │                                   
+                                                                     fn void Dog()  │                                   
+                                                                         {          │                                   
+                                                                                    ▼                                   
+                                                                         }        fn void makeSound()                   
+                                                                                     {                                  
+                                                                                         call print("Woof!");           
+                                                                                     }                                  
+                                                                                                                        
+                                                                                                                        
+*/
+
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
@@ -15,6 +65,7 @@
 #include "compiler/visitor/code_gen/helper/error_helper.h"
 #include "compiler/visitor/code_gen/helper/v_table_navigator.h"
 #include "compiler/utils/prysma_cast.h"
+#include <cstdint>
 #include <llvm-18/llvm/IR/Value.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Instructions.h>
@@ -51,7 +102,7 @@ void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
     // from the static class vtable of the object
     llvm::Value* vtable = _contextGenCode->getBackend()->getBuilder().CreateLoad(_contextGenCode->getBackend()->getBuilder().getPtrTy(), vptrAddress, "vptr");
     // Get the method index in the vtable for indirect call
-    int methodIndex = _contextGenCode->getRegistryClass()->get(className)->getMethodIndex(methodName.str());
+    uint32_t methodIndex = _contextGenCode->getRegistryClass()->get(className)->getMethodIndex(methodName.str());
 
     auto* classInfo = _contextGenCode->getRegistryClass()->get(className).get();
     classInfo = ErrorHelper::verifyNotNull(classInfo, "Class '" + className + "' not found");

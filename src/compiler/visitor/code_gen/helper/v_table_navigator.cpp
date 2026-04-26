@@ -14,8 +14,8 @@
 
 VTableNavigator::VTableNavigator(llvm::IRBuilderBase* p_builder) : builder(p_builder) {}
 
-auto VTableNavigator::getMethodPointer(llvm::Value* vtable, llvm::Type* vtableType, int methodIndex) -> llvm::Value* {
-    llvm::Value* indexValue = builder->getInt32(static_cast<uint32_t>(methodIndex));
+auto VTableNavigator::getMethodPointer(llvm::Value* vtable, llvm::Type* vtableType, uint32_t methodIndex) -> llvm::Value* {
+    llvm::Value* indexValue = builder->getInt32(methodIndex);
     std::vector<llvm::Value*> indices;
     indices.push_back(builder->getInt32(0));
     indices.push_back(indexValue);
