@@ -6,6 +6,24 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "compiler/ast/registry/stack/registry_variable.h"
+#include "compiler/ast/registry/registry_function.h"
+#include "compiler/visitor/code_gen/visitor_general_gen_code.h"
+#include "compiler/ast/ast_genere.h"
+#include "compiler/llvm/gestion_variable.h"
+#include "compiler/ast/registry/registry_class.h"
+#include "compiler/visitor/code_gen/helper/error_helper.h"
+#include "compiler/visitor/code_gen/helper/v_table_navigator.h"
+#include "compiler/utils/prysma_cast.h"
+#include <cstdint>
+#include <llvm-18/llvm/IR/Value.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/Support/Casting.h>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
 /*
                                                                                                                         
                                                           class Dog implements IAnimal                                  
@@ -56,23 +74,6 @@
                                                                                                                         
 */
 
-#include "compiler/ast/registry/stack/registry_variable.h"
-#include "compiler/ast/registry/registry_function.h"
-#include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "compiler/ast/ast_genere.h"
-#include "compiler/llvm/gestion_variable.h"
-#include "compiler/ast/registry/registry_class.h"
-#include "compiler/visitor/code_gen/helper/error_helper.h"
-#include "compiler/visitor/code_gen/helper/v_table_navigator.h"
-#include "compiler/utils/prysma_cast.h"
-#include <cstdint>
-#include <llvm-18/llvm/IR/Value.h>
-#include <llvm/IR/DerivedTypes.h>
-#include <llvm/IR/Instructions.h>
-#include <llvm/Support/Casting.h>
-#include <stdexcept>
-#include <string>
-#include <vector>
 
 void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
 {
