@@ -192,12 +192,19 @@ auto ParserClass::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
 
     consume(tokens, index, TOKEN_BRACE_CLOSE, "Expected '}' at the end of the class declaration.");
 
-    return _contextParser.getBuilderTreeInstruction()->allocate<NodeClass>(
-        _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(inheritance), 
+    auto* nodeClass = _contextParser.getBuilderTreeInstruction()->allocate<NodeClass>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    ); 
+
+    _contextParser.getNodeComponentRegistry()->emplace<NodeClassComponents>(
+        nodeClass->getNodeId(),
+        _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(inheritance),
         _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(memberList), 
         _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(builders), 
         classNameToken
     );
+
+    return nodeClass;
 }
 
 #endif /* PARSER_CLASS_CPP */

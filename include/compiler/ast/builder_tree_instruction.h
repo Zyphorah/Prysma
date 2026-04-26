@@ -16,6 +16,7 @@ private:
     NodeComponentRegistry* _nodeComponentRegistry;
     RegistryInstruction* _registryInstructions;
     llvm::BumpPtrAllocator& _arena;
+
 public: 
 
     BuilderTreeInstruction(NodeComponentRegistry* nodeComponentRegistry, RegistryInstruction* registryInstructions, llvm::BumpPtrAllocator& arena);
@@ -30,7 +31,6 @@ public:
     auto build(std::vector<Token>& tokens) -> INode* override;  
     auto build(std::vector<Token>& tokens, std::size_t index) -> INode* override;
     auto getArena() -> llvm::BumpPtrAllocator& override;
-
 };
 
 #endif /* BDC39C44_6952_4793_8198_C083B106A089 */

@@ -1,6 +1,8 @@
 #ifndef B05A551C_2519_458F_BB1D_8E5EF8DB9B83
 #define B05A551C_2519_458F_BB1D_8E5EF8DB9B83
 
+#include "compiler/ast/registry/context_gen_code.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/macros/prysma_nodiscard.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "i_type.h"
@@ -12,8 +14,10 @@ private:
     IType* _childType;
     INode* _size; 
 
+    NodeComponentRegistry* _nodeComponentRegistry; // à refactoriser, code smell.
+
 public:
-    TypeArray(IType* childType, INode* size);
+    TypeArray(IType* childType, INode* size, NodeComponentRegistry* nodeComponentRegistry);
     ~TypeArray() override = default;
 
     TypeArray(const TypeArray&) = delete;

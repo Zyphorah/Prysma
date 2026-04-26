@@ -10,10 +10,11 @@
 #include <stdexcept>
 #include <string>
 
-TypeArray::TypeArray(IType* childType, INode* size)
-    : _childType(childType), _size(size)
-{
-}
+// Obligation de passer le registre ici. Il s'agirait de trouver une solution 
+// ce n'est pas très optimal comme design. Patch temporaire.
+TypeArray::TypeArray(IType* childType, INode* size, NodeComponentRegistry* nodeComponentRegistry)
+    : _childType(childType), _size(size), _nodeComponentRegistry(nodeComponentRegistry)
+{}
 
 auto TypeArray::generateLLVMType(llvm::LLVMContext& context) -> llvm::Type*
 {
@@ -35,11 +36,9 @@ auto TypeArray::generateLLVMType(llvm::LLVMContext& context) -> llvm::Type*
         throw std::runtime_error("Error: the array size must be an integer literal");
     }
 
-    auto& nodeData = getContextGenCode()->getNodeComponentRegistry()->get<NodeLiteralComponents>(
-        getNodeDeclarationFunction()->getNodeId() // faut passer le contexte
-    );
+    auto& nodeLiteralData = _nodeComponentRegistry->get<NodeLiteralComponents>(literal->getNodeId()); // code smell.
 
-    auto size = static_cast<uint64_t>(std::stoull(std::string(literal->getToken().value)));
+    auto size = static_cast<uint64_t>(std::stoull(std::string(nodeLiteralData.getToken().value)));
     return llvm::ArrayType::get(elementType, size);
 }
 

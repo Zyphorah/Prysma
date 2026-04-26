@@ -173,7 +173,7 @@ void FunctionDeclarationGenerator::declareFunction()
     ArgumentsCodeGen argumentsCodeGen;
     if (getNodeDeclarationFunction() != nullptr) {
         for (INode* node : nodeData.getArguments()) {
-            ArgExtractorFunction extractor;
+            auto extractor = ArgExtractorFunction{ _contextGenCode };
 
             node->accept(&extractor);
 

@@ -1,4 +1,5 @@
 #include "compiler/ast/utils/orchestrator_include/configuration_facade_environment.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/macros/prysma_maybe_unused.h"
 
 #include "compiler/ast/registry/context_gen_code.h"
@@ -256,7 +257,7 @@ void ConfigurationFacadeEnvironment::registerExpressions()
 
     // Create the TypeParser with the registry
     _parserType = new (_arena.Allocate<TypeParser>()) // NOLINT(cppcoreguidelines-owning-memory)
-        TypeParser(_context->getRegistryType(), _builderEquation->getBuilderTree());
+        TypeParser(_context->getRegistryType(), _nodeComponentRegistry.get(), _builderEquation->getBuilderTree());
 
     if (_contextParser == nullptr) {
         createContextParser();
