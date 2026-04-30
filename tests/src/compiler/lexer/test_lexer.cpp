@@ -17,9 +17,8 @@
 using namespace std;
 
 TEST_CASE("Tester Lexer Identifiants", "[Lexer]") {
-    Lexer lexer;
     string code = "x y z variable_test";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens.size() == 5);
     CHECK(tokens[0].value == "x");
@@ -29,9 +28,8 @@ TEST_CASE("Tester Lexer Identifiants", "[Lexer]") {
 }
 
 TEST_CASE("Tester Lexer Nombres", "[Lexer]") {
-    Lexer lexer;
     string code = "42 3.14";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens[0].type == TOKEN_LIT_INT);
     CHECK(tokens[0].value == "42");
@@ -40,11 +38,9 @@ TEST_CASE("Tester Lexer Nombres", "[Lexer]") {
 }
 
 TEST_CASE("Tester Lexer Chaines de caracteres", "[Lexer]") {
-    Lexer lexer;
     string code = R"("Salut")";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
-    // Le lexer produit : GUILLEMET, IDENTIFIANT(contenu), GUILLEMET, EOF
     CHECK(tokens[0].type == TOKEN_QUOTE);
     CHECK(tokens[1].type == TOKEN_IDENTIFIER);
     CHECK(tokens[1].value == "Salut");
@@ -52,9 +48,8 @@ TEST_CASE("Tester Lexer Chaines de caracteres", "[Lexer]") {
 }
 
 TEST_CASE("Tester Lexer Mots-cles", "[Lexer]") {
-    Lexer lexer;
     string code = "fn if else while for return dec aff ref unref include";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens[0].type == TOKEN_FUNCTION);
     CHECK(tokens[1].type == TOKEN_IF);
@@ -70,9 +65,8 @@ TEST_CASE("Tester Lexer Mots-cles", "[Lexer]") {
 }
 
 TEST_CASE("Tester Lexer Operateurs mathematiques", "[Lexer]") {
-    Lexer lexer;
     string code = "a + b - c * d / e % f";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens[1].type == TOKEN_PLUS);
     CHECK(tokens[3].type == TOKEN_MINUS);
@@ -82,9 +76,8 @@ TEST_CASE("Tester Lexer Operateurs mathematiques", "[Lexer]") {
 }
 
 TEST_CASE("Tester Lexer Delimiteurs", "[Lexer]") {
-    Lexer lexer;
     string code = "( ) { } [ ] ; ,";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens[0].type == TOKEN_PAREN_OPEN);
     CHECK(tokens[1].type == TOKEN_PAREN_CLOSE);
@@ -97,27 +90,24 @@ TEST_CASE("Tester Lexer Delimiteurs", "[Lexer]") {
 }
 
 TEST_CASE("Tester Lexer Commentaires ligne", "[Lexer]") {
-    Lexer lexer;
     string code = "x // ceci est un commentaire\ny";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens[0].value == "x");
     CHECK(tokens[1].value == "y");
 }
 
 TEST_CASE("Tester Lexer Commentaires bloc", "[Lexer]") {
-    Lexer lexer;
     string code = "a /* commentaire bloc */ b";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens[0].value == "a");
     CHECK(tokens[1].value == "b");
 }
 
 TEST_CASE("Tester Lexer Booleans", "[Lexer]") {
-    Lexer lexer;
     string code = "true false";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens[0].type == TOKEN_LIT_BOOL);
     CHECK(tokens[0].value == "1");
@@ -126,19 +116,16 @@ TEST_CASE("Tester Lexer Booleans", "[Lexer]") {
 }
 
 TEST_CASE("Tester Lexer Code Vide", "[Lexer]") {
-    Lexer lexer;
     string code;
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
-    // Seul le token EOF devrait etre present
     CHECK(tokens.size() == 1);
     CHECK(tokens[0].type == TOKEN_EOF);
 }
 
 TEST_CASE("Tester Lexer Operateurs composites", "[Lexer]") {
-    Lexer lexer;
     string code = "a == b != c >= d <= e && f || g";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens[1].type == TOKEN_EQUAL_EQUAL);
     CHECK(tokens[3].type == TOKEN_NOT_EQUAL);
@@ -149,9 +136,8 @@ TEST_CASE("Tester Lexer Operateurs composites", "[Lexer]") {
 }
 
 TEST_CASE("Tester Lexer Lignes et colonnes", "[Lexer]") {
-    Lexer lexer;
     string code = "a\nb\nc";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens[0].line == 1);
     CHECK(tokens[1].line == 2);
@@ -159,9 +145,8 @@ TEST_CASE("Tester Lexer Lignes et colonnes", "[Lexer]") {
 }
 
 TEST_CASE("Tester Lexer Tokens sans espaces", "[Lexer]") {
-    Lexer lexer;
     string code = "a+b-c*d/e";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens[0].value == "a");
     CHECK(tokens[1].type == TOKEN_PLUS);
@@ -170,31 +155,27 @@ TEST_CASE("Tester Lexer Tokens sans espaces", "[Lexer]") {
     CHECK(tokens[4].value == "c");
 }
 
-// Cas non functionnel sad test pour verifier que le lexer ne plante pas et termine correctement avec EOF
+// sad tests -- lexer should never crash
 
 TEST_CASE("Tester Lexer Commentaire bloc non ferme", "[Lexer][SadTest]") {
-    Lexer lexer;
     string code = "a /* commentaire non ferme";
-    vector<Token> tokens = lexer.tokenize(code);
-
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens.size() > 0);
     CHECK(tokens[tokens.size() - 1].type == TOKEN_EOF);
 }
 
 TEST_CASE("Tester Lexer Nombre flottant invalide", "[Lexer][SadTest]") {
-    Lexer lexer;
     string code = "3.14.15 2.";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens.size() > 0);
     CHECK(tokens[tokens.size() - 1].type == TOKEN_EOF);
 }
 
 TEST_CASE("Tester Lexer Identifiant commence par chiffre", "[Lexer][SadTest]") {
-    Lexer lexer;
     string code = "123abc 456_var";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens[0].type == TOKEN_LIT_INT);
     CHECK(tokens[0].value == "123");
@@ -203,50 +184,75 @@ TEST_CASE("Tester Lexer Identifiant commence par chiffre", "[Lexer][SadTest]") {
 }
 
 TEST_CASE("Tester Lexer Caracteres speciaux non reconnues", "[Lexer][SadTest]") {
-    Lexer lexer;
     string code = "a @ b # c $ d";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens.size() > 0);
     CHECK(tokens[tokens.size() - 1].type == TOKEN_EOF);
 }
 
 TEST_CASE("Tester Lexer Chaine de caracteres non fermee", "[Lexer][SadTest]") {
-    Lexer lexer;
     string code = R"("Chaîne non fermée)";
-    vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = Lexer::tokenize(code);
 
     CHECK(tokens.size() > 0);
     CHECK(tokens[tokens.size() - 1].type == TOKEN_EOF);
 }
 
-
 TEST_CASE("Tester Lexer Fuzzing - Garbage aleatoire", "[Lexer][SadTest][Fuzzing]") {
-    Lexer lexer;
-    
-    // Generateur aleatoire
-    mt19937 gen(12345); // Seed fixe pour reproductibilite
+    mt19937 gen(12345);
     uniform_int_distribution<> dis(0, 255);
     
-    // Generer du garbage aleatoire
     string garbage;
     for (int i = 0; i < 5000; ++i) {
         garbage += static_cast<char>(dis(gen));
     }
     
-    // Il doit toujours returnner un vecteur avec au moins EOF
     try {
-        vector<Token> tokens = lexer.tokenize(garbage);
+        vector<Token> tokens = Lexer::tokenize(garbage);
         
-        // Verifications robustes
         CHECK(tokens.size() > 0);
         CHECK(tokens[tokens.size() - 1].type == TOKEN_EOF);
         
-        // S'assurer que le dernier token avant EOF est valide
         if (tokens.size() > 1) {
             CHECK(tokens[tokens.size() - 2].type != TOKEN_EOF);
         }
     } catch (...) {
         FAIL("Le lexer a lance une exception sur du garbage - Ne doit jamais crasher!");
     }
+}
+
+TEST_CASE("DFA state coverage - all keyword lengths", "[Lexer][DFA]") {
+    string code = "fn if for dec arg new ptr else true void bool char call pass "
+                   "while false scope unref int64 int32 float class "
+                   "return string delete public include private protected";
+    vector<Token> tokens = Lexer::tokenize(code);
+
+    CHECK(tokens[0].type == TOKEN_FUNCTION);
+    CHECK(tokens[1].type == TOKEN_IF);
+    CHECK(tokens[2].type == TOKEN_FOR);
+    CHECK(tokens[3].type == TOKEN_DECL);
+    CHECK(tokens[28].type == TOKEN_PROTECTED);
+    CHECK(tokens.back().type == TOKEN_EOF);
+}
+
+TEST_CASE("DFA signed number transitions", "[Lexer][DFA]") {
+    // unary context: after '=' the minus is a sign
+    string code = "x = -42 y = +3.14";
+    vector<Token> tokens = Lexer::tokenize(code);
+
+    CHECK(tokens[2].type == TOKEN_LIT_INT);
+    CHECK(tokens[2].value == "-42");
+    CHECK(tokens[5].type == TOKEN_LIT_FLOAT);
+    CHECK(tokens[5].value == "+3.14");
+}
+
+TEST_CASE("DFA colon transitions", "[Lexer][DFA]") {
+    string code = "a : b :: c";
+    vector<Token> tokens = Lexer::tokenize(code);
+
+    CHECK(tokens[1].type == TOKEN_COLON);
+    CHECK(tokens[1].value == ":");
+    CHECK(tokens[3].type == TOKEN_COLON);
+    CHECK(tokens[3].value == "::");
 }
