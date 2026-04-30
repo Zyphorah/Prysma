@@ -17,7 +17,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Configuration LLVM 
-find_package(LLVM REQUIRED CONFIG)
+find_package(LLVM 18.1.3 REQUIRED CONFIG)
 llvm_map_components_to_libnames(llvm_libs 
     core 
     support 
