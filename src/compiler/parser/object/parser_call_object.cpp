@@ -13,6 +13,7 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
+#include "compiler/ast/type_resolut.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <cstddef>
@@ -34,7 +35,9 @@ auto ParserCallObject::parse(std::vector<Token>& tokens, int& index) -> INode*
   Token objectName = consume(tokens, index, TOKEN_IDENTIFIER, "Error: object identifier expected");
 
   // Create the base (the first receiver)
-  INode* currentReceiver = _contextParser.getBuilderTreeEquation()->allocate<NodeRefVariable>(objectName);
+  INode* currentReceiver = _contextParser.getBuilderTreeEquation()->allocate<NodeRefVariable>(
+    _contextParser.getBuilderTreeEquation()->allocate<TypeResolut>(), 
+    objectName);
 
   // Chaining loop (as long as there is a '.')
   while (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type == TOKEN_DOT) {
@@ -53,7 +56,7 @@ auto ParserCallObject::parse(std::vector<Token>& tokens, int& index) -> INode*
       // The OLD call becomes the NEW receiver
       currentReceiver = _contextParser.getBuilderTreeEquation()->allocate<NodeCallObject>(
           methodName, 
-          nullptr, 
+          _contextParser.getBuilderTreeEquation()->allocate<TypeResolut>(), 
           currentReceiver, 
           children
       );

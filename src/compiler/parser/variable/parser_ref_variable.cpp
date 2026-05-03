@@ -13,6 +13,7 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
+#include "compiler/ast/type_resolut.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <string>
@@ -32,8 +33,10 @@ auto ParserRefVariable::parse(std::vector<Token>& tokens, int& index) -> INode*
     consume(tokens, index, TOKEN_REF, "Error: 'ref' expected");
     
     Token nameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Error: variable name expected after 'ref'");
-    
-    return _contextParser.getBuilderTreeEquation()->allocate<NodeRefVariable>(nameToken);
+    return _contextParser.getBuilderTreeEquation()->allocate<NodeRefVariable>(
+        _contextParser.getBuilderTreeEquation()->allocate<TypeResolut>(), 
+        nameToken
+    );
 }
 
 #endif /* PARSER_REFVARIABLE_CPP */

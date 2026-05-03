@@ -45,6 +45,7 @@ Node:
     RefVariable:
       engine: [parser, expression]
       champs:
+        typeResolut: "TypeResolut*"
         nomVariable: "Token"
     UnRefVariable:
       engine: [parser, expression]

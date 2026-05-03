@@ -47,7 +47,6 @@ virtual ~IBuilderTree() = default;
         if (elements.empty()) 
         { 
             return {};
-
         }
         T* mem = static_cast<T*>(getArena().Allocate(elements.size() * sizeof(T), alignof(T)));
         std::uninitialized_copy(elements.begin(), elements.end(), mem);

@@ -7,42 +7,79 @@
 #include "compiler/ast/registry/types/type_complex.h"
 #include "compiler/ast/type_resolut.h"
 #include "compiler/utils/prysma_cast.h"
+#include "compiler/visitor/visitor_base_generale.h"
 #include <memory>
 #include <stdexcept>
 #include <string>
 
  
+void ResolutionChainageType::visiter(NodeDeclarationVariable *node) {
+    if (node->getType() != nullptr) {
+        _variables[std::string(node->getNom().value)] = node->getType();
+    }
+    VisitorBaseGenerale::visiter(node);
+}
+
+void ResolutionChainageType::visiter(NodeDeclarationObject *node) {
+    if (node->getTypeObject() != nullptr) {
+        _variables[std::string(node->getNomObject().value)] = node->getTypeObject();
+    }
+    VisitorBaseGenerale::visiter(node);
+}
+
+void ResolutionChainageType::visiter(NodeArgFunction *node) {
+    if (node->getType() != nullptr) {
+        _variables[std::string(node->getNom().value)] = node->getType();
+    }
+    VisitorBaseGenerale::visiter(node);
+}
+
+void ResolutionChainageType::visiter(NodeRefVariable *node) {
+    std::string varName = std::string(node->getNomVariable().value);
+    
+    auto it = _variables.find(varName);
+    if (it != _variables.end()) {
+        if (node->getTypeResolut() != nullptr) {
+            node->getTypeResolut()->setTypeEvaluated(it->second);
+        }
+    }
+}
+
 void ResolutionChainageType::visiter(NodeCallObject *nodeCallObject)
 {
-    // Recursively resolve the receiver (e.g., 'test' or 'test.getDepth()')
+    // Recursive resolution of the receiver
     INode* receiver = nodeCallObject->getReceiver();
     receiver->accept(this);
-
-    // Extract the type that was just determined by the visit
-    auto* receiverNode = prysma::dyn_cast<NodeCallObject>(receiver);
     IType* receiverType = nullptr;
-    if ((receiverNode != nullptr) && receiverNode->getTypeResolut() != nullptr) {
-        receiverType = receiverNode->getTypeResolut()->getTypeEvaluated();
+
+    // We try to retrieve the TypeResolut in a generic way
+    if (auto* res = prysma::dyn_cast<NodeCallObject>(receiver)) {
+        receiverType = res->getTypeResolut()->getTypeEvaluated();
+    } else if (auto* res = prysma::dyn_cast<NodeRefVariable>(receiver)) {
+        receiverType = res->getTypeResolut()->getTypeEvaluated();
     }
 
     if (receiverType == nullptr) {
-        // Error: the previous link could not be resolved
-        throw std::runtime_error("Semantic error: unable to resolve the type of the receiver in the call chain.");
+        throw std::runtime_error("Semantic error: unable to resolve type for node " + std::to_string(static_cast<int>(receiver->getGeneratedType())));
     }
 
     auto* receiverComplexType = prysma::dyn_cast<TypeComplex>(receiverType);
+    if (receiverComplexType == nullptr) {
+        throw std::runtime_error("Semantic error: receiver is not a complex type (class).");
+    }
 
-    // 3. Query the registry for the current call
-    // We look for 'methodName' in the class 'receiverType'
+    // Method lookup
     const std::unique_ptr<Class>& classInfoPtr = _registryClass->get(receiverComplexType->getClassName());
-    const auto& method = classInfoPtr->getRegistryFunctionLocal()->get(nodeCallObject->getNomMethode().value);
+    if (!classInfoPtr) {
+        throw std::runtime_error("Semantic error: class '" + receiverComplexType->getClassName() + "' not found.");
+    }
 
+    const auto& method = classInfoPtr->getRegistryFunctionLocal()->get(nodeCallObject->getNomMethode().value);
     if (!method) {
-        // Semantic error: unknown method in this class
         throw std::runtime_error("Semantic error: method '" + std::string(nodeCallObject->getNomMethode().value) + "' not found in class '" + receiverComplexType->getClassName() + "'.");
     }
 
-    // Decoration: inject the return type into the current node's intermediate object
+    // Decoration
     if (nodeCallObject->getTypeResolut() != nullptr) {
         if (auto* symbolLocal = prysma::dyn_cast<SymbolFunctionLocal>(method.get())) {
             nodeCallObject->getTypeResolut()->setTypeEvaluated(symbolLocal->returnType);

@@ -25,7 +25,7 @@ class Profondeur
         
       }
 
-      fn ptr getProfondeurDeux()
+      fn ProfondeurDeux getProfondeurDeux()
       {
          return profondeurDeux;
       }
@@ -42,7 +42,7 @@ class TestClass
       {
       }
 
-      fn ptr getProfondeur()
+      fn Profondeur getProfondeur()
       {
          return profondeur;
       }

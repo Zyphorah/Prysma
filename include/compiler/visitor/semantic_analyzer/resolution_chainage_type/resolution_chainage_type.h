@@ -1,6 +1,10 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/registry/registry_class.h"
+#include "compiler/ast/registry/types/i_type.h"
 #include "compiler/visitor/visitor_base_generale.h"
+#include <string>
+#include <unordered_map>
+#include "compiler/ast/registry/registry_function.h"
 
 /**
  * @brief Example processing: this is a succession of calls on an object like this test.getDepth().getDepthTwo()
@@ -40,15 +44,16 @@
            │ NodeVariable: test │ TypeResolut (Intermediate)│                   
            └────────────────────└───────────────────────────┘                                                                                                 
  */
- 
+
 class ResolutionChainageType : public VisitorBaseGenerale
 {
 
 private:
     RegistryClass* _registryClass;
-
+    std::unordered_map<std::string, IType*> _variables;
+    
 public: 
-    explicit ResolutionChainageType(RegistryClass* registryClass) : _registryClass(registryClass) {}
+    explicit ResolutionChainageType(RegistryClass* registryClass) : _registryClass(registryClass){}
     ~ResolutionChainageType() override = default;
 
     // Delete copy and move constructors and assignment operators
@@ -58,4 +63,8 @@ public:
     auto operator=(ResolutionChainageType&&) -> ResolutionChainageType& = delete;
     
     void visiter(NodeCallObject *nodeCallObject) override;
+    void visiter(NodeDeclarationVariable *node) override;
+    void visiter(NodeDeclarationObject *node) override;
+    void visiter(NodeArgFunction *node) override;
+    void visiter(NodeRefVariable *node) override;
 };
