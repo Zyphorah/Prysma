@@ -13,9 +13,11 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_expression.h"
+#include "compiler/ast/type_resolut.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <cstddef>
+#include <llvm/ADT/SmallVector.h>
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Support/FormatVariadic.h>
 #include <string.h>
@@ -70,6 +72,45 @@ auto ExpressionIdentifiant::build(std::vector<Token>& equation) -> INode*
         }
 
         return _context.getBuilderTreeEquation()->allocate<NodeReadingArray>(indexExpr, equation[0]);
+    }
+
+    // Case: object.method() or object.method(arg1, arg2)
+    if (equation.size() >= 5 && equation[1].type == TOKEN_DOT &&
+        equation[3].type == TOKEN_PAREN_OPEN && equation.back().type == TOKEN_PAREN_CLOSE) {
+        
+        INode* receiver = _context.getBuilderTreeEquation()->allocate<NodeRefVariable>(
+            _context.getBuilderTreeEquation()->allocate<TypeResolut>(), 
+            equation[0]);
+        
+        // Parse arguments between '(' and ')'
+        llvm::SmallVector<INode*, 8> children;
+        std::vector<Token> argTokens;
+        int depth = 0;
+        
+        for (size_t i = 4; i < equation.size() - 1; ++i) {
+            Token t = equation[i];
+            if (t.type == TOKEN_PAREN_OPEN) depth++;
+            else if (t.type == TOKEN_PAREN_CLOSE) depth--;
+            
+            if (t.type == TOKEN_COMMA && depth == 0) {
+                if (!argTokens.empty()) {
+                    children.push_back(_context.getBuilderTreeEquation()->build(argTokens));
+                    argTokens.clear();
+                }
+            } else {
+                argTokens.push_back(t);
+            }
+        }
+        if (!argTokens.empty()) {
+            children.push_back(_context.getBuilderTreeEquation()->build(argTokens));
+        }
+        
+        return _context.getBuilderTreeEquation()->allocate<NodeCallObject>(
+            equation[2], 
+            _context.getBuilderTreeEquation()->allocate<TypeResolut>(), 
+            receiver, 
+            _context.getBuilderTreeEquation()->allocateArray<INode*>(children)
+        );
     }
 
     if (equation.size() == 3 && equation[1].type == TOKEN_DOT) {

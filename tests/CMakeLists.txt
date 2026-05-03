@@ -16,7 +16,8 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
 endif()
 
-# Configuration LLVM 
+# Configuration LLVM (forcé à LLVM 18)
+set(LLVM_DIR "/usr/lib/llvm-18/cmake" CACHE PATH "LLVM 18 config directory" FORCE)
 find_package(LLVM REQUIRED CONFIG)
 llvm_map_components_to_libnames(llvm_libs 
     core 
