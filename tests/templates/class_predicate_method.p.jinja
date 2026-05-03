@@ -1,0 +1,34 @@
+class Matcher
+{
+private:
+   dec {{ type_name }} expected = {{ val_0 }};
+
+public:
+   fn void Matcher(arg {{ type_name }} exp)
+   {
+      aff expected = exp;
+   }
+
+   fn bool matches(arg {{ type_name }} val)
+   {
+      return val == expected;
+   }
+}
+
+fn bool verification()
+{
+    dec {{ type_name }} target = {{ val_1 }};
+    dec {{ type_name }} wrong = {{ val_0 }};
+    dec Matcher m = new Matcher(target);
+
+    if (!m.matches(target)) { return false; }
+    if (m.matches(wrong)) { return false; }
+
+    return true;
+}
+
+fn int32 main()
+{
+    call print(call verification());
+    return 0;
+}

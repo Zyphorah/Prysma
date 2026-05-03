@@ -1,0 +1,39 @@
+class Data
+{
+private:
+   dec {{ type_name }} a = {{ val2 }};
+   dec {{ type_name }} b = {{ val2 }};
+   dec {{ type_name }} c = {{ val2 }};
+
+public:
+   fn void Data(arg {{ type_name }} pa, arg {{ type_name }} pb, arg {{ type_name }} pc)
+   {
+      aff a = pa;
+      aff b = pb;
+      aff c = pc;
+   }
+
+   fn {{ type_name }} getA() { return a; }
+   fn {{ type_name }} getB() { return b; }
+   fn {{ type_name }} getC() { return c; }
+}
+
+fn bool verification()
+{
+    dec {{ type_name }} x = {{ val_1 }};
+    dec {{ type_name }} y = {{ val_2 }};
+    dec {{ type_name }} z = {{ val_3 }};
+    dec Data d = new Data(x, y, z);
+
+    if (d.getA() == x && d.getB() == y && d.getC() == z) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+fn int32 main()
+{
+    call print(call verification());
+    return 0;
+}

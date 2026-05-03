@@ -1,0 +1,43 @@
+class Counter
+{
+private:
+   dec {{ type_name }} value = {{ val_0 }};
+
+public:
+   fn void Counter(arg {{ type_name }} initial)
+   {
+      aff value = initial;
+   }
+
+   fn void setValue(arg {{ type_name }} newValue)
+   {
+      aff value = newValue;
+   }
+
+   fn {{ type_name }} getValue() { return value; }
+}
+
+fn bool verification()
+{
+    dec {{ type_name }} initial = {{ val_1 }};
+    dec {{ type_name }} updated = {{ val_2 }};
+    dec Counter c = new Counter(initial);
+
+    if (c.getValue() != initial) {
+        return false;
+    }
+
+    call c.setValue(updated);
+
+    if (c.getValue() != updated) {
+        return false;
+    }
+
+    return true;
+}
+
+fn int32 main()
+{
+    call print(call verification());
+    return 0;
+}

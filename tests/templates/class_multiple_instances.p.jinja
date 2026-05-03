@@ -1,0 +1,33 @@
+class Box
+{
+private:
+   dec {{ type_name }} val = {{ val_0 }};
+
+public:
+   fn void Box(arg {{ type_name }} v)
+   {
+      aff val = v;
+   }
+
+   fn {{ type_name }} getVal() { return val; }
+}
+
+fn bool verification()
+{
+    dec {{ type_name }} v1 = {{ val_1 }};
+    dec {{ type_name }} v2 = {{ val_0 }};
+    dec Box b1 = new Box(v1);
+    dec Box b2 = new Box(v2);
+
+    if (b1.getVal() != v1) { return false; }
+    if (b2.getVal() != v2) { return false; }
+    if (b1.getVal() == b2.getVal()) { return false; }
+
+    return true;
+}
+
+fn int32 main()
+{
+    call print(call verification());
+    return 0;
+}

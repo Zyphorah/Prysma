@@ -1,0 +1,39 @@
+class Selector
+{
+private:
+   dec {{ type_name }} base = {{ val_0 }};
+
+public:
+   fn void Selector(arg {{ type_name }} b)
+   {
+      aff base = b;
+   }
+
+   fn {{ type_name }} pick(arg {{ type_name }} a)
+   {
+      if (a == base) {
+          return a;
+      } else {
+          return base;
+      }
+   }
+}
+
+fn bool verification()
+{
+    dec {{ type_name }} base = {{ val_1 }};
+    dec {{ type_name }} match = {{ val_1 }};
+    dec {{ type_name }} nomatch = {{ val_2 }};
+    dec Selector s = new Selector(base);
+
+    if (s.pick(match) != base) { return false; }
+    if (s.pick(nomatch) != base) { return false; }
+
+    return true;
+}
+
+fn int32 main()
+{
+    call print(call verification());
+    return 0;
+}
