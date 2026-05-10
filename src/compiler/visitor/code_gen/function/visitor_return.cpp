@@ -6,6 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/ast/ast_genere.h"
@@ -14,7 +15,12 @@
 
 void GeneralVisitorGenCode::visiter(NodeReturn* nodeReturn)
 {
-    nodeReturn->getValeurReturn()->accept(this);
+    INode* returnExpr = nodeReturn->getValeurReturn();
+    if (returnExpr == nullptr) {
+        _contextGenCode->getBackend()->getBuilder().CreateRetVoid();
+        return;
+    }
+    returnExpr->accept(this);
     llvm::Value* evaluatedValue = _contextGenCode->getTemporaryValue().getAddress();
     IType* returnTypeObj = _contextGenCode->getReturnContextCompilation()->getContext();
     llvm::Type* returnTypeLLVM = returnTypeObj->generateLLVMType(_contextGenCode->getBackend()->getContext());

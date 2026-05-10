@@ -308,6 +308,9 @@ void ConfigurationFacadeEnvironment::registerExpressions()
 
     auto* exprNew = new (_arena.Allocate<ExpressionNew>()) ExpressionNew(*_contextExpression); // NOLINT(cppcoreguidelines-owning-memory)
     _registryExpression->registerElement(TOKEN_NEW, exprNew);
+
+    auto* exprNullptr = new (_arena.Allocate<ExpressionLiteral>()) ExpressionLiteral(*_contextExpression); // NOLINT(cppcoreguidelines-owning-memory)
+    _registryExpression->registerElement(TOKEN_NULLPTR, exprNullptr);
 }
 
 void ConfigurationFacadeEnvironment::registerInstructions()

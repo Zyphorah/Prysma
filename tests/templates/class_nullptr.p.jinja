@@ -1,0 +1,42 @@
+class Box
+{
+private:
+   dec {{ type_name }} x = {{ val_0 }};
+
+public:
+   fn void Box(arg {{ type_name }} v)
+   {
+      aff x = v;
+   }
+
+   fn {{ type_name }} getX() { return x; }
+}
+
+fn bool verification()
+{
+    // Test 1: variable initialisée à nullptr
+    dec Box b1 = nullptr;
+    if (b1 != nullptr) { return false; }
+
+    // Test 2: assignation depuis new puis reset à nullptr
+    dec Box b2 = new Box({{ val_1 }});
+    if (b2 == nullptr) { return false; }
+    aff b2 = nullptr;
+    if (b2 != nullptr) { return false; }
+
+    // Test 3: comparaison != nullptr
+    dec Box b3 = new Box({{ val_2 }});
+    if (b3 != nullptr) {
+        if (b3.getX() != {{ val_2 }}) { return false; }
+    } else {
+        return false;
+    }
+
+    return true;
+}
+
+fn int32 main()
+{
+    call print(call verification());
+    return 0;
+}

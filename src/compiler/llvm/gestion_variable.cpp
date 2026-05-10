@@ -169,7 +169,7 @@ void VariableAssigner::assign(llvm::Value* existingVariable, llvm::Value* value,
         }
     }
 
-    if(typeToAllocate->isPointerTy()) {
+    if(typeToAllocate->isPointerTy() && !value->getType()->isPointerTy()) {
         llvm::Value* loadedValue = _context->getBackend()->getBuilder().CreateLoad(
             _context->getBackend()->getBuilder().getPtrTy(),
             existingVariable,

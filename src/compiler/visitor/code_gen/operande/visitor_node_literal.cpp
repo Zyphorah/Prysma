@@ -16,8 +16,10 @@
 #include "compiler/visitor/code_gen/helper/error_helper.h"
 #include <cstdint>
 #include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Value.h>
+#include <llvm/Support/Casting.h>
 #include <llvm/Support/FormatVariadic.h>
 #include <string>
 
@@ -59,6 +61,10 @@ void GeneralVisitorGenCode::visiter(NodeLiteral* nodeLiteral)
         float value = std::stof(std::string(token.value)); 
         llvmType = llvm::Type::getFloatTy(context);
         llvmValue = llvm::ConstantFP::get(llvmType, value);
+    }
+    else if (token.type == TOKEN_NULLPTR) {
+        llvmType = llvm::PointerType::getUnqual(context);
+        llvmValue = llvm::ConstantPointerNull::get(llvm::cast<llvm::PointerType>(llvmType));
     }
     else {
         ErrorHelper::compilationError(llvm::formatv("Unsupported literal type ({0})", token.value).str());

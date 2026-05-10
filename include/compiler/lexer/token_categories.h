@@ -29,6 +29,7 @@ constexpr auto isOperand(TokenType type) noexcept -> bool {
         case TOKEN_LIT_INT:
         case TOKEN_LIT_FLOAT:
         case TOKEN_LIT_BOOL:
+        case TOKEN_NULLPTR:
         case TOKEN_IDENTIFIER:
         case TOKEN_UNREF:
         case TOKEN_REF:

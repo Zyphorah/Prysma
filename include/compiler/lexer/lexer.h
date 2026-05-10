@@ -32,7 +32,7 @@ class Lexer {
 
     // Dictionary for reserved keywords of the prysma programming language
     // Allows to differentiate identifiers from keywords
-    static constexpr std::array<std::pair<const char*, TokenType>, 31> keywordsArray = {{
+    static constexpr std::array<std::pair<const char*, TokenType>, 32> keywordsArray = {{
         {"char", TOKEN_TYPE_CHAR},
         {"arg", TOKEN_ARG},
         {"fn", TOKEN_FUNCTION},
@@ -60,6 +60,7 @@ class Lexer {
         {"new", TOKEN_NEW},
         {"ptr",TOKEN_TYPE_PTR},
         {"delete", TOKEN_DELETE},
+        {"nullptr", TOKEN_NULLPTR},
         {"class", TOKEN_CLASS},
         {"public", TOKEN_PUBLIC},
         {"private", TOKEN_PRIVATE},

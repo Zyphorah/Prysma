@@ -87,6 +87,7 @@ enum TokenType {
     // new
     TOKEN_NEW,
     TOKEN_DELETE,
+    TOKEN_NULLPTR,
 
     // include 
     TOKEN_INCLUDE

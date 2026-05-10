@@ -59,6 +59,15 @@ void GeneralVisitorGenCode::visiter(NodeOperation* node)
             default: break;
         }
     } 
+    else if (leftVal->getType()->isPointerTy() && rightVal->getType()->isPointerTy()) {
+        // Pointer-to-pointer comparisons: do NOT cast to integers
+        switch (node->getToken().type) {
+            case TOKEN_EQUAL_EQUAL: result = builder.CreateICmpEQ(leftVal, rightVal, "icmp_eq"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
+            case TOKEN_NOT_EQUAL: result = builder.CreateICmpNE(leftVal, rightVal, "icmp_ne"); resultType = llvm::Type::getInt1Ty(builder.getContext()); break;
+            default:
+                ErrorHelper::compilationError("Only == and != are supported for pointer comparisons");
+        }
+    }
     else {
         llvm::Type* targetIntTy = nullptr;
         if (leftVal->getType()->isIntegerTy() && rightVal->getType()->isIntegerTy()) {

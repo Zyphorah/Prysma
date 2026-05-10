@@ -116,6 +116,9 @@ void Lexer::addCurrentWord(llvm::StringRef currentWord, vector<Token>& tokens, i
     } else if (type == TOKEN_FALSE) {
         token.type = TOKEN_LIT_BOOL;
         token.value = "0";
+    } else if (type == TOKEN_NULLPTR) {
+        token.type = TOKEN_NULLPTR;
+        token.value = "nullptr";
     } else {
         token.type = type;
         token.value = currentWord;
