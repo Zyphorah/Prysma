@@ -10,6 +10,9 @@
 #include "compiler/lexer/token_type.h"
 #include <cstring>
 
+// Branch prediction hints
+#define UNLIKELY(x) __builtin_expect(!!(x), 0)
+
 // Fast word-sized loads (assumes Little Endian)
 static inline uint16_t ld16(const char* p) { uint16_t v; std::memcpy(&v, p, 2); return v; }
 static inline uint32_t ld32(const char* p) { uint32_t v; std::memcpy(&v, p, 4); return v; }
@@ -167,7 +170,7 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
             const char* mark = cursor;
             while (lut[static_cast<uint8_t>(*++cursor)] == CC_DIGIT);
             bool isFp = false;
-            if (*cursor == '.') {
+            if (UNLIKELY(*cursor == '.')) {
                 if (lut[static_cast<uint8_t>(cursor[1])] == CC_DIGIT) {
                     isFp = true;
                     cursor++;
@@ -186,7 +189,7 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
             while (true) {
                 size_t skip = std::strcspn(cursor, "\"\\\n");
                 cursor += skip;
-                if (*cursor == '\\' && cursor[1] != '\0') {
+                if (UNLIKELY(*cursor == '\\' && cursor[1] != '\0')) {
                     cursor += 2;
                 } else {
                     break;
@@ -230,7 +233,7 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
                 const char* mark = cursor;
                 while (lut[static_cast<uint8_t>(*++cursor)] == CC_DIGIT);
                 bool isFp = false;
-                if (*cursor == '.') {
+                if (UNLIKELY(*cursor == '.')) {
                     if (lut[static_cast<uint8_t>(cursor[1])] == CC_DIGIT) {
                         isFp = true;
                         cursor++;
@@ -334,7 +337,7 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
         case CC_SEMI: *out++ = {TOKEN_SEMICOLON, ";", 0, 0}; lastTy = TOKEN_SEMICOLON; cursor++; break;
         case CC_COMMA: *out++ = {TOKEN_COMMA, ",", 0, 0}; lastTy = TOKEN_COMMA; cursor++; break;
         default: 
-            if (c == '\0') goto end_lexing;
+            if (UNLIKELY(c == '\0')) goto end_lexing;
             cursor++; 
             break;
         }
@@ -359,7 +362,7 @@ end_lexing:
         
         const char* tokenStart = t.value.data();
         while (p < tokenStart) {
-            if (*p == '\n') {
+            if (UNLIKELY(*p == '\n')) {
                 currentLine++;
                 lineStart = p + 1;
             }
