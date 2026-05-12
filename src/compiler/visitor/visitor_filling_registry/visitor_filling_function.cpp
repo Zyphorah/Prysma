@@ -28,7 +28,7 @@ void FillingVisitorRegistry::visiter(NodeDeclarationFunction* nodeDeclarationFun
         functionSymbol->node = nodeDeclarationFunction;
 
         std::string className = _contextGenCode->getCurrentClassName();
-        auto* classInfo = _contextGenCode->getRegistryClass()->get(className).get();
+        auto* classInfo = _contextGenCode->getRegistryClassLocal()->get(className).get();
         classInfo->getRegistryFunctionLocal()->registerElement(functionName, std::move(functionSymbol));
     } else {
         // global context (global function)
@@ -36,6 +36,6 @@ void FillingVisitorRegistry::visiter(NodeDeclarationFunction* nodeDeclarationFun
         functionSymbol->returnType = returnType;
         functionSymbol->node = nodeDeclarationFunction;
 
-        _contextGenCode->getRegistryFunctionGlobal()->registerElement(std::string(functionName), std::move(functionSymbol));
+        _contextGenCode->getRegistryFunctionGlobal()->registerElement(functionName, std::move(functionSymbol));
     }
 }

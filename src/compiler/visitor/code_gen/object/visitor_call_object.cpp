@@ -95,7 +95,7 @@ void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
         ErrorHelper::compilationError("Class undetermined for object executing method '" + methodName.str() + "'");
     }
 
-    auto* classInfo = _contextGenCode->getRegistryClass()->get(className).get();
+    auto* classInfo = _contextGenCode->getRegistryClassLocal()->get(className).get();
     classInfo = ErrorHelper::verifyNotNull(classInfo, "Class '" + className + "' not found");
     
     // We retrieve the StructType directly from classInfo rather than probing the pointer

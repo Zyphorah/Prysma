@@ -9,6 +9,7 @@
 #ifndef DB7C496D_6A43_4B78_B490_52A0C21C5224
 #define DB7C496D_6A43_4B78_B490_52A0C21C5224
 
+#include "compiler/ast/registry/registry_class.h"
 #include "compiler/ast/utils/orchestrator_include/configuration_facade_environment.h"
 #include "configuration_facade_environment.h"
 #include <string>
@@ -43,7 +44,12 @@ private:
     std::string _sourceDocument;
 
 public: 
-    UnitCompilation(OrchestratorInclude* orchestrator, FileRegistry* registry, std::string filePath, RegistryFunctionGlobal* registryFunctionGlobal);
+    UnitCompilation(
+        OrchestratorInclude* orchestrator, 
+        FileRegistry* registry, 
+        std::string filePath,
+        RegistryFunctionGlobal* registryFunctionGlobal, 
+        RegistryClassGlobal* registryClassGlobal);
     ~UnitCompilation();
 
     UnitCompilation(const UnitCompilation&) = delete;

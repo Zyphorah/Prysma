@@ -7,6 +7,8 @@
 //===----------------------------------------------------------------------===//
 
 #include "compiler/ast/utils/orchestrator_include/unit_compilation.h"
+#include "compiler/ast/registry/registry_class.h"
+#include "compiler/registry/registry_file.h"
 #include "compiler/visitor/semantic_analyzer/resolution_chainage_type/resolution_chainage_type.h"
 #include "compiler/ast/builder_tree_instruction.h"
 #include "compiler/ast/utils/builder_environment_registry_function.h"
@@ -32,7 +34,12 @@
 #include <utility>
 #include <vector>
 
-UnitCompilation::UnitCompilation(OrchestratorInclude* orchestrator, FileRegistry* registry, std::string filePath, RegistryFunctionGlobal* registryFunctionGlobale) 
+UnitCompilation::UnitCompilation(
+    OrchestratorInclude* orchestrator, 
+    FileRegistry* registry, 
+    std::string filePath, 
+    RegistryFunctionGlobal* registryFunctionGlobal,
+    RegistryClassGlobal* registryClassGlobal)   
     : _orchestrator(orchestrator), 
       _fileRegistry(registry),
       _context(nullptr),
@@ -40,7 +47,7 @@ UnitCompilation::UnitCompilation(OrchestratorInclude* orchestrator, FileRegistry
       _originalFilePath(std::move(filePath)) 
 {
     // Initialization of the separate context (the private bubble)
-    _facadeConfigurationEnvironment = std::make_unique<ConfigurationFacadeEnvironment>(registryFunctionGlobale, _fileRegistry);
+    _facadeConfigurationEnvironment = std::make_unique<ConfigurationFacadeEnvironment>(registryClassGlobal,registryFunctionGlobal);
 }
 
 UnitCompilation::~UnitCompilation() 
@@ -104,7 +111,7 @@ void UnitCompilation::pass2() {
     std::string pathProgram = (buildDir / "programme/").string();
     std::string pathGraph = (buildDir / "graphe/").string();
 
-    ResolutionChainageType resolutionChainageType(_context->getRegistryClass());
+    ResolutionChainageType resolutionChainageType(_context->getRegistryClassLocal());
     _tree->accept(&resolutionChainageType);
 
     GeneralVisitorGenCode visitor(_context, _orchestrator);
@@ -118,7 +125,7 @@ void UnitCompilation::pass2() {
 
         if (system(("dot -Tsvg " + pathGraph + _fileName + ".dot -o " + pathGraph + _fileName + ".svg").c_str()) != 0)
         {
-            std::cerr << "Error during graph generation." << std::endl;
+            std::cerr << "Error during graph generation." << "\n";
         }
 
         // Remove the intermediate .dot file

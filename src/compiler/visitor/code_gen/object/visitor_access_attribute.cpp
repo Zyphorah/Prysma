@@ -31,7 +31,7 @@ void GeneralVisitorGenCode::visiter(NodeAccesAttribute* nodeAccessAttribute)
         ErrorHelper::compilationError("Unable to determine the class of object '" + objectName.str() + "'");
     }
 
-    auto* classInfo = _contextGenCode->getRegistryClass()->get(className).get();
+    auto* classInfo = _contextGenCode->getRegistryClassLocal()->get(className).get();
     classInfo = ErrorHelper::verifyNotNull(classInfo, "Class '" + className + "' not found in the registry");
 
     if (!classInfo->getRegistryVariable()->variableExists(attributeName.str())) {

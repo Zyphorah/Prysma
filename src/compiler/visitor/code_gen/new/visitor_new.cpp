@@ -17,6 +17,7 @@
 #include "compiler/utils/prysma_cast.h"
 #include <cstddef>
 #include <cstdint>
+#include <llvm-18/llvm/ADT/StringRef.h>
 #include <llvm-18/llvm/IR/Value.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/Support/Casting.h>
@@ -34,7 +35,7 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
     Class* classInfo = nullptr;
 
     if (nodeNew->getNomType().type == TOKEN_IDENTIFIER) {
-        classInfo = _contextGenCode->getRegistryClass()->get(std::string(nodeNew->getNomType().value)).get();
+        classInfo = _contextGenCode->getRegistryClassLocal()->get(std::string(nodeNew->getNomType().value)).get();
         classInfo = ErrorHelper::verifyNotNull(classInfo, llvm::formatv("Class '{0}' not found", nodeNew->getNomType().value).str());
         targetType = classInfo->getStructType();
     } else {

@@ -9,11 +9,11 @@
 #ifndef D2577958_A8A8_4878_AFA0_2B3478129911
 #define D2577958_A8A8_4878_AFA0_2B3478129911
 
+#include "compiler/ast/registry/registry_class.h"
 #include "compiler/ast/utils/orchestrator_include/unit_compilation.h"
 #include <atomic>
 #include <mutex>
 #include <string>
-#include <thread>
 #include <vector>
 #include <set>
 #include <memory>
@@ -29,6 +29,7 @@ class OrchestratorInclude
 private: 
    std::mutex* _mutex;
    RegistryFunctionGlobal* _registryFunctionGlobal;
+   RegistryClassGlobal* _registryClassGlobal;
    FileRegistry* _registryFile;
    llvm::ThreadPool _threads;
    std::vector<std::unique_ptr<UnitCompilation>> _compilationUnits;
@@ -43,7 +44,7 @@ private:
    bool _enableGraphViz;
 
 public:
-    OrchestratorInclude(RegistryFunctionGlobal* registryFunctionGlobal, FileRegistry* registryFile, std::mutex* mutex, bool enableGraphViz = false);
+    OrchestratorInclude(RegistryFunctionGlobal* registryFunctionGlobal,RegistryClassGlobal* registryClassGlobal, FileRegistry* registryFile, std::mutex* mutex, bool enableGraphViz = false);
     ~OrchestratorInclude();
 
     OrchestratorInclude(const OrchestratorInclude&) = delete;

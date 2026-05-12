@@ -18,6 +18,8 @@
 #include <llvm-18/llvm/ADT/StringRef.h>
 #include <llvm-18/llvm/IR/DerivedTypes.h>
 #include <llvm-18/llvm/IR/GlobalVariable.h>
+#include <memory>
+#include <mutex>
 #include <string>
 #include <map>
 
@@ -94,21 +96,36 @@ public:
         return std::numeric_limits<uint32_t>::max();
     }
 };
-// TODO: support multi-thread mutex for classes. Otherwise, multi-file is not possible.
 
-#include <memory>
+// Ici je dois faire un registre globale
+// Pourquoi j'ai besoins d'un registre globale 
+// car, si je suis dans le fichier A mais que j'ai besoins d'une méthode dans le fichier B mais que c'elle ci n'est pas chargé dans un registre globale alors 
+// je n'ai pas accès au information. 
+// Pourquoi, car chaque thread on leur propre contexte, je dois donc faire un registre class globale une première passe pour remplir le registre globale en premier temps
+// Un visiteur de remplissage générale
 
-class RegistryClass : public RegistryGeneric<std::string, std::unique_ptr<Class>>
+class RegistryClassLocal : public RegistryGeneric<std::string, std::unique_ptr<Class>>
 {
 public:
-    RegistryClass() = default;
-    RegistryClass(const RegistryClass&) = delete;
-    auto operator=(const RegistryClass&) -> RegistryClass& = delete;
-    RegistryClass(RegistryClass&&) = delete;
-    auto operator=(RegistryClass&&) -> RegistryClass& = delete;
+    RegistryClassLocal() = default;
+    RegistryClassLocal(const RegistryClassLocal&) = delete;
+    auto operator=(const RegistryClassLocal&) -> RegistryClassLocal& = delete;
+    RegistryClassLocal(RegistryClassLocal&&) = delete;
+    auto operator=(RegistryClassLocal&&) -> RegistryClassLocal& = delete;
 
-    ~RegistryClass() override = default;
+    ~RegistryClassLocal() override = default;
 };
 
 
+class RegistryClassGlobal : public RegistryGeneric<std::string, std::unique_ptr<Class>, std::mutex>
+{
+public:
+    RegistryClassGlobal() = default;
+    RegistryClassGlobal(const RegistryClassGlobal&) = delete;
+    auto operator=(const RegistryClassGlobal&) -> RegistryClassGlobal& = delete;
+    RegistryClassGlobal(RegistryClassGlobal&&) = delete;
+    auto operator=(RegistryClassGlobal&&) -> RegistryClassGlobal& = delete;
+
+    ~RegistryClassGlobal() override = default;
+};
 #endif /* C2ADEE91_A0DA_4404_8AF5_5B1105A499EC */

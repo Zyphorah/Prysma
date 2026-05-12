@@ -49,11 +49,11 @@ class ResolutionChainageType : public VisitorBaseGenerale
 {
 
 private:
-    RegistryClass* _registryClass;
+    RegistryClassLocal* _registryClass;
     std::unordered_map<std::string, IType*> _variables;
     
 public: 
-    explicit ResolutionChainageType(RegistryClass* registryClass) : _registryClass(registryClass){}
+    explicit ResolutionChainageType(RegistryClassLocal* registryClassLocal) : _registryClass(registryClassLocal){}
     ~ResolutionChainageType() override = default;
 
     // Delete copy and move constructors and assignment operators

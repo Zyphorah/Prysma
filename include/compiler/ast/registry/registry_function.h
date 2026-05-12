@@ -10,6 +10,7 @@
 #define F2141F07_2C85_4ADB_9BC9_A909EBD34394
 
 #include "registry_generic.h"
+#include <cstdint>
 #include <llvm-18/llvm/ADT/StringRef.h>
 #include <llvm-18/llvm/IR/Function.h>
 #include <mutex>
@@ -22,14 +23,14 @@ class NodeDeclarationFunction;
 class IFunctionSymbolRegistry
 {
     public:
-        enum class SymbolType { Global, Local };
+        enum class SymbolType : std::uint8_t { Global, Local };
         IFunctionSymbolRegistry() = default;
         IFunctionSymbolRegistry(const IFunctionSymbolRegistry&) = delete;
         auto operator=(const IFunctionSymbolRegistry&) -> IFunctionSymbolRegistry& = delete;
         IFunctionSymbolRegistry(IFunctionSymbolRegistry&&) = delete;
         auto operator=(IFunctionSymbolRegistry&&) -> IFunctionSymbolRegistry& = delete;
         virtual ~IFunctionSymbolRegistry() = default;
-        [[nodiscard]] virtual SymbolType getType() const = 0;
+        [[nodiscard]] virtual auto getType() const -> SymbolType = 0;
 };
 
 // Acts as a struct to store global functions
@@ -59,7 +60,7 @@ public:
     }
 };
 
-class RegistryFunctionGlobal : public RegistryGeneric<std::string, std::unique_ptr<IFunctionSymbolRegistry>, std::mutex>
+class RegistryFunctionGlobal : public RegistryGeneric<llvm::StringRef, std::unique_ptr<IFunctionSymbolRegistry>, std::mutex>
 {
 public:
     RegistryFunctionGlobal() = default;
@@ -70,6 +71,8 @@ public:
     ~RegistryFunctionGlobal() override = default;
 };
 
+// Je vais rename registryFunctionLocal elle porte à confusion pour sa vrai utilité
+// Et puis, cette classe est redondante, je vais voir pour la retirer, mais sans forcément devoir faire un mutex
 class RegistryFunctionLocal : public RegistryGeneric<llvm::StringRef, std::unique_ptr<IFunctionSymbolRegistry>>
 {
 public:

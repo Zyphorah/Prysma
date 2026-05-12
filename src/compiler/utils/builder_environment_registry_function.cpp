@@ -147,9 +147,9 @@ void BuilderEnvironmentRegistryFunction::fill()
     }
 
     // Fill class methods (VTable, mangling)
-    for (const auto& className : _contextGenCode->getRegistryClass()->getKeys())
+    for (const auto& className : _contextGenCode->getRegistryClassLocal()->getKeys())
     {
-        auto const& classInfo = _contextGenCode->getRegistryClass()->get(className);
+        auto const& classInfo = _contextGenCode->getRegistryClassLocal()->get(className);
         
         for (const auto& methodName : classInfo->getRegistryFunctionLocal()->getKeys())
         {
@@ -183,7 +183,7 @@ void BuilderEnvironmentRegistryFunction::fill()
             
             // Name mangling for LLVM (e.g., Player_initialize)
             std::string llvmName = className;
-            llvmName += "_";
+            llvmName += '_';
             llvmName += methodName;
 
             llvm::Function* realFunction = llvm::Function::Create(

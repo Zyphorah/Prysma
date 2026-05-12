@@ -6,6 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "compiler/ast/registry/registry_class.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/ast/utils/orchestrator_include/orchestrator_include.h"
 #include "compiler/ast/utils/orchestrator_include/unit_compilation.h"
@@ -25,8 +26,8 @@
 #include <string>
 
 
-OrchestratorInclude::OrchestratorInclude(RegistryFunctionGlobal* registryFunctionGlobale, FileRegistry* registryFile, std::mutex* mutex, bool enableGraphViz)
-    : _mutex(mutex), _registryFunctionGlobal(registryFunctionGlobale), _registryFile(registryFile), _enableGraphViz(enableGraphViz)
+OrchestratorInclude::OrchestratorInclude(RegistryFunctionGlobal* registryFunctionGlobale,RegistryClassGlobal* registryClassGlobal, FileRegistry* registryFile, std::mutex* mutex, bool enableGraphViz)
+    : _mutex(mutex), _registryFunctionGlobal(registryFunctionGlobale), _registryClassGlobal(registryClassGlobal), _registryFile(registryFile), _enableGraphViz(enableGraphViz)
 {}
 
 OrchestratorInclude::~OrchestratorInclude()
@@ -54,7 +55,7 @@ void OrchestratorInclude::compileProject(const std::string& filePath)
             } catch (const CompilationError& e) {
                 std::lock_guard<std::mutex> lock(*_mutex);
                 _hasErrors = true;
-                std::cerr << "Error in file '" << ptrUnit->getPath() << "': " << e.what() << std::endl;
+                std::cerr << "Error in file '" << ptrUnit->getPath() << "': " << e.what() << '\n';
             }
         });
     }
@@ -70,7 +71,7 @@ void OrchestratorInclude::includeFile(const std::string& absolutePath)
     _alreadyIncludedFiles.insert(absolutePath);
 
    // Fill the compilation unit vector 
-    _compilationUnits.push_back(std::make_unique<UnitCompilation>(this, _registryFile, absolutePath, _registryFunctionGlobal));
+    _compilationUnits.push_back(std::make_unique<UnitCompilation>(this, _registryFile, absolutePath, _registryFunctionGlobal,_registryClassGlobal));
     auto *ptrNewUnit = _compilationUnits.back().get();
 
     // Fill the thread pool 
@@ -80,7 +81,7 @@ void OrchestratorInclude::includeFile(const std::string& absolutePath)
         } catch (const CompilationError& e) {
             std::lock_guard<std::mutex> lock(*_mutex);
             _hasErrors = true;
-            std::cerr << "Error in file '" << absolutePath << "': " << e.what() << std::endl;
+            std::cerr << "Error in file '" << absolutePath << "': " << e.what() << '\n';
         }
     });
 

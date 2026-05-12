@@ -29,7 +29,6 @@
 // Expressions
 #include "compiler/llvm/llvm_backend.h"
 #include "compiler/math/expression_literal.h"
-#include "compiler/registry/registry_file.h"
 #include "compiler/variable/expression_identifiant.h"
 #include "compiler/variable/expression_ref_variable.h"
 #include "compiler/variable/expression_un_ref_variable.h"
@@ -66,8 +65,9 @@
 
 // NOLINTBEGIN(cppcoreguidelines-owning-memory)
 
-ConfigurationFacadeEnvironment::ConfigurationFacadeEnvironment(RegistryFunctionGlobal* registryFunctionGlobale, [[maybe_unused]] FileRegistry* fileRegistry)
+ConfigurationFacadeEnvironment::ConfigurationFacadeEnvironment(RegistryClassGlobal* registryClassGlobal, RegistryFunctionGlobal* registryFunctionGlobale)
     : _registryFunctionGlobal(registryFunctionGlobale),
+      _registryClassGlobal(registryClassGlobal),
       // _registryFile(fileRegistry),
       _registryExpression(nullptr),
       _builderTreeInstruction(nullptr),
@@ -119,7 +119,7 @@ void ConfigurationFacadeEnvironment::createRegistries()
     _registryType = std::make_unique<RegistryType>();
     _returnContextCompilation = std::make_unique<ReturnContextCompilation>();
     _registryArgument = std::make_unique<RegistryArgument>();
-    _registryClass = std::make_unique<RegistryClass>();
+    _registryClass = std::make_unique<RegistryClassLocal>();
 }
 
 void ConfigurationFacadeEnvironment::createContext(const std::string& filePath)
@@ -135,6 +135,7 @@ void ConfigurationFacadeEnvironment::createContext(const std::string& filePath)
         _registryVariable.get(),
         _registryFunctionGlobal,
         _registryFunctionLocal.get(),
+              _registryClassGlobal,
         _returnContextCompilation.get(),
         _registryArgument.get(),
         _registryClass.get(),

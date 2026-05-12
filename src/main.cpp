@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "compiler/ast/utils/orchestrator_include/configuration_facade_environment.h"
+#include "compiler/ast/registry/registry_class.h"
 #include "compiler/ast/utils/orchestrator_include/orchestrator_include.h"
 #include "compiler/file_processing/builder_systeme.h"
 #include "compiler/file_processing/file_reading.h"
@@ -81,8 +81,8 @@
 auto main(int argc, char* argv[]) -> int
 {
     if (argc < 2) {
-        std::cerr << "Error: Aucun fichier spécifié" << std::endl;
-        std::cerr << "Usage: Prysma <fichier.p> [--graphviz]" << std::endl;
+        std::cerr << "Error: Aucun fichier spécifié" << '\n';
+        std::cerr << "Usage: Prysma <fichier.p> [--graphviz]" << '\n';
         return 1;
     }
     
@@ -99,7 +99,7 @@ auto main(int argc, char* argv[]) -> int
     }
 
     if (cheminFile.empty()) {
-        std::cerr << "Error: Aucun fichier spécifié" << std::endl;
+        std::cerr << "Error: Aucun fichier spécifié" << '\n';
         return 1;
     }
 
@@ -127,14 +127,22 @@ auto main(int argc, char* argv[]) -> int
         std::string objLib = (buildDir / "obj" / "lib").string();
 
         std::unique_ptr<RegistryFunctionGlobal> registryFunctionGlobale = std::make_unique<RegistryFunctionGlobal>();
-        std::unique_ptr<FileRegistry> registryFiles = std::make_unique<FileRegistry>();
-        std::unique_ptr<ConfigurationFacadeEnvironment> facadeConfigurationEnvironnement = std::make_unique<ConfigurationFacadeEnvironment>(registryFunctionGlobale.get(), registryFiles.get());
-        
-        OrchestratorInclude orchestratorInclude(registryFunctionGlobale.get(), registryFiles.get(), mutex.get(), activerGraphViz);
-        orchestratorInclude.compileProject(cheminFile);
 
+        // J'utilise pour la convention std::unique_ptr pour le moment mais je vais utilisée le système de rail offert par C++
+        // TODO
+        std::unique_ptr<RegistryClassGlobal> registryClassGlobale = std::make_unique<RegistryClassGlobal>();
+
+        std::unique_ptr<FileRegistry> registryFiles = std::make_unique<FileRegistry>();
+        
+        OrchestratorInclude orchestratorInclude(
+            registryFunctionGlobale.get(), 
+            registryClassGlobale.get(), 
+            registryFiles.get(), 
+            mutex.get(), 
+            activerGraphViz);
+            orchestratorInclude.compileProject(cheminFile);
         if (orchestratorInclude.hasErrors()) {
-            std::cerr << "Error: La compilation a échoué, arrêt du processus." << std::endl;
+            std::cerr << "Error: La compilation a échoué, arrêt du processus." << '\n';
             return 1;
         }
 
@@ -155,11 +163,11 @@ auto main(int argc, char* argv[]) -> int
         std::cerr << nomFile << ":" 
                   << error.getLine() << ":" 
                   << error.getColumn() << ": Error: " 
-                  << error.what() << std::endl;
+                  << error.what() << '\n';
         return 1;
     }
     catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "Error: " << e.what() << '\n';
         return 1;
     }
 }

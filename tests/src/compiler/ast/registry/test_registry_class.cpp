@@ -16,13 +16,13 @@ using namespace std;
 
 // Tests cas limites - Registry class
 
-TEST_CASE("Recuperation d'une classe inexistante lance exception", "[RegistryClass]") {
-    RegistryClass registry;
+TEST_CASE("Recuperation d'une classe inexistante lance exception", "[RegistryClassLocal]") {
+    RegistryClassLocal registry;
     CHECK_THROWS_AS(registry.get("ClasseFantome"), std::invalid_argument);
 }
 
-TEST_CASE("Enregistryment et recuperation d'une classe valide", "[RegistryClass]") {
-    RegistryClass registry;
+TEST_CASE("Enregistryment et recuperation d'une classe valide", "[RegistryClassLocal]") {
+    RegistryClassLocal registry;
     auto maClasse = make_unique<Class>();
     
     // On met quelques proprietes dans 'maClasse' pour s'assurer que c'est la meme
@@ -34,8 +34,8 @@ TEST_CASE("Enregistryment et recuperation d'une classe valide", "[RegistryClass]
     CHECK(getClasse->getStructType() == reinterpret_cast<llvm::StructType*>(0x800));
 }
 
-TEST_CASE("Ecrasement d'une classe existante avec la meme cle", "[RegistryClass]") {
-    RegistryClass registry;
+TEST_CASE("Ecrasement d'une classe existante avec la meme cle", "[RegistryClassLocal]") {
+    RegistryClassLocal registry;
     
     auto classe1 = make_unique<Class>();
     classe1->setStructType(reinterpret_cast<llvm::StructType*>(0x111));
@@ -49,8 +49,8 @@ TEST_CASE("Ecrasement d'une classe existante avec la meme cle", "[RegistryClass]
     CHECK(recuperation->getStructType() == reinterpret_cast<llvm::StructType*>(0x222));
 }
 
-TEST_CASE("Generer un message d'error personnalise avec callback", "[RegistryClass]") {
-    RegistryClass registry;
+TEST_CASE("Generer un message d'error personnalise avec callback", "[RegistryClassLocal]") {
+    RegistryClassLocal registry;
     registry.setErrorMessage([](const std::string& cle) {
         return "Error specifique : impossible de trouver " + cle;
     });
@@ -63,8 +63,8 @@ TEST_CASE("Generer un message d'error personnalise avec callback", "[RegistryCla
     }
 }
 
-TEST_CASE("Recuperation correcte des cles du registry", "[RegistryClass]") {
-    RegistryClass registry;
+TEST_CASE("Recuperation correcte des cles du registry", "[RegistryClassLocal]") {
+    RegistryClassLocal registry;
     
     registry.registerElement("ClasseA", make_unique<Class>());
     registry.registerElement("ClasseB", make_unique<Class>());

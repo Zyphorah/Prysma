@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/Prysma",
-            "args": ["${workspaceFolder}/src/prysma_code_tests/class_test/testGetProfondeur.p"],
+            "args": ["${workspaceFolder}/tests/prysma_code_tests/project_test_edge_case/test_oriente_objet/test_linked_list.p"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "sourceFileMap": {

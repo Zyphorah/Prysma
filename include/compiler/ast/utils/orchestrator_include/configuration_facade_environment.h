@@ -24,7 +24,6 @@
 #include "compiler/builder/equation/builder_equation_flottante.h"
 #include "compiler/parser/parser_type.h"
 #include "compiler/llvm/llvm_backend.h"
-#include "compiler/registry/registry_file.h"
 #include <llvm/Support/Allocator.h>
 #include <memory>
 #include <string>
@@ -35,6 +34,7 @@ class ConfigurationFacadeEnvironment
 {
 private:
     RegistryFunctionGlobal* _registryFunctionGlobal;
+    RegistryClassGlobal* _registryClassGlobal;
 
     llvm::BumpPtrAllocator _arena;
 
@@ -45,7 +45,7 @@ private:
     std::unique_ptr<RegistryType> _registryType;
     std::unique_ptr<ReturnContextCompilation> _returnContextCompilation;
     std::unique_ptr<RegistryArgument> _registryArgument;
-    std::unique_ptr<RegistryClass> _registryClass;
+    std::unique_ptr<RegistryClassLocal> _registryClass;
     std::unique_ptr<ContextGenCode> _context;
 
     RegistryExpression* _registryExpression;
@@ -64,7 +64,7 @@ private:
     void registerInstructions();
 
 public:
-    explicit ConfigurationFacadeEnvironment(RegistryFunctionGlobal* registryFunctionGlobal, [[maybe_unused]] FileRegistry* registryFile);
+    explicit ConfigurationFacadeEnvironment(RegistryClassGlobal*registryClassGlobal, RegistryFunctionGlobal* registryFunctionGlobal);
     ~ConfigurationFacadeEnvironment();
 
     ConfigurationFacadeEnvironment(const ConfigurationFacadeEnvironment&) = delete;

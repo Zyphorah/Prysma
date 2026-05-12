@@ -27,111 +27,116 @@
 struct ContextGenCode
 {
 private:
-    RegistryType* registryType;
-    Symbol temporaryValue;
-    LlvmBackend* backend;
-    RegistryInstruction* registryInstruction;
-    RegistryVariable* registryVariable;
-    RegistryFunctionGlobal* registryFunctionGlobal;
-    RegistryFunctionLocal* registryFunctionLocal;
-    ReturnContextCompilation* returnContextCompilation;
-    RegistryArgument* registryArgument;
-    RegistryClass* registryClass;
-    llvm::BumpPtrAllocator* arena;
-    std::string currentFilePath;
-    std::string currentClassName;
+    RegistryType* _registryType;
+    Symbol _temporaryValue;
+    LlvmBackend* _backend;
+    RegistryInstruction* _registryInstruction;
+    RegistryVariable* _registryVariable;
+    RegistryFunctionGlobal* _registryFunctionGlobal;
+    RegistryFunctionLocal* _registryFunctionLocal;
+    RegistryClassGlobal* _registryClassGlobal;
+    ReturnContextCompilation* _returnContextCompilation;
+    RegistryArgument* _registryArgument;
+    RegistryClassLocal* _registryClassLocal;
+    llvm::BumpPtrAllocator* _arena;
+    std::string _currentFilePath;
+    std::string _currentClassName;
 
 public:
     ContextGenCode(
-        RegistryType* p_registryType,
-        LlvmBackend* p_backend,
-        RegistryInstruction* p_registryInstruction,
-        RegistryVariable* p_registryVariable,
-        RegistryFunctionGlobal* p_registryFunctionGlobal,
-        RegistryFunctionLocal* p_registryFunctionLocal,
-        ReturnContextCompilation* p_returnContextCompilation,
-        RegistryArgument* p_registryArgument,
-        RegistryClass* p_registryClass,
-        Symbol p_temporaryValue,
-        llvm::BumpPtrAllocator* p_arena,
-        std::string p_currentFilePath
+        RegistryType* registryType,
+        LlvmBackend* backend,
+        RegistryInstruction* registryInstruction,
+        RegistryVariable* registryVariable,
+        RegistryFunctionGlobal* registryFunctionGlobal,
+        RegistryFunctionLocal* registryFunctionLocal,
+        RegistryClassGlobal* registryClassGlobal,
+        ReturnContextCompilation* returnContextCompilation,
+        RegistryArgument* registryArgument,
+        RegistryClassLocal* registryClassLocal,
+        Symbol temporaryValue,
+        llvm::BumpPtrAllocator* arena,
+        std::string currentFilePath
     ) 
     {
         try {
-            if (p_currentFilePath.empty()) {
+            if (currentFilePath.empty()) {
                 throw std::invalid_argument("The current file path cannot be empty");
             }
-            if (p_registryType == nullptr)
+            if (registryType == nullptr)
             {
                 throw std::invalid_argument("The file registry cannot be null");
             }
-            if (p_backend == nullptr) {
+            if (backend == nullptr) {
                 throw std::invalid_argument("The LLVM backend cannot be null");
             }
-            if (p_registryInstruction == nullptr) {
+            if (registryInstruction == nullptr) {
                 throw std::invalid_argument("The instruction registry cannot be null");
             }
-            if (p_registryVariable == nullptr) {
+            if (registryVariable == nullptr) {
                 throw std::invalid_argument("The variable registry cannot be null");
             }
-            if (p_registryFunctionGlobal == nullptr) {
+            if (registryFunctionGlobal == nullptr) {
                 throw std::invalid_argument("The global function registry cannot be null");
             }
-            if (p_registryFunctionLocal == nullptr) {
+            if (registryFunctionLocal == nullptr) {
                 throw std::invalid_argument("The local function registry cannot be null");
             }
-            if (p_registryType == nullptr) {
+            if (registryClassGlobal == nullptr) {
+                throw std::invalid_argument("The global class registry cannot be null");
+            }
+            if (registryType == nullptr) {
                 throw std::invalid_argument("The type registry cannot be null");
             }
-            if (p_returnContextCompilation == nullptr) {
+            if (returnContextCompilation == nullptr) {
                 throw std::invalid_argument("The return context compilation cannot be null");
             }
-            if (p_registryArgument == nullptr) {
+            if (registryArgument == nullptr) {
                 throw std::invalid_argument("The argument registry cannot be null");
             }
-            if (p_arena == nullptr) {
+            if (arena == nullptr) {
                 throw std::invalid_argument("The arena cannot be null");
             }
-            if (p_registryClass == nullptr) {
+            if (registryClassLocal == nullptr) {
                 throw std::invalid_argument("The class registry cannot be null");
             }
         } catch (const std::invalid_argument& e) {
-            std::cerr << "Error during code generation context creation: " << e.what() << std::endl;
+            std::cerr << "Error during code generation context creation: " << e.what() << "\n";
             throw;
         }
-        this->registryType = p_registryType;
-        this->currentFilePath = std::move(p_currentFilePath);
-        this->backend = p_backend;
-        this->registryInstruction = p_registryInstruction;
-        this->registryVariable = p_registryVariable;
-        this->registryFunctionGlobal = p_registryFunctionGlobal;
-        this->registryFunctionLocal = p_registryFunctionLocal;
-        this->registryType = p_registryType;
-        this->returnContextCompilation = p_returnContextCompilation;
-        this->registryArgument = p_registryArgument;
-        this->registryClass = p_registryClass;
-        this->temporaryValue = p_temporaryValue;
-        this->arena = p_arena;
+        _registryType = registryType;
+        _currentFilePath = std::move(currentFilePath);
+        _backend = backend;
+        _registryInstruction = registryInstruction;
+        _registryVariable = registryVariable;
+        _registryFunctionGlobal = registryFunctionGlobal;
+        _registryFunctionLocal = registryFunctionLocal;
+        _registryClassGlobal = registryClassGlobal;
+        _returnContextCompilation = returnContextCompilation;
+        _registryArgument = registryArgument;
+        _registryClassLocal = registryClassLocal;
+        _temporaryValue = temporaryValue;
+        _arena = arena;
     }
 
-    
-    void setTemporaryValue(Symbol p_temporaryValue) { temporaryValue = p_temporaryValue; }
-    void setCurrentClassName(std::string p_currentClassName) { currentClassName = std::move(p_currentClassName); }
+    void setTemporaryValue(Symbol temporaryValue) { _temporaryValue = temporaryValue; }
+    void setCurrentClassName(std::string currentClassName) { _currentClassName = std::move(currentClassName); }
 
     // Getters
-    [[nodiscard]] auto getRegistryType() const -> RegistryType* { return registryType; }
-    [[nodiscard]] auto getTemporaryValue() const -> Symbol { return temporaryValue; }
-    [[nodiscard]] auto getBackend() const -> LlvmBackend* { return backend; }
-    [[nodiscard]] auto getRegistryInstruction() const -> RegistryInstruction* { return registryInstruction; }
-    [[nodiscard]] auto getRegistryVariable() const -> RegistryVariable* { return registryVariable; }
-    [[nodiscard]] auto getRegistryFunctionGlobal() const -> RegistryFunctionGlobal* { return registryFunctionGlobal; }
-    [[nodiscard]] auto getRegistryFunctionLocal() const -> RegistryFunctionLocal* { return registryFunctionLocal; }
-    [[nodiscard]] auto getReturnContextCompilation() const -> ReturnContextCompilation* { return returnContextCompilation; }
-    [[nodiscard]] auto getRegistryArgument() const -> RegistryArgument* { return registryArgument; }
-    [[nodiscard]] auto getRegistryClass() const -> RegistryClass* { return registryClass; }
-    [[nodiscard]] auto getArena() const -> llvm::BumpPtrAllocator* { return arena; }
-    [[nodiscard]] auto getCurrentFilePath() const -> const std::string& { return currentFilePath; }
-    [[nodiscard]] auto getCurrentClassName() const -> const std::string& { return currentClassName; }
+    [[nodiscard]] auto getRegistryType() const -> RegistryType* { return _registryType; }
+    [[nodiscard]] auto getTemporaryValue() const -> Symbol { return _temporaryValue; }
+    [[nodiscard]] auto getBackend() const -> LlvmBackend* { return _backend; }
+    [[nodiscard]] auto getRegistryInstruction() const -> RegistryInstruction* { return _registryInstruction; }
+    [[nodiscard]] auto getRegistryVariable() const -> RegistryVariable* { return _registryVariable; }
+    [[nodiscard]] auto getRegistryFunctionGlobal() const -> RegistryFunctionGlobal* { return _registryFunctionGlobal; }
+    [[nodiscard]] auto getRegistryFunctionLocal() const -> RegistryFunctionLocal* { return _registryFunctionLocal; }
+    [[nodiscard]] auto getRegistryClassGlobal() const -> RegistryClassGlobal* { return _registryClassGlobal; }
+    [[nodiscard]] auto getReturnContextCompilation() const -> ReturnContextCompilation* { return _returnContextCompilation; }
+    [[nodiscard]] auto getRegistryArgument() const -> RegistryArgument* { return _registryArgument; }
+    [[nodiscard]] auto getRegistryClassLocal() const -> RegistryClassLocal* { return _registryClassLocal; }
+    [[nodiscard]] auto getArena() const -> llvm::BumpPtrAllocator* { return _arena; }
+    [[nodiscard]] auto getCurrentFilePath() const -> const std::string& { return _currentFilePath; }
+    [[nodiscard]] auto getCurrentClassName() const -> const std::string& { return _currentClassName; }
 };
 
 #endif /* C2537ED8_1CCF_4242_BDB0_B5ED5F2AD08F */
