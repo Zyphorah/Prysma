@@ -9,6 +9,8 @@
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <cstring>
+#include <array>
+#include <utility>
 
 // Branch prediction hints
 #define UNLIKELY(x) __builtin_expect(!!(x), 0)
@@ -40,14 +42,12 @@ static constexpr uint8_t classOf(unsigned char c) {
     }
 }
 
-struct CClassLUT {
-    uint8_t v[256];
-    constexpr CClassLUT() : v{} {
-        for (unsigned i = 0; i < 256; ++i)
-            v[i] = classOf(static_cast<unsigned char>(i));
-    }
-};
-static constexpr CClassLUT cclut{};
+// Template metaprogramming: Compile-time generation of the CharClass LUT
+template <std::size_t... Is>
+constexpr auto make_cclut(std::index_sequence<Is...>) -> std::array<uint8_t, 256> {
+    return {{ classOf(static_cast<unsigned char>(Is))... }};
+}
+constexpr auto cclut_array = make_cclut(std::make_index_sequence<256>{});
 
 // Keyword resolution via masked word-sized loads
 TokenType Lexer::resolveKeyword(llvm::StringRef w) {
@@ -119,7 +119,7 @@ TokenType Lexer::resolveKeyword(llvm::StringRef w) {
     return TOKEN_IDENTIFIER;
 }
 
-static inline bool isUnary(TokenType t) {
+constexpr bool checkUnary(size_t t) {
     switch (t) {
         case TOKEN_EQUAL: case TOKEN_PAREN_OPEN: case TOKEN_COMMA:
         case TOKEN_BRACKET_OPEN: case TOKEN_PLUS: case TOKEN_MINUS:
@@ -134,6 +134,17 @@ static inline bool isUnary(TokenType t) {
     }
 }
 
+// Template metaprogramming: Compile-time generation of the Unary Context LUT
+template <std::size_t... Is>
+constexpr auto make_unary_lut(std::index_sequence<Is...>) -> std::array<bool, 128> {
+    return {{ checkUnary(Is)... }};
+}
+constexpr auto unary_lut = make_unary_lut(std::make_index_sequence<128>{});
+
+static inline bool isUnary(TokenType t) {
+    return unary_lut[static_cast<size_t>(t)];
+}
+
 auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
     vector<Token> tokens;
     // Pre-allocate maximum possible tokens (1 char = 1 token worst case) + EOF
@@ -141,7 +152,7 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
     
     Token* __restrict out = tokens.data();
     const char* __restrict cursor = sourceCode.data();
-    const uint8_t* __restrict lut = cclut.v;
+    const uint8_t* __restrict lut = cclut_array.data();
     TokenType lastTy = TOKEN_EOF;
 
     while (true) {
