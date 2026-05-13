@@ -14,6 +14,7 @@
 #include "compiler/file_processing/file_reading.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/visitor/visitor_filling_registry/visitor_filling_registry.h"
+#include <exception>
 #include <iostream>
 #include <llvm-18/llvm/IR/DerivedTypes.h>
 #include <llvm-18/llvm/IR/Instructions.h>
@@ -60,7 +61,11 @@ void OrchestratorInclude::compileProject(const std::string& filePath)
             } catch (const CompilationError& e) {
                 std::lock_guard<std::mutex> lock(_mutex);
                 _hasErrors = true;
-                std::cerr << "Error in file '" << ptrUnit->getPath() << "': " << e.what() << '\n';
+                std::cerr << ptrUnit->getPath() << ":" << e.getLine() << ":" << e.getColumn() << ": Error: " << e.what() << '\n';
+            } catch (const std::exception& e) {
+                std::lock_guard<std::mutex> lock(_mutex);
+                _hasErrors = true;
+                std::cerr << ptrUnit->getPath() << ":1:1: Error: " << e.what() << '\n';
             }
         });
     }
@@ -86,7 +91,11 @@ void OrchestratorInclude::includeFile(const std::string& absolutePath)
         } catch (const CompilationError& e) {
             std::lock_guard<std::mutex> lock(_mutex);
             _hasErrors = true;
-            std::cerr << "Error in file '" << absolutePath << "': " << e.what() << '\n';
+            std::cerr << absolutePath << ":" << e.getLine() << ":" << e.getColumn() << ": Error: " << e.what() << '\n';
+        } catch (const std::exception& e) {
+            std::lock_guard<std::mutex> lock(_mutex);
+            _hasErrors = true;
+            std::cerr << absolutePath << ":1:1: Error: " << e.what() << '\n';
         }
     });
 

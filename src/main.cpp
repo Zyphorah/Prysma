@@ -19,7 +19,6 @@
 #include <llvm-18/llvm/IR/Value.h>
 #include <filesystem>
 #include <cstdlib>
-#include <memory>
 #include <mutex>
 #include <llvm/Support/TargetSelect.h>
 #include <string>
@@ -89,7 +88,10 @@ auto main(int argc, char* argv[]) -> int
     std::string cheminFile;
     bool activerGraphViz = false;
 
-    std::vector<std::string> arguments(argv + 1, argv + argc);
+    std::vector<std::string> arguments;
+    for (int i = 1; i < argc; ++i) {
+        arguments.emplace_back(argv[i]);
+    }
     for (const auto& arg : arguments) {
         if (arg == "--graphviz") {
             activerGraphViz = true;
@@ -164,7 +166,7 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
     catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << '\n';
+        std::cerr << cheminFile << ":1:1: Error: " << e.what() << '\n';
         return 1;
     }
 }
