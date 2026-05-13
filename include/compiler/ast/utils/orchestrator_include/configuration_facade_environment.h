@@ -24,6 +24,7 @@
 #include "compiler/builder/equation/builder_equation_flottante.h"
 #include "compiler/parser/parser_type.h"
 #include "compiler/llvm/llvm_backend.h"
+#include <functional>
 #include <llvm/Support/Allocator.h>
 #include <memory>
 #include <string>
@@ -33,8 +34,8 @@ class TypeParser;
 class ConfigurationFacadeEnvironment
 {
 private:
-    RegistryFunctionGlobal* _registryFunctionGlobal;
-    RegistryClassGlobal* _registryClassGlobal;
+    std::reference_wrapper<RegistryFunctionGlobal> _registryFunctionGlobal;
+    std::reference_wrapper<RegistryClassGlobal> _registryClassGlobal;
 
     llvm::BumpPtrAllocator _arena;
 
@@ -63,7 +64,9 @@ private:
     void registerInstructions();
 
 public:
-    explicit ConfigurationFacadeEnvironment(RegistryClassGlobal*registryClassGlobal, RegistryFunctionGlobal* registryFunctionGlobal);
+    explicit ConfigurationFacadeEnvironment(
+        RegistryClassGlobal& registryClassGlobal, 
+        RegistryFunctionGlobal& registryFunctionGlobal);
     ~ConfigurationFacadeEnvironment();
 
     ConfigurationFacadeEnvironment(const ConfigurationFacadeEnvironment&) = delete;

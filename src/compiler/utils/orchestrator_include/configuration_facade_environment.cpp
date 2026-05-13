@@ -67,10 +67,9 @@
 
 // NOLINTBEGIN(cppcoreguidelines-owning-memory)
 
-ConfigurationFacadeEnvironment::ConfigurationFacadeEnvironment(RegistryClassGlobal* registryClassGlobal, RegistryFunctionGlobal* registryFunctionGlobale)
+ConfigurationFacadeEnvironment::ConfigurationFacadeEnvironment(RegistryClassGlobal& registryClassGlobal, RegistryFunctionGlobal& registryFunctionGlobale)
     : _registryFunctionGlobal(registryFunctionGlobale),
       _registryClassGlobal(registryClassGlobal),
-      // _registryFile(fileRegistry),
       _registryExpression(nullptr),
       _builderTreeInstruction(nullptr),
       _builderEquation(nullptr),
@@ -154,7 +153,7 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
     _context->getBackend()->declareExternal("backSlashN", llvm::Type::getVoidTy(_context->getBackend()->getContext()), {});
     {
         auto symBackSlashNGlobal = std::make_unique<SymbolFunctionGlobal>(prysmaVoidType, nullptr);
-        _context->getRegistryFunctionGlobal()->registerElement("backSlashN", std::move(symBackSlashNGlobal));
+        _context->getRegistryFunctionGlobal().registerElement("backSlashN", std::move(symBackSlashNGlobal));
 
         llvm::Function* function = _context->getBackend()->getModule().getFunction("backSlashN");
         auto symBackSlashNLocal = std::make_unique<SymbolFunctionLocal>(function, prysmaVoidType, nullptr);
@@ -169,7 +168,7 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
     llvm::Function* printFunc = llvm::Function::Create(print_type, llvm::Function::ExternalLinkage, "print", _context->getBackend()->getModule());
     {
         auto symPrintGlobal = std::make_unique<SymbolFunctionGlobal>(prysmaVoidType, nullptr);
-        _context->getRegistryFunctionGlobal()->registerElement("print", std::move(symPrintGlobal));
+        _context->getRegistryFunctionGlobal().registerElement("print", std::move(symPrintGlobal));
 
         auto symPrintLocal = std::make_unique<SymbolFunctionLocal>(printFunc, prysmaVoidType, nullptr);
 
@@ -184,7 +183,7 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
     {
         IType* type = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::PointerType::getUnqual(_context->getBackend()->getContext()));
         auto symMallocGlobal = std::make_unique<SymbolFunctionGlobal>(type,nullptr);
-        _context->getRegistryFunctionGlobal()->registerElement("prysma_malloc", std::move(symMallocGlobal));
+        _context->getRegistryFunctionGlobal().registerElement("prysma_malloc", std::move(symMallocGlobal));
 
         IType* type2 = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::PointerType::getUnqual(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
         auto symMallocLocal = std::make_unique<SymbolFunctionLocal>(mallocFunc,type2, nullptr);
@@ -200,7 +199,7 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
     llvm::Function* freeFunc = llvm::Function::Create(free_type, llvm::Function::ExternalLinkage, "prysma_free", _context->getBackend()->getModule());
     {
         auto symFreeGlobal = std::make_unique<SymbolFunctionGlobal>(prysmaVoidType, nullptr);
-        _context->getRegistryFunctionGlobal()->registerElement("prysma_free", std::move(symFreeGlobal));
+        _context->getRegistryFunctionGlobal().registerElement("prysma_free", std::move(symFreeGlobal));
 
         auto symFreeLocal = std::make_unique<SymbolFunctionLocal>(freeFunc,prysmaVoidType,nullptr);
         _context->getMaterializedFunctionRegistry()->registerElement("prysma_free", std::move(symFreeLocal));

@@ -97,7 +97,7 @@ void FillingVisitorBodyClass::visiter(NodeClass* nodeClass)
     }
 
     // 1. Retrieve the class object
-    Class* classInfo = _contextGenCode->getRegistryClassGlobal()->get(className).get();
+    Class* classInfo = _contextGenCode->getRegistryClassGlobal().get(className).get();
 
     // 2. Recursive resolution of inheritance
     INode* parentHeritage = classInfo->getParentInheritance();
@@ -123,7 +123,7 @@ void FillingVisitorBodyClass::visiter(NodeClass* nodeClass)
         parentHeritage->accept(&parentExtractor);
         std::string parentName = parentExtractor.getClassName();
 
-        Class* parentClassInfo = _contextGenCode->getRegistryClassGlobal()->get(parentName).get();
+        Class* parentClassInfo = _contextGenCode->getRegistryClassGlobal().get(parentName).get();
 
         // Extract parent methods to bind them at the same vtable position
         auto parentMethodKeys = parentClassInfo->getMaterializedFunctionRegistry()->getKeys();

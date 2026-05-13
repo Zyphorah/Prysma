@@ -111,7 +111,7 @@ auto main(int argc, char* argv[]) -> int
         llvm::InitializeAllTargetMCs();
         llvm::InitializeAllAsmPrinters();
         
-        std::unique_ptr<std::mutex> mutex = std::make_unique<std::mutex>();
+        std::mutex mutex;
       
         std::filesystem::path exePath = std::filesystem::canonical("/proc/self/exe");
         std::filesystem::path buildDir = exePath.parent_path();
@@ -126,19 +126,16 @@ auto main(int argc, char* argv[]) -> int
         std::string srcLib = (racineProject / "src" / "lib").string();
         std::string objLib = (buildDir / "obj" / "lib").string();
 
-        std::unique_ptr<RegistryFunctionGlobal> registryFunctionGlobale = std::make_unique<RegistryFunctionGlobal>();
+        RegistryFunctionGlobal registryFunctionGlobale;
+        RegistryClassGlobal registryClassGlobale;
 
-        // J'utilise pour la convention std::unique_ptr pour le moment mais je vais utilisée le système de rail offert par C++
-        // TODO
-        std::unique_ptr<RegistryClassGlobal> registryClassGlobale = std::make_unique<RegistryClassGlobal>();
-
-        std::unique_ptr<FileRegistry> registryFiles = std::make_unique<FileRegistry>();
+        FileRegistry registryFiles;
         
         OrchestratorInclude orchestratorInclude(
-            registryFunctionGlobale.get(), 
-            registryClassGlobale.get(), 
-            registryFiles.get(), 
-            mutex.get(), 
+            registryFunctionGlobale, 
+            registryClassGlobale, 
+            registryFiles, 
+            mutex, 
             activerGraphViz);
             orchestratorInclude.compileProject(cheminFile);
         if (orchestratorInclude.hasErrors()) {
@@ -152,7 +149,7 @@ auto main(int argc, char* argv[]) -> int
             srcLib,
             objLib,
             buildDir.string(),
-            registryFiles->getAllFiles(),
+            registryFiles.getAllFiles(),
             nomExecutable
         };
         BuilderSystem builder(params);

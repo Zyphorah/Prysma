@@ -69,7 +69,7 @@ void ResolutionChainageType::visiter(NodeCallObject *nodeCallObject)
     }
 
     // Method lookup
-    const std::unique_ptr<Class>& classInfoPtr = _registryClass->get(receiverComplexType->getClassName());
+    const std::unique_ptr<Class>& classInfoPtr = _registryClass.get().get(receiverComplexType->getClassName());
     if (!classInfoPtr) {
         throw std::runtime_error("Semantic error: class '" + receiverComplexType->getClassName() + "' not found.");
     }

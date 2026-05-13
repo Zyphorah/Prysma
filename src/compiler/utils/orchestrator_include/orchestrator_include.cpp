@@ -26,7 +26,12 @@
 #include <string>
 
 
-OrchestratorInclude::OrchestratorInclude(RegistryFunctionGlobal* registryFunctionGlobale,RegistryClassGlobal* registryClassGlobal, FileRegistry* registryFile, std::mutex* mutex, bool enableGraphViz)
+OrchestratorInclude::OrchestratorInclude(
+    RegistryFunctionGlobal& registryFunctionGlobale,
+    RegistryClassGlobal& registryClassGlobal,
+    FileRegistry& registryFile, 
+    std::mutex& mutex, 
+    bool enableGraphViz)
     : _mutex(mutex), _registryFunctionGlobal(registryFunctionGlobale), _registryClassGlobal(registryClassGlobal), _registryFile(registryFile), _enableGraphViz(enableGraphViz)
 {}
 
@@ -53,7 +58,7 @@ void OrchestratorInclude::compileProject(const std::string& filePath)
             try {
                 ptrUnit->pass2();
             } catch (const CompilationError& e) {
-                std::lock_guard<std::mutex> lock(*_mutex);
+                std::lock_guard<std::mutex> lock(_mutex);
                 _hasErrors = true;
                 std::cerr << "Error in file '" << ptrUnit->getPath() << "': " << e.what() << '\n';
             }
@@ -64,7 +69,7 @@ void OrchestratorInclude::compileProject(const std::string& filePath)
 
 void OrchestratorInclude::includeFile(const std::string& absolutePath)
 {
-    std::lock_guard<std::mutex> lock(*_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     if (_alreadyIncludedFiles.count(absolutePath) > 0) {
         return; // File already included, ignore to avoid multiple inclusions
     }
@@ -79,7 +84,7 @@ void OrchestratorInclude::includeFile(const std::string& absolutePath)
         try {
             ptrNewUnit->pass1();
         } catch (const CompilationError& e) {
-            std::lock_guard<std::mutex> lock(*_mutex);
+            std::lock_guard<std::mutex> lock(_mutex);
             _hasErrors = true;
             std::cerr << "Error in file '" << absolutePath << "': " << e.what() << '\n';
         }

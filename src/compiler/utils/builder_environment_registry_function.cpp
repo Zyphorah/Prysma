@@ -152,14 +152,14 @@ auto BuilderEnvironmentRegistryFunction::fillArgFunction(SymbolFunctionGlobal* o
 
 void BuilderEnvironmentRegistryFunction::projectGlobalToMaterialized()
 {
-    for(const auto& key : _contextGenCode->getRegistryFunctionGlobal()->getKeys())
+    for(const auto& key : _contextGenCode->getRegistryFunctionGlobal().getKeys())
     {
         // Skip if already materialized (e.g. standard functions like print, backSlashN)
         if (_contextGenCode->getMaterializedFunctionRegistry()->exists(key)) {
             continue;
         }
 
-        const auto& oldSymbolUniquePtr = _contextGenCode->getRegistryFunctionGlobal()->get(key);
+        const auto& oldSymbolUniquePtr = _contextGenCode->getRegistryFunctionGlobal().get(key);
         auto* oldSymbol = prysma::cast<SymbolFunctionGlobal>(oldSymbolUniquePtr.get());
         
         llvm::Type* retType = oldSymbol->getReturnType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
@@ -196,7 +196,7 @@ auto BuilderEnvironmentRegistryFunction::fillClassMethodsParamTypes(const Symbol
 
 void BuilderEnvironmentRegistryFunction::fillClassMethods(const std::basic_string<char>&  className)
 {
-    auto const& classInfo = _contextGenCode->getRegistryClassGlobal()->get(className);
+    auto const& classInfo = _contextGenCode->getRegistryClassGlobal().get(className);
     
     // Check if the class contains a builder, otherwise the class is not valid.
     if (!classInfo->getMaterializedFunctionRegistry()->exists(className)) {
@@ -261,7 +261,7 @@ void BuilderEnvironmentRegistryFunction::fillClassMethods(const std::basic_strin
 
 void BuilderEnvironmentRegistryFunction::fillClass()
 {
-    for (const auto& className : _contextGenCode->getRegistryClassGlobal()->getKeys())
+    for (const auto& className : _contextGenCode->getRegistryClassGlobal().getKeys())
     {
        fillClassMethods(className);
     }

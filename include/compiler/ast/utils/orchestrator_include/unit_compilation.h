@@ -12,6 +12,7 @@
 #include "compiler/ast/registry/registry_class.h"
 #include "compiler/ast/utils/orchestrator_include/configuration_facade_environment.h"
 #include "configuration_facade_environment.h"
+#include <functional>
 #include <string>
 #include <memory>
 
@@ -37,7 +38,7 @@ private:
     std::string _oldDirectory;
     std::string _currentDirectory;
 
-    FileRegistry* _fileRegistry;
+    std::reference_wrapper<FileRegistry> _fileRegistry;
     ContextGenCode* _context;
     INode* _tree;
     std::string _originalFilePath;
@@ -46,10 +47,10 @@ private:
 public: 
     UnitCompilation(
         OrchestratorInclude* orchestrator, 
-        FileRegistry* registry, 
+        FileRegistry& registry, 
         std::string filePath,
-        RegistryFunctionGlobal* registryFunctionGlobal, 
-        RegistryClassGlobal* registryClassGlobal);
+        RegistryFunctionGlobal& registryFunctionGlobal, 
+        RegistryClassGlobal& registryClassGlobal);
     ~UnitCompilation();
 
     UnitCompilation(const UnitCompilation&) = delete;

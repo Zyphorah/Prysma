@@ -71,7 +71,7 @@ auto MethodFunctionDeclarationGenerator::createFunction() -> llvm::Function*
 {
     llvm::StringRef functionName = getNodeDeclarationFunction()->getNom().value;
     std::string className = getContextGenCode()->getCurrentClassName();
-    auto const& classInfo = getContextGenCode()->getRegistryClassGlobal()->get(className);
+    auto const& classInfo = getContextGenCode()->getRegistryClassGlobal().get(className);
     const auto& symbolPtr = classInfo->getMaterializedFunctionRegistry()->get(functionName);
     if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
         throw std::runtime_error("Error: Expected SymbolFunctionLocal");
@@ -218,7 +218,7 @@ FunctionCallGenerator::FunctionCallGenerator(ContextGenCode* context, IVisitor* 
 auto MethodFunctionCallGenerator::getLocalFunction(llvm::StringRef functionName) -> const SymbolFunctionLocal*
 {
     std::string className = getContextGenCode()->getCurrentClassName();
-    auto const& classInfo = getContextGenCode()->getRegistryClassGlobal()->get(className);
+    auto const& classInfo = getContextGenCode()->getRegistryClassGlobal().get(className);
     if(classInfo->getMaterializedFunctionRegistry()->exists(functionName)){
         const auto& symbolPtr = classInfo->getMaterializedFunctionRegistry()->get(functionName);
         if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {

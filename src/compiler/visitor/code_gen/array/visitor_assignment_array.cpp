@@ -35,7 +35,7 @@ void GeneralVisitorGenCode::visiter(NodeAssignmentArray* nodeAssignmentArray)
     Symbol symbol;
     llvm::Value* value = nullptr;
 
-    if (arrayNameStr.find('.') != std::string::npos) {
+    if (arrayNameStr.contains('.')) {
         size_t pos = arrayNameStr.find('.');
         llvm::StringRef objectName = arrayNameStr.substr(0, pos);
         llvm::StringRef attributeName = arrayNameStr.substr(pos + 1);
@@ -45,7 +45,7 @@ void GeneralVisitorGenCode::visiter(NodeAssignmentArray* nodeAssignmentArray)
         llvm::Value* object = objectSymbol.getAddress();
 
         std::string className = getClassNameFromSymbol(objectSymbol);
-        auto* classInfo = _contextGenCode->getRegistryClassGlobal()->get(className).get();
+        auto* classInfo = _contextGenCode->getRegistryClassGlobal().get(className).get();
         auto iterator = classInfo->getMemberIndices().find(attributeName);
         unsigned int indexObj = iterator->second;
 

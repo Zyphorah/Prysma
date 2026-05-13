@@ -35,7 +35,7 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
     Class* classInfo = nullptr;
 
     if (nodeNew->getNomType().type == TOKEN_IDENTIFIER) {
-        classInfo = _contextGenCode->getRegistryClassGlobal()->get(std::string(nodeNew->getNomType().value)).get();
+        classInfo = _contextGenCode->getRegistryClassGlobal().get(std::string(nodeNew->getNomType().value)).get();
         classInfo = ErrorHelper::verifyNotNull(classInfo, llvm::formatv("Class '{0}' not found", nodeNew->getNomType().value).str());
         targetType = classInfo->getStructType();
     } else {

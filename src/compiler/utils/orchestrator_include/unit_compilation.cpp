@@ -36,10 +36,10 @@
 
 UnitCompilation::UnitCompilation(
     OrchestratorInclude* orchestrator, 
-    FileRegistry* registry, 
+    FileRegistry& registry, 
     std::string filePath, 
-    RegistryFunctionGlobal* registryFunctionGlobal,
-    RegistryClassGlobal* registryClassGlobal)   
+    RegistryFunctionGlobal& registryFunctionGlobal,
+    RegistryClassGlobal& registryClassGlobal)   
     : _orchestrator(orchestrator), 
       _fileRegistry(registry),
       _context(nullptr),
@@ -75,7 +75,7 @@ void UnitCompilation::pass1() {
     std::string parentName = absolutePath.parent_path().filename().string();
     _fileName = parentName + "_" + baseName;
 
-    _fileRegistry->addFile("programme/" + _fileName + ".ll");
+    _fileRegistry.get().addFile("programme/" + _fileName + ".ll");
 
     _facadeConfigurationEnvironment->initialize(resolvedPath);
 

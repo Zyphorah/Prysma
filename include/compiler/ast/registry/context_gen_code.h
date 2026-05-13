@@ -9,6 +9,7 @@
 #ifndef C2537ED8_1CCF_4242_BDB0_B5ED5F2AD08F
 #define C2537ED8_1CCF_4242_BDB0_B5ED5F2AD08F
 
+#include <functional>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -32,9 +33,9 @@ private:
     LlvmBackend* _backend;
     RegistryInstruction* _registryInstruction;
     RegistryVariable* _registryVariable;
-    RegistryFunctionGlobal* _registryFunctionGlobal;
+    std::reference_wrapper<RegistryFunctionGlobal> _registryFunctionGlobal;
     MaterializedFunctionRegistry* _registryFunctionLocal;
-    RegistryClassGlobal* _registryClassGlobal;
+    std::reference_wrapper<RegistryClassGlobal> _registryClassGlobal;
     ReturnContextCompilation* _returnContextCompilation;
     RegistryArgument* _registryArgument;
     llvm::BumpPtrAllocator* _arena;
@@ -47,70 +48,64 @@ public:
         LlvmBackend* backend,
         RegistryInstruction* registryInstruction,
         RegistryVariable* registryVariable,
-        RegistryFunctionGlobal* registryFunctionGlobal,
+        RegistryFunctionGlobal& registryFunctionGlobal,
         MaterializedFunctionRegistry* registryFunctionLocal,
-        RegistryClassGlobal* registryClassGlobal,
+        RegistryClassGlobal& registryClassGlobal,
         ReturnContextCompilation* returnContextCompilation,
         RegistryArgument* registryArgument,
         Symbol temporaryValue,
         llvm::BumpPtrAllocator* arena,
         std::string currentFilePath
-    ) 
+    )
+    : _registryType(registryType)
+    , _temporaryValue(temporaryValue)
+    , _backend(backend)
+    , _registryInstruction(registryInstruction)
+    , _registryVariable(registryVariable)
+    , _registryFunctionGlobal(registryFunctionGlobal)
+    , _registryFunctionLocal(registryFunctionLocal)
+    , _registryClassGlobal(registryClassGlobal)
+    , _returnContextCompilation(returnContextCompilation)
+    , _registryArgument(registryArgument)
+    , _arena(arena)
+    , _currentFilePath(std::move(currentFilePath))
     {
         try {
-            if (currentFilePath.empty()) {
+            if (_currentFilePath.empty()) {
                 throw std::invalid_argument("The current file path cannot be empty");
             }
-            if (registryType == nullptr)
+            if (_registryType == nullptr)
             {
                 throw std::invalid_argument("The file registry cannot be null");
             }
-            if (backend == nullptr) {
+            if (_backend == nullptr) {
                 throw std::invalid_argument("The LLVM backend cannot be null");
             }
-            if (registryInstruction == nullptr) {
+            if (_registryInstruction == nullptr) {
                 throw std::invalid_argument("The instruction registry cannot be null");
             }
-            if (registryVariable == nullptr) {
+            if (_registryVariable == nullptr) {
                 throw std::invalid_argument("The variable registry cannot be null");
             }
-            if (registryFunctionGlobal == nullptr) {
-                throw std::invalid_argument("The global function registry cannot be null");
-            }
-            if (registryFunctionLocal == nullptr) {
+            if (_registryFunctionLocal == nullptr) {
                 throw std::invalid_argument("The local function registry cannot be null");
             }
-            if (registryClassGlobal == nullptr) {
-                throw std::invalid_argument("The global class registry cannot be null");
-            }
-            if (registryType == nullptr) {
+            if (_registryType == nullptr) {
                 throw std::invalid_argument("The type registry cannot be null");
             }
-            if (returnContextCompilation == nullptr) {
+            if (_returnContextCompilation == nullptr) {
                 throw std::invalid_argument("The return context compilation cannot be null");
             }
-            if (registryArgument == nullptr) {
+            if (_registryArgument == nullptr) {
                 throw std::invalid_argument("The argument registry cannot be null");
             }
-            if (arena == nullptr) {
+            if (_arena == nullptr) {
                 throw std::invalid_argument("The arena cannot be null");
             }
         } catch (const std::invalid_argument& e) {
             std::cerr << "Error during code generation context creation: " << e.what() << "\n";
             throw;
         }
-        _registryType = registryType;
-        _currentFilePath = std::move(currentFilePath);
-        _backend = backend;
-        _registryInstruction = registryInstruction;
-        _registryVariable = registryVariable;
-        _registryFunctionGlobal = registryFunctionGlobal;
-        _registryFunctionLocal = registryFunctionLocal;
-        _registryClassGlobal = registryClassGlobal;
-        _returnContextCompilation = returnContextCompilation;
-        _registryArgument = registryArgument;
-        _temporaryValue = temporaryValue;
-        _arena = arena;
     }
 
     void setTemporaryValue(Symbol temporaryValue) { _temporaryValue = temporaryValue; }
@@ -122,9 +117,9 @@ public:
     [[nodiscard]] auto getBackend() const -> LlvmBackend* { return _backend; }
     [[nodiscard]] auto getRegistryInstruction() const -> RegistryInstruction* { return _registryInstruction; }
     [[nodiscard]] auto getRegistryVariable() const -> RegistryVariable* { return _registryVariable; }
-    [[nodiscard]] auto getRegistryFunctionGlobal() const -> RegistryFunctionGlobal* { return _registryFunctionGlobal; }
+    [[nodiscard]] auto getRegistryFunctionGlobal() const -> RegistryFunctionGlobal& { return _registryFunctionGlobal; }
     [[nodiscard]] auto getMaterializedFunctionRegistry() const -> MaterializedFunctionRegistry* { return _registryFunctionLocal; }
-    [[nodiscard]] auto getRegistryClassGlobal() const -> RegistryClassGlobal* { return _registryClassGlobal; }
+    [[nodiscard]] auto getRegistryClassGlobal() const -> RegistryClassGlobal& { return _registryClassGlobal; }
     [[nodiscard]] auto getReturnContextCompilation() const -> ReturnContextCompilation* { return _returnContextCompilation; }
     [[nodiscard]] auto getRegistryArgument() const -> RegistryArgument* { return _registryArgument; }
     [[nodiscard]] auto getArena() const -> llvm::BumpPtrAllocator* { return _arena; }

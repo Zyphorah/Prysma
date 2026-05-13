@@ -2,6 +2,7 @@
 #include "compiler/ast/registry/registry_class.h"
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/visitor/visitor_base_generale.h"
+#include <functional>
 #include <string>
 #include <unordered_map>
 #include "compiler/ast/registry/registry_function.h"
@@ -49,11 +50,14 @@ class ResolutionChainageType : public VisitorBaseGenerale
 {
 
 private:
-    RegistryClassGlobal* _registryClass;
+    std::reference_wrapper<RegistryClassGlobal> _registryClass;
     std::unordered_map<std::string, IType*> _variables;
     
 public: 
-    explicit ResolutionChainageType(RegistryClassGlobal* RegistryClassGlobal) : _registryClass(RegistryClassGlobal){}
+    explicit ResolutionChainageType(
+        RegistryClassGlobal& RegistryClassGlobal
+    ) : _registryClass(RegistryClassGlobal)
+    {}
     ~ResolutionChainageType() override = default;
 
     // Delete copy and move constructors and assignment operators

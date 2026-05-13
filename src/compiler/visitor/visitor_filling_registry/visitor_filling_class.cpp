@@ -111,7 +111,7 @@ void FillingVisitorRegistry::visiter(NodeClass* nodeClass)
     Class* classInfoPtr = classInfo.get();
 
     // 7. Register the class in the compiler's global registry
-    _contextGenCode->getRegistryClassGlobal()->registerElement(className, std::move(classInfo));
+    _contextGenCode->getRegistryClassGlobal().registerElement(className, std::move(classInfo));
 
     // 8. Visit the class body to fill its registries (methods, etc.)
     std::string previousClass = _contextGenCode->getCurrentClassName();
