@@ -53,7 +53,7 @@ TEST_CASE("Enregistryr plusieurs functions et verifier les cles", "[RegistryFunc
 }
 
 TEST_CASE("Ecraser une function existante dans le registry", "[RegistryFunction]") {
-    RegistryFunctionLocal registry;
+    MaterializedFunctionRegistry registry;
 
     auto premier = make_unique<SymbolFunctionLocal>();
     premier->function = nullptr;
@@ -71,7 +71,7 @@ TEST_CASE("Ecraser une function existante dans le registry", "[RegistryFunction]
 
 TEST_CASE("Registry local functionne independamment du global", "[RegistryFunction]") {
     RegistryFunctionGlobal registryGlobal;
-    RegistryFunctionLocal registryLocal;
+    MaterializedFunctionRegistry registryLocal;
 
     registryGlobal.registerElement("shared", make_unique<SymbolFunctionGlobal>());
     registryLocal.registerElement("shared", make_unique<SymbolFunctionLocal>());
@@ -88,7 +88,7 @@ TEST_CASE("Registry local functionne independamment du global", "[RegistryFuncti
 
 // cas non functionnel sad test 
 TEST_CASE("RegistryFunction - Enregistryr null et get ne plante pas", "[RegistryFunction][SadTest]") {
-    RegistryFunctionLocal registry;
+    MaterializedFunctionRegistry registry;
 
     registry.registerElement("fn1", make_unique<SymbolFunctionLocal>());
     registry.registerElement("fn2", make_unique<SymbolFunctionLocal>());

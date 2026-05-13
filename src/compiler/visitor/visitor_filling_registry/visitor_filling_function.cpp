@@ -28,8 +28,8 @@ void FillingVisitorRegistry::visiter(NodeDeclarationFunction* nodeDeclarationFun
         functionSymbol->node = nodeDeclarationFunction;
 
         std::string className = _contextGenCode->getCurrentClassName();
-        auto* classInfo = _contextGenCode->getRegistryClassLocal()->get(className).get();
-        classInfo->getRegistryFunctionLocal()->registerElement(functionName, std::move(functionSymbol));
+        auto* classInfo = _contextGenCode->getRegistryClassGlobal()->get(className).get();
+        classInfo->getMaterializedFunctionRegistry()->registerElement(functionName, std::move(functionSymbol));
     } else {
         // global context (global function)
         auto functionSymbol = std::make_unique<SymbolFunctionGlobal>();

@@ -38,7 +38,7 @@ void GeneralVisitorGenCode::visiter(NodeReadingArray* nodeReadingArray)
         llvm::Value* object = objectSymbol.getAddress();
 
         std::string className = getClassNameFromSymbol(objectSymbol);
-        auto* classInfo = _contextGenCode->getRegistryClassLocal()->get(className).get();
+        auto* classInfo = _contextGenCode->getRegistryClassGlobal()->get(className).get();
         auto iterator = classInfo->getMemberIndices().find(attributeName.str());
         unsigned int indexObj = iterator->second;
 

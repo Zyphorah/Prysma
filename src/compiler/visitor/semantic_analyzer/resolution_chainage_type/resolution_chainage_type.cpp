@@ -74,7 +74,7 @@ void ResolutionChainageType::visiter(NodeCallObject *nodeCallObject)
         throw std::runtime_error("Semantic error: class '" + receiverComplexType->getClassName() + "' not found.");
     }
 
-    const auto& method = classInfoPtr->getRegistryFunctionLocal()->get(nodeCallObject->getNomMethode().value);
+    const auto& method = classInfoPtr->getMaterializedFunctionRegistry()->get(nodeCallObject->getNomMethode().value);
     if (!method) {
         throw std::runtime_error("Semantic error: method '" + std::string(nodeCallObject->getNomMethode().value) + "' not found in class '" + receiverComplexType->getClassName() + "'.");
     }

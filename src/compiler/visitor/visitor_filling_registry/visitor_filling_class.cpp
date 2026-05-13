@@ -103,7 +103,7 @@ void FillingVisitorRegistry::visiter(NodeClass* nodeClass)
 
     // 6. Prepare internal registries (empty for now, will be filled in Pass 2)
     classInfo->setRegistryVariable(new RegistryVariable());
-    classInfo->setRegistryFunctionLocal(new RegistryFunctionLocal());
+    classInfo->setRegistryFunctionLocal(new MaterializedFunctionRegistry());
 
     // The VTable will be generated later during virtual method resolution
     classInfo->setVTable(nullptr);
@@ -111,7 +111,7 @@ void FillingVisitorRegistry::visiter(NodeClass* nodeClass)
     Class* classInfoPtr = classInfo.get();
 
     // 7. Register the class in the compiler's global registry
-    _contextGenCode->getRegistryClassLocal()->registerElement(className, std::move(classInfo));
+    _contextGenCode->getRegistryClassGlobal()->registerElement(className, std::move(classInfo));
 
     // 8. Visit the class body to fill its registries (methods, etc.)
     std::string previousClass = _contextGenCode->getCurrentClassName();

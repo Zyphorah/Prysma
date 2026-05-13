@@ -111,7 +111,7 @@ void UnitCompilation::pass2() {
     std::string pathProgram = (buildDir / "programme/").string();
     std::string pathGraph = (buildDir / "graphe/").string();
 
-    ResolutionChainageType resolutionChainageType(_context->getRegistryClassLocal());
+    ResolutionChainageType resolutionChainageType(_context->getRegistryClassGlobal());
     _tree->accept(&resolutionChainageType);
 
     GeneralVisitorGenCode visitor(_context, _orchestrator);

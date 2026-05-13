@@ -38,7 +38,7 @@ auto VariableAddressor::getAddress(llvm::StringRef variableName) -> Symbol {
     }
 
     if (!_context->getCurrentClassName().empty()) {
-        auto const& classInfo = _context->getRegistryClassLocal()->get(_context->getCurrentClassName());
+        auto const& classInfo = _context->getRegistryClassGlobal()->get(_context->getCurrentClassName());
         if (classInfo->getMemberIndices().find(std::string(variableName)) != classInfo->getMemberIndices().end()) {
             unsigned int idx = classInfo->getMemberIndices().at(std::string(variableName));
             

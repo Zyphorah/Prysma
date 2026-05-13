@@ -33,11 +33,10 @@ private:
     RegistryInstruction* _registryInstruction;
     RegistryVariable* _registryVariable;
     RegistryFunctionGlobal* _registryFunctionGlobal;
-    RegistryFunctionLocal* _registryFunctionLocal;
+    MaterializedFunctionRegistry* _registryFunctionLocal;
     RegistryClassGlobal* _registryClassGlobal;
     ReturnContextCompilation* _returnContextCompilation;
     RegistryArgument* _registryArgument;
-    RegistryClassLocal* _registryClassLocal;
     llvm::BumpPtrAllocator* _arena;
     std::string _currentFilePath;
     std::string _currentClassName;
@@ -49,11 +48,10 @@ public:
         RegistryInstruction* registryInstruction,
         RegistryVariable* registryVariable,
         RegistryFunctionGlobal* registryFunctionGlobal,
-        RegistryFunctionLocal* registryFunctionLocal,
+        MaterializedFunctionRegistry* registryFunctionLocal,
         RegistryClassGlobal* registryClassGlobal,
         ReturnContextCompilation* returnContextCompilation,
         RegistryArgument* registryArgument,
-        RegistryClassLocal* registryClassLocal,
         Symbol temporaryValue,
         llvm::BumpPtrAllocator* arena,
         std::string currentFilePath
@@ -97,9 +95,6 @@ public:
             if (arena == nullptr) {
                 throw std::invalid_argument("The arena cannot be null");
             }
-            if (registryClassLocal == nullptr) {
-                throw std::invalid_argument("The class registry cannot be null");
-            }
         } catch (const std::invalid_argument& e) {
             std::cerr << "Error during code generation context creation: " << e.what() << "\n";
             throw;
@@ -114,7 +109,6 @@ public:
         _registryClassGlobal = registryClassGlobal;
         _returnContextCompilation = returnContextCompilation;
         _registryArgument = registryArgument;
-        _registryClassLocal = registryClassLocal;
         _temporaryValue = temporaryValue;
         _arena = arena;
     }
@@ -129,11 +123,10 @@ public:
     [[nodiscard]] auto getRegistryInstruction() const -> RegistryInstruction* { return _registryInstruction; }
     [[nodiscard]] auto getRegistryVariable() const -> RegistryVariable* { return _registryVariable; }
     [[nodiscard]] auto getRegistryFunctionGlobal() const -> RegistryFunctionGlobal* { return _registryFunctionGlobal; }
-    [[nodiscard]] auto getRegistryFunctionLocal() const -> RegistryFunctionLocal* { return _registryFunctionLocal; }
+    [[nodiscard]] auto getMaterializedFunctionRegistry() const -> MaterializedFunctionRegistry* { return _registryFunctionLocal; }
     [[nodiscard]] auto getRegistryClassGlobal() const -> RegistryClassGlobal* { return _registryClassGlobal; }
     [[nodiscard]] auto getReturnContextCompilation() const -> ReturnContextCompilation* { return _returnContextCompilation; }
     [[nodiscard]] auto getRegistryArgument() const -> RegistryArgument* { return _registryArgument; }
-    [[nodiscard]] auto getRegistryClassLocal() const -> RegistryClassLocal* { return _registryClassLocal; }
     [[nodiscard]] auto getArena() const -> llvm::BumpPtrAllocator* { return _arena; }
     [[nodiscard]] auto getCurrentFilePath() const -> const std::string& { return _currentFilePath; }
     [[nodiscard]] auto getCurrentClassName() const -> const std::string& { return _currentClassName; }

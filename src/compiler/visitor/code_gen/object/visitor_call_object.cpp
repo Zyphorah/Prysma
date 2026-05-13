@@ -95,7 +95,7 @@ void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
         ErrorHelper::compilationError("Class undetermined for object executing method '" + methodName.str() + "'");
     }
 
-    auto* classInfo = _contextGenCode->getRegistryClassLocal()->get(className).get();
+    auto* classInfo = _contextGenCode->getRegistryClassGlobal()->get(className).get();
     classInfo = ErrorHelper::verifyNotNull(classInfo, "Class '" + className + "' not found");
     
     // We retrieve the StructType directly from classInfo rather than probing the pointer
@@ -110,7 +110,7 @@ void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
     // Method index
     uint32_t methodIndex = classInfo->getMethodIndex(methodName.str());
 
-    ErrorHelper::verifyExistence(*classInfo->getRegistryFunctionLocal(), methodName.str(),
+    ErrorHelper::verifyExistence(*classInfo->getMaterializedFunctionRegistry(), methodName.str(),
         "Method '" + methodName.str() + "' does not exist in '" + className + "'");
 
     auto& builder = _contextGenCode->getBackend()->getBuilder();
@@ -122,7 +122,7 @@ void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
     std::vector<llvm::Value*> args;
     args.push_back(object);
 
-    const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(methodName.str());
+    const auto& symbolPtr = classInfo->getMaterializedFunctionRegistry()->get(methodName.str());
     const auto* functionSymbol = prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
     llvm::FunctionType* functionType = functionSymbol->function->getFunctionType();
 

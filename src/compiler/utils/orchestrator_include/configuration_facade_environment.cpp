@@ -115,11 +115,10 @@ void ConfigurationFacadeEnvironment::createRegistries()
     _backend = std::make_unique<LlvmBackend>();
     _registryInstruction = std::make_unique<RegistryInstruction>();
     _registryVariable = std::make_unique<RegistryVariable>();
-    _registryFunctionLocal = std::make_unique<RegistryFunctionLocal>();
+    _registryFunctionLocal = std::make_unique<MaterializedFunctionRegistry>();
     _registryType = std::make_unique<RegistryType>();
     _returnContextCompilation = std::make_unique<ReturnContextCompilation>();
     _registryArgument = std::make_unique<RegistryArgument>();
-    _registryClass = std::make_unique<RegistryClassLocal>();
 }
 
 void ConfigurationFacadeEnvironment::createContext(const std::string& filePath)
@@ -135,10 +134,9 @@ void ConfigurationFacadeEnvironment::createContext(const std::string& filePath)
         _registryVariable.get(),
         _registryFunctionGlobal,
         _registryFunctionLocal.get(),
-              _registryClassGlobal,
+        _registryClassGlobal,
         _returnContextCompilation.get(),
         _registryArgument.get(),
-        _registryClass.get(),
         tempValue,
         &_arena,
         filePath
@@ -162,7 +160,7 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
         symBackSlashNLocal->function = _context->getBackend()->getModule().getFunction("backSlashN");
         symBackSlashNLocal->returnType = prysmaVoidType;
         symBackSlashNLocal->node = nullptr;
-        _context->getRegistryFunctionLocal()->registerElement("backSlashN", std::move(symBackSlashNLocal));
+        _context->getMaterializedFunctionRegistry()->registerElement("backSlashN", std::move(symBackSlashNLocal));
     }
 
     // print
@@ -180,7 +178,7 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
         symPrintLocal->function = printFunc;
         symPrintLocal->returnType = prysmaVoidType;
         symPrintLocal->node = nullptr;
-        _context->getRegistryFunctionLocal()->registerElement("print", std::move(symPrintLocal));
+        _context->getMaterializedFunctionRegistry()->registerElement("print", std::move(symPrintLocal));
     }
 
     // prysma_malloc
@@ -198,7 +196,7 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
         symMallocLocal->function = mallocFunc;
         symMallocLocal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::PointerType::getUnqual(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
         symMallocLocal->node = nullptr;
-        _context->getRegistryFunctionLocal()->registerElement("prysma_malloc", std::move(symMallocLocal));
+        _context->getMaterializedFunctionRegistry()->registerElement("prysma_malloc", std::move(symMallocLocal));
     }
 
     // prysma_free
@@ -216,7 +214,7 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
         symFreeLocal->function = freeFunc;
         symFreeLocal->returnType = prysmaVoidType;
         symFreeLocal->node = nullptr;
-        _context->getRegistryFunctionLocal()->registerElement("prysma_free", std::move(symFreeLocal));
+        _context->getMaterializedFunctionRegistry()->registerElement("prysma_free", std::move(symFreeLocal));
     }
 }
 

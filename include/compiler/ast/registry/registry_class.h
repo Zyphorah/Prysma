@@ -28,7 +28,7 @@ class INode;
 struct Class
 {
 private:
-    RegistryFunctionLocal* registryFunctionLocal;
+    MaterializedFunctionRegistry* registryFunctionLocal;
     RegistryVariable* registryVariable;
 
     llvm::GlobalVariable* vtable;
@@ -47,7 +47,7 @@ private:
 public:
     // Builder to initialize members
     Class(
-        RegistryFunctionLocal* p_registryFunctionLocal,
+        MaterializedFunctionRegistry* p_registryFunctionLocal,
         RegistryVariable* p_registryVariable,
         llvm::GlobalVariable* p_vtable,
         llvm::StructType* p_structType,
@@ -75,11 +75,11 @@ public:
     void setStructType(llvm::StructType* type) { structType = type; }
     void setParentInheritance(INode* node) { parentInheritance = node; }
     void setRegistryVariable(RegistryVariable* reg) { registryVariable = reg; }
-    void setRegistryFunctionLocal(RegistryFunctionLocal* reg) { registryFunctionLocal = reg; }
+    void setRegistryFunctionLocal(MaterializedFunctionRegistry* reg) { registryFunctionLocal = reg; }
     void setVTable(llvm::GlobalVariable* vtablePtr) { vtable = vtablePtr; }
 
     // Getters
-    [[nodiscard]] auto getRegistryFunctionLocal() const -> RegistryFunctionLocal* { return registryFunctionLocal; }
+    [[nodiscard]] auto getMaterializedFunctionRegistry() const -> MaterializedFunctionRegistry* { return registryFunctionLocal; }
     [[nodiscard]] auto getRegistryVariable() const -> RegistryVariable* { return registryVariable; }
     [[nodiscard]] auto getVTable() const -> llvm::GlobalVariable* { return vtable; }
     [[nodiscard]] auto getStructType() const -> llvm::StructType* { return structType; }
@@ -104,6 +104,18 @@ public:
 // Pourquoi, car chaque thread on leur propre contexte, je dois donc faire un registre class globale une première passe pour remplir le registre globale en premier temps
 // Un visiteur de remplissage générale
 
+class RegistryClassGlobal : public RegistryGeneric<std::string, std::unique_ptr<Class>, std::mutex>
+{
+public:
+    RegistryClassGlobal() = default;
+    RegistryClassGlobal(const RegistryClassGlobal&) = delete;
+    auto operator=(const RegistryClassGlobal&) -> RegistryClassGlobal& = delete;
+    RegistryClassGlobal(RegistryClassGlobal&&) = delete;
+    auto operator=(RegistryClassGlobal&&) -> RegistryClassGlobal& = delete;
+
+    ~RegistryClassGlobal() override = default;
+};
+
 class RegistryClassLocal : public RegistryGeneric<std::string, std::unique_ptr<Class>>
 {
 public:
@@ -116,16 +128,4 @@ public:
     ~RegistryClassLocal() override = default;
 };
 
-
-class RegistryClassGlobal : public RegistryGeneric<std::string, std::unique_ptr<Class>, std::mutex>
-{
-public:
-    RegistryClassGlobal() = default;
-    RegistryClassGlobal(const RegistryClassGlobal&) = delete;
-    auto operator=(const RegistryClassGlobal&) -> RegistryClassGlobal& = delete;
-    RegistryClassGlobal(RegistryClassGlobal&&) = delete;
-    auto operator=(RegistryClassGlobal&&) -> RegistryClassGlobal& = delete;
-
-    ~RegistryClassGlobal() override = default;
-};
 #endif /* C2ADEE91_A0DA_4404_8AF5_5B1105A499EC */

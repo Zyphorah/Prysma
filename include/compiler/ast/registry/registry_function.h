@@ -14,7 +14,6 @@
 #include <llvm-18/llvm/ADT/StringRef.h>
 #include <llvm-18/llvm/IR/Function.h>
 #include <mutex>
-#include <string>
 #include <memory>
 
 class IType;
@@ -71,17 +70,15 @@ public:
     ~RegistryFunctionGlobal() override = default;
 };
 
-// Je vais rename registryFunctionLocal elle porte à confusion pour sa vrai utilité
-// Et puis, cette classe est redondante, je vais voir pour la retirer, mais sans forcément devoir faire un mutex
-class RegistryFunctionLocal : public RegistryGeneric<llvm::StringRef, std::unique_ptr<IFunctionSymbolRegistry>>
+class MaterializedFunctionRegistry : public RegistryGeneric<llvm::StringRef, std::unique_ptr<IFunctionSymbolRegistry>>
 {
 public:
-    RegistryFunctionLocal() = default;
-    RegistryFunctionLocal(const RegistryFunctionLocal&) = delete;
-    auto operator=(const RegistryFunctionLocal&) -> RegistryFunctionLocal& = delete;
-    RegistryFunctionLocal(RegistryFunctionLocal&&) = delete;
-    auto operator=(RegistryFunctionLocal&&) -> RegistryFunctionLocal& = delete;
-    ~RegistryFunctionLocal() override = default;
+    MaterializedFunctionRegistry() = default;
+    MaterializedFunctionRegistry(const MaterializedFunctionRegistry&) = delete;
+    auto operator=(const MaterializedFunctionRegistry&) -> MaterializedFunctionRegistry& = delete;
+    MaterializedFunctionRegistry(MaterializedFunctionRegistry&&) = delete;
+    auto operator=(MaterializedFunctionRegistry&&) -> MaterializedFunctionRegistry& = delete;
+    ~MaterializedFunctionRegistry() override = default;
 };
 
 #endif /* F2141F07_2C85_4ADB_9BC9_A909EBD34394 */

@@ -53,7 +53,7 @@ auto StandardFunctionDeclarationGenerator::createFunction() -> llvm::Function*
 {
     llvm::StringRef functionName = getNodeDeclarationFunction()->getNom().value;
     
-    const auto& symbolPtr = getContextGenCode()->getRegistryFunctionLocal()->get(functionName);
+    const auto& symbolPtr = getContextGenCode()->getMaterializedFunctionRegistry()->get(functionName);
     if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
         throw std::runtime_error("Error: Expected SymbolFunctionLocal");
     }
@@ -71,8 +71,8 @@ auto MethodFunctionDeclarationGenerator::createFunction() -> llvm::Function*
 {
     llvm::StringRef functionName = getNodeDeclarationFunction()->getNom().value;
     std::string className = getContextGenCode()->getCurrentClassName();
-    auto const& classInfo = getContextGenCode()->getRegistryClassLocal()->get(className);
-    const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(functionName);
+    auto const& classInfo = getContextGenCode()->getRegistryClassGlobal()->get(className);
+    const auto& symbolPtr = classInfo->getMaterializedFunctionRegistry()->get(functionName);
     if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
         throw std::runtime_error("Error: Expected SymbolFunctionLocal");
     }
@@ -218,17 +218,17 @@ FunctionCallGenerator::FunctionCallGenerator(ContextGenCode* context, IVisitor* 
 auto MethodFunctionCallGenerator::getLocalFunction(llvm::StringRef functionName) -> const SymbolFunctionLocal*
 {
     std::string className = getContextGenCode()->getCurrentClassName();
-    auto const& classInfo = getContextGenCode()->getRegistryClassLocal()->get(className);
-    if(classInfo->getRegistryFunctionLocal()->exists(functionName)){
-        const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(functionName);
+    auto const& classInfo = getContextGenCode()->getRegistryClassGlobal()->get(className);
+    if(classInfo->getMaterializedFunctionRegistry()->exists(functionName)){
+        const auto& symbolPtr = classInfo->getMaterializedFunctionRegistry()->get(functionName);
         if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
             throw std::runtime_error("Error: Expected SymbolFunctionLocal");
         }
         return prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
     }
     
-    if (getContextGenCode()->getRegistryFunctionLocal()->exists(functionName)) {
-        const auto& symbolPtr = getContextGenCode()->getRegistryFunctionLocal()->get(functionName);
+    if (getContextGenCode()->getMaterializedFunctionRegistry()->exists(functionName)) {
+        const auto& symbolPtr = getContextGenCode()->getMaterializedFunctionRegistry()->get(functionName);
         if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
             throw std::runtime_error("Error: Expected SymbolFunctionLocal");
         }
@@ -240,8 +240,8 @@ auto MethodFunctionCallGenerator::getLocalFunction(llvm::StringRef functionName)
 
 auto StandardFunctionCallGenerator::getLocalFunction(llvm::StringRef functionName) -> const SymbolFunctionLocal*
 {
-    if (getContextGenCode()->getRegistryFunctionLocal()->exists(functionName)) {
-        const auto& symbolPtr = getContextGenCode()->getRegistryFunctionLocal()->get(functionName);
+    if (getContextGenCode()->getMaterializedFunctionRegistry()->exists(functionName)) {
+        const auto& symbolPtr = getContextGenCode()->getMaterializedFunctionRegistry()->get(functionName);
         if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
             throw std::runtime_error("Error: Expected SymbolFunctionLocal");
         }
@@ -346,7 +346,7 @@ void RegistryBuiltIns::generateCall(llvm::StringRef name, NodeCallFunction* node
 
         llvm::Value* llvmTag = builder.getInt32(static_cast<uint32_t>(tag));
         
-        const auto& symbolPtr = context->getRegistryFunctionLocal()->get("print");
+        const auto& symbolPtr = context->getMaterializedFunctionRegistry()->get("print");
         if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
             throw std::runtime_error("Error: Expected SymbolFunctionLocal for 'print'");
         }

@@ -35,7 +35,7 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
     Class* classInfo = nullptr;
 
     if (nodeNew->getNomType().type == TOKEN_IDENTIFIER) {
-        classInfo = _contextGenCode->getRegistryClassLocal()->get(std::string(nodeNew->getNomType().value)).get();
+        classInfo = _contextGenCode->getRegistryClassGlobal()->get(std::string(nodeNew->getNomType().value)).get();
         classInfo = ErrorHelper::verifyNotNull(classInfo, llvm::formatv("Class '{0}' not found", nodeNew->getNomType().value).str());
         targetType = classInfo->getStructType();
     } else {
@@ -133,8 +133,8 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
     // Build the builder with arguments
     if (classInfo != nullptr) {
         llvm::StringRef builderName = nodeNew->getNomType().value;
-        if (classInfo->getRegistryFunctionLocal()->exists(std::string(builderName))) {
-            const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(std::string(builderName));
+        if (classInfo->getMaterializedFunctionRegistry()->exists(std::string(builderName))) {
+            const auto& symbolPtr = classInfo->getMaterializedFunctionRegistry()->get(std::string(builderName));
             if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
                 throw std::runtime_error("Error: SymbolFunctionLocal expected");
             }

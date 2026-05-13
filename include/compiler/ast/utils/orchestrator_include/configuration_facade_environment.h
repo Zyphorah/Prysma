@@ -41,11 +41,10 @@ private:
     std::unique_ptr<LlvmBackend> _backend;
     std::unique_ptr<RegistryInstruction> _registryInstruction;
     std::unique_ptr<RegistryVariable> _registryVariable;
-    std::unique_ptr<RegistryFunctionLocal> _registryFunctionLocal;
+    std::unique_ptr<MaterializedFunctionRegistry> _registryFunctionLocal;
     std::unique_ptr<RegistryType> _registryType;
     std::unique_ptr<ReturnContextCompilation> _returnContextCompilation;
     std::unique_ptr<RegistryArgument> _registryArgument;
-    std::unique_ptr<RegistryClassLocal> _registryClass;
     std::unique_ptr<ContextGenCode> _context;
 
     RegistryExpression* _registryExpression;
