@@ -26,7 +26,7 @@ private:
     void fillClassMethods(const std::basic_string<char>&  className);
     auto fillClassMethodsParamTypes(const SymbolFunctionLocal* symbol) -> std::vector<llvm::Type*>;
     auto alignVTableWithParent(Class* classInfo, const std::vector<NodeDeclarationFunction*>& parentMethodList) -> std::vector<llvm::Constant*>;
-    void appendNewMethodsToVTable(std::vector<llvm::Constant*>& vtableElements, Class* classInfo, const std::vector<NodeDeclarationFunction*>& parentMethodList);
+    void appendNewMethodsToVTable(std::vector<llvm::Constant*>& vtableElements, Class* classInfo, const std::string& className, const std::vector<NodeDeclarationFunction*>& parentMethodList);
     static auto checkIsInTheParent(llvm::StringRef methodName, const std::vector<NodeDeclarationFunction*>& parentMethodList) -> bool;
     void addAtTheEndOfVtable(llvm::StringRef methodName, Class* classInfo, std::vector<llvm::Constant*>& vtableElements);
 
@@ -35,7 +35,7 @@ private:
     // We separate them like this to avoid conflicts caused by LLVM, as it is not thread-safe. Therefore, we build the real objects after the first pass.
     void projectGlobalToMaterialized();
     void fillClass();
-    auto fileArgFunction(const SymbolFunctionGlobal* oldSymbol) -> std::vector<llvm::Type*>;
+    auto fillArgFunction(SymbolFunctionGlobal* oldSymbol) -> std::vector<llvm::Type*>;
 public:
     explicit BuilderEnvironmentRegistryFunction(ContextGenCode* _contextGenCode);
     ~BuilderEnvironmentRegistryFunction() override;

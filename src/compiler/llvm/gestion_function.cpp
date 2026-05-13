@@ -57,9 +57,9 @@ auto StandardFunctionDeclarationGenerator::createFunction() -> llvm::Function*
     if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
         throw std::runtime_error("Error: Expected SymbolFunctionLocal");
     }
-    const auto* symbol = prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
+    auto* symbol = prysma::cast<SymbolFunctionLocal>(symbolPtr.get());
     
-    llvm::Function* function = symbol->function;
+    llvm::Function* function = symbol->getFunction();
 
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(getContextGenCode()->getBackend()->getContext(), "entry", function);
     getContextGenCode()->getBackend()->getBuilder().SetInsertPoint(entryBlock);
@@ -76,9 +76,9 @@ auto MethodFunctionDeclarationGenerator::createFunction() -> llvm::Function*
     if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
         throw std::runtime_error("Error: Expected SymbolFunctionLocal");
     }
-    const auto* symbol = prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
+    auto* symbol = prysma::cast<SymbolFunctionLocal>(symbolPtr.get());
     
-    llvm::Function* function = symbol->function;
+    llvm::Function* function = symbol->getFunction();
 
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(getContextGenCode()->getBackend()->getContext(), "entry", function);
     getContextGenCode()->getBackend()->getBuilder().SetInsertPoint(entryBlock);
@@ -263,7 +263,7 @@ void FunctionCallGenerator::generateCallFunction(NodeCallFunction* nodeCallFunct
     getContextGenCode()->getRegistryArgument()->clear();
 
     const SymbolFunctionLocal* symbolFunction = getLocalFunction(functionName);
-    llvm::Function* targetFunction = symbolFunction->function;
+    llvm::Function* targetFunction = symbolFunction->getFunction();
     llvm::FunctionType* functionType = targetFunction->getFunctionType();
     
     unsigned int paramIndex = 0; 
@@ -302,7 +302,7 @@ void FunctionCallGenerator::generateCallFunction(NodeCallFunction* nodeCallFunct
         args, 
         "call_result"
     ), getContextGenCode()->getTemporaryValue().getType(), getContextGenCode()->getTemporaryValue().getPointedElementType()));
-    getContextGenCode()->setTemporaryValue(Symbol(getContextGenCode()->getTemporaryValue().getAddress(), symbolFunction->returnType, getContextGenCode()->getTemporaryValue().getPointedElementType()));
+    getContextGenCode()->setTemporaryValue(Symbol(getContextGenCode()->getTemporaryValue().getAddress(), symbolFunction->getReturnType(), getContextGenCode()->getTemporaryValue().getPointedElementType()));
 }
 
 
@@ -352,7 +352,7 @@ void RegistryBuiltIns::generateCall(llvm::StringRef name, NodeCallFunction* node
         }
         const auto* symbolPrint = prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
         
-        builder.CreateCall(symbolPrint->function, { llvmTag, argumentValue });
+        builder.CreateCall(symbolPrint->getFunction(), { llvmTag, argumentValue });
         context->setTemporaryValue(Symbol(nullptr, context->getTemporaryValue().getType(), context->getTemporaryValue().getPointedElementType()));
     }
 }

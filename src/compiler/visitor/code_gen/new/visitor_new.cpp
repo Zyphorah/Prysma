@@ -139,7 +139,7 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
                 throw std::runtime_error("Error: SymbolFunctionLocal expected");
             }
             const auto* functionSymbol = prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
-            builder.CreateCall(functionSymbol->function, builderArgs);
+            builder.CreateCall(functionSymbol->getFunction(), builderArgs);
         }
     }
 

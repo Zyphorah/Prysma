@@ -135,9 +135,9 @@ void FillingVisitorBodyClass::visiter(NodeClass* nodeClass)
                 throw std::runtime_error("Error: SymbolFunctionLocal expected");
             }
             auto* localSymbol = prysma::cast<SymbolFunctionLocal>(symbol.get());
-            if (localSymbol->node != nullptr) {
+            if (localSymbol->getNode() != nullptr) {
                 MembersExtractorClass methodExtractor;
-                localSymbol->node->accept(&methodExtractor);
+                localSymbol->getNode()->accept(&methodExtractor);
                 if (!methodExtractor.getMethods().empty()) {
                     parentMethodList.push_back(methodExtractor.getMethods()[0]);
                 }

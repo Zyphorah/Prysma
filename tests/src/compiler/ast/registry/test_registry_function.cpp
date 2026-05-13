@@ -18,9 +18,7 @@ using namespace std;
 TEST_CASE("Enregistryr et get une function globale", "[RegistryFunction]") {
     RegistryFunctionGlobal registry;
 
-    auto symbole = make_unique<SymbolFunctionGlobal>();
-    symbole->returnType = nullptr;
-    symbole->node = nullptr;
+    auto symbole = make_unique<SymbolFunctionGlobal>(nullptr,nullptr);
 
     registry.registerElement("maFunction", std::move(symbole));
 
@@ -41,9 +39,9 @@ TEST_CASE("Recuperer une function inexistante lance une exception", "[RegistryFu
 TEST_CASE("Enregistryr plusieurs functions et verifier les cles", "[RegistryFunction]") {
     RegistryFunctionGlobal registry;
 
-    registry.registerElement("fn_a", make_unique<SymbolFunctionGlobal>());
-    registry.registerElement("fn_b", make_unique<SymbolFunctionGlobal>());
-    registry.registerElement("fn_c", make_unique<SymbolFunctionGlobal>());
+    registry.registerElement("fn_a", make_unique<SymbolFunctionGlobal>(nullptr, nullptr));
+    registry.registerElement("fn_b", make_unique<SymbolFunctionGlobal>(nullptr, nullptr));
+    registry.registerElement("fn_c", make_unique<SymbolFunctionGlobal>(nullptr, nullptr));
 
     auto cles = registry.getKeys();
     CHECK(cles.size() == 3);
@@ -56,24 +54,24 @@ TEST_CASE("Ecraser une function existante dans le registry", "[RegistryFunction]
     MaterializedFunctionRegistry registry;
 
     auto premier = make_unique<SymbolFunctionLocal>();
-    premier->function = nullptr;
+    premier->setFunction(nullptr);
     registry.registerElement("update", std::move(premier));
 
     auto second = make_unique<SymbolFunctionLocal>();
-    second->function = reinterpret_cast<llvm::Function*>(0xDEAD);
+    second->setFunction(reinterpret_cast<llvm::Function*>(0xDEAD));
     registry.registerElement("update", std::move(second));
 
     const auto& recupere = registry.get("update");
     auto* symboleCast = dynamic_cast<SymbolFunctionLocal*>(recupere.get());
     REQUIRE(symboleCast != nullptr);
-    CHECK(symboleCast->function == reinterpret_cast<llvm::Function*>(0xDEAD));
+    CHECK(symboleCast->getFunction() == reinterpret_cast<llvm::Function*>(0xDEAD));
 }
 
 TEST_CASE("Registry local functionne independamment du global", "[RegistryFunction]") {
     RegistryFunctionGlobal registryGlobal;
     MaterializedFunctionRegistry registryLocal;
 
-    registryGlobal.registerElement("shared", make_unique<SymbolFunctionGlobal>());
+    registryGlobal.registerElement("shared", make_unique<SymbolFunctionGlobal>(nullptr, nullptr));
     registryLocal.registerElement("shared", make_unique<SymbolFunctionLocal>());
 
     CHECK(registryGlobal.exists("shared"));
@@ -98,13 +96,13 @@ TEST_CASE("RegistryFunction - Enregistryr null et get ne plante pas", "[Registry
     CHECK(registry.getKeys().size() == 2);
 
     auto fnUpdate = make_unique<SymbolFunctionLocal>();
-    fnUpdate->function = reinterpret_cast<llvm::Function*>(0xABCD);
+    fnUpdate->setFunction(reinterpret_cast<llvm::Function*>(0xABCD));
     registry.registerElement("fn1", std::move(fnUpdate));
 
     const auto& recupere = registry.get("fn1");
     auto* symbole = dynamic_cast<SymbolFunctionLocal*>(recupere.get());
     REQUIRE(symbole != nullptr);
-    CHECK(symbole->function == reinterpret_cast<llvm::Function*>(0xABCD));
+    CHECK(symbole->getFunction() == reinterpret_cast<llvm::Function*>(0xABCD));
 
     CHECK(registry.getKeys().size() == 2);
     CHECK_THROWS_AS(registry.get("fn_inexistante"), std::invalid_argument);

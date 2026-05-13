@@ -82,9 +82,9 @@ void ResolutionChainageType::visiter(NodeCallObject *nodeCallObject)
     // Decoration
     if (nodeCallObject->getTypeResolut() != nullptr) {
         if (auto* symbolLocal = prysma::dyn_cast<SymbolFunctionLocal>(method.get())) {
-            nodeCallObject->getTypeResolut()->setTypeEvaluated(symbolLocal->returnType);
+            nodeCallObject->getTypeResolut()->setTypeEvaluated(symbolLocal->getReturnType());
         } else if (auto* symbolGlobal = prysma::dyn_cast<SymbolFunctionGlobal>(method.get())) {
-            nodeCallObject->getTypeResolut()->setTypeEvaluated(symbolGlobal->returnType);
+            nodeCallObject->getTypeResolut()->setTypeEvaluated(symbolGlobal->getReturnType());
         }
     }
 }

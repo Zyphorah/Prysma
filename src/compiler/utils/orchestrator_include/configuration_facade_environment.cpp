@@ -19,6 +19,7 @@
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/ast/registry/registry_instruction.h"
 #include "compiler/ast/registry/registry_type.h"
+#include "compiler/ast/registry/types/i_type.h"
 #include "compiler/ast/registry/types/type_simple.h"
 #include "compiler/ast/builder_tree_instruction.h"
 #include "compiler/control_memory/parser_delete.h"
@@ -54,6 +55,7 @@
 #include "compiler/object/parser_class.h"
 
 #include <llvm-18/llvm/IR/DerivedTypes.h>
+#include <llvm-18/llvm/IR/Function.h>
 #include <llvm-18/llvm/IR/Instructions.h>
 #include <llvm-18/llvm/IR/Value.h>
 #include <llvm/Support/Allocator.h>
@@ -151,15 +153,12 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
     // backSlashN
     _context->getBackend()->declareExternal("backSlashN", llvm::Type::getVoidTy(_context->getBackend()->getContext()), {});
     {
-        auto symBackSlashNGlobal = std::make_unique<SymbolFunctionGlobal>();
-        symBackSlashNGlobal->returnType = prysmaVoidType;
-        symBackSlashNGlobal->node = nullptr;
+        auto symBackSlashNGlobal = std::make_unique<SymbolFunctionGlobal>(prysmaVoidType, nullptr);
         _context->getRegistryFunctionGlobal()->registerElement("backSlashN", std::move(symBackSlashNGlobal));
 
-        auto symBackSlashNLocal = std::make_unique<SymbolFunctionLocal>();
-        symBackSlashNLocal->function = _context->getBackend()->getModule().getFunction("backSlashN");
-        symBackSlashNLocal->returnType = prysmaVoidType;
-        symBackSlashNLocal->node = nullptr;
+        llvm::Function* function = _context->getBackend()->getModule().getFunction("backSlashN");
+        auto symBackSlashNLocal = std::make_unique<SymbolFunctionLocal>(function, prysmaVoidType, nullptr);
+
         _context->getMaterializedFunctionRegistry()->registerElement("backSlashN", std::move(symBackSlashNLocal));
     }
 
@@ -169,15 +168,11 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
     llvm::FunctionType* print_type = llvm::FunctionType::get(llvm::Type::getVoidTy(_context->getBackend()->getContext()), print_args, true);
     llvm::Function* printFunc = llvm::Function::Create(print_type, llvm::Function::ExternalLinkage, "print", _context->getBackend()->getModule());
     {
-        auto symPrintGlobal = std::make_unique<SymbolFunctionGlobal>();
-        symPrintGlobal->returnType = prysmaVoidType;
-        symPrintGlobal->node = nullptr;
+        auto symPrintGlobal = std::make_unique<SymbolFunctionGlobal>(prysmaVoidType, nullptr);
         _context->getRegistryFunctionGlobal()->registerElement("print", std::move(symPrintGlobal));
 
-        auto symPrintLocal = std::make_unique<SymbolFunctionLocal>();
-        symPrintLocal->function = printFunc;
-        symPrintLocal->returnType = prysmaVoidType;
-        symPrintLocal->node = nullptr;
+        auto symPrintLocal = std::make_unique<SymbolFunctionLocal>(printFunc, prysmaVoidType, nullptr);
+
         _context->getMaterializedFunctionRegistry()->registerElement("print", std::move(symPrintLocal));
     }
 
@@ -187,15 +182,14 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
     llvm::FunctionType* malloc_type = llvm::FunctionType::get(llvm::PointerType::getUnqual(_context->getBackend()->getContext()), malloc_args, false);
     llvm::Function* mallocFunc = llvm::Function::Create(malloc_type, llvm::Function::ExternalLinkage, "prysma_malloc", _context->getBackend()->getModule());
     {
-        auto symMallocGlobal = std::make_unique<SymbolFunctionGlobal>();
-        symMallocGlobal->returnType = static_cast<TypeSimple*>(static_cast<void*>(new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::PointerType::getUnqual(_context->getBackend()->getContext()))));
-        symMallocGlobal->node = nullptr;
+        IType* type = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::PointerType::getUnqual(_context->getBackend()->getContext()));
+        auto symMallocGlobal = std::make_unique<SymbolFunctionGlobal>(type,nullptr);
         _context->getRegistryFunctionGlobal()->registerElement("prysma_malloc", std::move(symMallocGlobal));
 
-        auto symMallocLocal = std::make_unique<SymbolFunctionLocal>();
-        symMallocLocal->function = mallocFunc;
-        symMallocLocal->returnType = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::PointerType::getUnqual(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
-        symMallocLocal->node = nullptr;
+        IType* type2 = new (_arena.Allocate<TypeSimple>()) TypeSimple(llvm::PointerType::getUnqual(_context->getBackend()->getContext())); // NOLINT(cppcoreguidelines-owning-memory)
+        auto symMallocLocal = std::make_unique<SymbolFunctionLocal>(mallocFunc,type2, nullptr);
+     
+       
         _context->getMaterializedFunctionRegistry()->registerElement("prysma_malloc", std::move(symMallocLocal));
     }
 
@@ -205,15 +199,10 @@ void ConfigurationFacadeEnvironment::registerExternalFunctions()
     llvm::FunctionType* free_type = llvm::FunctionType::get(llvm::Type::getVoidTy(_context->getBackend()->getContext()), free_args, false);
     llvm::Function* freeFunc = llvm::Function::Create(free_type, llvm::Function::ExternalLinkage, "prysma_free", _context->getBackend()->getModule());
     {
-        auto symFreeGlobal = std::make_unique<SymbolFunctionGlobal>();
-        symFreeGlobal->returnType = prysmaVoidType;
-        symFreeGlobal->node = nullptr;
+        auto symFreeGlobal = std::make_unique<SymbolFunctionGlobal>(prysmaVoidType, nullptr);
         _context->getRegistryFunctionGlobal()->registerElement("prysma_free", std::move(symFreeGlobal));
 
-        auto symFreeLocal = std::make_unique<SymbolFunctionLocal>();
-        symFreeLocal->function = freeFunc;
-        symFreeLocal->returnType = prysmaVoidType;
-        symFreeLocal->node = nullptr;
+        auto symFreeLocal = std::make_unique<SymbolFunctionLocal>(freeFunc,prysmaVoidType,nullptr);
         _context->getMaterializedFunctionRegistry()->registerElement("prysma_free", std::move(symFreeLocal));
     }
 }

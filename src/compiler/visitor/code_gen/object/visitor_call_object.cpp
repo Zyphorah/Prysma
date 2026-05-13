@@ -124,7 +124,7 @@ void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
 
     const auto& symbolPtr = classInfo->getMaterializedFunctionRegistry()->get(methodName.str());
     const auto* functionSymbol = prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
-    llvm::FunctionType* functionType = functionSymbol->function->getFunctionType();
+    llvm::FunctionType* functionType = functionSymbol->getFunction()->getFunctionType();
 
     unsigned int paramIndex = 1; 
     for (INode* argumentChild : nodeCallObject->getChildren()) 
@@ -144,15 +144,15 @@ void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
 
     // Actual call
     if(methodName == className) {
-        builder.CreateCall(functionSymbol->function, args);
+        builder.CreateCall(functionSymbol->getFunction(), args);
         return;
     }
 
-    if (functionSymbol->function->getReturnType()->isVoidTy()) { 
+    if (functionSymbol->getFunction()->getReturnType()->isVoidTy()) { 
         builder.CreateCall(functionType, methodPointer, args);
         _contextGenCode->setTemporaryValue(Symbol(nullptr, nullptr, nullptr));
     } else {
         llvm::Value* result = builder.CreateCall(functionType, methodPointer, args, "object_call_result");
-        _contextGenCode->setTemporaryValue(Symbol(result, functionSymbol->returnType, nullptr));
+        _contextGenCode->setTemporaryValue(Symbol(result, functionSymbol->getReturnType(), nullptr));
     }
 }

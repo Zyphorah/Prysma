@@ -28,9 +28,9 @@ TEST_CASE("Registry global vide get lance exception", "[RegistryGlobal]") {
 TEST_CASE("Registry global ecraser ne change pas le nombre de cles", "[RegistryGlobal]") {
     RegistryFunctionGlobal registry;
 
-    registry.registerElement("fn", make_unique<SymbolFunctionGlobal>());
-    registry.registerElement("fn", make_unique<SymbolFunctionGlobal>());
-    registry.registerElement("fn", make_unique<SymbolFunctionGlobal>());
+    registry.registerElement("fn", make_unique<SymbolFunctionGlobal>(nullptr,nullptr));
+    registry.registerElement("fn", make_unique<SymbolFunctionGlobal>(nullptr,nullptr));
+    registry.registerElement("fn", make_unique<SymbolFunctionGlobal>(nullptr,nullptr));
 
     auto cles = registry.getKeys();
     CHECK(cles.size() == 1);
@@ -39,9 +39,9 @@ TEST_CASE("Registry global ecraser ne change pas le nombre de cles", "[RegistryG
 TEST_CASE("Registry global cles similaires sont distinctes", "[RegistryGlobal]") {
     RegistryFunctionGlobal registry;
 
-    registry.registerElement("fn", make_unique<SymbolFunctionGlobal>());
-    registry.registerElement("Fn", make_unique<SymbolFunctionGlobal>());
-    registry.registerElement("FN", make_unique<SymbolFunctionGlobal>());
+    registry.registerElement("fn", make_unique<SymbolFunctionGlobal>(nullptr,nullptr));
+    registry.registerElement("Fn", make_unique<SymbolFunctionGlobal>(nullptr,nullptr));
+    registry.registerElement("FN", make_unique<SymbolFunctionGlobal>(nullptr,nullptr));
 
     CHECK(registry.getKeys().size() == 3);
     CHECK(registry.exists("fn"));
@@ -66,13 +66,13 @@ TEST_CASE("Registry global message error contient la cle", "[RegistryGlobal]") {
 TEST_CASE("RegistryGlobal - Acces concurrent a la meme cle ne plante pas", "[RegistryGlobal][SadTest]") {
     RegistryFunctionGlobal registry;
 
-    registry.registerElement("fn", make_unique<SymbolFunctionGlobal>());
+    registry.registerElement("fn", make_unique<SymbolFunctionGlobal>(nullptr,nullptr));
 
     CHECK_NOTHROW(registry.get("fn"));
     CHECK_NOTHROW(registry.get("fn"));
     CHECK_NOTHROW(registry.get("fn"));
 
-    registry.registerElement("fn", make_unique<SymbolFunctionGlobal>());
+    registry.registerElement("fn", make_unique<SymbolFunctionGlobal>(nullptr,nullptr));
     CHECK_NOTHROW(registry.get("fn"));
 
     CHECK(registry.exists("fn"));

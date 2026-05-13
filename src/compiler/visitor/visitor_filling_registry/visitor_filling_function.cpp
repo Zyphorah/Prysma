@@ -24,18 +24,15 @@ void FillingVisitorRegistry::visiter(NodeDeclarationFunction* nodeDeclarationFun
     if (_contextGenCode->getCurrentClassName() != "") {
         // class context (method)
         auto functionSymbol = std::make_unique<SymbolFunctionLocal>();
-        functionSymbol->returnType = returnType;
-        functionSymbol->node = nodeDeclarationFunction;
+        functionSymbol->setReturnType(returnType);
+        functionSymbol->setNode(nodeDeclarationFunction);
 
         std::string className = _contextGenCode->getCurrentClassName();
         auto* classInfo = _contextGenCode->getRegistryClassGlobal()->get(className).get();
         classInfo->getMaterializedFunctionRegistry()->registerElement(functionName, std::move(functionSymbol));
     } else {
         // global context (global function)
-        auto functionSymbol = std::make_unique<SymbolFunctionGlobal>();
-        functionSymbol->returnType = returnType;
-        functionSymbol->node = nodeDeclarationFunction;
-
+        auto functionSymbol = std::make_unique<SymbolFunctionGlobal>(returnType,nodeDeclarationFunction);
         _contextGenCode->getRegistryFunctionGlobal()->registerElement(functionName, std::move(functionSymbol));
     }
 }

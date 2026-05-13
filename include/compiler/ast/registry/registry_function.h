@@ -36,26 +36,58 @@ class IFunctionSymbolRegistry
 // Public members
 // No llvm::Function* here, thread safe for the global registry
 class SymbolFunctionGlobal : public IFunctionSymbolRegistry {
-public: 
-    IType* returnType = nullptr;
-    NodeDeclarationFunction* node = nullptr;
+private:
+    IType* _returnType;
+    NodeDeclarationFunction* _node;
+public:  
+    explicit SymbolFunctionGlobal(
+        IType* returnType,
+        NodeDeclarationFunction* node
+    ):
+    _returnType(returnType),
+    _node(node)
+    {}; 
+    [[nodiscard]] auto getReturnType() const -> IType*{ return _returnType;}
+    [[nodiscard]] auto getNode() const -> NodeDeclarationFunction*{return _node;}
     
     [[nodiscard]] auto getType() const -> SymbolType override { return SymbolType::Global; }
-    [[nodiscard]] static auto classof(const IFunctionSymbolRegistry* s) -> bool { 
-        return s->getType() == SymbolType::Global; 
+    [[nodiscard]] static auto classof(const IFunctionSymbolRegistry* symbole) -> bool { 
+        return symbole->getType() == SymbolType::Global; 
     }
 };
 
 // Local registry with llvm::Function* for code generation in a thread
 class SymbolFunctionLocal : public IFunctionSymbolRegistry {
+private:
+    llvm::Function* _function;
+    IType* _returnType;
+    NodeDeclarationFunction* _node;
 public:
-    llvm::Function* function = nullptr;
-    IType* returnType = nullptr;
-    NodeDeclarationFunction* node = nullptr;
 
+    SymbolFunctionLocal() : _function(nullptr), _returnType(nullptr), _node(nullptr) {}
+
+    explicit SymbolFunctionLocal(
+        llvm::Function* function,
+        IType* returnType,
+        NodeDeclarationFunction* node
+    ) : 
+        _function(function),
+        _returnType(returnType),
+        _node(node)
+    {};
+    
+    [[nodiscard]] auto getFunction() const -> llvm::Function* {return _function;}
+    [[nodiscard]] auto getReturnType() const -> IType* {return _returnType;}
+    [[nodiscard]] auto getNode() const -> NodeDeclarationFunction* {return _node;}
+
+    // TODO : bon à regarder je ne sais pas si c'est la meilleur solution ou peut être créer un nouveau objet serais préférable ? 
+    auto setFunction(llvm::Function* function) -> void { _function = function; }
+    auto setReturnType(IType* returnType) -> void { _returnType = returnType; }
+    auto setNode(NodeDeclarationFunction* node) -> void { _node = node; }
+ 
     [[nodiscard]] auto getType() const -> SymbolType override { return SymbolType::Local; }
-    [[nodiscard]] static auto classof(const IFunctionSymbolRegistry* s) -> bool { 
-        return s->getType() == SymbolType::Local; 
+    [[nodiscard]] static auto classof(const IFunctionSymbolRegistry* symbole) -> bool { 
+        return symbole->getType() == SymbolType::Local; 
     }
 };
 

@@ -48,7 +48,7 @@ auto BuilderEnvironmentRegistryFunction::alignVTableWithParent(Class* classInfo,
                 throw std::runtime_error("Error: Expected SymbolFunctionLocal");
             }
             auto* localSymbol = prysma::cast<SymbolFunctionLocal>(symbol.get());
-            functionImpl = localSymbol->function;
+            functionImpl = localSymbol->getFunction();
         }
         
         // If found, add the function pointer to the vtable
@@ -81,21 +81,25 @@ void BuilderEnvironmentRegistryFunction::addAtTheEndOfVtable(llvm::StringRef met
         throw std::runtime_error("Error: Expected SymbolFunctionLocal");
     }
     auto* localSymbol = prysma::cast<SymbolFunctionLocal>(symbol.get()); 
-    if (localSymbol->function != nullptr) {
+    if (localSymbol->getFunction() != nullptr) {
         vtableElements.push_back(llvm::ConstantExpr::getBitCast(
-            localSymbol->function,
+            localSymbol->getFunction(),
             llvm::PointerType::get(llvm::Type::getInt8Ty(_contextGenCode->getBackend()->getContext()), 0)
         ));
         classInfo->getMethodIndices()[std::string(methodName)] = static_cast<unsigned int>(vtableElements.size() - 1);
     }
 }
 
-void BuilderEnvironmentRegistryFunction::appendNewMethodsToVTable(std::vector<llvm::Constant*>& vtableElements, Class* classInfo, const std::vector<NodeDeclarationFunction*>& parentMethodList)
+void BuilderEnvironmentRegistryFunction::appendNewMethodsToVTable(std::vector<llvm::Constant*>& vtableElements, Class* classInfo, const std::string& className, const std::vector<NodeDeclarationFunction*>& parentMethodList)
 {
     // Add additional methods from the current class that are not in the parent
     auto methodKeys = classInfo->getMaterializedFunctionRegistry()->getKeys();
     for (const auto& key : methodKeys) {
         llvm::StringRef methodName = key;
+        // Skip the builder (constructor) — it is not part of the vtable
+        if (methodName == className) {
+            continue;
+        }
         bool isInParent = checkIsInTheParent(methodName, parentMethodList);
         
         // If not a parent method, add it at the end of the vtable
@@ -109,7 +113,7 @@ void BuilderEnvironmentRegistryFunction::buildVTable(Class* classInfo, const std
 {
     // Build the vtable by aligning the parent's methods at the same positions
     std::vector<llvm::Constant*> vtableElements = alignVTableWithParent(classInfo,parentMethodList);
-    appendNewMethodsToVTable(vtableElements,classInfo,parentMethodList);
+    appendNewMethodsToVTable(vtableElements,classInfo,className,parentMethodList);
 
     // Create a constant array for the vtable
     llvm::ArrayType* vtableType = llvm::ArrayType::get(
@@ -131,10 +135,14 @@ void BuilderEnvironmentRegistryFunction::buildVTable(Class* classInfo, const std
     classInfo->setVTable(vtableGlobal);
 }
 
-auto BuilderEnvironmentRegistryFunction::fileArgFunction(const SymbolFunctionGlobal* oldSymbol) -> std::vector<llvm::Type*>
+auto BuilderEnvironmentRegistryFunction::fillArgFunction(SymbolFunctionGlobal* oldSymbol) -> std::vector<llvm::Type*>
 {
     std::vector<llvm::Type*> paramTypes;
-    for (auto* arg : oldSymbol->node->getArguments())
+    auto* node = oldSymbol->getNode();
+    if (node == nullptr) {
+        return paramTypes;
+    }
+    for (auto* arg : node->getArguments())
     {
         auto* argFunction = prysma::cast<NodeArgFunction>(arg);
         paramTypes.push_back(argFunction->getType()->generateLLVMType(_contextGenCode->getBackend()->getContext()));
@@ -146,14 +154,17 @@ void BuilderEnvironmentRegistryFunction::projectGlobalToMaterialized()
 {
     for(const auto& key : _contextGenCode->getRegistryFunctionGlobal()->getKeys())
     {
-        const auto& oldSymbolUniquePtr = _contextGenCode->getRegistryFunctionGlobal()->get(key);
-        const auto* oldSymbol = prysma::cast<const SymbolFunctionGlobal>(oldSymbolUniquePtr.get());
-        
-        if (oldSymbol->node == nullptr) { continue;}
+        // Skip if already materialized (e.g. standard functions like print, backSlashN)
+        if (_contextGenCode->getMaterializedFunctionRegistry()->exists(key)) {
+            continue;
+        }
 
-        llvm::Type* retType = oldSymbol->returnType->generateLLVMType(_contextGenCode->getBackend()->getContext());
+        const auto& oldSymbolUniquePtr = _contextGenCode->getRegistryFunctionGlobal()->get(key);
+        auto* oldSymbol = prysma::cast<SymbolFunctionGlobal>(oldSymbolUniquePtr.get());
         
-        std::vector<llvm::Type*> paramTypes = fileArgFunction(oldSymbol);
+        llvm::Type* retType = oldSymbol->getReturnType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
+        
+        std::vector<llvm::Type*> paramTypes = fillArgFunction(oldSymbol);
         
         llvm::FunctionType* funcType = llvm::FunctionType::get(retType, paramTypes, false);
         
@@ -165,13 +176,8 @@ void BuilderEnvironmentRegistryFunction::projectGlobalToMaterialized()
         );
 
         // This is where we create the function in the local function registry
-        auto newSymbol = std::make_unique<SymbolFunctionLocal>();
-        newSymbol->function = realFunction;
-        newSymbol->returnType = oldSymbol->returnType;
-        newSymbol->node = oldSymbol->node;
-        
-        llvm::StringRef safeKey = oldSymbol->node->getNom().value;
-        _contextGenCode->getMaterializedFunctionRegistry()->registerElement(safeKey, std::move(newSymbol));        
+        auto newSymbol = std::make_unique<SymbolFunctionLocal>(realFunction,oldSymbol->getReturnType(),oldSymbol->getNode());
+        _contextGenCode->getMaterializedFunctionRegistry()->registerElement(key, std::move(newSymbol));        
     }
 }
 
@@ -181,7 +187,7 @@ auto BuilderEnvironmentRegistryFunction::fillClassMethodsParamTypes(const Symbol
     // Add the hidden 'this' parameter as the first parameter
     paramTypes.push_back(llvm::PointerType::getUnqual(_contextGenCode->getBackend()->getContext()));
 
-    for (auto* arg : symbol->node->getArguments()) {
+    for (auto* arg : symbol->getNode()->getArguments()) {
         auto* argFunction = prysma::cast<NodeArgFunction>(arg);
         paramTypes.push_back(argFunction->getType()->generateLLVMType(_contextGenCode->getBackend()->getContext()));
     }
@@ -191,6 +197,19 @@ auto BuilderEnvironmentRegistryFunction::fillClassMethodsParamTypes(const Symbol
 void BuilderEnvironmentRegistryFunction::fillClassMethods(const std::basic_string<char>&  className)
 {
     auto const& classInfo = _contextGenCode->getRegistryClassGlobal()->get(className);
+    
+    // Check if the class contains a builder, otherwise the class is not valid.
+    if (!classInfo->getMaterializedFunctionRegistry()->exists(className)) {
+        throw std::runtime_error("Error: The class '" + className + "' must have a builder with the same name");
+    }
+    
+    // Build the vtable for this class (parent methods alignment)
+    std::vector<NodeDeclarationFunction*> parentMethodList;
+    if (classInfo->getParentInheritance() != nullptr) {
+        MembersExtractorClass parentExtractor;
+        classInfo->getParentInheritance()->accept(&parentExtractor);
+        parentMethodList = parentExtractor.getMethods();
+    }
         
     for (const auto& methodName : classInfo->getMaterializedFunctionRegistry()->getKeys())
     {
@@ -198,7 +217,7 @@ void BuilderEnvironmentRegistryFunction::fillClassMethods(const std::basic_strin
         const auto& symbolUniquePtr = classInfo->getMaterializedFunctionRegistry()->get(methodName);
         auto* symbol = prysma::cast<SymbolFunctionLocal>(symbolUniquePtr.get());
         
-        if (symbol->node == nullptr) 
+        if (symbol->getNode() == nullptr) 
         {
             std::string errorMsg = "Error: SymbolFunctionLocal for method '";
             errorMsg += methodName;
@@ -210,12 +229,12 @@ void BuilderEnvironmentRegistryFunction::fillClassMethods(const std::basic_strin
 
         // If already processed by a previous unit, reset so we can recreate in the current module.
         // Pass 2 is now sequential, so this is safe.
-        if (symbol->function != nullptr)
+        if (symbol->getFunction() != nullptr)
         {
-            symbol->function = nullptr;
+            symbol->setFunction(nullptr);
         }
 
-        llvm::Type* retType = symbol->returnType->generateLLVMType(_contextGenCode->getBackend()->getContext());
+        llvm::Type* retType = symbol->getReturnType()->generateLLVMType(_contextGenCode->getBackend()->getContext());
         
         std::vector<llvm::Type*> paramTypes = fillClassMethodsParamTypes(symbol);
     
@@ -233,24 +252,11 @@ void BuilderEnvironmentRegistryFunction::fillClassMethods(const std::basic_strin
             _contextGenCode->getBackend()->getModule()
         );
         
-        symbol->function = realFunction;    
-        
-        // Build the vtable for this class
-        std::vector<NodeDeclarationFunction*> parentMethodList;
-        if (classInfo->getParentInheritance() != nullptr) {
-            MembersExtractorClass parentExtractor;
-            classInfo->getParentInheritance()->accept(&parentExtractor);
-            parentMethodList = parentExtractor.getMethods();
-        }
-        if(methodName != className) // If the method is not the builder, put it in the vtable, otherwise do not put it in the vtable and call it directly by its mangled name
-        {
-            buildVTable(classInfo.get(), className, parentMethodList);
-        }
-        // Check if the class contains a builder, otherwise the class is not valid.
-        if (!classInfo->getMaterializedFunctionRegistry()->exists(className)) {
-            throw std::runtime_error("Error: The class '" + className + "' must have a builder with the same name");
-        }
+        symbol->setFunction(realFunction);
     }
+    
+    // Build the vtable once after all methods have been materialized
+    buildVTable(classInfo.get(), className, parentMethodList);
 }
 
 void BuilderEnvironmentRegistryFunction::fillClass()
