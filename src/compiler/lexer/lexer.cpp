@@ -106,9 +106,9 @@ TokenType Lexer::resolveKeyword(llvm::StringRef w) {
         break;
     }
     case 7: {
-        uint64_t v = ld64(s);
-        if ((v & 0x00FFFFFFFFFFFFFFULL) == 0x6564756C636E69ULL) return TOKEN_INCLUDE; // "include"
-        if ((v & 0x00FFFFFFFFFFFFFFULL) == 0x65746176697270ULL) return TOKEN_PRIVATE; // "private"
+        uint64_t v = ld32(s) | (static_cast<uint64_t>(ld16(s+4)) << 32) | (static_cast<uint64_t>(s[6]) << 48);
+        if (v == 0x6564756C636E69ULL) return TOKEN_INCLUDE; // "include"
+        if (v == 0x65746176697270ULL) return TOKEN_PRIVATE; // "private"
         break;
     }
     case 9: {
@@ -145,13 +145,18 @@ static inline bool isUnary(TokenType t) {
     return unary_lut[static_cast<size_t>(t)];
 }
 
+#include <algorithm>
+
 auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
     vector<Token> tokens;
-    // Pre-allocate maximum possible tokens (1 char = 1 token worst case) + EOF
-    tokens.resize(sourceCode.size() + 1);
+    tokens.reserve(sourceCode.size() / 3 + 4);
     
-    Token* __restrict out = tokens.data();
+    vector<uint32_t> lineOffsets;
+    lineOffsets.reserve(sourceCode.size() / 40 + 4);
+    lineOffsets.push_back(0); // Line 1 starts at offset 0
+
     const char* __restrict cursor = sourceCode.data();
+    const char* basePtr = sourceCode.data();
     const uint8_t* __restrict lut = cclut_array.data();
     TokenType lastTy = TOKEN_EOF;
 
@@ -161,8 +166,11 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
 
         switch (cc) {
         case CC_WS:
+            cursor++;
+            break;
         case CC_NL:
             cursor++;
+            lineOffsets.push_back(static_cast<uint32_t>(cursor - basePtr));
             break;
         case CC_ALPHA: {
             const char* mark = cursor;
@@ -172,16 +180,16 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
             }
             llvm::StringRef word(mark, cursor - mark);
             TokenType ty = resolveKeyword(word);
-            if (ty == TOKEN_TRUE)       { *out++ = {TOKEN_LIT_BOOL, "1", 0, 0}; lastTy = TOKEN_LIT_BOOL; }
-            else if (ty == TOKEN_FALSE) { *out++ = {TOKEN_LIT_BOOL, "0", 0, 0}; lastTy = TOKEN_LIT_BOOL; }
-            else                        { *out++ = {ty, word, 0, 0}; lastTy = ty; }
+            if (ty == TOKEN_TRUE)       { tokens.push_back({TOKEN_LIT_BOOL, "1", 0, 0}); lastTy = TOKEN_LIT_BOOL; }
+            else if (ty == TOKEN_FALSE) { tokens.push_back({TOKEN_LIT_BOOL, "0", 0, 0}); lastTy = TOKEN_LIT_BOOL; }
+            else                        { tokens.push_back({ty, word, 0, 0}); lastTy = ty; }
             break;
         }
         case CC_DIGIT: {
             const char* mark = cursor;
             while (lut[static_cast<uint8_t>(*++cursor)] == CC_DIGIT);
             bool isFp = false;
-            if (UNLIKELY(*cursor == '.')) {
+            if (*cursor == '.') {
                 if (lut[static_cast<uint8_t>(cursor[1])] == CC_DIGIT) {
                     isFp = true;
                     cursor++;
@@ -189,28 +197,33 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
                 }
             }
             lastTy = isFp ? TOKEN_LIT_FLOAT : TOKEN_LIT_INT;
-            *out++ = {lastTy, llvm::StringRef(mark, cursor - mark), 0, 0};
+            tokens.push_back({lastTy, llvm::StringRef(mark, cursor - mark), 0, 0});
             break;
         }
         case CC_DQUOTE: {
-            *out++ = {TOKEN_QUOTE, "\"", 0, 0};
+            tokens.push_back({TOKEN_QUOTE, "\"", 0, 0});
             cursor++;
             const char* mark = cursor;
-            // Extremely fast SIMD-like string scanning using strcspn
             while (true) {
-                size_t skip = std::strcspn(cursor, "\"\\\n");
-                cursor += skip;
-                if (UNLIKELY(*cursor == '\\' && cursor[1] != '\0')) {
-                    cursor += 2;
+                char ch = *cursor;
+                if (UNLIKELY(ch == '"' || ch == '\\' || ch == '\n' || ch == '\0')) {
+                    if (ch == '\\' && cursor[1] != '\0') {
+                        cursor += 2;
+                    } else if (ch == '\n') {
+                        cursor++;
+                        lineOffsets.push_back(static_cast<uint32_t>(cursor - basePtr));
+                    } else {
+                        break;
+                    }
                 } else {
-                    break;
+                    cursor++;
                 }
             }
             if (cursor > mark) {
-                *out++ = {TOKEN_IDENTIFIER, llvm::StringRef(mark, cursor - mark), 0, 0};
+                tokens.push_back({TOKEN_IDENTIFIER, llvm::StringRef(mark, cursor - mark), 0, 0});
             }
             if (*cursor == '"') {
-                *out++ = {TOKEN_QUOTE, "\"", 0, 0};
+                tokens.push_back({TOKEN_QUOTE, "\"", 0, 0});
                 cursor++;
             }
             lastTy = TOKEN_QUOTE;
@@ -229,11 +242,14 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
                         cursor += 2;
                         break;
                     }
+                    if (*cursor == '\n') {
+                        lineOffsets.push_back(static_cast<uint32_t>(cursor + 1 - basePtr));
+                    }
                     cursor++;
                 }
                 continue;
             }
-            *out++ = {TOKEN_SLASH, "/", 0, 0};
+            tokens.push_back({TOKEN_SLASH, "/", 0, 0});
             lastTy = TOKEN_SLASH;
             cursor++;
             break;
@@ -244,7 +260,7 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
                 const char* mark = cursor;
                 while (lut[static_cast<uint8_t>(*++cursor)] == CC_DIGIT);
                 bool isFp = false;
-                if (UNLIKELY(*cursor == '.')) {
+                if (*cursor == '.') {
                     if (lut[static_cast<uint8_t>(cursor[1])] == CC_DIGIT) {
                         isFp = true;
                         cursor++;
@@ -252,21 +268,21 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
                     }
                 }
                 lastTy = isFp ? TOKEN_LIT_FLOAT : TOKEN_LIT_INT;
-                *out++ = {lastTy, llvm::StringRef(mark, cursor - mark), 0, 0};
+                tokens.push_back({lastTy, llvm::StringRef(mark, cursor - mark), 0, 0});
             } else {
                 lastTy = (cc == CC_PLUS) ? TOKEN_PLUS : TOKEN_MINUS;
-                *out++ = {lastTy, (cc == CC_PLUS) ? "+" : "-", 0, 0};
+                tokens.push_back({lastTy, (cc == CC_PLUS) ? "+" : "-", 0, 0});
                 cursor++;
             }
             break;
         }
         case CC_EQ: {
             if (cursor[1] == '=') {
-                *out++ = {TOKEN_EQUAL_EQUAL, "==", 0, 0};
+                tokens.push_back({TOKEN_EQUAL_EQUAL, "==", 0, 0});
                 lastTy = TOKEN_EQUAL_EQUAL;
                 cursor += 2;
             } else {
-                *out++ = {TOKEN_EQUAL, "=", 0, 0};
+                tokens.push_back({TOKEN_EQUAL, "=", 0, 0});
                 lastTy = TOKEN_EQUAL;
                 cursor++;
             }
@@ -274,11 +290,11 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
         }
         case CC_BANG: {
             if (cursor[1] == '=') {
-                *out++ = {TOKEN_NOT_EQUAL, "!=", 0, 0};
+                tokens.push_back({TOKEN_NOT_EQUAL, "!=", 0, 0});
                 lastTy = TOKEN_NOT_EQUAL;
                 cursor += 2;
             } else {
-                *out++ = {TOKEN_NOT, "!", 0, 0};
+                tokens.push_back({TOKEN_NOT, "!", 0, 0});
                 lastTy = TOKEN_NOT;
                 cursor++;
             }
@@ -286,11 +302,11 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
         }
         case CC_LT: {
             if (cursor[1] == '=') {
-                *out++ = {TOKEN_LESS_EQUAL, "<=", 0, 0};
+                tokens.push_back({TOKEN_LESS_EQUAL, "<=", 0, 0});
                 lastTy = TOKEN_LESS_EQUAL;
                 cursor += 2;
             } else {
-                *out++ = {TOKEN_LESS, "<", 0, 0};
+                tokens.push_back({TOKEN_LESS, "<", 0, 0});
                 lastTy = TOKEN_LESS;
                 cursor++;
             }
@@ -298,11 +314,11 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
         }
         case CC_GT: {
             if (cursor[1] == '=') {
-                *out++ = {TOKEN_GREATER_EQUAL, ">=", 0, 0};
+                tokens.push_back({TOKEN_GREATER_EQUAL, ">=", 0, 0});
                 lastTy = TOKEN_GREATER_EQUAL;
                 cursor += 2;
             } else {
-                *out++ = {TOKEN_GREATER, ">", 0, 0};
+                tokens.push_back({TOKEN_GREATER, ">", 0, 0});
                 lastTy = TOKEN_GREATER;
                 cursor++;
             }
@@ -310,7 +326,7 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
         }
         case CC_AMP: {
             if (cursor[1] == '&') {
-                *out++ = {TOKEN_AND, "&&", 0, 0};
+                tokens.push_back({TOKEN_AND, "&&", 0, 0});
                 lastTy = TOKEN_AND;
                 cursor += 2;
             } else cursor++;
@@ -318,7 +334,7 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
         }
         case CC_PIPE: {
             if (cursor[1] == '|') {
-                *out++ = {TOKEN_OR, "||", 0, 0};
+                tokens.push_back({TOKEN_OR, "||", 0, 0});
                 lastTy = TOKEN_OR;
                 cursor += 2;
             } else cursor++;
@@ -326,27 +342,27 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
         }
         case CC_COLON: {
             if (cursor[1] == ':') {
-                *out++ = {TOKEN_COLON, "::", 0, 0};
+                tokens.push_back({TOKEN_COLON, "::", 0, 0});
                 lastTy = TOKEN_COLON;
                 cursor += 2;
             } else {
-                *out++ = {TOKEN_COLON, ":", 0, 0};
+                tokens.push_back({TOKEN_COLON, ":", 0, 0});
                 lastTy = TOKEN_COLON;
                 cursor++;
             }
             break;
         }
-        case CC_DOT: *out++ = {TOKEN_DOT, ".", 0, 0}; lastTy = TOKEN_DOT; cursor++; break;
-        case CC_STAR: *out++ = {TOKEN_STAR, "*", 0, 0}; lastTy = TOKEN_STAR; cursor++; break;
-        case CC_PERCENT: *out++ = {TOKEN_MODULO, "%", 0, 0}; lastTy = TOKEN_MODULO; cursor++; break;
-        case CC_LPAREN: *out++ = {TOKEN_PAREN_OPEN, "(", 0, 0}; lastTy = TOKEN_PAREN_OPEN; cursor++; break;
-        case CC_RPAREN: *out++ = {TOKEN_PAREN_CLOSE, ")", 0, 0}; lastTy = TOKEN_PAREN_CLOSE; cursor++; break;
-        case CC_LBRACE: *out++ = {TOKEN_BRACE_OPEN, "{", 0, 0}; lastTy = TOKEN_BRACE_OPEN; cursor++; break;
-        case CC_RBRACE: *out++ = {TOKEN_BRACE_CLOSE, "}", 0, 0}; lastTy = TOKEN_BRACE_CLOSE; cursor++; break;
-        case CC_LBRACK: *out++ = {TOKEN_BRACKET_OPEN, "[", 0, 0}; lastTy = TOKEN_BRACKET_OPEN; cursor++; break;
-        case CC_RBRACK: *out++ = {TOKEN_BRACKET_CLOSE, "]", 0, 0}; lastTy = TOKEN_BRACKET_CLOSE; cursor++; break;
-        case CC_SEMI: *out++ = {TOKEN_SEMICOLON, ";", 0, 0}; lastTy = TOKEN_SEMICOLON; cursor++; break;
-        case CC_COMMA: *out++ = {TOKEN_COMMA, ",", 0, 0}; lastTy = TOKEN_COMMA; cursor++; break;
+        case CC_DOT: tokens.push_back({TOKEN_DOT, ".", 0, 0}); lastTy = TOKEN_DOT; cursor++; break;
+        case CC_STAR: tokens.push_back({TOKEN_STAR, "*", 0, 0}); lastTy = TOKEN_STAR; cursor++; break;
+        case CC_PERCENT: tokens.push_back({TOKEN_MODULO, "%", 0, 0}); lastTy = TOKEN_MODULO; cursor++; break;
+        case CC_LPAREN: tokens.push_back({TOKEN_PAREN_OPEN, "(", 0, 0}); lastTy = TOKEN_PAREN_OPEN; cursor++; break;
+        case CC_RPAREN: tokens.push_back({TOKEN_PAREN_CLOSE, ")", 0, 0}); lastTy = TOKEN_PAREN_CLOSE; cursor++; break;
+        case CC_LBRACE: tokens.push_back({TOKEN_BRACE_OPEN, "{", 0, 0}); lastTy = TOKEN_BRACE_OPEN; cursor++; break;
+        case CC_RBRACE: tokens.push_back({TOKEN_BRACE_CLOSE, "}", 0, 0}); lastTy = TOKEN_BRACE_CLOSE; cursor++; break;
+        case CC_LBRACK: tokens.push_back({TOKEN_BRACKET_OPEN, "[", 0, 0}); lastTy = TOKEN_BRACKET_OPEN; cursor++; break;
+        case CC_RBRACK: tokens.push_back({TOKEN_BRACKET_CLOSE, "]", 0, 0}); lastTy = TOKEN_BRACKET_CLOSE; cursor++; break;
+        case CC_SEMI: tokens.push_back({TOKEN_SEMICOLON, ";", 0, 0}); lastTy = TOKEN_SEMICOLON; cursor++; break;
+        case CC_COMMA: tokens.push_back({TOKEN_COMMA, ",", 0, 0}); lastTy = TOKEN_COMMA; cursor++; break;
         default: 
             if (UNLIKELY(c == '\0')) goto end_lexing;
             cursor++; 
@@ -355,33 +371,19 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
     }
 
 end_lexing:
-    *out++ = {TOKEN_EOF, "", 0, 0};
-    tokens.resize(out - tokens.data());
+    tokens.push_back({TOKEN_EOF, "", 0, 0});
 
-    // Lazy evaluation pass for lines and columns
-    int currentLine = 1;
-    const char* lineStart = sourceCode.data();
-    const char* p = sourceCode.data();
-    const char* endPtr = sourceCode.data() + sourceCode.size();
-    
+    // Populate lines and columns using binary search (O(T log N) where N is number of lines)
     for (auto& t : tokens) {
         if (t.type == TOKEN_EOF) {
-            t.line = currentLine;
-            t.column = static_cast<int>(endPtr - lineStart) + 1;
+            t.line = lineOffsets.size();
+            t.column = static_cast<int>(sourceCode.size() - lineOffsets.back()) + 1;
             continue;
         }
-        
-        const char* tokenStart = t.value.data();
-        while (p < tokenStart) {
-            if (UNLIKELY(*p == '\n')) {
-                currentLine++;
-                lineStart = p + 1;
-            }
-            p++;
-        }
-        
-        t.line = currentLine;
-        t.column = static_cast<int>(tokenStart - lineStart) + 1;
+        uint32_t offset = static_cast<uint32_t>(t.value.data() - basePtr);
+        auto it = std::upper_bound(lineOffsets.begin(), lineOffsets.end(), offset);
+        t.line = static_cast<int>(std::distance(lineOffsets.begin(), it));
+        t.column = static_cast<int>(offset - *(it - 1)) + 1;
     }
 
     return tokens;
