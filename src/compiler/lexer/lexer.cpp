@@ -9,9 +9,12 @@
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <array>
+#include <llvm-18/llvm/ADT/StringRef.h>
 #include <utility>
+#include <vector>
 
 // Branch prediction hints
 #define UNLIKELY(x) __builtin_expect(!!(x), 0)
