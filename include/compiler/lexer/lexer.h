@@ -67,7 +67,7 @@ public:
     static auto tokenize(const string& sourceCode) -> vector<Token>;
 
 private:
-    static TokenType resolveKeyword(llvm::StringRef word);
+    static auto resolveKeyword(llvm::StringRef word) -> TokenType;
 };
 
 #endif /* F2D02E97_AF62_409B_84AD_90905E9BE240 */
