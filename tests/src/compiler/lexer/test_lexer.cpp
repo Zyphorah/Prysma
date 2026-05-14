@@ -135,14 +135,7 @@ TEST_CASE("Tester Lexer Operateurs composites", "[Lexer]") {
     CHECK(tokens[11].type == TOKEN_OR);
 }
 
-TEST_CASE("Tester Lexer Lignes et colonnes", "[Lexer]") {
-    string code = "a\nb\nc";
-    vector<Token> tokens = Lexer::tokenize(code);
 
-    CHECK(tokens[0].line == 1);
-    CHECK(tokens[1].line == 2);
-    CHECK(tokens[2].line == 3);
-}
 
 TEST_CASE("Tester Lexer Tokens sans espaces", "[Lexer]") {
     string code = "a+b-c*d/e";

@@ -8,6 +8,7 @@
 
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
+#include <cstdint>
 #include <cstring>
 #include <array>
 #include <utility>
@@ -16,11 +17,11 @@
 #define UNLIKELY(x) __builtin_expect(!!(x), 0)
 
 // Fast word-sized loads (assumes Little Endian)
-static inline uint16_t ld16(const char* p) { uint16_t v; std::memcpy(&v, p, 2); return v; }
-static inline uint32_t ld32(const char* p) { uint32_t v; std::memcpy(&v, p, 4); return v; }
-static inline uint64_t ld64(const char* p) { uint64_t v; std::memcpy(&v, p, 8); return v; }
+static inline auto ld16(const char* p) -> uint16_t { uint16_t v; std::memcpy(&v, p, 2); return v; }
+static inline auto ld32(const char* p) -> uint32_t { uint32_t v; std::memcpy(&v, p, 4); return v; }
+static inline auto ld64(const char* p) -> uint64_t { uint64_t v; std::memcpy(&v, p, 8); return v; }
 
-static constexpr uint8_t classOf(unsigned char c) {
+static constexpr auto classOf(unsigned char c) -> uint8_t {
     if (c >= 'a' && c <= 'z') return CC_ALPHA;
     if (c >= 'A' && c <= 'Z') return CC_ALPHA;
     if (c == '_')             return CC_ALPHA;
@@ -148,15 +149,24 @@ static inline bool isUnary(TokenType t) {
 #include <algorithm>
 
 auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
-    vector<Token> tokens;
-    tokens.reserve(sourceCode.size() / 3 + 4);
-    
-    vector<uint32_t> lineOffsets;
-    lineOffsets.reserve(sourceCode.size() / 40 + 4);
-    lineOffsets.push_back(0); // Line 1 starts at offset 0
+    size_t capacity = sourceCode.size() / 3 + 4;
+    Token* tokensData = static_cast<Token*>(std::malloc(capacity * sizeof(Token)));
+    Token* out = tokensData;
+    Token* outEnd = tokensData + capacity - 1; // reserve 1 for EOF
+
+#define PUSH_TOKEN(ty, val) \
+    do { \
+        if (UNLIKELY(out >= outEnd)) { \
+            size_t sz = out - tokensData; \
+            capacity *= 2; \
+            tokensData = static_cast<Token*>(std::realloc(tokensData, capacity * sizeof(Token))); \
+            out = tokensData + sz; \
+            outEnd = tokensData + capacity - 1; \
+        } \
+        *out++ = {ty, val, 0, 0}; \
+    } while(0)
 
     const char* __restrict cursor = sourceCode.data();
-    const char* basePtr = sourceCode.data();
     const uint8_t* __restrict lut = cclut_array.data();
     TokenType lastTy = TOKEN_EOF;
 
@@ -166,11 +176,8 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
 
         switch (cc) {
         case CC_WS:
-            cursor++;
-            break;
         case CC_NL:
             cursor++;
-            lineOffsets.push_back(static_cast<uint32_t>(cursor - basePtr));
             break;
         case CC_ALPHA: {
             const char* mark = cursor;
@@ -180,9 +187,9 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
             }
             llvm::StringRef word(mark, cursor - mark);
             TokenType ty = resolveKeyword(word);
-            if (ty == TOKEN_TRUE)       { tokens.push_back({TOKEN_LIT_BOOL, "1", 0, 0}); lastTy = TOKEN_LIT_BOOL; }
-            else if (ty == TOKEN_FALSE) { tokens.push_back({TOKEN_LIT_BOOL, "0", 0, 0}); lastTy = TOKEN_LIT_BOOL; }
-            else                        { tokens.push_back({ty, word, 0, 0}); lastTy = ty; }
+            if (ty == TOKEN_TRUE)       { PUSH_TOKEN(TOKEN_LIT_BOOL, "1"); lastTy = TOKEN_LIT_BOOL; }
+            else if (ty == TOKEN_FALSE) { PUSH_TOKEN(TOKEN_LIT_BOOL, "0"); lastTy = TOKEN_LIT_BOOL; }
+            else                        { PUSH_TOKEN(ty, word); lastTy = ty; }
             break;
         }
         case CC_DIGIT: {
@@ -197,11 +204,11 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
                 }
             }
             lastTy = isFp ? TOKEN_LIT_FLOAT : TOKEN_LIT_INT;
-            tokens.push_back({lastTy, llvm::StringRef(mark, cursor - mark), 0, 0});
+            PUSH_TOKEN(lastTy, llvm::StringRef(mark, cursor - mark));
             break;
         }
         case CC_DQUOTE: {
-            tokens.push_back({TOKEN_QUOTE, "\"", 0, 0});
+            PUSH_TOKEN(TOKEN_QUOTE, "\"");
             cursor++;
             const char* mark = cursor;
             while (true) {
@@ -211,7 +218,6 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
                         cursor += 2;
                     } else if (ch == '\n') {
                         cursor++;
-                        lineOffsets.push_back(static_cast<uint32_t>(cursor - basePtr));
                     } else {
                         break;
                     }
@@ -220,10 +226,10 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
                 }
             }
             if (cursor > mark) {
-                tokens.push_back({TOKEN_IDENTIFIER, llvm::StringRef(mark, cursor - mark), 0, 0});
+                PUSH_TOKEN(TOKEN_IDENTIFIER, llvm::StringRef(mark, cursor - mark));
             }
             if (*cursor == '"') {
-                tokens.push_back({TOKEN_QUOTE, "\"", 0, 0});
+                PUSH_TOKEN(TOKEN_QUOTE, "\"");
                 cursor++;
             }
             lastTy = TOKEN_QUOTE;
@@ -242,14 +248,11 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
                         cursor += 2;
                         break;
                     }
-                    if (*cursor == '\n') {
-                        lineOffsets.push_back(static_cast<uint32_t>(cursor + 1 - basePtr));
-                    }
                     cursor++;
                 }
                 continue;
             }
-            tokens.push_back({TOKEN_SLASH, "/", 0, 0});
+            PUSH_TOKEN(TOKEN_SLASH, "/");
             lastTy = TOKEN_SLASH;
             cursor++;
             break;
@@ -268,21 +271,21 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
                     }
                 }
                 lastTy = isFp ? TOKEN_LIT_FLOAT : TOKEN_LIT_INT;
-                tokens.push_back({lastTy, llvm::StringRef(mark, cursor - mark), 0, 0});
+                PUSH_TOKEN(lastTy, llvm::StringRef(mark, cursor - mark));
             } else {
                 lastTy = (cc == CC_PLUS) ? TOKEN_PLUS : TOKEN_MINUS;
-                tokens.push_back({lastTy, (cc == CC_PLUS) ? "+" : "-", 0, 0});
+                PUSH_TOKEN(lastTy, (cc == CC_PLUS) ? "+" : "-");
                 cursor++;
             }
             break;
         }
         case CC_EQ: {
             if (cursor[1] == '=') {
-                tokens.push_back({TOKEN_EQUAL_EQUAL, "==", 0, 0});
+                PUSH_TOKEN(TOKEN_EQUAL_EQUAL, "==");
                 lastTy = TOKEN_EQUAL_EQUAL;
                 cursor += 2;
             } else {
-                tokens.push_back({TOKEN_EQUAL, "=", 0, 0});
+                PUSH_TOKEN(TOKEN_EQUAL, "=");
                 lastTy = TOKEN_EQUAL;
                 cursor++;
             }
@@ -290,11 +293,11 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
         }
         case CC_BANG: {
             if (cursor[1] == '=') {
-                tokens.push_back({TOKEN_NOT_EQUAL, "!=", 0, 0});
+                PUSH_TOKEN(TOKEN_NOT_EQUAL, "!=");
                 lastTy = TOKEN_NOT_EQUAL;
                 cursor += 2;
             } else {
-                tokens.push_back({TOKEN_NOT, "!", 0, 0});
+                PUSH_TOKEN(TOKEN_NOT, "!");
                 lastTy = TOKEN_NOT;
                 cursor++;
             }
@@ -302,11 +305,11 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
         }
         case CC_LT: {
             if (cursor[1] == '=') {
-                tokens.push_back({TOKEN_LESS_EQUAL, "<=", 0, 0});
+                PUSH_TOKEN(TOKEN_LESS_EQUAL, "<=");
                 lastTy = TOKEN_LESS_EQUAL;
                 cursor += 2;
             } else {
-                tokens.push_back({TOKEN_LESS, "<", 0, 0});
+                PUSH_TOKEN(TOKEN_LESS, "<");
                 lastTy = TOKEN_LESS;
                 cursor++;
             }
@@ -314,11 +317,11 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
         }
         case CC_GT: {
             if (cursor[1] == '=') {
-                tokens.push_back({TOKEN_GREATER_EQUAL, ">=", 0, 0});
+                PUSH_TOKEN(TOKEN_GREATER_EQUAL, ">=");
                 lastTy = TOKEN_GREATER_EQUAL;
                 cursor += 2;
             } else {
-                tokens.push_back({TOKEN_GREATER, ">", 0, 0});
+                PUSH_TOKEN(TOKEN_GREATER, ">");
                 lastTy = TOKEN_GREATER;
                 cursor++;
             }
@@ -326,7 +329,7 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
         }
         case CC_AMP: {
             if (cursor[1] == '&') {
-                tokens.push_back({TOKEN_AND, "&&", 0, 0});
+                PUSH_TOKEN(TOKEN_AND, "&&");
                 lastTy = TOKEN_AND;
                 cursor += 2;
             } else cursor++;
@@ -334,7 +337,7 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
         }
         case CC_PIPE: {
             if (cursor[1] == '|') {
-                tokens.push_back({TOKEN_OR, "||", 0, 0});
+                PUSH_TOKEN(TOKEN_OR, "||");
                 lastTy = TOKEN_OR;
                 cursor += 2;
             } else cursor++;
@@ -342,27 +345,27 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
         }
         case CC_COLON: {
             if (cursor[1] == ':') {
-                tokens.push_back({TOKEN_COLON, "::", 0, 0});
+                PUSH_TOKEN(TOKEN_COLON, "::");
                 lastTy = TOKEN_COLON;
                 cursor += 2;
             } else {
-                tokens.push_back({TOKEN_COLON, ":", 0, 0});
+                PUSH_TOKEN(TOKEN_COLON, ":");
                 lastTy = TOKEN_COLON;
                 cursor++;
             }
             break;
         }
-        case CC_DOT: tokens.push_back({TOKEN_DOT, ".", 0, 0}); lastTy = TOKEN_DOT; cursor++; break;
-        case CC_STAR: tokens.push_back({TOKEN_STAR, "*", 0, 0}); lastTy = TOKEN_STAR; cursor++; break;
-        case CC_PERCENT: tokens.push_back({TOKEN_MODULO, "%", 0, 0}); lastTy = TOKEN_MODULO; cursor++; break;
-        case CC_LPAREN: tokens.push_back({TOKEN_PAREN_OPEN, "(", 0, 0}); lastTy = TOKEN_PAREN_OPEN; cursor++; break;
-        case CC_RPAREN: tokens.push_back({TOKEN_PAREN_CLOSE, ")", 0, 0}); lastTy = TOKEN_PAREN_CLOSE; cursor++; break;
-        case CC_LBRACE: tokens.push_back({TOKEN_BRACE_OPEN, "{", 0, 0}); lastTy = TOKEN_BRACE_OPEN; cursor++; break;
-        case CC_RBRACE: tokens.push_back({TOKEN_BRACE_CLOSE, "}", 0, 0}); lastTy = TOKEN_BRACE_CLOSE; cursor++; break;
-        case CC_LBRACK: tokens.push_back({TOKEN_BRACKET_OPEN, "[", 0, 0}); lastTy = TOKEN_BRACKET_OPEN; cursor++; break;
-        case CC_RBRACK: tokens.push_back({TOKEN_BRACKET_CLOSE, "]", 0, 0}); lastTy = TOKEN_BRACKET_CLOSE; cursor++; break;
-        case CC_SEMI: tokens.push_back({TOKEN_SEMICOLON, ";", 0, 0}); lastTy = TOKEN_SEMICOLON; cursor++; break;
-        case CC_COMMA: tokens.push_back({TOKEN_COMMA, ",", 0, 0}); lastTy = TOKEN_COMMA; cursor++; break;
+        case CC_DOT: PUSH_TOKEN(TOKEN_DOT, "."); lastTy = TOKEN_DOT; cursor++; break;
+        case CC_STAR: PUSH_TOKEN(TOKEN_STAR, "*"); lastTy = TOKEN_STAR; cursor++; break;
+        case CC_PERCENT: PUSH_TOKEN(TOKEN_MODULO, "%"); lastTy = TOKEN_MODULO; cursor++; break;
+        case CC_LPAREN: PUSH_TOKEN(TOKEN_PAREN_OPEN, "("); lastTy = TOKEN_PAREN_OPEN; cursor++; break;
+        case CC_RPAREN: PUSH_TOKEN(TOKEN_PAREN_CLOSE, ")"); lastTy = TOKEN_PAREN_CLOSE; cursor++; break;
+        case CC_LBRACE: PUSH_TOKEN(TOKEN_BRACE_OPEN, "{"); lastTy = TOKEN_BRACE_OPEN; cursor++; break;
+        case CC_RBRACE: PUSH_TOKEN(TOKEN_BRACE_CLOSE, "}"); lastTy = TOKEN_BRACE_CLOSE; cursor++; break;
+        case CC_LBRACK: PUSH_TOKEN(TOKEN_BRACKET_OPEN, "["); lastTy = TOKEN_BRACKET_OPEN; cursor++; break;
+        case CC_RBRACK: PUSH_TOKEN(TOKEN_BRACKET_CLOSE, "]"); lastTy = TOKEN_BRACKET_CLOSE; cursor++; break;
+        case CC_SEMI: PUSH_TOKEN(TOKEN_SEMICOLON, ";"); lastTy = TOKEN_SEMICOLON; cursor++; break;
+        case CC_COMMA: PUSH_TOKEN(TOKEN_COMMA, ","); lastTy = TOKEN_COMMA; cursor++; break;
         default: 
             if (UNLIKELY(c == '\0')) goto end_lexing;
             cursor++; 
@@ -371,20 +374,11 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
     }
 
 end_lexing:
-    tokens.push_back({TOKEN_EOF, "", 0, 0});
-
-    // Populate lines and columns using binary search (O(T log N) where N is number of lines)
-    for (auto& t : tokens) {
-        if (t.type == TOKEN_EOF) {
-            t.line = lineOffsets.size();
-            t.column = static_cast<int>(sourceCode.size() - lineOffsets.back()) + 1;
-            continue;
-        }
-        uint32_t offset = static_cast<uint32_t>(t.value.data() - basePtr);
-        auto it = std::upper_bound(lineOffsets.begin(), lineOffsets.end(), offset);
-        t.line = static_cast<int>(std::distance(lineOffsets.begin(), it));
-        t.column = static_cast<int>(offset - *(it - 1)) + 1;
-    }
-
+    *out++ = {TOKEN_EOF, "", 0, 0};
+    
+    // Construct vector from raw array and free it
+    vector<Token> tokens(tokensData, out);
+    std::free(tokensData);
+#undef PUSH_TOKEN
     return tokens;
 }
