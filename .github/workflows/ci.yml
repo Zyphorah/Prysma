@@ -38,4 +38,4 @@ jobs:
 
       - name: Lancer tests
         working-directory: tests
-        run: python3 run_tests.py
+        run: python3 run_unit_tests.py
