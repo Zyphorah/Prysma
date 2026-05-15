@@ -70,7 +70,7 @@
     "cmake.configureOnOpen": false,
 
     // ===== Hover Information =====
-    "editor.hover.enabled": true,
+    "editor.hover.enabled": "on",
     "editor.hover.delay": 300,
     "chat.disableAIFeatures": false
 }

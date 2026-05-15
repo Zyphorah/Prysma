@@ -12,6 +12,7 @@
 enum TokenType {
     // End of file
     TOKEN_EOF,
+    TOKEN_INVALID,
 
     // Literals: direct value "string", 123, 12.34, true/false
     TOKEN_LIT_INT, 
@@ -36,6 +37,8 @@ enum TokenType {
     TOKEN_NOT_EQUAL,
     TOKEN_AND,          
     TOKEN_OR,
+    TOKEN_AMP,
+    TOKEN_PIPE,
     TOKEN_NOT,         
 
     // Structure
