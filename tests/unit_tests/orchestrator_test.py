@@ -62,8 +62,8 @@ class TestOrchestrator:
 if __name__ == "__main__":
     base_dir = Path(__file__).parent.resolve()
     gen_dir = base_dir / "build" / "prysma_code_generation"
-    manual_dir = base_dir / "prysma_code_tests"
-    compiler = base_dir.parent / "build" / "Prysma"
+    manual_dir = base_dir.parent / "prysma_code_tests"
+    compiler = base_dir.parent.parent / "build" / "Prysma"
 
     locator = TestLocator([gen_dir, manual_dir])
     TestOrchestrator(locator, compiler).run_tests()

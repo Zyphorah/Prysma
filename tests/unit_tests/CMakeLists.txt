@@ -29,13 +29,13 @@ llvm_map_components_to_libnames(llvm_libs
 # Gestion automatique des fichiers sources 
 
 # 1. Récupération des sources du project principal
-file(GLOB_RECURSE SOURCES_MAIN CONFIGURE_DEPENDS "../src/*.cpp")
+file(GLOB_RECURSE SOURCES_MAIN CONFIGURE_DEPENDS "../../src/*.cpp")
 
 # IMPORTANT : Exclusion du main.cpp du project principal pour éviter les conflits (double function main)
-list(REMOVE_ITEM SOURCES_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/../src/main.cpp")
+list(REMOVE_ITEM SOURCES_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/../../src/main.cpp")
 
 # 2. Récupération du code généré
-file(GLOB_RECURSE SOURCES_GENEREES CONFIGURE_DEPENDS "../build/generationCode/src/*.cpp")
+file(GLOB_RECURSE SOURCES_GENEREES CONFIGURE_DEPENDS "../../build/generationCode/src/*.cpp")
 
 # 3. Récupération des fichiers de tests locaux
 file(GLOB_RECURSE SOURCES_TESTS CONFIGURE_DEPENDS "src/*.cpp")
@@ -59,8 +59,8 @@ target_compile_definitions(PrysmaTests PRIVATE ${LLVM_DEFINITIONS})
 # Définition des dossiers d'en-tête (include)
 target_include_directories(PrysmaTests PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/include 
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include 
-    ${CMAKE_CURRENT_SOURCE_DIR}/../build/generationCode/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../include 
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../build/generationCode/include
 )
 
 # Inclusion de LLVM en mode SYSTEM pour masquer ses avertissements internes
