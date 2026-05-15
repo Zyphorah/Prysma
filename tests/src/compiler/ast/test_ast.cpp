@@ -22,11 +22,12 @@
 #include "compiler/builder/equation/builder_equation_flottante.h"
 #include "compiler/ast/registry/registry_instruction.h"
 #include "compiler/ast/registry/registry_expression.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/context_expression.h"
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
-#include "compiler/ast/ast_genere.h"
+#include "../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 
 // Expressions
 #include "compiler/math/expression_literal.h"
@@ -63,6 +64,7 @@ struct EnvironnementAST {
     std::unique_ptr<RegistryExpression> registryExpression;
     std::unique_ptr<RegistryType> registryType;
     std::unique_ptr<RegistryVariable> registryVariable;
+    std::unique_ptr<NodeComponentRegistry> nodeComponentRegistry;
 
     BuilderTreeInstruction* builderTree = nullptr;
     BuilderFloatEquation* builderEquation = nullptr;
@@ -76,6 +78,7 @@ struct EnvironnementAST {
         registryExpression = std::make_unique<RegistryExpression>();
         registryType = std::make_unique<RegistryType>();
         registryVariable = std::make_unique<RegistryVariable>();
+        nodeComponentRegistry = std::make_unique<NodeComponentRegistry>();
 
         // Builder d'tree d'instruction 
         #pragma GCC diagnostic push
@@ -97,7 +100,8 @@ struct EnvironnementAST {
             builderTree,
             parserType,
             registryVariable.get(),
-            registryType.get()
+            registryType.get(),
+            nodeComponentRegistry.get()
         });
 
         contexteExpression = new (arena.Allocate<ContextExpression>()) ContextExpression(
@@ -407,8 +411,16 @@ TEST_CASE("Construction Tree If simple avec else", "[AST][Branch]")
 
     // 1. Racine = NodeInstruction qui contient le if
     auto* racine = dynamic_cast<NodeInstruction*>(tree);
+    auto& component = _contextGenCode->getNodeComponentRegistry()->get<NodeInstructionComponents>(instruction->getNodeId());
+
+    auto& children = component.children;
+
     REQUIRE(racine != nullptr);
-    REQUIRE(racine->getChildren().size() == 1);
+
+    REQUIRE(children.size() == 1);
+    //REQUIRE(racine->getChildren().size() == 1); // A TERMINER QUAND TOUS LES NOEUDS SERONT TRANSFORMÉS
+
+
 
     // 2. Premier child = NodeIf
     auto* nodeIf = dynamic_cast<NodeIf*>(racine->getChildren()[0]);

@@ -25,6 +25,10 @@
 #include <vector>
 
 
+//#include "compiler/ast/nodes/expression/soa-node-register-backend/experiment.hpp" // INCLUDE TEMPORAIRE, DÉPLACER DANS compiler/ast/registry/
+
+
+
 // Polyspace analyse static prouvé mathématiquement que l'execution d'une function ne cause pas de null pointer ou certaine catégorie de crash
 
 // Ne pas oblier de faire le système de delete en onion pour les objects de la classe du langage prysma. 
@@ -129,7 +133,16 @@ auto main(int argc, char* argv[]) -> int
         std::unique_ptr<FileRegistry> registryFiles = std::make_unique<FileRegistry>();
         std::unique_ptr<ConfigurationFacadeEnvironment> facadeConfigurationEnvironnement = std::make_unique<ConfigurationFacadeEnvironment>(registryFunctionGlobale.get(), registryFiles.get());
         
-        OrchestratorInclude orchestratorInclude(registryFunctionGlobale.get(), registryFiles.get(), mutex.get(), activerGraphViz);
+        //std::unique_ptr<NodeRegistry> nodeRegistry = std::make_unique<NodeRegistry>(); // À REMETTRE QUAND TERMINÉ
+
+
+        OrchestratorInclude orchestratorInclude(
+            registryFunctionGlobale.get(), 
+            registryFiles.get(), 
+            mutex.get(), 
+            activerGraphViz
+        );
+
         orchestratorInclude.compileProject(cheminFile);
 
         if (orchestratorInclude.hasErrors()) {

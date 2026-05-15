@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "compiler/ast/ast_genere.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
@@ -24,7 +25,12 @@
 void GeneralVisitorGenCode::visiter(NodeLiteral* nodeLiteral)
 {
     llvm::LLVMContext& context = _contextGenCode->getBackend()->getContext();
-    Token token = nodeLiteral->getToken();
+
+    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeLiteralComponents>(
+        nodeLiteral->getNodeId()
+    );
+
+    Token token = nodeData.getToken();
 
     if (token.type == TOKEN_IDENTIFIER) {
         VariableLoader loader(_contextGenCode);

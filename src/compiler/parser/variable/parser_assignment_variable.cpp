@@ -13,6 +13,7 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <cstddef>
@@ -27,13 +28,13 @@ ParserAssignmentVariable::ParserAssignmentVariable(ContextParser& contextParser)
 ParserAssignmentVariable::~ParserAssignmentVariable()
 = default;
 
-auto ParserAssignmentVariable::parse(std::vector<Token>& tokens, int& index) -> INode*
+auto ParserAssignmentVariable::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
 {
     consume(tokens, index, TOKEN_ASSIGN, "Error: 'aff' expected");
     Token nameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Error: variable name expected");
     std::string variableName = std::string(nameToken.value);
 
-    if (tokens[static_cast<size_t>(index)].type == TOKEN_DOT) {
+    if (tokens[index].type == TOKEN_DOT) {
         consume(tokens, index, TOKEN_DOT, "Error '.'");
         Token attributeToken = consume(tokens, index, TOKEN_IDENTIFIER, "Error: attribute expected");
         variableName += "." + std::string(attributeToken.value);
@@ -41,7 +42,7 @@ auto ParserAssignmentVariable::parse(std::vector<Token>& tokens, int& index) -> 
 
     INode* indexExpression = nullptr;
 
-    if (tokens[static_cast<size_t>(index)].type == TOKEN_BRACKET_OPEN) {
+    if (tokens[index].type == TOKEN_BRACKET_OPEN) {
         consume(tokens, index, TOKEN_BRACKET_OPEN, "Error '['");
         indexExpression = _contextParser.getBuilderTreeEquation()->build(tokens, index);
         consume(tokens, index, TOKEN_BRACKET_CLOSE, "Error: ']' expected after index");
@@ -54,10 +55,24 @@ auto ParserAssignmentVariable::parse(std::vector<Token>& tokens, int& index) -> 
     Token constructedToken = nameToken;
 
     if (indexExpression != nullptr) {
-        return _contextParser.getBuilderTreeEquation()->allocate<NodeAssignmentArray>(constructedToken, indexExpression, expression, nameToken);
+        auto* nodeAssignmentArr = _contextParser.getBuilderTreeInstruction()->allocate<NodeAssignmentArray>(
+            _contextParser.getNodeComponentRegistry()->getNextId()
+        ); 
+        _contextParser.getNodeComponentRegistry()->emplace<NodeAssignmentArrayComponents>(
+            nodeAssignmentArr->getNodeId(), constructedToken, indexExpression, expression, nameToken
+        );
+
+        return nodeAssignmentArr;
     }
-    
-    return _contextParser.getBuilderTreeEquation()->allocate<NodeAssignmentVariable>(constructedToken, expression, nameToken);
+
+    auto* nodeAssignmentVar = _contextParser.getBuilderTreeInstruction()->allocate<NodeAssignmentVariable>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    ); 
+    _contextParser.getNodeComponentRegistry()->emplace<NodeAssignmentVariableComponents>(
+        nodeAssignmentVar->getNodeId(), constructedToken, expression, nameToken
+    );
+
+    return nodeAssignmentVar;
 }
 
 #endif /* PARSER_ASSIGNMENTVARIABLE_CPP */

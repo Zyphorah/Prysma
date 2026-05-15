@@ -6,9 +6,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "compiler/ast/ast_genere.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "compiler/ast/ast_genere.h"
 #include "compiler/llvm/gestion_variable.h"
 #include "compiler/ast/registry/registry_class.h"
 #include "compiler/visitor/code_gen/helper/error_helper.h"
@@ -18,8 +19,12 @@
 
 void GeneralVisitorGenCode::visiter(NodeAccesAttribute* nodeAccessAttribute)
 {
-    llvm::StringRef objectName = nodeAccessAttribute->getNomObject().value;
-    llvm::StringRef attributeName = nodeAccessAttribute->getNomAttribute().value;
+    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeAccesAttributeComponents>(
+        nodeAccessAttribute->getNodeId()
+    );
+
+    llvm::StringRef objectName = nodeData.getObjectName().value;
+    llvm::StringRef attributeName = nodeData.getAttributeName().value;
 
     VariableLoader loader(_contextGenCode);
     Symbol objectSymbol = loader.load(objectName);
@@ -49,7 +54,7 @@ void GeneralVisitorGenCode::visiter(NodeAccesAttribute* nodeAccessAttribute)
 
     auto& builder = _contextGenCode->getBackend()->getBuilder();
 
-    Symbol varSymbol = classInfo->getRegistryVariable()->getVariable(nodeAccessAttribute->getNomAttribute());
+    Symbol varSymbol = classInfo->getRegistryVariable()->getVariable(nodeData.getAttributeName());
     
     llvm::Type* structType = classInfo->getStructType();
 

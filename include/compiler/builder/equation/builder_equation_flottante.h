@@ -9,10 +9,12 @@
 #ifndef FLOATEQUATIONBUILDER_H
 #define FLOATEQUATIONBUILDER_H
 
+#include <cstddef>
 #include <llvm/Support/Allocator.h>
 #include <memory>
 #include <vector>
 
+#include "compiler/macros/prysma_nodiscard.h"
 #include "compiler/ast/interfaces/i_builder_tree.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/parser/equation/chain_of_responsibility.h"
@@ -63,10 +65,10 @@ public:
     auto operator=(BuilderFloatEquation&&) -> BuilderFloatEquation& = delete;
 
     auto build(std::vector<Token>& tokens) -> INode* override;
-    auto build(std::vector<Token>& tokens, int& index) -> INode* override;
+    auto build(std::vector<Token>& tokens, std::size_t index) -> INode* override;
     auto getArena() -> llvm::BumpPtrAllocator& override;
     
-    [[nodiscard]] auto getBuilderTree() const -> IBuilderTree*;
+    PRYSMA_NODISCARD auto getBuilderTree() const -> IBuilderTree*;
 };
 
 #endif /* FLOATEQUATIONBUILDER_H */

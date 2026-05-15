@@ -9,9 +9,11 @@
 #ifndef F4099BCE_4896_40B4_B34C_93B4827706C3
 #define F4099BCE_4896_40B4_B34C_93B4827706C3
 
+#include "compiler/macros/prysma_nodiscard.h"
 #include "compiler/ast/interfaces/i_builder_tree.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/registry_type.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/parser/parser_type.h"
 #include <stdexcept>
 
@@ -23,6 +25,7 @@ private:
     TypeParser* parserType;
     RegistryVariable* registryVariable;
     RegistryType* registryType;
+    NodeComponentRegistry* nodeComponentRegistry;
 
 public:
     struct Dependencies {
@@ -31,6 +34,7 @@ public:
         TypeParser* parserType;
         RegistryVariable* registryVariable;
         RegistryType* registryType;
+        NodeComponentRegistry* nodeComponentRegistry;
     };
 
     explicit ContextParser(const Dependencies& deps)
@@ -38,7 +42,8 @@ public:
           builderTreeInstruction(deps.builderTreeInstruction),
           parserType(deps.parserType),
           registryVariable(deps.registryVariable),
-          registryType(deps.registryType)
+          registryType(deps.registryType),
+          nodeComponentRegistry(deps.nodeComponentRegistry)
     {
         if(builderTreeEquation == nullptr)
         {
@@ -64,13 +69,19 @@ public:
         {
             throw std::invalid_argument("registryType cannot be null");
         }
+
+        if(nodeComponentRegistry == nullptr)
+        {
+            throw std::invalid_argument("nodeComponentRegistry cannot be null");
+        }
     }    
 
-    [[nodiscard]] auto getBuilderTreeEquation() const -> IBuilderTree* { return builderTreeEquation; }
-    [[nodiscard]] auto getBuilderTreeInstruction() const -> IBuilderTree* { return builderTreeInstruction; }
-    [[nodiscard]] auto getTypeParser() const -> TypeParser* { return parserType; }
-    [[nodiscard]] auto getRegistryVariable() const -> RegistryVariable* { return registryVariable; }
-    [[nodiscard]] auto getRegistryType() const -> RegistryType* { return registryType; }
+    PRYSMA_NODISCARD auto getBuilderTreeEquation() const -> IBuilderTree* { return builderTreeEquation; }
+    PRYSMA_NODISCARD auto getBuilderTreeInstruction() const -> IBuilderTree* { return builderTreeInstruction; }
+    PRYSMA_NODISCARD auto getTypeParser() const -> TypeParser* { return parserType; }
+    PRYSMA_NODISCARD auto getRegistryVariable() const -> RegistryVariable* { return registryVariable; }
+    PRYSMA_NODISCARD auto getRegistryType() const -> RegistryType* { return registryType; }
+    PRYSMA_NODISCARD auto getNodeComponentRegistry() const -> NodeComponentRegistry* { return nodeComponentRegistry; }
 };
 
 #endif /* F4099BCE_4896_40B4_B34C_93B4827706C3 */

@@ -13,9 +13,11 @@
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include "compiler/macros/prysma_nodiscard.h"
 #include "compiler/ast/registry/registry_type.h"
 #include "registry_instruction.h"
-#include "stack/registry_variable.h"
+#include "registry_instruction.h"
+#include "node_component_registry.h"
 #include "registry_function.h"
 #include "registry_type.h"
 #include "registry_argument.h"
@@ -30,6 +32,7 @@ private:
     RegistryType* registryType;
     Symbol temporaryValue;
     LlvmBackend* backend;
+    NodeComponentRegistry* nodeComponentRegistry;
     RegistryInstruction* registryInstruction;
     RegistryVariable* registryVariable;
     RegistryFunctionGlobal* registryFunctionGlobal;
@@ -45,6 +48,7 @@ public:
     ContextGenCode(
         RegistryType* p_registryType,
         LlvmBackend* p_backend,
+        NodeComponentRegistry* p_nodeComponentRegistry,
         RegistryInstruction* p_registryInstruction,
         RegistryVariable* p_registryVariable,
         RegistryFunctionGlobal* p_registryFunctionGlobal,
@@ -67,6 +71,9 @@ public:
             }
             if (p_backend == nullptr) {
                 throw std::invalid_argument("The LLVM backend cannot be null");
+            }
+            if (p_nodeComponentRegistry == nullptr) {
+                throw std::invalid_argument("The node component registry cannot be null");
             }
             if (p_registryInstruction == nullptr) {
                 throw std::invalid_argument("The instruction registry cannot be null");
@@ -102,6 +109,7 @@ public:
         this->registryType = p_registryType;
         this->currentFilePath = std::move(p_currentFilePath);
         this->backend = p_backend;
+        this->nodeComponentRegistry = p_nodeComponentRegistry;
         this->registryInstruction = p_registryInstruction;
         this->registryVariable = p_registryVariable;
         this->registryFunctionGlobal = p_registryFunctionGlobal;
@@ -119,19 +127,20 @@ public:
     void setCurrentClassName(std::string p_currentClassName) { currentClassName = std::move(p_currentClassName); }
 
     // Getters
-    [[nodiscard]] auto getRegistryType() const -> RegistryType* { return registryType; }
-    [[nodiscard]] auto getTemporaryValue() const -> Symbol { return temporaryValue; }
-    [[nodiscard]] auto getBackend() const -> LlvmBackend* { return backend; }
-    [[nodiscard]] auto getRegistryInstruction() const -> RegistryInstruction* { return registryInstruction; }
-    [[nodiscard]] auto getRegistryVariable() const -> RegistryVariable* { return registryVariable; }
-    [[nodiscard]] auto getRegistryFunctionGlobal() const -> RegistryFunctionGlobal* { return registryFunctionGlobal; }
-    [[nodiscard]] auto getRegistryFunctionLocal() const -> RegistryFunctionLocal* { return registryFunctionLocal; }
-    [[nodiscard]] auto getReturnContextCompilation() const -> ReturnContextCompilation* { return returnContextCompilation; }
-    [[nodiscard]] auto getRegistryArgument() const -> RegistryArgument* { return registryArgument; }
-    [[nodiscard]] auto getRegistryClass() const -> RegistryClass* { return registryClass; }
-    [[nodiscard]] auto getArena() const -> llvm::BumpPtrAllocator* { return arena; }
-    [[nodiscard]] auto getCurrentFilePath() const -> const std::string& { return currentFilePath; }
-    [[nodiscard]] auto getCurrentClassName() const -> const std::string& { return currentClassName; }
+    PRYSMA_NODISCARD auto getRegistryType() const -> RegistryType* { return registryType; }
+    PRYSMA_NODISCARD auto getTemporaryValue() const -> Symbol { return temporaryValue; }
+    PRYSMA_NODISCARD auto getBackend() const -> LlvmBackend* { return backend; }
+    PRYSMA_NODISCARD auto getNodeComponentRegistry() const -> NodeComponentRegistry* { return nodeComponentRegistry; }
+    PRYSMA_NODISCARD auto getRegistryInstruction() const -> RegistryInstruction* { return registryInstruction; }
+    PRYSMA_NODISCARD auto getRegistryVariable() const -> RegistryVariable* { return registryVariable; }
+    PRYSMA_NODISCARD auto getRegistryFunctionGlobal() const -> RegistryFunctionGlobal* { return registryFunctionGlobal; }
+    PRYSMA_NODISCARD auto getRegistryFunctionLocal() const -> RegistryFunctionLocal* { return registryFunctionLocal; }
+    PRYSMA_NODISCARD auto getReturnContextCompilation() const -> ReturnContextCompilation* { return returnContextCompilation; }
+    PRYSMA_NODISCARD auto getRegistryArgument() const -> RegistryArgument* { return registryArgument; }
+    PRYSMA_NODISCARD auto getRegistryClass() const -> RegistryClass* { return registryClass; }
+    PRYSMA_NODISCARD auto getArena() const -> llvm::BumpPtrAllocator* { return arena; }
+    PRYSMA_NODISCARD auto getCurrentFilePath() const -> const std::string& { return currentFilePath; }
+    PRYSMA_NODISCARD auto getCurrentClassName() const -> const std::string& { return currentClassName; }
 };
 
 #endif /* C2537ED8_1CCF_4242_BDB0_B5ED5F2AD08F */

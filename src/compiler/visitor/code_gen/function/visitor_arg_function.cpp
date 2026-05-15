@@ -8,9 +8,10 @@
 
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
-#include "compiler/ast/ast_genere.h"
+#include "compiler/macros/prysma_maybe_unused.h"
+#include "../../../../../build/generationCode/include/compiler/ast/ast_genere_copy.txt"
 
-void GeneralVisitorGenCode::visiter([[maybe_unused]]NodeArgFunction* nodeArgFunction) 
+void GeneralVisitorGenCode::visiter(PRYSMA_MAYBE_UNUSED NodeArgFunction* nodeArgFunction) 
 {
     _contextGenCode->setTemporaryValue(Symbol(nullptr, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
 }

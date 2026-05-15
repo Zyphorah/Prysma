@@ -9,6 +9,8 @@
 #ifndef D8FAA486_F5BA_43FB_BFFC_AB9990B46458
 #define D8FAA486_F5BA_43FB_BFFC_AB9990B46458
 
+#include "compiler/macros/prysma_nodiscard.h"
+#include "compiler/macros/prysma_maybe_unused.h"
 #include "compiler/ast/registry/context_gen_code.h"
 #include "compiler/ast/registry/context_expression.h"
 #include "compiler/ast/registry/context_parser.h"
@@ -38,6 +40,8 @@ private:
 
     llvm::BumpPtrAllocator _arena;
 
+    std::unique_ptr<NodeComponentRegistry> _nodeComponentRegistry;
+
     std::unique_ptr<LlvmBackend> _backend;
     std::unique_ptr<RegistryInstruction> _registryInstruction;
     std::unique_ptr<RegistryVariable> _registryVariable;
@@ -64,7 +68,7 @@ private:
     void registerInstructions();
 
 public:
-    explicit ConfigurationFacadeEnvironment(RegistryFunctionGlobal* registryFunctionGlobal, [[maybe_unused]] FileRegistry* registryFile);
+    explicit ConfigurationFacadeEnvironment(RegistryFunctionGlobal* registryFunctionGlobal, PRYSMA_MAYBE_UNUSED FileRegistry* registryFile);
     ~ConfigurationFacadeEnvironment();
 
     ConfigurationFacadeEnvironment(const ConfigurationFacadeEnvironment&) = delete;
@@ -75,10 +79,10 @@ public:
     /// Initializes the entire compilation environment in a single step
     void initialize(const std::string& filePath);
     
-    [[nodiscard]] auto getContext() const -> ContextGenCode*;
+    PRYSMA_NODISCARD auto getContext() const -> ContextGenCode*;
     auto getArena() -> llvm::BumpPtrAllocator&;
-    [[nodiscard]] auto getBuilderTreeInstruction() const -> BuilderTreeInstruction*;
-    [[nodiscard]] auto getBuilderEquation() const -> BuilderFloatEquation*;
+    PRYSMA_NODISCARD auto getBuilderTreeInstruction() const -> BuilderTreeInstruction*;
+    PRYSMA_NODISCARD auto getBuilderEquation() const -> BuilderFloatEquation*;
 };
 
 #endif /* D8FAA486_F5BA_43FB_BFFC_AB9990B46458 */

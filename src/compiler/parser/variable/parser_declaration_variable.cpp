@@ -13,6 +13,7 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
@@ -27,7 +28,7 @@ ParserDeclarationVariable::ParserDeclarationVariable(ContextParser& contextParse
 ParserDeclarationVariable::~ParserDeclarationVariable()
 = default;
 
-auto ParserDeclarationVariable::parse(std::vector<Token>& tokens, int& index) -> INode*
+auto ParserDeclarationVariable::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
 {
     consume(tokens, index, TOKEN_DECL, "Error: expected type 'dec'");
     
@@ -42,12 +43,18 @@ auto ParserDeclarationVariable::parse(std::vector<Token>& tokens, int& index) ->
     
     consume(tokens, index, TOKEN_SEMICOLON, "Error: ';' expected at the end of the declaration");
 
-    return _contextParser.getBuilderTreeEquation()->allocate<NodeDeclarationVariable>(
+    auto* nodeDeclarationVar = _contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationVariable>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    ); 
+    _contextParser.getNodeComponentRegistry()->emplace<NodeDeclarationVariableComponents>(
+        nodeDeclarationVar->getNodeId(),
         Token{},
         nameToken,
         type,
         expression
     );
+
+    return nodeDeclarationVar;
 }
 #endif /* PARSER_DECLARATIONVARIABLE_CPP */
 

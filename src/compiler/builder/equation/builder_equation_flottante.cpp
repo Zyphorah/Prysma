@@ -6,17 +6,18 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/builder_tree_equation.h"
 #include "compiler/builder/equation/builder_equation_flottante.h"
 #include "compiler/ast/interfaces/i_builder_tree.h"
 #include "compiler/ast/nodes/interfaces/i_expression.h"
-#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/registry_expression.h"
 #include "compiler/parser/equation/chain_of_responsibility.h"
 #include "compiler/parser/equation/manager_operator.h"
 #include "compiler/parser/equation/service_parenthesis.h"
 #include "compiler/lexer/token_type.h"
+#include <cstddef>
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/Support/Allocator.h>
 #include <memory>
@@ -132,7 +133,7 @@ auto BuilderFloatEquation::getBuilderTree() const -> IBuilderTree*
     return _builderTree;
 }
 
-auto BuilderFloatEquation::build(std::vector<Token>& tokens, int& index) -> INode*
+auto BuilderFloatEquation::build(std::vector<Token>& tokens, std::size_t index) -> INode*
 {
     return _builderTree->build(tokens, index);
 }

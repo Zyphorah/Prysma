@@ -9,10 +9,11 @@
 #ifndef PARSER_CLASS_CPP
 #define PARSER_CLASS_CPP
 
+#include "compiler/ast/registry/node_component_registry.h"
+#include "compiler/macros/prysma_nodiscard.h"
 #include "compiler/manager_error.h"
-#include <cstddef>
-#include "compiler/object/parser_class.h"
 #include "compiler/ast/ast_genere.h"
+#include "compiler/object/parser_class.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
 #include "compiler/lexer/lexer.h"
@@ -22,6 +23,7 @@
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/Support/FormatVariadic.h>
 #include <vector>
+#include <cstddef>
 
 namespace
 {
@@ -34,8 +36,8 @@ namespace
     ClassParameters(const TokenClassName& classNameToken, const TokenVisibility& currentVisibility)
         : classNameToken_(classNameToken.t), current_visibility_(currentVisibility.t) {}
 
-    [[nodiscard]] auto classNameToken() const -> const Token& { return classNameToken_; }
-    [[nodiscard]] auto current_visibility() const -> const Token& { return current_visibility_; }
+    PRYSMA_NODISCARD auto classNameToken() const -> const Token& { return classNameToken_; }
+    PRYSMA_NODISCARD auto current_visibility() const -> const Token& { return current_visibility_; }
 
   private:
     Token classNameToken_;
@@ -48,17 +50,30 @@ namespace
               llvm::SmallVectorImpl<INode*>& memberList,
               llvm::SmallVectorImpl<INode*>& builders)
   {
-    if (node == nullptr) {
-      return;
-    }
+      if (node == nullptr) {
+        return;
+      }
+
+      // ce système fonctionne bien mais il repose sur un système de "pseudo_casting" qui coute cher au runtime.
+      // il serait plus judicieux d'utiliser les informations du type courant depuis le wrapper crtp. 
+      // Le truc principal est que ce dyn_cast introduit un static_cast qui pourait être évité avec le crtp.
+
+      // Il faut absolument refactoriser ce bout de code du moment que le crtp est en place. Ça fera du bien.
 
       if (auto* declarationVariable = prysma::dyn_cast<NodeDeclarationVariable>(node)) {
         if (declarationVariable != nullptr) {
+          auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationVariableComponents>(node->getNodeId());
+
           node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationVariable>(
+              contextParser.getNodeComponentRegistry()->getNextId()
+          );
+
+          contextParser.getNodeComponentRegistry()->emplace<NodeDeclarationVariableComponents>(
+              node->getNodeId(),
               param.current_visibility(),
-              declarationVariable->getNom(),
-              declarationVariable->getType(),
-              declarationVariable->getExpression()
+              nodeData.getName(),
+              nodeData.getType(),
+              nodeData.getExpression()
           );
         }
         memberList.push_back(node);
@@ -67,21 +82,34 @@ namespace
 
       if (auto* declarationFunction = prysma::dyn_cast<NodeDeclarationFunction>(node)) {
         if (declarationFunction != nullptr) {
+          auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(node->getNodeId());
+
           node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(
-              param.current_visibility(),
-              declarationFunction->getTypeReturn(),
-              declarationFunction->getNom(),
-              declarationFunction->getArguments(),
-              declarationFunction->getBody()
+              contextParser.getNodeComponentRegistry()->getNextId()
           );
-        }      auto* newDeclarationFunction = prysma::cast<NodeDeclarationFunction>(node);
-      if (newDeclarationFunction != nullptr && newDeclarationFunction->getNom().value == param.classNameToken().value) {
-        builders.push_back(node);
+
+          contextParser.getNodeComponentRegistry()->emplace<NodeDeclarationFunctionComponents>(
+              node->getNodeId(),
+              param.current_visibility(),
+              nodeData.getReturnType(),
+              nodeData.getName(),
+              nodeData.getArguments(),
+              nodeData.getBody()
+          );
+        }
+        
+        auto* newDeclarationFunction = prysma::cast<NodeDeclarationFunction>(node); // très suspect, à changer avec le crtp
+        auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(node->getNodeId());
+        // il se pourrait que le node data soit empty et que le registre lance un exception (not found). il faudrait peut-être emplace ou revoir l'algo pour être certain...
+
+        if (newDeclarationFunction != nullptr && nodeData.getName().value == param.classNameToken().value) {
+          builders.push_back(node);
+          return;
+        }
+        
+        memberList.push_back(node);
         return;
       }
-      memberList.push_back(node);
-      return;
-    }
 
     throw CompilationError(llvm::formatv("Invalid class member: '{0}'", param.classNameToken().value).str(), Line(param.classNameToken().line), Column(param.classNameToken().column));
   }
@@ -118,7 +146,7 @@ ParserClass::~ParserClass()
 //                  }
 //           }
 
-auto ParserClass::parse(std::vector<Token>& tokens, int& index) -> INode*
+auto ParserClass::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
 {
     consume(tokens, index, TOKEN_CLASS, "Expected 'class' at the beginning of the class declaration.");
     Token classNameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Expected an identifier after 'class' for the class name.");
@@ -136,25 +164,25 @@ auto ParserClass::parse(std::vector<Token>& tokens, int& index) -> INode*
     current_visibility.type = TOKEN_PRIVATE;
     current_visibility.value = "private";
 
-    while (index < static_cast<int>(tokens.size()) && tokens[static_cast<size_t>(index)].type != TOKEN_BRACE_CLOSE) {
-        TokenType tokenType = tokens[static_cast<size_t>(index)].type;
+    while (index < static_cast<int>(tokens.size()) && tokens[index].type != TOKEN_BRACE_CLOSE) {
+        TokenType tokenType = tokens[index].type;
 
         if (tokenType == TOKEN_PUBLIC) {
-            current_visibility = tokens[static_cast<size_t>(index)];
+            current_visibility = tokens[index];
             consume(tokens, index, TOKEN_PUBLIC, "Expected 'public' for the public section of the class.");
             consume(tokens, index, TOKEN_COLON, "Expected ':' after 'public'.");
             continue;
         }
 
         if (tokenType == TOKEN_PRIVATE) {
-            current_visibility = tokens[static_cast<size_t>(index)];
+            current_visibility = tokens[index];
             consume(tokens, index, TOKEN_PRIVATE, "Expected 'private' for the private section of the class.");
             consume(tokens, index, TOKEN_COLON, "Expected ':' after 'private'.");
             continue;
         }
 
         if (tokenType == TOKEN_PROTECTED) {
-          current_visibility = tokens[static_cast<size_t>(index)];
+          current_visibility = tokens[index];
           consume(tokens, index, TOKEN_PROTECTED, "Expected 'protected' for the protected section of the class.");
           consume(tokens, index, TOKEN_COLON, "Expected ':' after 'protected'.");
           continue;
@@ -172,12 +200,19 @@ auto ParserClass::parse(std::vector<Token>& tokens, int& index) -> INode*
 
     consume(tokens, index, TOKEN_BRACE_CLOSE, "Expected '}' at the end of the class declaration.");
 
-    return _contextParser.getBuilderTreeInstruction()->allocate<NodeClass>(
-        _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(inheritance), 
+    auto* nodeClass = _contextParser.getBuilderTreeInstruction()->allocate<NodeClass>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    ); 
+
+    _contextParser.getNodeComponentRegistry()->emplace<NodeClassComponents>(
+        nodeClass->getNodeId(),
+        _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(inheritance),
         _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(memberList), 
         _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(builders), 
         classNameToken
     );
+
+    return nodeClass;
 }
 
 #endif /* PARSER_CLASS_CPP */

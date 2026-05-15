@@ -13,6 +13,7 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_expression.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/manager_error.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
@@ -74,10 +75,17 @@ auto ExpressionNew::build(std::vector<Token>& equation) -> INode*
         }
     }
 
-    return _context.getBuilderTreeEquation()->allocate<NodeNew>(
+    auto* nodeNew = _context.getBuilderTreeEquation()->allocate<NodeNew>(
+    _context.getNodeComponentRegistry()->getNextId()
+    );
+
+    _context.getNodeComponentRegistry()->emplace<NodeNewComponents>(
+        nodeNew->getNodeId(),
         _context.getBuilderTreeEquation()->allocateArray<INode*>(arguments), 
         typeName
     );
+
+    return nodeNew;
 }
 
 #endif /* EXPRESSION_NEW_CPP */

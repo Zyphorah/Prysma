@@ -6,8 +6,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/visitor/visitor_filling_registry/visitor_filling_registry.h"
-#include "compiler/ast/ast_genere.h"
 #include "compiler/ast/registry/registry_class.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/ast/registry/types/i_type.h"
@@ -18,8 +18,11 @@
 
 void FillingVisitorRegistry::visiter(NodeDeclarationFunction* nodeDeclarationFunction)
 {
-    IType* returnType = nodeDeclarationFunction->getTypeReturn();
-    llvm::StringRef functionName = nodeDeclarationFunction->getNom().value;
+    auto& nodeDeclFuncData = _contextGenCode->getNodeComponentRegistry()
+        ->get<NodeDeclarationFunctionComponents>(nodeDeclarationFunction->getNodeId());
+
+    IType* returnType = nodeDeclFuncData.getReturnType();
+    llvm::StringRef functionName = nodeDeclFuncData.getName().value;
     
     if (_contextGenCode->getCurrentClassName() != "") {
         // class context (method)

@@ -13,9 +13,11 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_parser.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include "compiler/visitor/interfaces/i_visitor.h"
+#include <cstddef>
 #include <llvm/ADT/ArrayRef.h>
 #include <vector>
 
@@ -26,7 +28,7 @@ ParserWhile::ParserWhile(ContextParser& contextParser)
 
 ParserWhile::~ParserWhile() = default;
 
-auto ParserWhile::parse(std::vector<Token>& tokens, int& index) -> INode*
+auto ParserWhile::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
 {
     consume(tokens, index, TOKEN_WHILE, "Error, expected token 'while' ");
 
@@ -37,13 +39,34 @@ auto ParserWhile::parse(std::vector<Token>& tokens, int& index) -> INode*
     consume(tokens, index, TOKEN_PAREN_CLOSE, "Error, token is not ')'! ");
 
     consume(tokens, index, TOKEN_BRACE_OPEN, "Error, token is not '{'");
+
+
     auto blockWhileChildren = consumeChildBody(tokens, index, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
-    INode* nodeBlockWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(blockWhileChildren);
+
+    auto* nodeBlockWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    ); 
+    _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBlockWhile->getNodeId(), blockWhileChildren);
+
+
     consume(tokens, index, TOKEN_BRACE_CLOSE, "Error, token is not '}'");
 
-    INode* nodeBlockEndWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(llvm::ArrayRef<INode*>{});
 
-    INode* nodeWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeWhile>(condition, nodeBlockWhile, nodeBlockEndWhile);
+    auto* nodeBlockEndWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    ); 
+    _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBlockEndWhile->getNodeId(), llvm::ArrayRef<INode*>{});
+    
+    
+    auto* nodeWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeWhile>(
+        _contextParser.getNodeComponentRegistry()->getNextId()
+    ); 
+    _contextParser.getNodeComponentRegistry()->emplace<NodeWhileComponents>(
+        nodeBlockEndWhile->getNodeId(),
+        condition, 
+        nodeBlockWhile,
+        nodeBlockEndWhile
+    );
 
     return nodeWhile;
 }

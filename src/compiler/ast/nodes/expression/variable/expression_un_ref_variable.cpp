@@ -13,6 +13,7 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_expression.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <stdexcept>
@@ -30,7 +31,17 @@ auto ExpressionUnRefVariable::build(std::vector<Token>& equation) -> INode*
     if (equation.size() < 2 || equation[1].type != TOKEN_IDENTIFIER) {
         throw std::runtime_error("Error: 'unref' must be followed by an identifier");
     }
-    return _context.getBuilderTreeEquation()->allocate<NodeUnRefVariable>(equation[1]); 
+
+    auto* nodeUnrefVar = _context.getBuilderTreeEquation()->allocate<NodeUnRefVariable>(
+        _context.getNodeComponentRegistry()->getNextId()
+    );
+
+    _context.getNodeComponentRegistry()->emplace<NodeUnRefVariableComponents>(
+        nodeUnrefVar->getNodeId(),
+        equation[1]
+    );
+
+    return nodeUnrefVar;
 }
 
 #endif /* EXPRESSION_UNREFVARIABLE_CPP */
