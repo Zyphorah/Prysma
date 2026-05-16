@@ -62,3 +62,32 @@ assertions: - none -
 
 
 etudiant@CGPP-1001184:~/prysma/tests$ 
+
+
+
+avec l'optimisation __builtin_unreachable() 
+
+
+ Performance counter stats for '/home/etudiant/prysma/tests/perf_tests/build/PrysmaPerfTests':
+
+     7 215 571 622      cpu_atom/cycles/                                                        (0,15%)
+    14 004 106 978      cpu_core/cycles/                                                        (99,85%)
+    10 492 080 105      cpu_atom/instructions/           #    1,45  insn per cycle              (0,15%)
+    22 222 439 347      cpu_core/instructions/           #    1,59  insn per cycle              (99,85%)
+        83 534 804      cpu_atom/cache-misses/           #   65,85% of all cache refs           (0,15%)
+        62 119 956      cpu_core/cache-misses/           #   63,60% of all cache refs           (99,85%)
+       126 855 262      cpu_atom/cache-references/                                              (0,15%)
+        97 679 585      cpu_core/cache-references/                                              (99,85%)
+     1 923 027 261      cpu_atom/branches/                                                      (0,15%)
+     4 472 793 680      cpu_core/branches/                                                      (99,85%)
+        35 902 250      cpu_atom/branch-misses/          #    1,87% of all branches             (0,15%)
+        88 043 595      cpu_core/branch-misses/          #    1,97% of all branches             (99,85%)
+
+       2,953580231 seconds time elapsed
+
+       2,442320000 seconds user
+       0,509858000 seconds sys
+
+
+etudiant@CGPP-1001184:~/prysma/tests$ 
+

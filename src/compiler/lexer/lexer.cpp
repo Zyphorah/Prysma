@@ -456,7 +456,7 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
         case CC_RBRACK: PUSH_TOKEN(TOKEN_BRACKET_CLOSE, "]"); lastTy = TOKEN_BRACKET_CLOSE; cursor++; break;
         case CC_SEMI: PUSH_TOKEN(TOKEN_SEMICOLON, ";"); lastTy = TOKEN_SEMICOLON; cursor++; break;
         case CC_COMMA: PUSH_TOKEN(TOKEN_COMMA, ","); lastTy = TOKEN_COMMA; cursor++; break;
-        default: 
+        case CC_OTHER: 
             if (PRYSMA_UNLIKELY(chr == '\0'))
             {
                  goto end_lexing;
@@ -465,6 +465,8 @@ auto Lexer::tokenize(const string& sourceCode) -> vector<Token> {
             lastTy = TOKEN_INVALID;
             cursor++; 
             break;
+        default:
+             __builtin_unreachable();
         }
     }
 
