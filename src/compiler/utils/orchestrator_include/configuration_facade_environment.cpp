@@ -261,7 +261,7 @@ void ConfigurationFacadeEnvironment::registerExpressions()
     _registryExpression = new (_arena.Allocate<RegistryExpression>()) RegistryExpression(); // NOLINT(cppcoreguidelines-owning-memory)
 
     _builderEquation = new (_arena) // NOLINT(cppcoreguidelines-owning-memory)
-        BuilderFloatEquation(_registryExpression, _arena);
+        BuilderFloatEquation(_registryExpression, _nodeComponentRegistry.get(), _arena);
 
     // Create the TypeParser with the registry
     _parserType = new (_arena.Allocate<TypeParser>()) // NOLINT(cppcoreguidelines-owning-memory)

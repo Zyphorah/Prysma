@@ -14,6 +14,7 @@
 #include <memory>
 #include <vector>
 
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/macros/prysma_nodiscard.h"
 #include "compiler/ast/interfaces/i_builder_tree.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
@@ -29,6 +30,7 @@ class BuilderFloatEquation : public IBuilderTree
 {
 private:
     RegistryExpression* _expressionRegistry;
+    NodeComponentRegistry* _nodeComponentRegistry;
     llvm::BumpPtrAllocator& _arena;
     std::unique_ptr<RegistrySymbol> _symbolRegistry;
     
@@ -55,7 +57,7 @@ private:
 
 public: 
 
-    BuilderFloatEquation(RegistryExpression* expressionRegistry, llvm::BumpPtrAllocator& arena);
+    BuilderFloatEquation(RegistryExpression* expressionRegistry, NodeComponentRegistry* nodeComponentRegistry, llvm::BumpPtrAllocator& arena);
     
     ~BuilderFloatEquation() override;
 

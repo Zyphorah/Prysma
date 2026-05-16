@@ -5,7 +5,7 @@ auto NodeComponentRegistry::getNextId() noexcept -> node_id_t {
 }
 
 template<typename StoredType> sparse_set<StoredType>&
-NodeComponentRegistry::resolve<StoredType>::get(NodeComponentRegistry& reg) {
+NodeComponentRegistry::resolve<StoredType>::on(NodeComponentRegistry& reg) {
     return std::get<sparse_set<StoredType>>(reg.storage_);
 }
 
@@ -38,4 +38,3 @@ NodeComponentRegistry::resolve<StoredType>::get(NodeComponentRegistry& reg) {
 // sparse_set<of_return_nodes>&
 // NodeComponentRegistry::resolve<AST_NODE_RETURN_COMPONENT>::get(NodeComponentRegistry& reg) {
 //     return reg.return_nodes;
-}

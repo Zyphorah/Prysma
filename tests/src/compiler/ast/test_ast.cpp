@@ -89,7 +89,7 @@ struct EnvironnementAST {
         //  Strategie d'équation 
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wmismatched-new-delete"
-        builderEquation = new (arena) BuilderFloatEquation(registryExpression.get(), arena);
+        builderEquation = new (arena) BuilderFloatEquation(registryExpression.get(), nodeComponentRegistry.get() arena);
         #pragma GCC diagnostic pop
 
         parserType = new (arena.Allocate<TypeParser>()) TypeParser(registryType.get(), builderEquation->getBuilderTree());

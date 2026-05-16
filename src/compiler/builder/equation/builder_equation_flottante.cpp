@@ -1,10 +1,3 @@
-//===-- builder_equation_flottante.cpp --------------------------*- C++ -*-===//
-//
-// Part of the Prysma Project, under the GNU GPL v3.0 or later.
-// See LICENSE at the project root for license information.
-// SPDX-License-Identifier: GPL-3.0-or-later WITH Prysma-exception-1.0
-//
-//===----------------------------------------------------------------------===//
 
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/builder_tree_equation.h"
@@ -12,6 +5,7 @@
 #include "compiler/ast/interfaces/i_builder_tree.h"
 #include "compiler/ast/nodes/interfaces/i_expression.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/registry_expression.h"
 #include "compiler/parser/equation/chain_of_responsibility.h"
 #include "compiler/parser/equation/manager_operator.h"
@@ -25,8 +19,8 @@
 #include <vector>
 
 // Floating-point equation builder
-BuilderFloatEquation::BuilderFloatEquation(RegistryExpression* expressionRegistry, llvm::BumpPtrAllocator& arena)
-    : _expressionRegistry(expressionRegistry), _arena(arena)
+BuilderFloatEquation::BuilderFloatEquation(RegistryExpression* expressionRegistry, NodeComponentRegistry* nodeComponentRegistry, llvm::BumpPtrAllocator& arena)
+    : _expressionRegistry(expressionRegistry), _nodeComponentRegistry(nodeComponentRegistry), _arena(arena)
 {
     _symbolRegistry = std::make_unique<RegistrySymbol>();
 
@@ -80,46 +74,94 @@ BuilderFloatEquation::BuilderFloatEquation(RegistryExpression* expressionRegistr
 void BuilderFloatEquation::initializeRegistry()
 {
     _symbolRegistry->registerSymbol(TOKEN_PLUS, [this](Token token) -> IExpression* { 
-        return this->allocate<NodeOperation>(std::move(token)); 
+        auto* nodeOperation = this->allocate<NodeOperation>(_nodeComponentRegistry->getNextId());
+        _nodeComponentRegistry->emplace<NodeOperation>(nodeOperation->getNodeId(), std::move(token));
+
+        return nodeOperation;
     });
 
     _symbolRegistry->registerSymbol(TOKEN_MINUS, [this](Token token) -> IExpression* { 
-        return this->allocate<NodeOperation>(std::move(token)); 
+        auto* nodeOperation = this->allocate<NodeOperation>(_nodeComponentRegistry->getNextId());
+        _nodeComponentRegistry->emplace<NodeOperation>(nodeOperation->getNodeId(), std::move(token));
+
+        return nodeOperation;
     });
 
     _symbolRegistry->registerSymbol(TOKEN_STAR, [this](Token token) -> IExpression* { 
-        return this->allocate<NodeOperation>(std::move(token)); 
+        auto* nodeOperation = this->allocate<NodeOperation>(_nodeComponentRegistry->getNextId());
+        _nodeComponentRegistry->emplace<NodeOperation>(nodeOperation->getNodeId(), std::move(token));
+
+        return nodeOperation;
     });
 
     _symbolRegistry->registerSymbol(TOKEN_SLASH, [this](Token token) -> IExpression* { 
-        return this->allocate<NodeOperation>(std::move(token)); 
+        auto* nodeOperation = this->allocate<NodeOperation>(_nodeComponentRegistry->getNextId());
+        _nodeComponentRegistry->emplace<NodeOperation>(nodeOperation->getNodeId(), std::move(token));
+
+        return nodeOperation;
     });
+
     _symbolRegistry->registerSymbol(TOKEN_LESS, [this](Token token) -> IExpression* { 
-        return this->allocate<NodeOperation>(std::move(token)); 
+        auto* nodeOperation = this->allocate<NodeOperation>(_nodeComponentRegistry->getNextId());
+        _nodeComponentRegistry->emplace<NodeOperation>(nodeOperation->getNodeId(), std::move(token));
+
+        return nodeOperation;
     });
+
     _symbolRegistry->registerSymbol(TOKEN_GREATER, [this](Token token) -> IExpression* { 
-        return this->allocate<NodeOperation>(std::move(token)); 
+        auto* nodeOperation = this->allocate<NodeOperation>(_nodeComponentRegistry->getNextId());
+        _nodeComponentRegistry->emplace<NodeOperation>(nodeOperation->getNodeId(), std::move(token));
+
+        return nodeOperation;
     });
+
     _symbolRegistry->registerSymbol(TOKEN_GREATER_EQUAL, [this](Token token) -> IExpression* { 
-        return this->allocate<NodeOperation>(std::move(token)); 
+        auto* nodeOperation = this->allocate<NodeOperation>(_nodeComponentRegistry->getNextId());
+        _nodeComponentRegistry->emplace<NodeOperation>(nodeOperation->getNodeId(), std::move(token));
+
+        return nodeOperation;
     });
+
     _symbolRegistry->registerSymbol(TOKEN_LESS_EQUAL, [this](Token token) -> IExpression* { 
-        return this->allocate<NodeOperation>(std::move(token));
+        auto* nodeOperation = this->allocate<NodeOperation>(_nodeComponentRegistry->getNextId());
+        _nodeComponentRegistry->emplace<NodeOperation>(nodeOperation->getNodeId(), std::move(token));
+
+        return nodeOperation;
     });
+
     _symbolRegistry->registerSymbol(TOKEN_MODULO, [this](Token token) -> IExpression* { 
-        return this->allocate<NodeOperation>(std::move(token));
+        auto* nodeOperation = this->allocate<NodeOperation>(_nodeComponentRegistry->getNextId());
+        _nodeComponentRegistry->emplace<NodeOperation>(nodeOperation->getNodeId(), std::move(token));
+
+        return nodeOperation;
     });
+
     _symbolRegistry->registerSymbol(TOKEN_EQUAL_EQUAL, [this](Token token) -> IExpression* { 
-        return this->allocate<NodeOperation>(std::move(token));
+        auto* nodeOperation = this->allocate<NodeOperation>(_nodeComponentRegistry->getNextId());
+        _nodeComponentRegistry->emplace<NodeOperation>(nodeOperation->getNodeId(), std::move(token));
+
+        return nodeOperation;
     });
+
     _symbolRegistry->registerSymbol(TOKEN_NOT_EQUAL, [this](Token token) -> IExpression* { 
-        return this->allocate<NodeOperation>(std::move(token));
+        auto* nodeOperation = this->allocate<NodeOperation>(_nodeComponentRegistry->getNextId());
+        _nodeComponentRegistry->emplace<NodeOperation>(nodeOperation->getNodeId(), std::move(token));
+
+        return nodeOperation;
     });
+
     _symbolRegistry->registerSymbol(TOKEN_AND, [this](Token token) -> IExpression* { 
-        return this->allocate<NodeOperation>(std::move(token));
+        auto* nodeOperation = this->allocate<NodeOperation>(_nodeComponentRegistry->getNextId());
+        _nodeComponentRegistry->emplace<NodeOperation>(nodeOperation->getNodeId(), std::move(token));
+
+        return nodeOperation;
     });
+
     _symbolRegistry->registerSymbol(TOKEN_OR, [this](Token token) -> IExpression* { 
-        return this->allocate<NodeOperation>(std::move(token));
+        auto* nodeOperation = this->allocate<NodeOperation>(_nodeComponentRegistry->getNextId());
+        _nodeComponentRegistry->emplace<NodeOperation>(nodeOperation->getNodeId(), std::move(token));
+
+        return nodeOperation;
     });
 }
 
