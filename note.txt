@@ -25,3 +25,7 @@ Points positifs
 Les optimisations agressives au cycle CPU près.
 Section compile time
 
+
+
+
+benchstat utilisée pour mesurer les performances, c'est une bonne pratique, calculer les statistiques. 

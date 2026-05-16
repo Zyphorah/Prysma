@@ -48,6 +48,8 @@
 /Documents/LLVMDoc/build/ 
 /tests/unit_tests/build/ 
 /tests/unit_tests/build-*/
+/tests/perf_tests/build/
+/tests/perf_tests/build-*/
 
 # Cache clangd 
 

@@ -39,6 +39,26 @@ constexpr size_t TOKEN_RESERVE_DIVISOR = 3;
 constexpr size_t TOKEN_RESERVE_OFFSET = 4;
 
 // Utility to convert a string of 1 to 8 characters into a uint64_t (Little Endian)
+
+// This function transforms a string into a hexadecimal number at compile time.
+
+// Why do we do this? We perform this operation for performance reasons: instead of comparing two strings,
+// which takes a lot of time, we transform the string into a hexadecimal number at compile time.
+// The comparison then takes only a single CPU cycle instead of several, and cache locality is much better.
+// Here is an example:
+
+// i = 0 ('e' = 0x65): Shifted by 0 bits -> 0x00000065
+// i = 1 ('l' = 0x6C): Shifted by 8 bits -> 0x00006C00
+// i = 2 ('s' = 0x73): Shifted by 16 bits -> 0x00730000
+// i = 3 ('e' = 0x65): Shifted by 24 bits -> 0x65000000
+
+// So, instead of writing
+// if (value == 0x656C696877) { return TOKEN_WHILE; }
+// to directly compare a string transformed into hexadecimal,
+// we ask the CPU to do this transformation.
+// This gives us something more readable.
+// if (value == to_kw("while")) { return TOKEN_WHILE; }
+
 constexpr auto Lexer::to_kw(std::string_view str) -> uint64_t {
 
     if (str.size() > LONGMAXREGISTRY64BITS) {
