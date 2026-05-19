@@ -133,7 +133,7 @@ auto main(int argc, char* argv[]) -> int
         std::unique_ptr<FileRegistry> registryFiles = std::make_unique<FileRegistry>();
         std::unique_ptr<ConfigurationFacadeEnvironment> facadeConfigurationEnvironnement = std::make_unique<ConfigurationFacadeEnvironment>(registryFunctionGlobale.get(), registryFiles.get());
         
-        //std::unique_ptr<NodeRegistry> nodeRegistry = std::make_unique<NodeRegistry>(); // À REMETTRE QUAND TERMINÉ
+        //std::unique_ptr<NodeRegistry> nodeRegistry = std::make_unique<NodeRegistry>(); // À REMETTRE QUAND TERMINÉ (note: je suis tombé la dessus, je ne suis pas certain que c'est encore valid)
 
 
         OrchestratorInclude orchestratorInclude(

@@ -28,7 +28,7 @@ ParserWhile::ParserWhile(ContextParser& contextParser)
 
 ParserWhile::~ParserWhile() = default;
 
-auto ParserWhile::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
+auto ParserWhile::parse(std::vector<Token>& tokens, std::size_t& index) -> INode*
 {
     consume(tokens, index, TOKEN_WHILE, "Error, expected token 'while' ");
 

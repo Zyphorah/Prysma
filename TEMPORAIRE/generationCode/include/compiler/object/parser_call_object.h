@@ -18,7 +18,7 @@ public:
     ParserCallObject(ContextParser& contextParser);
     ~ParserCallObject();
     
-    auto parse(std::vector<Token>& tokens, std::size_t index) -> INode* override;
+    auto parse(std::vector<Token>& tokens, std::size_t& index) -> INode* override;
 };
 
 

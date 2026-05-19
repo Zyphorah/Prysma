@@ -1,9 +1,11 @@
 #pragma once
 
 #include <cstddef>
+#include <iostream>
 #include <llvm-18/llvm/ADT/ArrayRef.h>
 #include <stdexcept>
 #include <utility>
+#include "compiler/ast/nodes/interfaces/i_expression.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/macros/prysma_nodiscard.h"
@@ -450,8 +452,8 @@ private:
     INode* nodeBlocFinWhile;
 
 public:
-    NodeWhileComponents(INode* p_nodeCondition, INode* p_nodeBlocWhile,
-                        INode* p_nodeBlocFinWhile)
+    NodeWhileComponents(INode* p_nodeCondition = nullptr, INode* p_nodeBlocWhile = nullptr,
+                        INode* p_nodeBlocFinWhile = nullptr)
         : nodeCondition(p_nodeCondition),
           nodeBlocWhile(p_nodeBlocWhile),
           nodeBlocFinWhile(p_nodeBlocFinWhile) {}
@@ -470,14 +472,35 @@ private:
     INode* droite;
 
 public:
-    NodeOperationComponents(Token p_token, INode* p_gauche, INode* p_droite)
+    NodeOperationComponents(Token p_token, INode* p_gauche = nullptr, INode* p_droite = nullptr)
         : token(p_token), gauche(p_gauche), droite(p_droite) {}
+
+
+    // EXTRÈMEMENT TEMPORAIRE ET ASSEZ UNSAFE, CE N'EST QU'EN ATTENDANT DE TROUVER UNE SOLUTION
+    // LE DESIGN NE RESTERA PAS COMME ÇA, IL S'AGIRAIT DE FAIRE CE DONT J'AI ABORDÉ PLUS BAS
+
+    // d'ailleurs, je ne vois pas pourquoi addExpression devrait retourner this? Je pense comprendre que c'est
+    // pour un système de chaînage ou quelque chose du genre mais en aucuns cas une structure de donnée ne devrait
+    // être dépendante ou altérée par une fonctionnalitée externe comme un builder par exemple. addExpression ne fait
+    // qu'altérer les données de l'objet depuis lequel la méthode est appelée, en théorie, nous ne devrions pas retourner
+    // this car nous avons littéralement called la méthode depuis cet objet, donc en toute logique, nous y avons déja accès.
+    
+    // je pourrais me tromper mais pour l'instant, je continue et j'adapte le design.
+    void addExpression(INode* left, INode* right) { gauche = left; droite = right; } // devrait être dans genre ExpressionOperationComponents
+    // ou peut-être même faire un ExpressionComponentsRegistry et templater le registre que j'ai plus bas pour pouvoir le configurer pour les deux
+
 
     NodeTypeGenerated getGeneratedNodeType() { return nodeTypeGenerated; }
     Token getToken() { return token; }
     INode* getLeft() { return gauche; }
     INode* getRight() { return droite; }
 };
+
+// ok, il s'agirait de faire des catégories de contracts. par exemple, avoir un INodeComponent
+// ou bien un IExpressionComponent ou bien même avoir des tags sur les noeuds EUX-MÊMES genre
+// il hérite de IsExpression ou IsNode. Nous pourrions même faire du crtp afin d'optimiser le tout
+// et de profiter d'optimisations suplémentaires (inlining agressif par exemple).
+
 
 struct NodeLiteralComponents {
 private:
@@ -581,6 +604,12 @@ public:
 // TODO: éliminer les NodeTypeGenerated et IsA<T, U> en faveur d'un approche reliant sur les types
 // TODO: changer les std::size_t en std::size_t& dans les modules concernés
 
+
+template<typename... Types>
+std::tuple<Types...> make_node_storage(std::size_t dense_cap, std::size_t sparse_cap) {
+    return std::tuple<Types...>{ Types(dense_cap, sparse_cap)... };
+}
+
 using NodeComponentStorage = std::tuple<
     sparse_set<NodeInstructionComponents>,
     sparse_set<NodeCallFunctionComponents>,
@@ -620,6 +649,13 @@ struct NodeComponentRegistry {
 public:
     template<typename StoredType> struct resolve;
 
+    // template<typename StoredType>
+    // struct resolve {
+    //     static sparse_set<StoredType>& on(NodeComponentRegistry& reg) {
+    //         return std::get<sparse_set<StoredType>>(reg.storage_);
+    //     }
+    // };
+
 public:
     template<typename StoredType, typename T>
     auto insert(node_id_t id, T&& component) noexcept -> void;
@@ -646,35 +682,138 @@ private:
     // est thread safe afin d'éviter les race ou les incrémentations invalides
 
 private:
-    NodeComponentStorage storage_; // FAIRE RESERVE UN MOMENT DONNÉ
+    NodeComponentStorage storage_ = make_node_storage<
+        sparse_set<NodeInstructionComponents>,
+        sparse_set<NodeCallFunctionComponents>,
+        sparse_set<NodeArgFunctionComponents>,
+        sparse_set<NodeDeclarationFunctionComponents>,
+        sparse_set<NodeReturnComponents>,
+        sparse_set<NodeAssignmentVariableComponents>,
+        sparse_set<NodeDeclarationVariableComponents>,
+        sparse_set<NodeRefVariableComponents>,
+        sparse_set<NodeUnRefVariableComponents>,
+        sparse_set<NodeIdentifiantComponents>,
+        sparse_set<NodeAssignmentArrayComponents>,
+        sparse_set<NodeArrayInitializationComponents>,
+        sparse_set<NodeReadingArrayComponents>,
+        sparse_set<NodeClassComponents>,
+        sparse_set<NodeCallObjectComponents>,
+        sparse_set<NodeAccesAttributeComponents>,
+        sparse_set<NodeDeclarationObjectComponents>,
+        sparse_set<NodeIfComponents>,
+        sparse_set<NodeNewComponents>,
+        sparse_set<NodeDeleteComponents>,
+        sparse_set<NodeIncludeComponents>,
+        sparse_set<NodeWhileComponents>,
+        sparse_set<NodeOperationComponents>,
+        sparse_set<NodeLiteralComponents>,
+        sparse_set<NodeNegationComponents>,
+        sparse_set<NodeStringComponents>
+    >(32768, 32768);
+    
+    
+    
+    // bon, j'aurais peut-être du utiliser mon cerveau parce que je viens toute juste de penser
+    // à une solution bien plus simple et efficace. c'est certain que j'ai fait ce design y'a 2 mois
+    // et que j'étais pas au stade ou j'en suis mais dude c'est quand meme con. bon, en gros, au lieu
+    // de faire get<ComponentType>..., il s'agirait de faire une table compile-time qui match les nodeType
+    // aux componentTypes. En gros, je n'aurais qu'à envoyer le node dans une méthode get (pour le nodeComponentRegistry
+    // et get autrement pour le registry de Expression) et il s'occuperait seul de trouver la composante en question rattaché
+    // au type donné. ça se base sur le type connu a la compilation mais ça pourrait aussi fonctionner avec NodeTypeGenerated 
+    // mais ça serait un peu différent et surtout totalement runtime. Ainsi, on pourrait faire un INode et tout regrouper au cout
+    // d'une logique de dispatching runtime... ça aurait été la solution optimale niveau design. Si je retombe ici un jour, c'est 
+    // exactement la prochaine migration à effectuer, ce n'est pas très complexe, juste remplacer get<...>(node->getId) pour
+    // get(node), point final.
+         
+private:
+    // ok voici le plan pour l'architecture:
+    //      en gros on fait un conteneur générique qui stocke n éléments T comme le monotonic_atomic_buffer (genre le polymorphic_alloc)
+    //      en faite, pmr ne pourrait pas fonctionner car il n'expose pas de méthode permettant l'accès a l'id (MONOTONIC)
+    //      il s'agirait d'utiliser une plage std::byte* custom ou un std::array afin d'accéder par index
+    //
+    //      par la suite, nous avons une facade nommée genre NodeRegistry.. ou ExpressionRegistry... (ou NodeDataRegistry) et qui, en prenant la ressource d'en haut,
+    //      exposera les méthodes par exemple get(avec le node, pas le node->id) ou bien emplace(node). tout ce système fonctionnera sur une table
+    //      compile-time présente dans la classe facade (potentiellement injectable par template) qui sera un binding entre les ressources et les types
+    //      par exemple un NodeWhile sera bindé a son NodeWhileComponent ou NodeWhileData (probablement lui) et permettra de simplifier l'api. c'est justement
+    //      le principe d'une facade. il sélectionnera le bon registre (ressource d'en haut) ou aller faire les opérations (par exemple registre pour NodeWhileData). 
+
+    //      par contre, il faut aussi que les ressources soient des classes avec leurs méthodes comme insert ou plus car notre NodeDataRegistry n'est qu'une facade et 
+    //      ne devrais que déléguer des comportement en utilisant les noeuds envoyés.  
+
+    //      _nodeDataRegistry->construct(node, ...)
+    //      même possiblement utiliser un -> getHandle(node) pour rendre la logique de .getId() flexible
+
+    /*
+        struct HandleProvider
+        {
+            inline NodeHandle operator()(const Node* n) const
+            {
+                return n->id();
+            }
+        };
+    */
+
+ 
+    // FAIRE RESERVE UN MOMENT DONNÉ
 
     // SI L'ARBRE NE CHANGE PAS, IL SERAIT BIEN MIEUX D'UTILISER DES ARRAYS/STD::VECTOR (0 différence perf)
     // AU LIEU DE SPARSE SET QUI EN PLUS D'ÊTRE PLUS GROS, AJOUTE 1-2 INDIRECTIONS POUR OBTENIR LES DONNÉES. 
 
 };
 
-
 /************************************************************************/
 
+class NodeDataRegistry { // facade
+
+
+
+
+};
+
+class ExpressionDataRegistry { // facade
+
+    // pourrait même mettre genre "ce type de noeud ne comporte aucunes données d'expression."
+};
+
+
+
+
+/************************************************************************/
 
 template<typename StoredType>
 struct NodeComponentRegistry::resolve {
     PRYSMA_NODISCARD static sparse_set<StoredType>& on(NodeComponentRegistry& reg);
 };
 
+template<typename StoredType>
+static sparse_set<StoredType>& NodeComponentRegistry::resolve<StoredType>::on(NodeComponentRegistry& reg) {
+    std::cout << "\tcalling resolve from NodeComponentRegistry for "<< typeid(StoredType).name() << "\n";
+
+    return std::get<sparse_set<StoredType>>(reg.storage_);
+}
+
 
 template<typename StoredType, typename T>
 auto NodeComponentRegistry::insert(node_id_t id, T&& component) noexcept -> void {
+    std::cout << "\tcalling insert from NodeComponentRegistry for "<< typeid(StoredType).name() << "\n";
+    std::cout << "\t\tfor entity #" << id << "\n";
+
     resolve<StoredType>::on(*this).insert(id, std::forward<T>(component));
 }
 
 template<typename StoredType, typename... Args>
 auto NodeComponentRegistry::emplace(node_id_t id, Args&&... args) noexcept -> void {
+    std::cout << "\tcalling emplace from NodeComponentRegistry for "<< typeid(StoredType).name() << "\n";
+    std::cout << "\t\tfor entity #" << id << "\n";
+
     resolve<StoredType>::on(*this).emplace(id, std::forward<Args>(args)...);
 }
 
 template<typename StoredType>
 PRYSMA_NODISCARD auto NodeComponentRegistry::get(std::size_t id) noexcept -> auto& {
+    std::cout << "\tcalling get from NodeComponentRegistry for "<< typeid(StoredType).name() << "\n";
+    std::cout << "\t\tfor entity #" << id << "\n";
+
     auto* ptr = resolve<StoredType>::on(*this).get(id);
 
     if (ptr) PRYSMA_LIKELY_BRANCH return *ptr;
@@ -683,9 +822,11 @@ PRYSMA_NODISCARD auto NodeComponentRegistry::get(std::size_t id) noexcept -> aut
 
 template<typename StoredType>
 auto NodeComponentRegistry::remove(node_id_t id) noexcept -> void {
+    std::cout << "\tcalling remove from NodeComponentRegistry for "<< typeid(StoredType).name() << "\n";
+    std::cout << "\t\tfor entity #" << id << "\n";
+
     resolve<StoredType>::on(*this).remove(id);
 }
-
 
 
 

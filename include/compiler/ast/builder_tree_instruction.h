@@ -37,7 +37,7 @@ public:
     auto operator=(BuilderTreeInstruction&&) -> BuilderTreeInstruction& = delete;
 
     auto build(std::vector<Token>& tokens) -> INode* override;  
-    auto build(std::vector<Token>& tokens, std::size_t index) -> INode* override;
+    auto build(std::vector<Token>& tokens, std::size_t& index) -> INode* override;
     auto getArena() -> llvm::BumpPtrAllocator& override;
 };
 

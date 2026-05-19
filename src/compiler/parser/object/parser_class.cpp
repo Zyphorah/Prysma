@@ -20,6 +20,7 @@
 #include "compiler/lexer/token_type.h"
 #include "compiler/visitor/interfaces/i_visitor.h"
 #include "compiler/utils/prysma_cast.h"
+#include <iostream>
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/Support/FormatVariadic.h>
 #include <vector>
@@ -62,7 +63,7 @@ namespace
 
       if (auto* declarationVariable = prysma::dyn_cast<NodeDeclarationVariable>(node)) {
         if (declarationVariable != nullptr) {
-          auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationVariableComponents>(node->getNodeId());
+          auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationVariableComponents>(declarationVariable->getNodeId());
 
           node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationVariable>(
               contextParser.getNodeComponentRegistry()->getNextId()
@@ -82,7 +83,7 @@ namespace
 
       if (auto* declarationFunction = prysma::dyn_cast<NodeDeclarationFunction>(node)) {
         if (declarationFunction != nullptr) {
-          auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(node->getNodeId());
+          auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(declarationFunction->getNodeId());
 
           node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(
               contextParser.getNodeComponentRegistry()->getNextId()
@@ -96,10 +97,12 @@ namespace
               nodeData.getArguments(),
               nodeData.getBody()
           );
+
+          std::cout << "parser_class.cpp\n"; // ICI AUSSI
         }
         
         auto* newDeclarationFunction = prysma::cast<NodeDeclarationFunction>(node); // très suspect, à changer avec le crtp
-        auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(node->getNodeId());
+        auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(newDeclarationFunction->getNodeId());
         // il se pourrait que le node data soit empty et que le registre lance un exception (not found). il faudrait peut-être emplace ou revoir l'algo pour être certain...
 
         if (newDeclarationFunction != nullptr && nodeData.getName().value == param.classNameToken().value) {
@@ -146,7 +149,7 @@ ParserClass::~ParserClass()
 //                  }
 //           }
 
-auto ParserClass::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
+auto ParserClass::parse(std::vector<Token>& tokens, std::size_t& index) -> INode*
 {
     consume(tokens, index, TOKEN_CLASS, "Expected 'class' at the beginning of the class declaration.");
     Token classNameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Expected an identifier after 'class' for the class name.");

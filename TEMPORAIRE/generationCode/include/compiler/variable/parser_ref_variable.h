@@ -18,7 +18,7 @@ public:
     ParserRefVariable(ContextParser& contextParser);
     ~ParserRefVariable();
     
-    auto parse(std::vector<Token>& tokens, std::size_t index) -> INode* override;
+    auto parse(std::vector<Token>& tokens, std::size_t& index) -> INode* override;
 };
 
 

@@ -10,9 +10,10 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/registry/context_gen_code.h"
 #include "compiler/ast/registry/node_component_registry.h"
+#include "compiler/visitor/visitor_base_generale.h"
 
 MembersExtractorClass::MembersExtractorClass(ContextGenCode* contextGenCode)
-    : _contextGenCode(contextGenCode) {}
+    : VisitorBaseGenerale(contextGenCode) {}
 
 MembersExtractorClass::~MembersExtractorClass()
 = default;

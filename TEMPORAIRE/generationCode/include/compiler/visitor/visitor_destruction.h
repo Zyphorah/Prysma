@@ -7,6 +7,9 @@
 class VisitorDestruction : public VisitorBaseGenerale
 {
 public:
+
+
+public:
     void visiter(NodeCallFunction* node) override {
         VisitorBaseGenerale::visiter(node);
         node->~NodeCallFunction();

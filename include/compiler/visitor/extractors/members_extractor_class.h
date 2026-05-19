@@ -34,9 +34,7 @@ private:
     std::vector<NodeDeclarationFunction*> methods;
     std::vector<NodeDeclarationVariable*> variables;
     std::string className;
-
-    ContextGenCode* _contextGenCode; 
-
+    
 public:
     PRYSMA_NODISCARD auto getMethods() const -> const std::vector<NodeDeclarationFunction*>& { return methods; }
     PRYSMA_NODISCARD auto getVariables() const -> const std::vector<NodeDeclarationVariable*>& { return variables; }

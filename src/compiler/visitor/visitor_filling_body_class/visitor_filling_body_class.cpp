@@ -28,7 +28,7 @@
 #include <vector>
 
 FillingVisitorBodyClass::FillingVisitorBodyClass(ContextGenCode* contextGenCode)
-    : _contextGenCode(contextGenCode)
+    : VisitorBaseGenerale(contextGenCode)
 {
 }
 

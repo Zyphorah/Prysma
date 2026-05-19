@@ -10,6 +10,7 @@
 
 #include "compiler/ast/interfaces/i_builder_tree.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
+#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/registry_symbole.h"
 #include "compiler/ast/registry/registry_expression.h"
 #include "compiler/lexer/lexer.h"
@@ -23,6 +24,8 @@
 class BuilderTreeEquation : public IBuilderTree
 {
 private:
+    NodeComponentRegistry* _nodeComponentRegistry; // TODO: à possiblement changer pour un ExpressionComponentRegistry
+
     ChainOfResponsibility* _chainOfResponsibility;
     RegistrySymbol* _symbolRegistry;
     RegistryExpression* _expressionRegistry;
@@ -32,6 +35,7 @@ private:
 
 public:
     BuilderTreeEquation(
+        NodeComponentRegistry* nodeComponentRegistry,
         ChainOfResponsibility* chainOfResponsibility,
         RegistrySymbol* symbolRegistry,
         RegistryExpression* expressionRegistry,
@@ -40,6 +44,6 @@ public:
     );
     
     auto build(std::vector<Token> &tokens) -> INode* override;
-    auto build(std::vector<Token>& tokens, std::size_t index) -> INode* override;
+    auto build(std::vector<Token>& tokens, std::size_t& index) -> INode* override;
     auto getArena() -> llvm::BumpPtrAllocator& override;
 };

@@ -29,7 +29,7 @@ BuilderTreeInstruction::BuilderTreeInstruction(NodeComponentRegistry* nodeCompon
 
 BuilderTreeInstruction::~BuilderTreeInstruction() = default;
 
-auto BuilderTreeInstruction::build(std::vector<Token>& tokens, std::size_t index) -> INode*
+auto BuilderTreeInstruction::build(std::vector<Token>& tokens, std::size_t& index) -> INode*
 {
     if (!_registryInstructions->exists(tokens[index].type)) {
         throw CompilationError(llvm::formatv(

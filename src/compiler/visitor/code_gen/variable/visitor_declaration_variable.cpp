@@ -35,7 +35,10 @@ void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVari
     );
 
     INode* expression = nodeDeclarationData.getExpression();
-       
+
+    // ici ya aucun null check quand je fais par exemple ->getNodeId, la solution est simple, juste mettre un nullcheck ou déplacer la logique dans le if (...)
+    // et ya le truc en bas, faudrait juste rechercher un autre fois dans le registre ou faire une var = nullptr par défaut pour nodeElement pour qu'il ne saute pas le nullcheck    
+
     // Check if the expression is an array initialization
     auto* arrayInit = prysma::dyn_cast<NodeArrayInitialization>(expression);
 

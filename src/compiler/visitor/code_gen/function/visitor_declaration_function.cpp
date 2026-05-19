@@ -14,6 +14,9 @@
 
 void GeneralVisitorGenCode::visiter(NodeDeclarationFunction* nodeDeclarationFunction) 
 {
+    std::cout << "calling ::create from GeneralVisitorGenCode::visiter\n";
+    std::cout << "CTX used in visitor = " << _contextGenCode << "\n";
+
     auto generator = FunctionDeclarationGenerator::create(_contextGenCode, nodeDeclarationFunction, this);
     generator->declareFunction();
 }

@@ -17,6 +17,7 @@
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
+#include <iostream>
 #include <llvm/ADT/SmallVector.h>
 #include <cstddef>
 #include <string>
@@ -29,7 +30,7 @@ ParserDeclarationFunction::ParserDeclarationFunction(ContextParser& contextParse
 
 ParserDeclarationFunction::~ParserDeclarationFunction() = default;
 
-auto ParserDeclarationFunction::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
+auto ParserDeclarationFunction::parse(std::vector<Token>& tokens, std::size_t& index) -> INode*
 {
     consume(tokens, index, TOKEN_FUNCTION, "Error: not the correct token! 'fn'");
 
@@ -63,10 +64,10 @@ auto ParserDeclarationFunction::parse(std::vector<Token>& tokens, std::size_t in
 
     auto bodyChildren = consumeChildBody(tokens, index, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
 
-    auto* body_node = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
+    auto* nodeBody = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
         _contextParser.getNodeComponentRegistry()->getNextId()
     ); 
-    _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(body_node->getNodeId(), bodyChildren);
+    _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBody->getNodeId(), bodyChildren);
 
 
     consume(tokens, index, TOKEN_BRACE_CLOSE, "Error: not a closing brace '}'");
@@ -81,8 +82,9 @@ auto ParserDeclarationFunction::parse(std::vector<Token>& tokens, std::size_t in
         typeReturn,
         tokenFunctionName,
         _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(arguments),
-        body_node
+        nodeBody
     );
+    std::cout << "parser_declaration_function.cpp\n"; // ICI LE PROB
 
     return nodeFunction; 
 }

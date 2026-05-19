@@ -1206,14 +1206,20 @@ private:
 
 
 
-class NodeOperation : public INode {
+class NodeOperation : public IExpression {
 public:
     explicit NodeOperation(std::size_t p_id) : nodeId(p_id) {}
 
 public:
-    PRYSMA_NODISCARD NodeTypeGenerated getGeneratedType() const override {
+    PRYSMA_NODISCARD NodeTypeGenerated getGeneratedType() const override { // faudrait différencier les components INode et IExpression et ne rien laisser ici
          return NodeTypeGenerated::Operation; // LE STOCKER DANS LE REGISTRY
     }
+
+    // le fait que IExpression hérite de INode est étrange. Je sais très bien que c'est une norme et que c'est une approche totalement
+    // valide mais je ne trouve pas ça très optimal au niveau du design. En effet, bien qu'un expression est un noeud, je trouve que la
+    // séparation des contracts est un peu voilé ici.
+
+    IExpression* addExpression(INode* left, INode* right) override { return this; } // NOT IMPLEMENTED EN ATTENDANT LE REFACTOR, POUR QUE LE COMPILATEUR SHUT THE F UP
 
     PRYSMA_NODISCARD static bool classof(const INode* node) { // on dirait qu'il fait la meme chose que l'autre
         return node->getGeneratedType() == NodeTypeGenerated::Operation;

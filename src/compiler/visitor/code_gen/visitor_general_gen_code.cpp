@@ -14,6 +14,7 @@
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/types/type_complex.h"
 #include "compiler/utils/prysma_cast.h"
+#include "compiler/visitor/visitor_base_generale.h"
 #include <cstddef>
 #include <llvm/ADT/StringRef.h>
 #include <llvm/IR/Constants.h>
@@ -22,7 +23,7 @@
 #include <string>
 
 GeneralVisitorGenCode::GeneralVisitorGenCode(ContextGenCode* contextGenCode, OrchestratorInclude* orchestratorInclude) 
-: _contextGenCode(contextGenCode), _orchestratorInclude(orchestratorInclude)
+: VisitorBaseGenerale(contextGenCode), _orchestratorInclude(orchestratorInclude)
 {}
 
 GeneralVisitorGenCode::~GeneralVisitorGenCode()

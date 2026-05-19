@@ -28,7 +28,7 @@ ParserDeclarationVariable::ParserDeclarationVariable(ContextParser& contextParse
 ParserDeclarationVariable::~ParserDeclarationVariable()
 = default;
 
-auto ParserDeclarationVariable::parse(std::vector<Token>& tokens, std::size_t index) -> INode*
+auto ParserDeclarationVariable::parse(std::vector<Token>& tokens, std::size_t& index) -> INode*
 {
     consume(tokens, index, TOKEN_DECL, "Error: expected type 'dec'");
     

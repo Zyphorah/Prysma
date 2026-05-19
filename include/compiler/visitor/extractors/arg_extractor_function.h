@@ -34,8 +34,7 @@ public:
 
 private:
     NodeArgFunction* arg = nullptr;
-    ContextGenCode* _contextGenCode; 
-
+    
 };
 
 #endif /* F18431EF_5246_41F8_BED6_A8C2574165E4 */

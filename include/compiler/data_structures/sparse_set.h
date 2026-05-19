@@ -146,6 +146,7 @@ template<typename T>
 sparse_set<T>::sparse_set(std::size_t init_dense_capacity, std::size_t init_sparse_capacity) {
     dense_.reserve(init_dense_capacity);
     reverse_.reserve(init_dense_capacity);
+    
     sparse_.reserve(init_sparse_capacity);
     sparse_.resize(init_sparse_capacity, SIZE_MAX);
 }
@@ -337,6 +338,11 @@ const T* sparse_set<T>::operator[](std::size_t entity_id) const noexcept {
 
 template<typename T>
 T* sparse_set<T>::get(std::size_t entity_id) & noexcept {
+    if (sparse_[entity_id] == SIZE_MAX) { // temporaire
+        std::cout << "entity #" << entity_id << " has no component\n";
+        return nullptr;
+    }
+    
     if (!is_valid_entity_id(entity_id) || sparse_[entity_id] == SIZE_MAX) {
         error_not_enough_capacity("Sparse vector too small or entity has no component", entity_id + 1, sparse_.size());
         return nullptr;
@@ -346,6 +352,11 @@ T* sparse_set<T>::get(std::size_t entity_id) & noexcept {
 
 template<typename T>
 const T* sparse_set<T>::get(std::size_t entity_id) const& noexcept {
+    if (sparse_[entity_id] == SIZE_MAX) { // temporaire
+        std::cout << "entity #" << entity_id << " has no component\n";
+        return nullptr;
+    }
+
     if (!is_valid_entity_id(entity_id) || sparse_[entity_id] == SIZE_MAX) {
         error_not_enough_capacity("Sparse vector too small or entity has no component", entity_id + 1, sparse_.size());
         return nullptr;

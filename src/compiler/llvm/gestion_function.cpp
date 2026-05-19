@@ -21,6 +21,7 @@
 #include "compiler/utils/prysma_cast.h"
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <llvm-18/llvm/ADT/ArrayRef.h>
 #include <llvm-18/llvm/ADT/StringRef.h>
 #include <llvm-18/llvm/IR/Function.h>
@@ -38,6 +39,8 @@
 
 std::unique_ptr<FunctionDeclarationGenerator> FunctionDeclarationGenerator::create(ContextGenCode* context, NodeDeclarationFunction* node, IVisitor* visitor)
 {
+    std::cout << "-1\n";
+
     if (!context->getCurrentClassName().empty()) {
         return std::make_unique<MethodFunctionDeclarationGenerator>(context, node, visitor);
     } 
@@ -53,6 +56,8 @@ FunctionDeclarationGenerator::FunctionDeclarationGenerator(ContextGenCode* conte
 
 auto StandardFunctionDeclarationGenerator::createFunction() -> llvm::Function*
 {
+    std::cout << "0\n";
+
     auto& nodeData = getContextGenCode()->getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(
         getNodeDeclarationFunction()->getNodeId()
     );
@@ -73,31 +78,118 @@ auto StandardFunctionDeclarationGenerator::createFunction() -> llvm::Function*
     return function;
 }
 
-auto MethodFunctionDeclarationGenerator::createFunction() -> llvm::Function*
+// auto MethodFunctionDeclarationGenerator::createFunction() -> llvm::Function*
+// {
+//     std::cout << "MethodFunctionDeclarationGenerator::createFunction\n"; // c'est ici le problème
+
+//     auto& nodeData = getContextGenCode()->getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(
+//         getNodeDeclarationFunction()->getNodeId()
+//     );
+
+//     // peut-etre un problème avec les ID jsp, je penses pas, le nom 'test' s'affiche bien
+
+//     llvm::StringRef functionName = nodeData.getName().value;
+//     std::string className = getContextGenCode()->getCurrentClassName();
+
+//     std::cout << "FUNCTION NAME: " << functionName.str() << "\n";
+
+//     // le problème se situe ici avec un argument je penses
+
+//     auto const& classInfo = getContextGenCode()->getRegistryClass()->get(className);
+//     const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(functionName);
+//     if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
+//         throw std::runtime_error("Error: Expected SymbolFunctionLocal");
+//     }
+//     const auto* symbol = prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
+    
+//     llvm::Function* function = symbol->function;
+
+//     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(getContextGenCode()->getBackend()->getContext(), "entry", function);
+//     getContextGenCode()->getBackend()->getBuilder().SetInsertPoint(entryBlock);
+
+//     return function;
+// }
+
+auto MethodFunctionDeclarationGenerator::createFunction() -> llvm::Function* // OK C'EST PROBABLEMENT UN TRUC DE JE DONNE PAS LE BON CONTEXT GEN CODE
 {
-    auto& nodeData = getContextGenCode()->getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(
+    std::cout << "\n================ CREATE FUNCTION ================\n";
+    std::cout << "ENTER createFunction\n";
+    std::cout << "this = " << this << "\n";
+    std::cout << "node ptr = " << getNodeDeclarationFunction() << "\n";
+    std::cout << "nodeId = " << getNodeDeclarationFunction()->getNodeId() << "\n";
+
+    auto* ctx = getContextGenCode();
+    std::cout << "ctx = " << ctx << "\n";
+
+    auto* registry = ctx->getNodeComponentRegistry();
+    std::cout << "NodeComponentRegistry = " << registry << "\n";
+
+    std::cout << "GET NodeDeclarationFunctionComponents...\n";
+
+    auto& nodeData = registry->get<NodeDeclarationFunctionComponents>(
         getNodeDeclarationFunction()->getNodeId()
     );
 
+    std::cout << "nodeData addr = " << &nodeData << "\n";
+    std::cout << "nodeData name = " << nodeData.getName().value.str() << "\n";
+
     llvm::StringRef functionName = nodeData.getName().value;
-    std::string className = getContextGenCode()->getCurrentClassName();
-    auto const& classInfo = getContextGenCode()->getRegistryClass()->get(className);
-    const auto& symbolPtr = classInfo->getRegistryFunctionLocal()->get(functionName);
+    std::cout << "functionName (LLVM) = " << functionName.str() << "\n";
+
+    std::string className = ctx->getCurrentClassName();
+    std::cout << "className = " << className << "\n";
+
+    auto* classRegistry = ctx->getRegistryClass();
+    std::cout << "classRegistry = " << classRegistry << "\n";
+    //std::cout << "classRegistry size = " << classRegistry-> << "\n";
+
+    std::cout << "GET classInfo...\n";
+    auto const& classInfo = classRegistry->get(className);
+    std::cout << "classInfo ptr = " << &classInfo << "\n";
+
+    auto* functionRegistry = classInfo->getRegistryFunctionLocal();
+    std::cout << "functionRegistry ptr = " << functionRegistry << "\n";
+
+    //std::cout << "functionRegistry size BEFORE = " << functionRegistry->size() << "\n";
+
+    std::cout << "LOOKUP key = " << functionName.str() << "\n";
+
+    const auto& symbolPtr = functionRegistry->get(functionName);
+
+    std::cout << "LOOKUP SUCCESS\n";
+    std::cout << "symbolPtr raw = " << symbolPtr.get() << "\n";
+
     if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
+        std::cout << "ERROR: TYPE MISMATCH\n";
         throw std::runtime_error("Error: Expected SymbolFunctionLocal");
     }
-    const auto* symbol = prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
-    
-    llvm::Function* function = symbol->function;
 
-    llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(getContextGenCode()->getBackend()->getContext(), "entry", function);
-    getContextGenCode()->getBackend()->getBuilder().SetInsertPoint(entryBlock);
+    const auto* symbol = prysma::cast<const SymbolFunctionLocal>(symbolPtr.get());
+    std::cout << "symbol = " << symbol << "\n";
+
+    llvm::Function* function = symbol->function;
+    std::cout << "llvm function = " << function << "\n";
+
+    auto& context = ctx->getBackend()->getContext();
+    auto& builder = ctx->getBackend()->getBuilder();
+
+    std::cout << "creating entry block...\n";
+
+    llvm::BasicBlock* entryBlock =
+        llvm::BasicBlock::Create(context, "entry", function);
+
+    builder.SetInsertPoint(entryBlock);
+
+    std::cout << "EXIT createFunction SUCCESS\n";
+    std::cout << "============================================\n\n";
 
     return function;
 }
 
 void MethodFunctionDeclarationGenerator::handleConstructedArguments(llvm::Function* function, const ArgumentsCodeGen& args)
 {
+    std::cout << "1\n";
+
     std::size_t argIndex = 0;
     
     if (function->arg_size() > 0) {
@@ -145,6 +237,8 @@ void MethodFunctionDeclarationGenerator::handleConstructedArguments(llvm::Functi
 
 void StandardFunctionDeclarationGenerator::handleConstructedArguments(llvm::Function* function, const ArgumentsCodeGen& args)
 {
+    std::cout << "2\n";
+
     std::size_t argIndex = 0;
 
     for (auto* nodeArg : args.arguments) {
@@ -172,6 +266,8 @@ void StandardFunctionDeclarationGenerator::handleConstructedArguments(llvm::Func
 
 void FunctionDeclarationGenerator::declareFunction()
 {
+    std::cout << "3\n";
+
     auto& nodeData = getContextGenCode()->getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(
         getNodeDeclarationFunction()->getNodeId()
     );
@@ -191,7 +287,7 @@ void FunctionDeclarationGenerator::declareFunction()
                 auto& exctracted_arg_comp = _contextGenCode->getNodeComponentRegistry()->get<NodeArgFunctionComponents>(extractor.getArg()->getNodeId());
                 auto *extract_arg_type = exctracted_arg_comp.getType();
 
-                llvm::Type* argType = extract_arg_type->generateLLVMType(getContextGenCode()->getBackend()->getContext());
+                llvm::Type* argType = extract_arg_type->generateLLVMType(getContextGenCode()->getBackend()->getContext()); // ca devrait être extractor
 
                 argumentsCodeGen.argTypes.push_back(argType);
             }
@@ -229,6 +325,8 @@ void FunctionDeclarationGenerator::declareFunction()
 
 std::unique_ptr<FunctionCallGenerator> FunctionCallGenerator::create(ContextGenCode* context, IVisitor* visitor)
 {
+    std::cout << "4\n";
+
     if (!context->getCurrentClassName().empty()) {
         return std::make_unique<MethodFunctionCallGenerator>(context, visitor);
     }
@@ -242,6 +340,8 @@ FunctionCallGenerator::FunctionCallGenerator(ContextGenCode* context, IVisitor* 
 
 const SymbolFunctionLocal* MethodFunctionCallGenerator::getLocalFunction(llvm::StringRef functionName)
 {
+    std::cout << "5\n";
+
     std::string className = getContextGenCode()->getCurrentClassName();
     auto const& classInfo = getContextGenCode()->getRegistryClass()->get(className);
     if(classInfo->getRegistryFunctionLocal()->exists(functionName)){
@@ -265,6 +365,8 @@ const SymbolFunctionLocal* MethodFunctionCallGenerator::getLocalFunction(llvm::S
 
 auto StandardFunctionCallGenerator::getLocalFunction(llvm::StringRef functionName) -> const SymbolFunctionLocal*
 {
+    std::cout << "6\n";
+
     if (getContextGenCode()->getRegistryFunctionLocal()->exists(functionName)) {
         const auto& symbolPtr = getContextGenCode()->getRegistryFunctionLocal()->get(functionName);
         if (!prysma::isa<SymbolFunctionLocal>(symbolPtr.get())) {
@@ -278,6 +380,8 @@ auto StandardFunctionCallGenerator::getLocalFunction(llvm::StringRef functionNam
 
 void FunctionCallGenerator::generateCallFunction(NodeCallFunction* nodeCallFunction)
 {
+    std::cout << "7\n";
+
     auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeCallFunctionComponents>(nodeCallFunction->getNodeId());
     
     llvm::StringRef functionName = nodeData.getName().value;
@@ -336,10 +440,14 @@ void FunctionCallGenerator::generateCallFunction(NodeCallFunction* nodeCallFunct
 // Management of Native Functions (Built-ins)
 
 bool RegistryBuiltIns::isBuiltIn(llvm::StringRef name) {
+    std::cout << "8\n";
+
     return name == "print";
 }
 
 void RegistryBuiltIns::generateCall(llvm::StringRef name, NodeCallFunction* nodeCallFunction, ContextGenCode* context, IVisitor* visitor) {
+    std::cout << "9\n";
+    
     auto& nodeData = context->getNodeComponentRegistry()->get<NodeCallFunctionComponents>(nodeCallFunction->getNodeId());
     auto nodeChildren = nodeData.getChildren(); 
 

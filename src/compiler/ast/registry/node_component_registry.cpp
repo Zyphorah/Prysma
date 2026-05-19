@@ -4,10 +4,12 @@ auto NodeComponentRegistry::getNextId() noexcept -> node_id_t {
     return ++globalId;
 }
 
+#if 0
 template<typename StoredType> sparse_set<StoredType>&
 NodeComponentRegistry::resolve<StoredType>::on(NodeComponentRegistry& reg) {
     return std::get<sparse_set<StoredType>>(reg.storage_);
 }
+#endif
 
 
 // sparse_set<of_nodegen_types>&

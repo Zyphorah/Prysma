@@ -29,7 +29,7 @@ ParserUnRefVariable::~ParserUnRefVariable()
 = default;
 
 // Example: unref variable
-auto ParserUnRefVariable::parse(std::vector<Token>& tokens, std::size_t index) -> INode* 
+auto ParserUnRefVariable::parse(std::vector<Token>& tokens, std::size_t& index) -> INode* 
 {
     consume(tokens, index, TOKEN_UNREF, "Error: 'unref' expected");
     
