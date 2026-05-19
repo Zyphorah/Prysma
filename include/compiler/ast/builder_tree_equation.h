@@ -10,6 +10,7 @@
 
 #include "compiler/ast/interfaces/i_builder_tree.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
+#include "compiler/ast/registry/data/node_data_registry.hpp"
 #include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/registry_symbole.h"
 #include "compiler/ast/registry/registry_expression.h"
@@ -24,7 +25,7 @@
 class BuilderTreeEquation : public IBuilderTree
 {
 private:
-    NodeComponentRegistry* _nodeComponentRegistry; // TODO: à possiblement changer pour un ExpressionComponentRegistry
+    NodeDataRegistry* _nodeDataRegistry;// TODO: à possiblement changer pour un ExpressionDataRegistry
 
     ChainOfResponsibility* _chainOfResponsibility;
     RegistrySymbol* _symbolRegistry;
@@ -35,7 +36,7 @@ private:
 
 public:
     BuilderTreeEquation(
-        NodeComponentRegistry* nodeComponentRegistry,
+        NodeDataRegistry* nodeDataRegistry,
         ChainOfResponsibility* chainOfResponsibility,
         RegistrySymbol* symbolRegistry,
         RegistryExpression* expressionRegistry,

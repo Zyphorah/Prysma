@@ -10,7 +10,6 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_gen_code.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/types/type_complex.h"
 #include "compiler/utils/prysma_cast.h"
@@ -31,7 +30,7 @@ GeneralVisitorGenCode::~GeneralVisitorGenCode()
 
 void GeneralVisitorGenCode::traverseChild(NodeInstruction* node)
 {
-    auto& component = _contextGenCode->getNodeComponentRegistry()->get<NodeInstructionComponents>(node->getNodeId());
+    auto& component = _contextGenCode->getNodeDataRegistry()->get(node);
     
     for (const auto& child : component.getChildren()) {
         child->accept(this);

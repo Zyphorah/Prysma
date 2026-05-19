@@ -43,11 +43,10 @@ auto ParserDeclarationVariable::parse(std::vector<Token>& tokens, std::size_t& i
     
     consume(tokens, index, TOKEN_SEMICOLON, "Error: ';' expected at the end of the declaration");
 
-    auto* nodeDeclarationVar = _contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationVariable>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    ); 
-    _contextParser.getNodeComponentRegistry()->emplace<NodeDeclarationVariableComponents>(
-        nodeDeclarationVar->getNodeId(),
+    auto* nodeDeclarationVar = _contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationVariable>(_contextParser.getIdGenerator()->next()); 
+    
+    _contextParser.getNodeDataRegistry()->construct(
+        nodeDeclarationVar,
         Token{},
         nameToken,
         type,

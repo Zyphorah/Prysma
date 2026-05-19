@@ -7,7 +7,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "compiler/ast/ast_genere.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/lexer/lexer.h"
@@ -25,9 +24,7 @@
 
 void GeneralVisitorGenCode::visiter(NodeAssignmentArray* nodeAssignmentArray)
 {
-    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeAssignmentArrayComponents>(
-        nodeAssignmentArray->getNodeId()
-    );
+    auto& nodeData = _contextGenCode->getNodeDataRegistry()->get(nodeAssignmentArray);
 
     // Evaluate the index expression
     llvm::Value* indexValue = evaluateExpression(nodeData.getExpressionIndex()).getAddress();

@@ -9,7 +9,7 @@
 #include "compiler/parser/parser_type.h"
 #include "compiler/ast/interfaces/i_builder_tree.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
-#include "compiler/ast/registry/node_component_registry.h"
+#include "compiler/ast/registry/data/node_data_registry.hpp"
 #include "compiler/ast/registry/registry_type.h"
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/ast/registry/types/type_simple.h"
@@ -23,8 +23,8 @@
 #include <llvm/IR/Type.h>
 #include <vector>
 
-TypeParser::TypeParser(RegistryType* registryType, NodeComponentRegistry* nodeComponentRegistry, IBuilderTree* builderTree)
-    : _registryType(registryType), _builderTree(builderTree), _nodeComponentRegistry(nodeComponentRegistry)
+TypeParser::TypeParser(RegistryType* registryType, NodeDataRegistry* nodeDataRegistry, IBuilderTree* builderTree)
+    : _registryType(registryType), _builderTree(builderTree), _nodeDataRegistry(nodeDataRegistry)
 {
 }
 
@@ -61,7 +61,7 @@ auto TypeParser::parse(std::vector<Token>& tokens, std::size_t& index) -> IType*
         }
         index++; // Consume the closing bracket
 
-        type = _builderTree->allocate<TypeArray>(type, sizeEquation, _nodeComponentRegistry);
+        type = _builderTree->allocate<TypeArray>(type, sizeEquation, _nodeDataRegistry);
     }
     return type;
 }

@@ -39,14 +39,8 @@ auto ParserCallObject::parse(std::vector<Token>& tokens, std::size_t& index) -> 
 
   auto children = consumeChildBody(tokens, index, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_CLOSE);
 
-
-    auto* nodeCall = _contextParser.getBuilderTreeInstruction()->allocate<NodeCallObject>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    ); 
-    _contextParser.getNodeComponentRegistry()->emplace<NodeCallObjectComponents>(
-        nodeCall->getNodeId(), objectName, methodName, children
-    );
-
+    auto* nodeCall = _contextParser.getBuilderTreeInstruction()->allocate<NodeCallObject>(_contextParser.getIdGenerator()->next()); 
+    _contextParser.getNodeDataRegistry()->construct(nodeCall, objectName, methodName, children);
 
   consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: ')' expected");
 

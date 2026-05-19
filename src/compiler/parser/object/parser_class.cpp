@@ -9,6 +9,7 @@
 #ifndef PARSER_CLASS_CPP
 #define PARSER_CLASS_CPP
 
+#include "compiler/ast/registry/data/node_data.hpp"
 #include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/macros/prysma_nodiscard.h"
 #include "compiler/manager_error.h"
@@ -63,14 +64,12 @@ namespace
 
       if (auto* declarationVariable = prysma::dyn_cast<NodeDeclarationVariable>(node)) {
         if (declarationVariable != nullptr) {
-          auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationVariableComponents>(declarationVariable->getNodeId());
+          auto& nodeData = contextParser.getNodeDataRegistry()->get(declarationVariable);
 
-          node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationVariable>(
-              contextParser.getNodeComponentRegistry()->getNextId()
-          );
+          node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationVariable>(contextParser.getIdGenerator()->next());
 
-          contextParser.getNodeComponentRegistry()->emplace<NodeDeclarationVariableComponents>(
-              node->getNodeId(),
+          contextParser.getNodeDataRegistry()->construct_for<VariableDeclarationNodeData>( // car il est INode*, il s'agirait de dyn_cast mais je vous laisse le faire
+              node, 
               param.current_visibility(),
               nodeData.getName(),
               nodeData.getType(),
@@ -83,14 +82,12 @@ namespace
 
       if (auto* declarationFunction = prysma::dyn_cast<NodeDeclarationFunction>(node)) {
         if (declarationFunction != nullptr) {
-          auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(declarationFunction->getNodeId());
+          auto& nodeData = contextParser.getNodeDataRegistry()->get(declarationFunction);
 
-          node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(
-              contextParser.getNodeComponentRegistry()->getNextId()
-          );
+          node = contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(contextParser.getIdGenerator()->next());
 
-          contextParser.getNodeComponentRegistry()->emplace<NodeDeclarationFunctionComponents>(
-              node->getNodeId(),
+          contextParser.getNodeDataRegistry()->construct_for<FunctionDeclarationNodeData>(
+              node,
               param.current_visibility(),
               nodeData.getReturnType(),
               nodeData.getName(),
@@ -102,7 +99,7 @@ namespace
         }
         
         auto* newDeclarationFunction = prysma::cast<NodeDeclarationFunction>(node); // très suspect, à changer avec le crtp
-        auto& nodeData = contextParser.getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(newDeclarationFunction->getNodeId());
+        auto& nodeData = contextParser.getNodeDataRegistry()->get(newDeclarationFunction);
         // il se pourrait que le node data soit empty et que le registre lance un exception (not found). il faudrait peut-être emplace ou revoir l'algo pour être certain...
 
         if (newDeclarationFunction != nullptr && nodeData.getName().value == param.classNameToken().value) {
@@ -203,12 +200,10 @@ auto ParserClass::parse(std::vector<Token>& tokens, std::size_t& index) -> INode
 
     consume(tokens, index, TOKEN_BRACE_CLOSE, "Expected '}' at the end of the class declaration.");
 
-    auto* nodeClass = _contextParser.getBuilderTreeInstruction()->allocate<NodeClass>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    ); 
+    auto* nodeClass = _contextParser.getBuilderTreeInstruction()->allocate<NodeClass>(_contextParser.getIdGenerator()->next()); 
 
-    _contextParser.getNodeComponentRegistry()->emplace<NodeClassComponents>(
-        nodeClass->getNodeId(),
+    _contextParser.getNodeDataRegistry()->construct(
+        nodeClass,
         _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(inheritance),
         _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(memberList), 
         _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(builders), 

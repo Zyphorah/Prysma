@@ -58,9 +58,7 @@ auto StandardFunctionDeclarationGenerator::createFunction() -> llvm::Function*
 {
     std::cout << "0\n";
 
-    auto& nodeData = getContextGenCode()->getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(
-        getNodeDeclarationFunction()->getNodeId()
-    );
+    auto& nodeData = getContextGenCode()->getNodeDataRegistry()->get(getNodeDeclarationFunction());
 
     llvm::StringRef functionName = nodeData.getName().value;
 
@@ -121,14 +119,9 @@ auto MethodFunctionDeclarationGenerator::createFunction() -> llvm::Function* // 
     auto* ctx = getContextGenCode();
     std::cout << "ctx = " << ctx << "\n";
 
-    auto* registry = ctx->getNodeComponentRegistry();
-    std::cout << "NodeComponentRegistry = " << registry << "\n";
-
     std::cout << "GET NodeDeclarationFunctionComponents...\n";
 
-    auto& nodeData = registry->get<NodeDeclarationFunctionComponents>(
-        getNodeDeclarationFunction()->getNodeId()
-    );
+    auto& nodeData = getContextGenCode()->getNodeDataRegistry()->get(getNodeDeclarationFunction());
 
     std::cout << "nodeData addr = " << &nodeData << "\n";
     std::cout << "nodeData name = " << nodeData.getName().value.str() << "\n";
@@ -213,7 +206,7 @@ void MethodFunctionDeclarationGenerator::handleConstructedArguments(llvm::Functi
     }
 
     for (auto* nodeArg : args.arguments) {
-        auto& nodeData = getContextGenCode()->getNodeComponentRegistry()->get<NodeArgFunctionComponents>(nodeArg->getNodeId());
+        auto& nodeData = getContextGenCode()->getNodeDataRegistry()->get(nodeArg);
 
         llvm::Argument* arg = function->getArg(static_cast<unsigned int>(argIndex));
         arg->setName(nodeData.getName().value);
@@ -242,7 +235,7 @@ void StandardFunctionDeclarationGenerator::handleConstructedArguments(llvm::Func
     std::size_t argIndex = 0;
 
     for (auto* nodeArg : args.arguments) {
-        auto& nodeData = getContextGenCode()->getNodeComponentRegistry()->get<NodeArgFunctionComponents>(nodeArg->getNodeId());
+        auto& nodeData = getContextGenCode()->getNodeDataRegistry()->get(nodeArg);
 
         llvm::Argument* arg = function->getArg(static_cast<unsigned int>(argIndex));
         arg->setName(nodeData.getName().value);
@@ -268,9 +261,7 @@ void FunctionDeclarationGenerator::declareFunction()
 {
     std::cout << "3\n";
 
-    auto& nodeData = getContextGenCode()->getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(
-        getNodeDeclarationFunction()->getNodeId()
-    );
+    auto& nodeData = getContextGenCode()->getNodeDataRegistry()->get(getNodeDeclarationFunction());
 
     llvm::Type* returnType = nodeData.getReturnType()->generateLLVMType(getContextGenCode()->getBackend()->getContext());
     
@@ -284,7 +275,7 @@ void FunctionDeclarationGenerator::declareFunction()
             if (extractor.getArg() != nullptr) {
                 argumentsCodeGen.arguments.push_back(extractor.getArg());
 
-                auto& exctracted_arg_comp = _contextGenCode->getNodeComponentRegistry()->get<NodeArgFunctionComponents>(extractor.getArg()->getNodeId());
+                auto& exctracted_arg_comp = getContextGenCode()->getNodeDataRegistry()->get(extractor.getArg());
                 auto *extract_arg_type = exctracted_arg_comp.getType();
 
                 llvm::Type* argType = extract_arg_type->generateLLVMType(getContextGenCode()->getBackend()->getContext()); // ca devrait être extractor
@@ -382,8 +373,8 @@ void FunctionCallGenerator::generateCallFunction(NodeCallFunction* nodeCallFunct
 {
     std::cout << "7\n";
 
-    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeCallFunctionComponents>(nodeCallFunction->getNodeId());
-    
+    auto& nodeData = getContextGenCode()->getNodeDataRegistry()->get(nodeCallFunction);
+
     llvm::StringRef functionName = nodeData.getName().value;
 
     if (RegistryBuiltIns::isBuiltIn(functionName)) {
@@ -448,7 +439,7 @@ bool RegistryBuiltIns::isBuiltIn(llvm::StringRef name) {
 void RegistryBuiltIns::generateCall(llvm::StringRef name, NodeCallFunction* nodeCallFunction, ContextGenCode* context, IVisitor* visitor) {
     std::cout << "9\n";
     
-    auto& nodeData = context->getNodeComponentRegistry()->get<NodeCallFunctionComponents>(nodeCallFunction->getNodeId());
+    auto& nodeData = context->getNodeDataRegistry()->get(nodeCallFunction);
     auto nodeChildren = nodeData.getChildren(); 
 
     if (name == "print") {

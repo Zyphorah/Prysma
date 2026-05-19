@@ -35,11 +35,8 @@ INode* ParserCallFunction::parse(std::vector<Token>& tokens, std::size_t& index)
     
     auto children = consumeChildBody(tokens, index, _contextParser.getBuilderTreeEquation(), TOKEN_PAREN_CLOSE);
 
-
-    NodeComponentRegistry* registry = _contextParser.getNodeComponentRegistry();
-    auto* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallFunction>(registry->getNextId());
-
-    _contextParser.getNodeComponentRegistry()->emplace<NodeCallFunctionComponents>(nodeCall->getNodeId(), functionName, children);
+    auto* nodeCall = _contextParser.getBuilderTreeEquation()->allocate<NodeCallFunction>(_contextParser.getIdGenerator()->next());
+    _contextParser.getNodeDataRegistry()->construct(nodeCall, functionName, children);
     
     consume(tokens, index, TOKEN_PAREN_CLOSE, "Error: ')' expected");
 

@@ -19,7 +19,6 @@
 #include <cstddef>
 #include <vector>
 
-
 ParserReturn::ParserReturn(ContextParser& contextParser) 
     : _contextParser(contextParser)
 {}
@@ -37,20 +36,16 @@ auto ParserReturn::parse(std::vector<Token>& tokens, std::size_t& index) -> INod
     } else {
         consume(tokens, index, TOKEN_SEMICOLON, "Error: semicolon expected after return");
 
-        auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeReturn>(
-            _contextParser.getNodeComponentRegistry()->getNextId()
-        );
-        _contextParser.getNodeComponentRegistry()->emplace<NodeReturnComponents>(new_node->getNodeId(), returnValue);
+        auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeReturn>(_contextParser.getIdGenerator()->next());
+       _contextParser.getNodeDataRegistry()->construct(new_node, returnValue);
 
         return new_node;
     }
     
     consume(tokens, index, TOKEN_SEMICOLON, "Error: ';' expected at the end of return");
 
-    auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeReturn>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    );
-    _contextParser.getNodeComponentRegistry()->emplace<NodeReturnComponents>(new_node->getNodeId(), returnValue);
+    auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeReturn>(_contextParser.getIdGenerator()->next());
+    _contextParser.getNodeDataRegistry()->construct(new_node, returnValue);
 
     return new_node;
 }

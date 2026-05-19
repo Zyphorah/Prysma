@@ -55,14 +55,14 @@ auto ExpressionArrayInitialization::build(std::vector<Token>& equation) -> INode
         }
     }
     
-    auto* nodeArrayInit = _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
-        _context.getNodeComponentRegistry()->getNextId()
-    );
+    auto* nodeArrayInit = _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(_context.getIdGenerator()->next());
 
-    _context.getNodeComponentRegistry()->emplace<NodeArrayInitializationComponents>(
-        nodeArrayInit->getNodeId(),
-        _context.getBuilderTreeEquation()->allocateArray<INode*>(arrayElements)
-    );
+    // _context.getNodeDataRegistry()->emplace<NodeArrayInitializationComponents>(
+    //     nodeArrayInit->getNodeId(),
+    //     _context.getBuilderTreeEquation()->allocateArray<INode*>(arrayElements)
+    // );
+
+    _context.getNodeDataRegistry()->construct(nodeArrayInit, _context.getBuilderTreeEquation()->allocateArray<INode*>(arrayElements));
 
     return nodeArrayInit;
 }

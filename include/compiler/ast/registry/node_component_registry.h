@@ -763,17 +763,17 @@ private:
 
 /************************************************************************/
 
-class NodeDataRegistry { // facade
+// class NodeDataRegistry { // facade
 
 
 
 
-};
+// };
 
-class ExpressionDataRegistry { // facade
+// class ExpressionDataRegistry { // facade
 
-    // pourrait même mettre genre "ce type de noeud ne comporte aucunes données d'expression."
-};
+//     // pourrait même mettre genre "ce type de noeud ne comporte aucunes données d'expression."
+// };
 
 
 

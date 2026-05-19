@@ -8,7 +8,6 @@
 
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/registry/context_gen_code.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/visitor/visitor_filling_registry/visitor_filling_registry.h"
 #include "compiler/ast/utils/orchestrator_include/orchestrator_include.h" 
 #include <filesystem>
@@ -16,8 +15,7 @@
 
 void FillingVisitorRegistry::visiter(NodeInclude* nodeInclude)
 {
-    auto& nodeIncludeData = _contextGenCode->getNodeComponentRegistry()
-        ->get<NodeIncludeComponents>(nodeInclude->getNodeId());
+    auto& nodeIncludeData = _contextGenCode->getNodeDataRegistry()->get(nodeInclude);
 
     std::filesystem::path parentFilePath(_contextGenCode->getCurrentFilePath());
     std::filesystem::path parentDirectory = parentFilePath.parent_path();

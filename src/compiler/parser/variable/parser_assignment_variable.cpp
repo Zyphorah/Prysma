@@ -55,22 +55,14 @@ auto ParserAssignmentVariable::parse(std::vector<Token>& tokens, std::size_t& in
     Token constructedToken = nameToken;
 
     if (indexExpression != nullptr) {
-        auto* nodeAssignmentArr = _contextParser.getBuilderTreeInstruction()->allocate<NodeAssignmentArray>(
-            _contextParser.getNodeComponentRegistry()->getNextId()
-        ); 
-        _contextParser.getNodeComponentRegistry()->emplace<NodeAssignmentArrayComponents>(
-            nodeAssignmentArr->getNodeId(), constructedToken, indexExpression, expression, nameToken
-        );
+        auto* nodeAssignmentArr = _contextParser.getBuilderTreeInstruction()->allocate<NodeAssignmentArray>(_contextParser.getIdGenerator()->next());
+        _contextParser.getNodeDataRegistry()->construct(nodeAssignmentArr, constructedToken, indexExpression, expression, nameToken);
 
         return nodeAssignmentArr;
     }
 
-    auto* nodeAssignmentVar = _contextParser.getBuilderTreeInstruction()->allocate<NodeAssignmentVariable>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    ); 
-    _contextParser.getNodeComponentRegistry()->emplace<NodeAssignmentVariableComponents>(
-        nodeAssignmentVar->getNodeId(), constructedToken, expression, nameToken
-    );
+    auto* nodeAssignmentVar = _contextParser.getBuilderTreeInstruction()->allocate<NodeAssignmentVariable>(_contextParser.getIdGenerator()->next());
+    _contextParser.getNodeDataRegistry()->construct(nodeAssignmentVar, constructedToken, expression, nameToken);
 
     return nodeAssignmentVar;
 }

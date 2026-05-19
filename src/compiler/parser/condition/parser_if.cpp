@@ -44,11 +44,8 @@ auto ParserIf::parse(std::vector<Token>& tokens, std::size_t& index) -> INode*
 
     auto ifChildren = consumeChildBody(tokens, index, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
     
-    auto* nodeBlockIf = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    ); 
-    _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBlockIf->getNodeId(), ifChildren);
-
+    auto* nodeBlockIf = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(_contextParser.getIdGenerator()->next()); 
+    _contextParser.getNodeDataRegistry()->construct(nodeBlockIf, ifChildren);
 
     consume(tokens, index, TOKEN_BRACE_CLOSE, "Error, token is not '}'");
 
@@ -58,32 +55,19 @@ auto ParserIf::parse(std::vector<Token>& tokens, std::size_t& index) -> INode*
         consume(tokens, index, TOKEN_ELSE, "Error, token is not 'else'! ");
         consume(tokens, index, TOKEN_BRACE_OPEN, "Error, token is not '{'");
 
-
         auto elseChildren = consumeChildBody(tokens, index, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
 
-        auto* nodeBlockElse = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
-            _contextParser.getNodeComponentRegistry()->getNextId()
-        ); 
-        _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBlockElse->getNodeId(), elseChildren);
-
+        auto* nodeBlockElse = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(_contextParser.getIdGenerator()->next()); 
+        _contextParser.getNodeDataRegistry()->construct(nodeBlockElse, elseChildren);
 
         consume(tokens, index, TOKEN_BRACE_CLOSE, "Error, token is not '}'");
     }
 
+    auto* nodeBlockEndif = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(_contextParser.getIdGenerator()->next()); 
+    _contextParser.getNodeDataRegistry()->construct(nodeBlockEndif, llvm::ArrayRef<INode*>{});
 
-    // Create the ENDIF block node
-    auto* nodeBlockEndif = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    ); 
-    _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBlockEndif->getNodeId(), llvm::ArrayRef<INode*>{});
-
-
-    auto* nodeIf = _contextParser.getBuilderTreeInstruction()->allocate<NodeIf>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    ); 
-    _contextParser.getNodeComponentRegistry()->emplace<NodeIfComponents>(
-        nodeIf->getNodeId(), condition, nodeBlockIf, nodeBlockElse, nodeBlockEndif
-    );
+    auto* nodeIf = _contextParser.getBuilderTreeInstruction()->allocate<NodeIf>(_contextParser.getIdGenerator()->next()); 
+    _contextParser.getNodeDataRegistry()->construct(nodeIf, condition, nodeBlockIf, nodeBlockElse, nodeBlockEndif);
 
     return nodeIf;
 }

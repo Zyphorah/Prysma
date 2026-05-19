@@ -7,7 +7,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "compiler/ast/ast_genere.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/lexer/token_type.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
@@ -19,9 +18,7 @@
 
 void GeneralVisitorGenCode::visiter(NodeOperation* node)
 {
-    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeOperationComponents>(
-        node->getNodeId()
-    );
+    auto& nodeData = _contextGenCode->getNodeDataRegistry()->get(node);
 
     // Evaluate the left side and SAVE the complete Symbol
     nodeData.getLeft()->accept(this);

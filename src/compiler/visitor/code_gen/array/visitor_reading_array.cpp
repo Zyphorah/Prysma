@@ -7,7 +7,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "compiler/ast/ast_genere.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/lexer/lexer.h"
@@ -25,9 +24,7 @@
 
 void GeneralVisitorGenCode::visiter(NodeReadingArray* nodeReadingArray)
 {
-    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeReadingArrayComponents>(
-        nodeReadingArray->getNodeId()
-    );
+    auto& nodeData = _contextGenCode->getNodeDataRegistry()->get(nodeReadingArray);
 
     llvm::StringRef arrayNameStr = nodeData.getName().value;
     Symbol symbol;

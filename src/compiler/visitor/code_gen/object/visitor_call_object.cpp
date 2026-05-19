@@ -7,7 +7,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "compiler/ast/ast_genere.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
@@ -26,9 +25,7 @@
 
 void GeneralVisitorGenCode::visiter(NodeCallObject* nodeCallObject)
 {
-    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeCallObjectComponents>(
-        nodeCallObject->getNodeId()
-    );
+    auto& nodeData = _contextGenCode->getNodeDataRegistry()->get(nodeCallObject);
 
     // Retrieve the object name (e.g., "dog")
     llvm::StringRef objectName = nodeData.getObjectName().value;

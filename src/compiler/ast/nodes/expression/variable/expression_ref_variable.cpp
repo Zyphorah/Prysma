@@ -33,14 +33,8 @@ auto ExpressionRefVariable::build(std::vector<Token>& equation) -> INode*
         throw std::runtime_error("Error: 'ref' must be followed by an identifier");
     }
 
-    auto* nodeRefVar = _context.getBuilderTreeEquation()->allocate<NodeRefVariable>(
-        _context.getNodeComponentRegistry()->getNextId()
-    );
-
-    _context.getNodeComponentRegistry()->emplace<NodeRefVariableComponents>(
-        nodeRefVar->getNodeId(),
-        equation[1]
-    );
+    auto* nodeRefVar = _context.getBuilderTreeEquation()->allocate<NodeRefVariable>(_context.getIdGenerator()->next());
+    _context.getNodeDataRegistry()->construct(nodeRefVar, equation[1]);
 
     return nodeRefVar;
 }

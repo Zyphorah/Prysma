@@ -15,7 +15,7 @@
 
 void GeneralVisitorGenCode::visiter(NodeReturn* nodeReturn)
 {
-    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeReturnComponents>(nodeReturn->getNodeId());
+    auto& nodeData = _contextGenCode->getNodeDataRegistry()->get(nodeReturn);
 
     nodeData.getReturnValue()->accept(this);
 
@@ -27,5 +27,3 @@ void GeneralVisitorGenCode::visiter(NodeReturn* nodeReturn)
     _contextGenCode->getBackend()->getBuilder().CreateRet(returnValue);
     _contextGenCode->setTemporaryValue(Symbol(returnValue, _contextGenCode->getTemporaryValue().getType(), _contextGenCode->getTemporaryValue().getPointedElementType()));
 }
-
-/*il faut que je return des références car sinon, le user peut littéralement modifier les ptr présents dans les sparse sets, ce qui est vraiment bad.*/

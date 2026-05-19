@@ -75,16 +75,14 @@ auto ExpressionNew::build(std::vector<Token>& equation) -> INode*
         }
     }
 
-    auto* nodeNew = _context.getBuilderTreeEquation()->allocate<NodeNew>(
-    _context.getNodeComponentRegistry()->getNextId()
-    );
+    auto* nodeNew = _context.getBuilderTreeEquation()->allocate<NodeNew>(_context.getIdGenerator()->next());
 
-    _context.getNodeComponentRegistry()->emplace<NodeNewComponents>(
-        nodeNew->getNodeId(),
-        _context.getBuilderTreeEquation()->allocateArray<INode*>(arguments), 
+    _context.getNodeDataRegistry()->construct(
+        nodeNew,
+        _context.getBuilderTreeEquation()->allocateArray<INode*>(arguments),
         typeName
     );
-
+    
     return nodeNew;
 }
 

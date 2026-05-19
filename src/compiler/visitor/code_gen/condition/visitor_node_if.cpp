@@ -8,16 +8,13 @@
 
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/visitor/code_gen/helper/control_flow_helper.h"
 #include <llvm-18/llvm/IR/Value.h>
 
 void GeneralVisitorGenCode::visiter(NodeIf* nodeIf) 
 {
-    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeIfComponents>(
-        nodeIf->getNodeId()
-    );
+    auto& nodeData = _contextGenCode->getNodeDataRegistry()->get(nodeIf);
 
     // Retrieve the condition and blocks from the if node
     INode* nodeCondition = nodeData.getNodeCondition();

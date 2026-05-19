@@ -7,7 +7,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "compiler/ast/ast_genere.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
@@ -20,9 +19,7 @@ void GeneralVisitorGenCode::visiter(NodeDelete* nodeDelete)
     auto& module = _contextGenCode->getBackend()->getModule();
     auto& builder = _contextGenCode->getBackend()->getBuilder();
 
-    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeDeleteComponents>(
-        nodeDelete->getNodeId()
-    );
+    auto& nodeData = _contextGenCode->getNodeDataRegistry()->get(nodeDelete);
 
     // Retrieve the token of the variable to delete
     const Token& variableToken = nodeData.getName();

@@ -12,7 +12,8 @@
 #include <vector>
 #include "compiler/ast/nodes/interfaces/i_expression.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
-#include "compiler/ast/registry/node_component_registry.h"
+#include "compiler/ast/registry/data/node_data.hpp"
+#include "compiler/ast/registry/data/node_data_registry.hpp"
 #include "compiler/ast/registry/registry_expression.h"
 #include "compiler/ast/registry/registry_symbole.h"
 #include "compiler/parser/equation/chain_of_responsibility.h"
@@ -21,14 +22,14 @@
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 
-BuilderTreeEquation::BuilderTreeEquation(
-    NodeComponentRegistry* nodeComponentRegistry, // TODO: à possiblement changer pour un ExpressionComponentRegistry
+BuilderTreeEquation::BuilderTreeEquation( // TODO: miger le naming scheme des membres vers _membre
+    NodeDataRegistry* nodeDataRegistry, // TODO: à possiblement changer pour un ExpressionComponentRegistry
     ChainOfResponsibility* chainOfResponsibility,
     RegistrySymbol* symbolRegistry,
     RegistryExpression* expressionRegistry,
     IManagerParenthesis* parenthesisManager,
     llvm::BumpPtrAllocator& arena)
-        : _nodeComponentRegistry(nodeComponentRegistry)
+        : _nodeDataRegistry(nodeDataRegistry)
         , _chainOfResponsibility(chainOfResponsibility)
         ,  _symbolRegistry(symbolRegistry)
         , _expressionRegistry(expressionRegistry)
@@ -66,8 +67,10 @@ auto BuilderTreeEquation::build(std::vector<Token> &tokens) -> INode* {
     INode* leftExpr = build(left);
     INode* rightExpr = build(right);
 
-    auto& expressionData = _nodeComponentRegistry->get<NodeOperationComponents>(node->getNodeId());
-        // TODO: à remplacer par le ExpressionOperationComponents
+    //auto& expressionData = _nodeComponentRegistry->get<NodeOperationComponents>(node->getNodeId());
+
+    auto& expressionData = _nodeDataRegistry->get_for<OperationNodeData>(node);
+    // TODO: à remplacer par le ExpressionOperationComponents
 
     expressionData.addExpression(leftExpr, rightExpr);
     

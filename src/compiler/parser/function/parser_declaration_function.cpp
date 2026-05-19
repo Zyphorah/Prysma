@@ -64,26 +64,22 @@ auto ParserDeclarationFunction::parse(std::vector<Token>& tokens, std::size_t& i
 
     auto bodyChildren = consumeChildBody(tokens, index, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
 
-    auto* nodeBody = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    ); 
-    _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBody->getNodeId(), bodyChildren);
-
+    auto* nodeBody = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(_contextParser.getIdGenerator()->next()); 
+    _contextParser.getNodeDataRegistry()->construct(nodeBody, bodyChildren);
 
     consume(tokens, index, TOKEN_BRACE_CLOSE, "Error: not a closing brace '}'");
 
+    auto* nodeFunction = _contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(_contextParser.getIdGenerator()->next());
     
-    auto* nodeFunction = _contextParser.getBuilderTreeInstruction()->allocate<NodeDeclarationFunction>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    ); 
-    _contextParser.getNodeComponentRegistry()->emplace<NodeDeclarationFunctionComponents>(
-        nodeFunction->getNodeId(),
+    _contextParser.getNodeDataRegistry()->construct(
+        nodeFunction,
         Token{},
         typeReturn,
         tokenFunctionName,
         _contextParser.getBuilderTreeInstruction()->allocateArray<INode*>(arguments),
         nodeBody
     );
+ 
     std::cout << "parser_declaration_function.cpp\n"; // ICI LE PROB
 
     return nodeFunction; 

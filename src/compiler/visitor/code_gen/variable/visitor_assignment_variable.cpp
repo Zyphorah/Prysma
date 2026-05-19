@@ -7,7 +7,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "compiler/ast/ast_genere.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/llvm/gestion_variable.h"
@@ -15,9 +14,7 @@
 
 void GeneralVisitorGenCode::visiter(NodeAssignmentVariable* nodeAssignmentVariable)
 {
-    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeAssignmentVariableComponents>(
-        nodeAssignmentVariable->getNodeId()
-    );
+    auto& nodeData = _contextGenCode->getNodeDataRegistry()->get(nodeAssignmentVariable);
 
     llvm::Value* expressionResult = evaluateExpression(nodeData.getExpression()).getAddress();
 

@@ -10,7 +10,7 @@
 #define BA12D61E_9205_4816_94C1_379B8ABA63D3
 
 #include "compiler/ast/interfaces/i_builder_tree.h"
-#include "compiler/ast/registry/node_component_registry.h"
+#include "compiler/ast/registry/data/node_data_registry.hpp"
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/ast/registry/registry_type.h"
 #include "compiler/lexer/lexer.h"
@@ -21,10 +21,10 @@ class TypeParser {
 private:
     RegistryType* _registryType;
     IBuilderTree* _builderTree;
-    NodeComponentRegistry* _nodeComponentRegistry;
+    NodeDataRegistry* _nodeDataRegistry;
 
 public:
-    TypeParser(RegistryType* registryType, NodeComponentRegistry* nodeComponentRegistry, IBuilderTree* builderTree);
+    TypeParser(RegistryType* registryType, NodeDataRegistry* nodeDataRegistry, IBuilderTree* builderTree);
     ~TypeParser() = default;
 
     TypeParser(const TypeParser&) = delete;

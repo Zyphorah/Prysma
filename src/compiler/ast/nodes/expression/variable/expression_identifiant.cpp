@@ -68,48 +68,29 @@ auto ExpressionIdentifiant::build(std::vector<Token>& equation) -> INode*
             combinedName.value = llvm::StringRef(arr, tempStr.size());
             combinedName.type = TOKEN_IDENTIFIER;
 
-            auto* nodeReadingArr = _context.getBuilderTreeEquation()->allocate<NodeReadingArray>(
-                _context.getNodeComponentRegistry()->getNextId()
-            );
-
-            _context.getNodeComponentRegistry()->emplace<NodeReadingArrayComponents>(
-                nodeReadingArr->getNodeId(), indexExpr, combinedName
-            );
+            auto* nodeReadingArr = _context.getBuilderTreeEquation()->allocate<NodeReadingArray>(_context.getIdGenerator()->next());
+            _context.getNodeDataRegistry()->construct(nodeReadingArr, indexExpr, combinedName);
 
             return nodeReadingArr;
         }
+        
 
-        auto* nodeReadingArr = _context.getBuilderTreeEquation()->allocate<NodeReadingArray>(
-            _context.getNodeComponentRegistry()->getNextId()
-        );
-
-        _context.getNodeComponentRegistry()->emplace<NodeReadingArrayComponents>(
-            nodeReadingArr->getNodeId(), indexExpr, equation[0]
-        );
+        auto* nodeReadingArr = _context.getBuilderTreeEquation()->allocate<NodeReadingArray>(_context.getIdGenerator()->next());
+        _context.getNodeDataRegistry()->construct(nodeReadingArr, indexExpr, equation[0]);
 
         return nodeReadingArr;
     }
 
     if (equation.size() == 3 && equation[1].type == TOKEN_DOT) {
 
-        auto* nodeAccessAttr = _context.getBuilderTreeEquation()->allocate<NodeAccesAttribute>(
-            _context.getNodeComponentRegistry()->getNextId()
-        );
-
-        _context.getNodeComponentRegistry()->emplace<NodeAccesAttributeComponents>(
-            nodeAccessAttr->getNodeId(), equation[0], equation[2]
-        );
+        auto* nodeAccessAttr = _context.getBuilderTreeEquation()->allocate<NodeAccesAttribute>(_context.getIdGenerator()->next());
+        _context.getNodeDataRegistry()->construct(nodeAccessAttr, equation[0], equation[2]);
 
         return nodeAccessAttr;
     }
 
-    auto* nodeLiteral = _context.getBuilderTreeEquation()->allocate<NodeLiteral>(
-        _context.getNodeComponentRegistry()->getNextId()
-    );
-
-    _context.getNodeComponentRegistry()->emplace<NodeLiteralComponents>(
-        nodeLiteral->getNodeId(), equation[0]
-    );
+    auto* nodeLiteral = _context.getBuilderTreeEquation()->allocate<NodeLiteral>(_context.getIdGenerator()->next());
+    _context.getNodeDataRegistry()->construct(nodeLiteral, equation[0]);
 
     return nodeLiteral;
 }

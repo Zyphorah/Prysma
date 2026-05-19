@@ -14,7 +14,8 @@
 #include <memory>
 #include <vector>
 
-#include "compiler/ast/registry/node_component_registry.h"
+#include "compiler/ast/registry/data/id_generator.hpp"
+#include "compiler/ast/registry/data/node_data_registry.hpp"
 #include "compiler/macros/prysma_nodiscard.h"
 #include "compiler/ast/interfaces/i_builder_tree.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
@@ -29,8 +30,10 @@ struct Token;
 class BuilderFloatEquation : public IBuilderTree
 {
 private:
+    NodeDataRegistry* _nodeDataRegistry;
+    IdGenerator* _idGenerator;
+
     RegistryExpression* _expressionRegistry;
-    NodeComponentRegistry* _nodeComponentRegistry;
     llvm::BumpPtrAllocator& _arena;
     std::unique_ptr<RegistrySymbol> _symbolRegistry;
     
@@ -57,7 +60,7 @@ private:
 
 public: 
 
-    BuilderFloatEquation(RegistryExpression* expressionRegistry, NodeComponentRegistry* nodeComponentRegistry, llvm::BumpPtrAllocator& arena);
+    BuilderFloatEquation(RegistryExpression* expressionRegistry, NodeDataRegistry* nodeDataRegistry, IdGenerator* idGenerator, llvm::BumpPtrAllocator& arena);
     
     ~BuilderFloatEquation() override;
 

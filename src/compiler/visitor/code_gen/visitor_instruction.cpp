@@ -13,7 +13,7 @@
 void GeneralVisitorGenCode::visiter(NodeInstruction* instruction)
 {
     if (instruction != nullptr) {
-        auto& component = _contextGenCode->getNodeComponentRegistry()->get<NodeInstructionComponents>(instruction->getNodeId());
+        auto& component = _contextGenCode->getNodeDataRegistry()->get(instruction);
 
         for (const auto& child : component.getChildren()) {
             if (child != nullptr) {

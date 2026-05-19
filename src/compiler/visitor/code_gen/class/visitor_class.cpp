@@ -17,9 +17,7 @@ void GeneralVisitorGenCode::visiter(NodeClass* nodeClass)
 {
     std::string previousClassName = _contextGenCode->getCurrentClassName();
 
-    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeClassComponents>(
-        nodeClass->getNodeId()
-    );
+    auto& nodeData = _contextGenCode->getNodeDataRegistry()->get(nodeClass);
 
     _contextGenCode->setCurrentClassName(std::string(nodeData.getName().value));
 

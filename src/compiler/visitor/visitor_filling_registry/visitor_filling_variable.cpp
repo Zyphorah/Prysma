@@ -18,8 +18,7 @@
 // This class is intended to fill the global variable registry located outside a function
 void FillingVisitorRegistry::visiter(NodeDeclarationVariable* nodeDeclarationVariable)
 {
-    auto& nodeDeclVarData = _contextGenCode->getNodeComponentRegistry()
-        ->get<NodeDeclarationVariableComponents>(nodeDeclarationVariable->getNodeId());
+    auto& nodeDeclVarData = _contextGenCode->getNodeDataRegistry()->get(nodeDeclarationVariable);
 
     Token token; 
     IType* type = nodeDeclVarData.getType();

@@ -27,8 +27,7 @@ void MembersExtractorClass::visiter(NodeDeclarationVariable* nodeClass) {
 }
 
 void MembersExtractorClass::visiter(NodeClass* nodeClass) { 
-    auto& nodeClassData = _contextGenCode->getNodeComponentRegistry()
-        ->get<NodeClassComponents>(nodeClass->getNodeId());
+    auto& nodeClassData = _contextGenCode->getNodeDataRegistry()->get(nodeClass);
 
     className = nodeClassData.getName().value; 
 }

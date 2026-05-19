@@ -7,7 +7,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "compiler/ast/ast_genere.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/registry_class.h"
 #include "compiler/ast/registry/registry_function.h"
@@ -31,9 +30,7 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
     auto& module = _contextGenCode->getBackend()->getModule();
     auto& builder = _contextGenCode->getBackend()->getBuilder();
 
-    auto& nodeNewData = _contextGenCode->getNodeComponentRegistry()->get<NodeNewComponents>(
-        nodeNew->getNodeId()
-    );
+    auto& nodeNewData = _contextGenCode->getNodeDataRegistry()->get(nodeNew);
 
     llvm::Type* targetType = nullptr;
     Class* classInfo = nullptr;
@@ -98,7 +95,7 @@ void GeneralVisitorGenCode::visiter(NodeNew* nodeNew)
                             llvm::Type* elementType = typeArrayLLVM->getElementType();
                             llvm::Value* memberPtr = builder.CreateStructGEP(targetType, allocatedAddress, idx, memberName + "_ptrinit");
                             
-                            auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeArrayInitializationComponents>(arrayInit->getNodeId());
+                            auto& nodeData = _contextGenCode->getNodeDataRegistry()->get(arrayInit);
                             auto nodeElements = nodeData.getElements();
 
                             for (std::size_t i = 0; i < nodeElements.size(); ++i) {

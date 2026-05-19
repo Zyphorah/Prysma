@@ -31,38 +31,26 @@ ParserWhile::~ParserWhile() = default;
 auto ParserWhile::parse(std::vector<Token>& tokens, std::size_t& index) -> INode*
 {
     consume(tokens, index, TOKEN_WHILE, "Error, expected token 'while' ");
-
     consume(tokens, index, TOKEN_PAREN_OPEN, "Error, token is not '('! ");
     
     INode* condition = _contextParser.getBuilderTreeEquation()->build(tokens, index);
 
     consume(tokens, index, TOKEN_PAREN_CLOSE, "Error, token is not ')'! ");
-
     consume(tokens, index, TOKEN_BRACE_OPEN, "Error, token is not '{'");
-
 
     auto blockWhileChildren = consumeChildBody(tokens, index, _contextParser.getBuilderTreeInstruction(), TOKEN_BRACE_CLOSE);
 
-    auto* nodeBlockWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    ); 
-    _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBlockWhile->getNodeId(), blockWhileChildren);
-
+    auto* nodeBlockWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(_contextParser.getIdGenerator()->next()); 
+    _contextParser.getNodeDataRegistry()->construct(nodeBlockWhile, blockWhileChildren);
 
     consume(tokens, index, TOKEN_BRACE_CLOSE, "Error, token is not '}'");
 
+    auto* nodeBlockEndWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(_contextParser.getIdGenerator()->next()); 
+    _contextParser.getNodeDataRegistry()->construct(nodeBlockEndWhile, llvm::ArrayRef<INode*>{});
 
-    auto* nodeBlockEndWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeInstruction>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    ); 
-    _contextParser.getNodeComponentRegistry()->emplace<NodeInstructionComponents>(nodeBlockEndWhile->getNodeId(), llvm::ArrayRef<INode*>{});
-    
-    
-    auto* nodeWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeWhile>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    ); 
-    _contextParser.getNodeComponentRegistry()->emplace<NodeWhileComponents>(
-        nodeBlockEndWhile->getNodeId(),
+    auto* nodeWhile = _contextParser.getBuilderTreeInstruction()->allocate<NodeWhile>(_contextParser.getIdGenerator()->next()); 
+    _contextParser.getNodeDataRegistry()->construct(
+        nodeWhile,
         condition, 
         nodeBlockWhile,
         nodeBlockEndWhile

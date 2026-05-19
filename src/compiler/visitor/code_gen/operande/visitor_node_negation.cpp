@@ -7,7 +7,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "compiler/ast/ast_genere.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/ast/registry/types/type_simple.h"
 #include <llvm/IR/Instructions.h>
@@ -16,9 +15,7 @@
 
 void GeneralVisitorGenCode::visiter(NodeNegation* node)
 {
-    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeNegationComponents>(
-        node->getNodeId()
-    );
+    auto& nodeData = _contextGenCode->getNodeDataRegistry()->get(node);
 
     // Safety check
     if (node == nullptr || nodeData.getOperand() == nullptr) {

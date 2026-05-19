@@ -1,0 +1,184 @@
+//===-- smart_storage.hpp ---------------------------------------*- C++ -*-===//
+//
+// Part of the Prysma Project, under the GNU GPL v3.0 or later.
+// See LICENSE at the project root for license information.
+// SPDX-License-Identifier: GPL-3.0-or-later WITH Prysma-exception-1.0
+//
+//===----------------------------------------------------------------------===//
+
+#pragma once
+
+#include <array>
+#include <memory>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <stdexcept>
+#include <string>
+#include <type_traits>
+#include <iostream>
+
+/***************************************************************************/
+
+template<typename Tp, std::size_t N>
+class SmartStorage final {
+protected:
+    static constexpr std::uint16_t MaxStack = 1 << 14;
+
+    using RawBufferType = std::conditional_t<(N * sizeof(Tp) > MaxStack),
+                                              std::unique_ptr<std::byte[]>,
+                                              std::byte[N * sizeof(Tp)]>;
+
+public:
+    SmartStorage() : is_constructed_{} {
+        if constexpr (N * sizeof(Tp) > MaxStack) {
+            raw_buffer_ = std::make_unique<std::byte[]>(N * sizeof(Tp));
+            buffer_ptr_ = raw_buffer_.get(); // heap alloc for std::unique_ptr<std::byte[]
+        }
+        else { 
+            buffer_ptr_ = raw_buffer_; // stack alloc for std::byte[]
+        }
+    }
+
+    ~SmartStorage() noexcept { reset(); }
+
+protected:
+    void throw_if_out_of_range(std::size_t index) const {
+        if (index >= N) [[unlikely]] {
+            throw std::out_of_range(
+                "[PRYSMA::SmartStorage] index out of range: "
+                + std::to_string(index) + " (valid range: 0.." + std::to_string(N - 1) + ")"
+            );
+        }
+    }
+
+    void throw_if_existing(std::size_t index) const {
+        if (is_constructed_[index]) [[unlikely]] {
+            throw std::runtime_error(
+                "[PRYSMA::SmartStorage] construction conflict: slot already occupied at index "
+                + std::to_string(index)
+            );
+        }
+    }
+
+    void throw_if_nonexistent(std::size_t index) const {
+        if (!is_constructed_[index]) [[unlikely]] {
+            throw std::runtime_error(
+                "[PRYSMA::SmartStorage] access violation: no object constructed at index "
+                + std::to_string(index)
+            );
+        }
+    }
+
+public:
+    [[nodiscard]] Tp& get(std::size_t index) {
+        throw_if_out_of_range(index); throw_if_nonexistent(index);
+        return *reinterpret_cast<Tp*>(buffer_ptr_ + (index * sizeof(Tp)));
+    }
+
+    [[nodiscard]] const Tp& get(std::size_t index) const {
+        throw_if_out_of_range(index); throw_if_nonexistent(index);
+        return *reinterpret_cast<const Tp*>(buffer_ptr_ + (index * sizeof(Tp)));
+
+    }
+
+public:
+    template<typename... Types>
+    Tp& emplace(std::size_t index, Types&&... args)
+        noexcept(std::is_nothrow_constructible_v<std::decay<Tp>, Types&&...>)
+    {
+        std::cout << "buffer capacity: " << N * sizeof(Tp) << "\n";
+        std::cout << "sizeof T: " << sizeof(Tp) << "\n";
+
+        throw_if_out_of_range(index);
+        throw_if_existing(index);
+
+        Tp* ptr = reinterpret_cast<Tp*>(buffer_ptr_ + (index * sizeof(Tp)));
+        new (ptr) Tp(std::forward<Types>(args)...);
+
+        is_constructed_[index] = true;
+        return *ptr;
+    }
+
+public:
+    Tp& insert(std::size_t index, Tp&& obj)
+        noexcept(
+            std::is_nothrow_copy_constructible_v<Tp>
+            && std::is_nothrow_assignable_v<Tp&, Tp&&>
+        )
+    {
+        throw_if_out_of_range(index);
+
+        Tp* ptr = reinterpret_cast<Tp*>(buffer_ptr_ + (index * sizeof(Tp)));
+
+        if (is_constructed_[index]) {
+            ptr = obj;
+        }
+        else {
+            new (ptr) Tp(obj);
+            is_constructed_[index] = true;
+        }
+
+        return *ptr;
+    }
+
+    Tp& insert(std::size_t index, Tp& obj)
+        noexcept(
+            std::is_nothrow_copy_constructible_v<Tp>
+            && std::is_nothrow_assignable_v<Tp&, Tp&>
+        )
+    {
+        throw_if_out_of_range(index);
+
+        Tp* ptr = reinterpret_cast<Tp*>(buffer_ptr_ + (index * sizeof(Tp)));
+
+        if (is_constructed_[index]) {
+            *ptr = obj;
+        }
+        else {
+            new (ptr) Tp(obj);
+            is_constructed_[index] = true;
+        }
+
+        return *ptr;
+    }
+
+public:
+    void destroy(std::size_t index)
+        noexcept(std::is_nothrow_destructible_v<Tp>)
+    {
+        throw_if_out_of_range(index);
+        throw_if_nonexistent(index);
+
+        Tp* ptr = reinterpret_cast<Tp*>(buffer_ptr_ + (index * sizeof(Tp)));
+        ptr->~Tp();
+
+        is_constructed_[index] = false;
+    }
+
+public:
+    void reset()
+        noexcept(std::is_nothrow_destructible_v<Tp>)
+    {
+        for (std::size_t i = 0; i < N; ++i) {
+            if (is_constructed_[i]) {
+                Tp* ptr = reinterpret_cast<Tp*>(buffer_ptr_ + (i * sizeof(Tp)));
+                ptr->~Tp();
+                is_constructed_[i] = false;
+            }
+        }
+
+        std::memset(buffer_ptr_, 0, N * sizeof(Tp));
+    }
+
+public:
+    [[nodiscard]] constexpr std::size_t capacity() const noexcept {
+        return N;
+    }
+
+private:
+    std::array<bool, N> is_constructed_;
+
+    RawBufferType raw_buffer_;
+    std::byte* buffer_ptr_;
+};

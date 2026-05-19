@@ -36,10 +36,8 @@ auto ParserInclude::parse(std::vector<Token>& tokens, std::size_t& index) -> INo
     consume(tokens, index, TOKEN_QUOTE, "Error: Include instruction must be followed by a string in quotes");
     consume(tokens, index, TOKEN_SEMICOLON, "Error: Include instruction must end with a semicolon");
 
-    auto* nodeInclude = _contextParser.getBuilderTreeInstruction()->allocate<NodeInclude>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    ); 
-    _contextParser.getNodeComponentRegistry()->emplace<NodeIncludeComponents>(nodeInclude->getNodeId(), tokenPath);
+    auto* nodeInclude = _contextParser.getBuilderTreeInstruction()->allocate<NodeInclude>(_contextParser.getIdGenerator()->next()); 
+    _contextParser.getNodeDataRegistry()->construct(nodeInclude, tokenPath);
 
     return nodeInclude;
 }

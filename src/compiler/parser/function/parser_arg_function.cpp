@@ -36,10 +36,8 @@ auto ParserArgFunction::parse(std::vector<Token>& tokens, std::size_t& index) ->
 
     Token name = consume(tokens, index, TOKEN_IDENTIFIER, "Error: not an identifier!");
 
-    auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeArgFunction>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    );
-    _contextParser.getNodeComponentRegistry()->emplace<NodeArgFunctionComponents>(new_node->getNodeId(), type, name);
+    auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeArgFunction>(_contextParser.getIdGenerator()->next());
+    _contextParser.getNodeDataRegistry()->construct(new_node, type, name);
 
     return new_node;
 }

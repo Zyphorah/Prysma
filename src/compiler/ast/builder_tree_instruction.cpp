@@ -9,8 +9,9 @@
 #include "compiler/ast/builder_tree_instruction.h"
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
+#include "compiler/ast/registry/data/id_generator.hpp"
+#include "compiler/ast/registry/data/node_data_registry.hpp"
 #include "compiler/ast/registry/registry_instruction.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/parser/interfaces/i_parser.h"
 #include "compiler/manager_error.h"
 #include "compiler/lexer/lexer.h"
@@ -21,11 +22,10 @@
 #include <llvm-18/llvm/IR/Instruction.h>
 #include <llvm/Support/Allocator.h>
 #include <llvm/Support/FormatVariadic.h>
-#include <utility>
 #include <vector>
 
-BuilderTreeInstruction::BuilderTreeInstruction(NodeComponentRegistry* nodeComponentRegistry, RegistryInstruction* registryInstructions, llvm::BumpPtrAllocator& arena)
-    : _nodeComponentRegistry(nodeComponentRegistry), _registryInstructions(registryInstructions), _arena(arena) {}
+BuilderTreeInstruction::BuilderTreeInstruction(RegistryInstruction* registryInstructions, NodeDataRegistry* nodeDataRegistry, IdGenerator* idGenerator, llvm::BumpPtrAllocator& arena)
+    : _nodeDataRegistry(nodeDataRegistry), _idGenerator(idGenerator), _registryInstructions(registryInstructions), _arena(arena) {}
 
 BuilderTreeInstruction::~BuilderTreeInstruction() = default;
 
@@ -57,10 +57,10 @@ auto BuilderTreeInstruction::build(std::vector<Token>& tokens) -> INode*
         }
     }
 
-    auto* new_node = allocate<NodeInstruction>(_nodeComponentRegistry->getNextId()); // un nouveau noeud d'instruction (INode*) est allocated dans le pool
+    auto* new_node = allocate<NodeInstruction>(_idGenerator->next()); // un nouveau noeud d'instruction (INode*) est allocated dans le pool
     llvm::ArrayRef<INode*> arr_ref = allocateArray<INode*>(children); // les noeuds enfants (INode*) sont allocated dans le pool 
 
-    _nodeComponentRegistry->emplace<NodeInstructionComponents>(new_node->getNodeId(), arr_ref); // le llvm::ArrayRef est inséré dans le registre au ID du nouveau noeud
+    _nodeDataRegistry->construct(new_node, arr_ref); // le llvm::ArrayRef est inséré dans le registre au ID du nouveau noeud
 
     return new_node;
 }

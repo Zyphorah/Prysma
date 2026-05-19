@@ -11,9 +11,10 @@
 
 #include "compiler/ast/interfaces/i_builder_tree.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
+#include "compiler/ast/registry/data/id_generator.hpp"
+#include "compiler/ast/registry/data/node_data_registry.hpp"
 #include "compiler/lexer/lexer.h"
 #include "compiler/ast/registry/registry_instruction.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include <cstddef>
 #include <llvm/Support/Allocator.h>
 #include <vector>
@@ -21,13 +22,15 @@
 class BuilderTreeInstruction : public IBuilderTree
 {
 private: 
-    NodeComponentRegistry* _nodeComponentRegistry;
+    NodeDataRegistry* _nodeDataRegistry;
+    IdGenerator* _idGenerator;
+
     RegistryInstruction* _registryInstructions;
     llvm::BumpPtrAllocator& _arena;
 
 public: 
 
-    BuilderTreeInstruction(NodeComponentRegistry* nodeComponentRegistry, RegistryInstruction* registryInstructions, llvm::BumpPtrAllocator& arena);
+    BuilderTreeInstruction(RegistryInstruction* registryInstructions, NodeDataRegistry* _nodeDataRegistry, IdGenerator* idGenerator, llvm::BumpPtrAllocator& arena);
     ~BuilderTreeInstruction() override;
 
     // Delete copy and move constructors and assignment operators

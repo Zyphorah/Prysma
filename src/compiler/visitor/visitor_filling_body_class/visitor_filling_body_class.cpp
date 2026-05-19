@@ -8,7 +8,6 @@
 
 #include "compiler/visitor/visitor_filling_body_class/visitor_filling_body_class.h"
 #include "compiler/ast/registry/context_gen_code.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/registry_class.h"
 #include "compiler/ast/registry/registry_function.h"
 #include "compiler/ast/ast_genere.h"
@@ -37,8 +36,7 @@ FillingVisitorBodyClass::~FillingVisitorBodyClass()
 
 void FillingVisitorBodyClass::visiter(NodeClass* nodeClass)
 {
-    auto& nodeClassData = _contextGenCode->getNodeComponentRegistry()
-        ->get<NodeClassComponents>(nodeClass->getNodeId());
+    auto& nodeClassData = _contextGenCode->getNodeDataRegistry()->get(nodeClass);
 
     std::string className = std::string(nodeClassData.getName().value);
 
@@ -111,14 +109,12 @@ void FillingVisitorBodyClass::visiter(NodeClass* nodeClass)
         // d'aller chercher toutes les composantes à l'avance avant la boucle afin d'éliminer l'indirection pendant la boucle.
         for(NodeDeclarationFunction* parentMethod : parentMethodList)
         {
-            auto& parentNodeData = _contextGenCode->getNodeComponentRegistry()
-                ->get<NodeDeclarationFunctionComponents>(parentMethod->getNodeId());
+            auto& parentNodeData = _contextGenCode->getNodeDataRegistry()->get(parentMethod);
 
             bool found = false;
             for(NodeDeclarationFunction* classMethod : classExtractor.getMethods())
             {
-                auto& nodeDeclFuncData = _contextGenCode->getNodeComponentRegistry()
-                    ->get<NodeDeclarationFunctionComponents>(classMethod->getNodeId());
+                auto& nodeDeclFuncData = _contextGenCode->getNodeDataRegistry()->get(classMethod);
 
                 if(nodeDeclFuncData.getName().value == parentNodeData.getName().value)
                 {
@@ -146,8 +142,7 @@ void FillingVisitorBodyClass::visiter(NodeClass* nodeClass)
     // Traverse members to get variables in declaration order
     for(NodeDeclarationVariable* declarationVariable : classExtractor.getVariables())
     {
-        auto& nodeDeclVarData = _contextGenCode->getNodeComponentRegistry()
-            ->get<NodeDeclarationVariableComponents>(declarationVariable->getNodeId());
+        auto& nodeDeclVarData = _contextGenCode->getNodeDataRegistry()->get(declarationVariable);
 
         IType* itype = nodeDeclVarData.getType();
         llvm::Type* variableType = itype->generateLLVMType(_contextGenCode->getBackend()->getContext());

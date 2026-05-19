@@ -8,7 +8,6 @@
 
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/visitor/code_gen/visitor_general_gen_code.h"
 #include "compiler/visitor/code_gen/helper/control_flow_helper.h"
 #include <llvm-18/llvm/IR/Function.h>
@@ -16,9 +15,7 @@
 
 void GeneralVisitorGenCode::visiter(NodeWhile* nodeWhile) 
 {
-    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeWhileComponents>(
-        nodeWhile->getNodeId()
-    );
+    auto& nodeData = _contextGenCode->getNodeDataRegistry()->get(nodeWhile);
 
     // Retrieve the condition and blocks from the while node
     INode* nodeCondition = nodeData.getNodeCondition();

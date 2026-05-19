@@ -9,6 +9,8 @@
 #ifndef A089019F_3756_4ED8_96C6_BBAA2C5A05F0
 #define A089019F_3756_4ED8_96C6_BBAA2C5A05F0
 
+#include "compiler/ast/registry/data/id_generator.hpp"
+#include "compiler/ast/registry/data/node_data_registry.hpp"
 #include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/macros/prysma_nodiscard.h"
 #include "compiler/ast/interfaces/i_builder_tree.h"
@@ -21,7 +23,7 @@
 
 struct ContextExpression
 {
-private:
+private: // TODO: adapter le naming scheme vers _membre
     IBuilderTree* builderTreeEquation;
     IBuilderTree* builderTreeInstruction;
     TypeParser* parserType;
@@ -29,7 +31,8 @@ private:
     llvm::BumpPtrAllocator* arena;
     RegistryVariable* registryVariable;
     RegistryType* registryType;
-    NodeComponentRegistry* nodeComponentRegistry;
+    NodeDataRegistry* nodeDataRegistry;
+    IdGenerator* idGenerator;
 
 public:
     ContextExpression(
@@ -40,7 +43,8 @@ public:
         llvm::BumpPtrAllocator* p_arena,
         RegistryVariable* p_registryVariable,
         RegistryType* p_registryType,
-        NodeComponentRegistry* p_nodeComponentRegistry
+        NodeDataRegistry* p_nodeDataRegistry,
+        IdGenerator* p_idGenerator
     )
         : builderTreeEquation(p_builderTreeEquation),
           builderTreeInstruction(p_builderTreeInstruction),
@@ -49,7 +53,8 @@ public:
           arena(p_arena),
           registryVariable(p_registryVariable),
           registryType(p_registryType),
-          nodeComponentRegistry(p_nodeComponentRegistry)
+          nodeDataRegistry(p_nodeDataRegistry),
+          idGenerator(p_idGenerator)
     {
         if (p_contextParser == nullptr)
         {
@@ -75,9 +80,13 @@ public:
         {
             throw std::invalid_argument("registryType cannot be null");
         }   
-        if (p_nodeComponentRegistry == nullptr)
+        if (p_nodeDataRegistry == nullptr)
         {
-            throw std::invalid_argument("nodeComponentRegistry cannot be null");
+            throw std::invalid_argument("nodeDataRegistry cannot be null");
+        }  
+        if (p_idGenerator == nullptr)
+        {
+            throw std::invalid_argument("idGenerator cannot be null");
         }   
     }
 
@@ -88,8 +97,8 @@ public:
     PRYSMA_NODISCARD auto getArena() const -> llvm::BumpPtrAllocator* { return arena; }
     PRYSMA_NODISCARD auto getRegistryVariable() const -> RegistryVariable* { return registryVariable; }
     PRYSMA_NODISCARD auto getRegistryType() const -> RegistryType* { return registryType; }
-    PRYSMA_NODISCARD auto getNodeComponentRegistry() const -> NodeComponentRegistry* { return nodeComponentRegistry; }
-    
+    PRYSMA_NODISCARD auto getNodeDataRegistry() const -> NodeDataRegistry* { return nodeDataRegistry; }
+    PRYSMA_NODISCARD auto getIdGenerator() const -> IdGenerator* { return idGenerator; }
 };
 
 #endif /* A089019F_3756_4ED8_96C6_BBAA2C5A05F0 */

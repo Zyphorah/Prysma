@@ -24,9 +24,7 @@ void GeneralVisitorGraphViz::generate()
 
 void GeneralVisitorGraphViz::visiter(NodeInstruction* nodeInstruction)
 {
-    auto& nodeInstructionData = _contextGenCode->getNodeComponentRegistry()->get<NodeInstructionComponents>(
-        nodeInstruction->getNodeId()
-    );
+    auto& nodeInstructionData = _contextGenCode->getNodeDataRegistry()->get(nodeInstruction);
 
     (void)nodeInstruction;
     int idNode = _outputVisualGraph.addNode("Instruction"); // size_t ?
@@ -43,9 +41,7 @@ void GeneralVisitorGraphViz::visiter(NodeInstruction* nodeInstruction)
 }
 void GeneralVisitorGraphViz::visiter(NodeCallFunction* nodeCallFunction)
 {
-    auto& nodeCallFunctionData = _contextGenCode->getNodeComponentRegistry()->get<NodeCallFunctionComponents>(
-        nodeCallFunction->getNodeId()
-    );
+    auto& nodeCallFunctionData = _contextGenCode->getNodeDataRegistry()->get(nodeCallFunction);
 
     (void)nodeCallFunction;
      int idNode = _outputVisualGraph.addNode(nodeCallFunctionData.getName().value.str());
@@ -62,9 +58,7 @@ void GeneralVisitorGraphViz::visiter(NodeCallFunction* nodeCallFunction)
 }
 void GeneralVisitorGraphViz::visiter(NodeArgFunction* nodeArgFunction)
 {
-    auto& nodeArgFunctionData = _contextGenCode->getNodeComponentRegistry()->get<NodeArgFunctionComponents>(
-        nodeArgFunction->getNodeId()
-    );
+    auto& nodeArgFunctionData = _contextGenCode->getNodeDataRegistry()->get(nodeArgFunction);
 
     (void)nodeArgFunction;
 
@@ -73,9 +67,7 @@ void GeneralVisitorGraphViz::visiter(NodeArgFunction* nodeArgFunction)
 }
 void GeneralVisitorGraphViz::visiter(NodeDeclarationFunction* nodeDeclarationFunction)
 {
-    auto& nodeDeclarationFunctionData = _contextGenCode->getNodeComponentRegistry()->get<NodeDeclarationFunctionComponents>(
-        nodeDeclarationFunction->getNodeId()
-    );
+    auto& nodeDeclarationFunctionData = _contextGenCode->getNodeDataRegistry()->get(nodeDeclarationFunction);
 
     (void)nodeDeclarationFunction;
     int idNode = _outputVisualGraph.addNode(nodeDeclarationFunctionData.getVisibility().value.str());
@@ -101,9 +93,7 @@ void GeneralVisitorGraphViz::visiter(NodeDeclarationFunction* nodeDeclarationFun
 }
 void GeneralVisitorGraphViz::visiter(NodeReturn* nodeReturn)
 {
-    auto& nodeReturnData = _contextGenCode->getNodeComponentRegistry()->get<NodeReturnComponents>(
-        nodeReturn->getNodeId()
-    );
+    auto& nodeReturnData = _contextGenCode->getNodeDataRegistry()->get(nodeReturn);
 
     int idNode = _outputVisualGraph.addNode("Return");
 
@@ -121,9 +111,7 @@ void GeneralVisitorGraphViz::visiter(NodeReturn* nodeReturn)
 }
 void GeneralVisitorGraphViz::visiter(NodeAssignmentVariable* nodeAssignmentVariable)
 {
-    auto& nodeAssignmentVariableData = _contextGenCode->getNodeComponentRegistry()->get<NodeAssignmentVariableComponents>(
-        nodeAssignmentVariable->getNodeId()
-    );
+    auto& nodeAssignmentVariableData = _contextGenCode->getNodeDataRegistry()->get(nodeAssignmentVariable);
 
     int idNode = _outputVisualGraph.addNode(nodeAssignmentVariableData.getName().value.str());
     if (nodeAssignmentVariableData.getExpression() != nullptr)
@@ -140,9 +128,7 @@ void GeneralVisitorGraphViz::visiter(NodeAssignmentVariable* nodeAssignmentVaria
 }
 void GeneralVisitorGraphViz::visiter(NodeDeclarationVariable* nodeDeclarationVariable)
 {
-    auto& nodeDeclarationVariableData = _contextGenCode->getNodeComponentRegistry()->get<NodeDeclarationVariableComponents>(
-        nodeDeclarationVariable->getNodeId()
-    );
+    auto& nodeDeclarationVariableData = _contextGenCode->getNodeDataRegistry()->get(nodeDeclarationVariable);
 
     int idNode = _outputVisualGraph.addNode(nodeDeclarationVariableData.getVisibility().value.str());
     if (nodeDeclarationVariableData.getExpression() != nullptr)
@@ -158,18 +144,14 @@ void GeneralVisitorGraphViz::visiter(NodeDeclarationVariable* nodeDeclarationVar
 }
 void GeneralVisitorGraphViz::visiter(NodeRefVariable* nodeRefVariable)
 {
-    auto& nodeRefVariableData = _contextGenCode->getNodeComponentRegistry()->get<NodeRefVariableComponents>(
-        nodeRefVariable->getNodeId()
-    );
+    auto& nodeRefVariableData = _contextGenCode->getNodeDataRegistry()->get(nodeRefVariable);
 
     int idNode = _outputVisualGraph.addNode(nodeRefVariableData.getName().value.str());
     _pileIds.push(idNode);
 }
 void GeneralVisitorGraphViz::visiter(NodeUnRefVariable* nodeUnRefVariable)
 {
-    auto& nodeUnRefVariableData = _contextGenCode->getNodeComponentRegistry()->get<NodeUnRefVariableComponents>(
-        nodeUnRefVariable->getNodeId()
-    );
+    auto& nodeUnRefVariableData = _contextGenCode->getNodeDataRegistry()->get(nodeUnRefVariable);
 
     int idNode = _outputVisualGraph.addNode(nodeUnRefVariableData.getName().value.str());
     _pileIds.push(idNode);
@@ -181,9 +163,7 @@ void GeneralVisitorGraphViz::visiter(NodeIdentifiant* nodeIdentifiant PRYSMA_MAY
 }
 void GeneralVisitorGraphViz::visiter(NodeAssignmentArray* nodeAssignmentArray)
 {
-    auto& nodeAssignmentArrayData = _contextGenCode->getNodeComponentRegistry()->get<NodeAssignmentArrayComponents>(
-        nodeAssignmentArray->getNodeId()
-    );
+    auto& nodeAssignmentArrayData = _contextGenCode->getNodeDataRegistry()->get(nodeAssignmentArray);
 
     int idNode = _outputVisualGraph.addNode(nodeAssignmentArrayData.getName().value.str());
     if (nodeAssignmentArrayData.getExpressionIndex() != nullptr)
@@ -209,9 +189,7 @@ void GeneralVisitorGraphViz::visiter(NodeAssignmentArray* nodeAssignmentArray)
 }
 void GeneralVisitorGraphViz::visiter(NodeArrayInitialization* nodeArrayInitialization)
 {
-    auto& nodeArrayInitializationData = _contextGenCode->getNodeComponentRegistry()->get<NodeArrayInitializationComponents>(
-        nodeArrayInitialization->getNodeId()
-    );
+    auto& nodeArrayInitializationData = _contextGenCode->getNodeDataRegistry()->get(nodeArrayInitialization);
 
     int idNode = _outputVisualGraph.addNode("ArrayInitialization");
     for (auto* element : nodeArrayInitializationData.getElements())
@@ -227,9 +205,7 @@ void GeneralVisitorGraphViz::visiter(NodeArrayInitialization* nodeArrayInitializ
 }
 void GeneralVisitorGraphViz::visiter(NodeReadingArray* nodeReadingArray)
 {
-    auto& nodeReadingArrayData = _contextGenCode->getNodeComponentRegistry()->get<NodeReadingArrayComponents>(
-        nodeReadingArray->getNodeId()
-    );
+    auto& nodeReadingArrayData = _contextGenCode->getNodeDataRegistry()->get(nodeReadingArray);
 
     int idNode = _outputVisualGraph.addNode(nodeReadingArrayData.getName().value.str());
     if (nodeReadingArrayData.getIndexEquation() != nullptr)
@@ -245,9 +221,7 @@ void GeneralVisitorGraphViz::visiter(NodeReadingArray* nodeReadingArray)
 }
 void GeneralVisitorGraphViz::visiter(NodeClass* nodeClass)
 {
-    auto& nodeClassData = _contextGenCode->getNodeComponentRegistry()->get<NodeClassComponents>(
-        nodeClass->getNodeId()
-    );
+    auto& nodeClassData = _contextGenCode->getNodeDataRegistry()->get(nodeClass);
 
     int idNode = _outputVisualGraph.addNode(nodeClassData.getName().value.str());
 
@@ -284,9 +258,7 @@ void GeneralVisitorGraphViz::visiter(NodeClass* nodeClass)
 }
 void GeneralVisitorGraphViz::visiter(NodeCallObject* nodeCallObject)
 {
-    auto& nodeCallObjectData = _contextGenCode->getNodeComponentRegistry()->get<NodeCallObjectComponents>(
-        nodeCallObject->getNodeId()
-    );
+    auto& nodeCallObjectData = _contextGenCode->getNodeDataRegistry()->get(nodeCallObject);
 
     int idNode = _outputVisualGraph.addNode(nodeCallObjectData.getObjectName().value.str());
     for (auto* element : nodeCallObjectData.getChildren())
@@ -302,27 +274,21 @@ void GeneralVisitorGraphViz::visiter(NodeCallObject* nodeCallObject)
 }
 void GeneralVisitorGraphViz::visiter(NodeAccesAttribute* nodeAccesAttribute)
 {
-    auto& nodeAccesAttributeData = _contextGenCode->getNodeComponentRegistry()->get<NodeAccesAttributeComponents>(
-        nodeAccesAttribute->getNodeId()
-    );
+    auto& nodeAccesAttributeData = _contextGenCode->getNodeDataRegistry()->get(nodeAccesAttribute);
 
     int idNode = _outputVisualGraph.addNode(nodeAccesAttributeData.getObjectName().value.str());
     _pileIds.push(idNode);
 }
 void GeneralVisitorGraphViz::visiter(NodeDeclarationObject* nodeDeclarationObject)
 {
-    auto& nodeDeclarationObjectData = _contextGenCode->getNodeComponentRegistry()->get<NodeDeclarationObjectComponents>(
-        nodeDeclarationObject->getNodeId()
-    );
+    auto& nodeDeclarationObjectData = _contextGenCode->getNodeDataRegistry()->get(nodeDeclarationObject);
 
     int idNode = _outputVisualGraph.addNode(nodeDeclarationObjectData.getObjectName().value.str());
     _pileIds.push(idNode);
 }
 void GeneralVisitorGraphViz::visiter(NodeIf* nodeIf)
 {
-    auto& nodeIfData = _contextGenCode->getNodeComponentRegistry()->get<NodeIfComponents>(
-        nodeIf->getNodeId()
-    );
+    auto& nodeIfData = _contextGenCode->getNodeDataRegistry()->get(nodeIf);
 
     int idNode = _outputVisualGraph.addNode("If");
 
@@ -361,9 +327,7 @@ void GeneralVisitorGraphViz::visiter(NodeIf* nodeIf)
 }
 void GeneralVisitorGraphViz::visiter(NodeNew* nodeNew)
 {
-    auto& nodeNewData = _contextGenCode->getNodeComponentRegistry()->get<NodeNewComponents>(
-        nodeNew->getNodeId()
-    );
+    auto& nodeNewData = _contextGenCode->getNodeDataRegistry()->get(nodeNew);
 
     int idNode = _outputVisualGraph.addNode(nodeNewData.getName().value.str());
     for (auto* element : nodeNewData.getArguments())
@@ -377,27 +341,21 @@ void GeneralVisitorGraphViz::visiter(NodeNew* nodeNew)
 }
 void GeneralVisitorGraphViz::visiter(NodeDelete* nodeDelete)
 {
-    auto& nodeDeleteData = _contextGenCode->getNodeComponentRegistry()->get<NodeDeleteComponents>(
-        nodeDelete->getNodeId()
-    );
+    auto& nodeDeleteData = _contextGenCode->getNodeDataRegistry()->get(nodeDelete);
 
     int idNode = _outputVisualGraph.addNode(nodeDeleteData.getName().value.str());
     _pileIds.push(idNode);
 }
 void GeneralVisitorGraphViz::visiter(NodeInclude* nodeInclude)
 {
-    auto& nodeIncludeData = _contextGenCode->getNodeComponentRegistry()->get<NodeIncludeComponents>(
-        nodeInclude->getNodeId()
-    );
+    auto& nodeIncludeData = _contextGenCode->getNodeDataRegistry()->get(nodeInclude);
 
     int idNode = _outputVisualGraph.addNode(nodeIncludeData.getPath().value.str());
     _pileIds.push(idNode);
 }
 void GeneralVisitorGraphViz::visiter(NodeWhile* nodeWhile)
 {
-    auto& nodeWhileData = _contextGenCode->getNodeComponentRegistry()->get<NodeWhileComponents>(
-        nodeWhile->getNodeId()
-    );
+    auto& nodeWhileData = _contextGenCode->getNodeDataRegistry()->get(nodeWhile);
 
     int idNode = _outputVisualGraph.addNode("While");
 
@@ -428,9 +386,7 @@ void GeneralVisitorGraphViz::visiter(NodeWhile* nodeWhile)
 }
 void GeneralVisitorGraphViz::visiter(NodeOperation* nodeOperation)
 {
-    auto& nodeOperationData = _contextGenCode->getNodeComponentRegistry()->get<NodeOperationComponents>(
-        nodeOperation->getNodeId()
-    );
+    auto& nodeOperationData = _contextGenCode->getNodeDataRegistry()->get(nodeOperation);
 
     int idNode = _outputVisualGraph.addNode(nodeOperationData.getToken().value.str());
     if (nodeOperationData.getLeft() != nullptr)
@@ -452,18 +408,14 @@ void GeneralVisitorGraphViz::visiter(NodeOperation* nodeOperation)
 }
 void GeneralVisitorGraphViz::visiter(NodeLiteral* nodeLiteral)
 {
-    auto& nodeLiteralData = _contextGenCode->getNodeComponentRegistry()->get<NodeLiteralComponents>(
-        nodeLiteral->getNodeId()
-    );
+    auto& nodeLiteralData = _contextGenCode->getNodeDataRegistry()->get(nodeLiteral);
 
     int idNode = _outputVisualGraph.addNode(nodeLiteralData.getToken().value.str());
     _pileIds.push(idNode);
 }
 void GeneralVisitorGraphViz::visiter(NodeNegation* nodeNegation)
 {
-    auto& nodeNegationData = _contextGenCode->getNodeComponentRegistry()->get<NodeNegationComponents>(
-        nodeNegation->getNodeId()
-    );
+    auto& nodeNegationData = _contextGenCode->getNodeDataRegistry()->get(nodeNegation);
 
     int idNode = _outputVisualGraph.addNode(nodeNegationData.getOperator().value.str());
     if (nodeNegationData.getOperand() != nullptr)

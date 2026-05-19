@@ -7,7 +7,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "compiler/ast/ast_genere.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/visitor/visitor_filling_registry/visitor_filling_registry.h"
 #include "compiler/ast/registry/registry_class.h"
@@ -28,8 +27,7 @@
 
 void FillingVisitorRegistry::visiter(NodeClass* nodeClass)
 {
-    auto& nodeClassData = _contextGenCode->getNodeComponentRegistry()
-        ->get<NodeClassComponents>(nodeClass->getNodeId());
+    auto& nodeClassData = _contextGenCode->getNodeDataRegistry()->get(nodeClass);
 
     // 1. Retrieve the class name from the declaration node
     const Token& classNameToken = nodeClassData.getName();
@@ -76,8 +74,7 @@ void FillingVisitorRegistry::visiter(NodeClass* nodeClass)
             member->accept(this);
         }
         else if (auto* declVar = prysma::dyn_cast<NodeDeclarationVariable>(member)) {
-            auto& nodeDeclData = _contextGenCode->getNodeComponentRegistry()
-                ->get<NodeDeclarationVariableComponents>(declVar->getNodeId());
+            auto& nodeDeclData = _contextGenCode->getNodeDataRegistry()->get(declVar);
 
             Token token;
             token.value = nodeDeclData.getName().value;

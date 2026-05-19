@@ -34,11 +34,9 @@ auto ParserUnRefVariable::parse(std::vector<Token>& tokens, std::size_t& index) 
     consume(tokens, index, TOKEN_UNREF, "Error: 'unref' expected");
     
     Token nameToken = consume(tokens, index, TOKEN_IDENTIFIER, "Error: variable name expected after 'unref'");
-    
-    auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeUnRefVariable>(
-        _contextParser.getNodeComponentRegistry()->getNextId()
-    );
-    _contextParser.getNodeComponentRegistry()->emplace<NodeUnRefVariableComponents>(new_node->getNodeId(), nameToken);
+
+    auto* new_node = _contextParser.getBuilderTreeEquation()->allocate<NodeUnRefVariable>(_contextParser.getIdGenerator()->next());
+    _contextParser.getNodeDataRegistry()->construct(new_node, nameToken);
 
     return new_node;
 }

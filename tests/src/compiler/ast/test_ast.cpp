@@ -14,6 +14,7 @@
 #include <vector>
 #include <llvm-18/llvm/Support/Allocator.h>
 #include <llvm/Support/TargetSelect.h>
+#include "compiler/ast/registry/data/node_data_registry.hpp"
 #include "compiler/ast/registry/registry_type.h"
 #include "compiler/lexer/token_type.h"
 #include "catch.hpp"
@@ -64,7 +65,7 @@ struct EnvironnementAST {
     std::unique_ptr<RegistryExpression> registryExpression;
     std::unique_ptr<RegistryType> registryType;
     std::unique_ptr<RegistryVariable> registryVariable;
-    std::unique_ptr<NodeComponentRegistry> nodeComponentRegistry;
+    std::unique_ptr<NodeDataRegistry> nodeDataRegistry;
 
     BuilderTreeInstruction* builderTree = nullptr;
     BuilderFloatEquation* builderEquation = nullptr;
@@ -78,7 +79,7 @@ struct EnvironnementAST {
         registryExpression = std::make_unique<RegistryExpression>();
         registryType = std::make_unique<RegistryType>();
         registryVariable = std::make_unique<RegistryVariable>();
-        nodeComponentRegistry = std::make_unique<NodeComponentRegistry>();
+        nodeDataRegistry = std::make_unique<NodeDataRegistry>();
 
         // Builder d'tree d'instruction 
         #pragma GCC diagnostic push
@@ -89,7 +90,7 @@ struct EnvironnementAST {
         //  Strategie d'équation 
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wmismatched-new-delete"
-        builderEquation = new (arena) BuilderFloatEquation(registryExpression.get(), nodeComponentRegistry.get() arena);
+        builderEquation = new (arena) BuilderFloatEquation(registryExpression.get(), nodeDataRegistry.get() arena);
         #pragma GCC diagnostic pop
 
         parserType = new (arena.Allocate<TypeParser>()) TypeParser(registryType.get(), builderEquation->getBuilderTree());
@@ -101,7 +102,7 @@ struct EnvironnementAST {
             parserType,
             registryVariable.get(),
             registryType.get(),
-            nodeComponentRegistry.get()
+            nodeDataRegistry.get()
         });
 
         contexteExpression = new (arena.Allocate<ContextExpression>()) ContextExpression(

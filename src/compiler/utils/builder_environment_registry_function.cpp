@@ -36,8 +36,7 @@ void BuilderEnvironmentRegistryFunction::buildVTable(Class* classInfo, const std
     
     // Add the parent's function pointers to the vtable, in the same order
     for (NodeDeclarationFunction* parentMethodDecl : parentMethodList) {
-        auto& nodeParentMethodDeclData = _contextGenCode->getNodeComponentRegistry()
-            ->get<NodeDeclarationFunctionComponents>(parentMethodDecl->getNodeId());
+        auto& nodeParentMethodDeclData = _contextGenCode->getNodeDataRegistry()->get(parentMethodDecl);
 
         llvm::StringRef parentMethodName = nodeParentMethodDeclData.getName().value;
         std::string parentMethodNameStr = parentMethodName.str();
@@ -71,8 +70,7 @@ void BuilderEnvironmentRegistryFunction::buildVTable(Class* classInfo, const std
         
         // Check if this method is in the parent
         for (NodeDeclarationFunction* parentMethodDecl : parentMethodList) {
-            auto& nodeParentMethodDeclData = _contextGenCode->getNodeComponentRegistry()
-                ->get<NodeDeclarationFunctionComponents>(parentMethodDecl->getNodeId());
+            auto& nodeParentMethodDeclData = _contextGenCode->getNodeDataRegistry()->get(parentMethodDecl);
 
             if (nodeParentMethodDeclData.getName().value == methodName) {
                 isInParent = true;
@@ -127,15 +125,14 @@ void BuilderEnvironmentRegistryFunction::fill()
         
         if (oldSymbol->node == nullptr) { continue;}
 
-        auto& oldSymbolNodeData = _contextGenCode->getNodeComponentRegistry()
-            ->get<NodeDeclarationFunctionComponents>(oldSymbol->node->getNodeId());
+        auto& oldSymbolNodeData = _contextGenCode->getNodeDataRegistry()->get(oldSymbol->node);
 
         llvm::Type* retType = oldSymbol->returnType->generateLLVMType(_contextGenCode->getBackend()->getContext());
 
         std::vector<llvm::Type*> paramTypes;
         for (auto* arg : oldSymbolNodeData.getArguments()) {
             auto* argFunction = prysma::cast<NodeArgFunction>(arg);
-            auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeArgFunctionComponents>(argFunction->getNodeId());
+            auto& nodeData = _contextGenCode->getNodeDataRegistry()->get(argFunction);
 
             paramTypes.push_back(nodeData.getType()->generateLLVMType(_contextGenCode->getBackend()->getContext()));
         }
@@ -186,12 +183,11 @@ void BuilderEnvironmentRegistryFunction::fill()
             // Add the hidden 'this' parameter as the first parameter
             paramTypes.push_back(llvm::PointerType::getUnqual(_contextGenCode->getBackend()->getContext()));
 
-            auto& symbolNodeData = _contextGenCode->getNodeComponentRegistry()
-                ->get<NodeDeclarationFunctionComponents>(symbol->node->getNodeId());
+            auto& symbolNodeData = _contextGenCode->getNodeDataRegistry()->get(symbol->node);
 
             for (auto* arg : symbolNodeData.getArguments()) {
                 auto* argFunction = prysma::cast<NodeArgFunction>(arg);
-                auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeArgFunctionComponents>(argFunction->getNodeId());
+                auto& nodeData = _contextGenCode->getNodeDataRegistry()->get(argFunction);
 
                 paramTypes.push_back(nodeData.getType()->generateLLVMType(_contextGenCode->getBackend()->getContext()));
             }

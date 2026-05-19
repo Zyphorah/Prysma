@@ -13,7 +13,6 @@
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
 #include "compiler/ast/registry/context_expression.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/lexer/lexer.h"
 #include "compiler/lexer/token_type.h"
 #include <cstring>
@@ -21,7 +20,6 @@
 #include <cstddef>
 #include <llvm/ADT/StringRef.h>
 #include <stdexcept>
-#include <string.h>
 #include <string>
 #include <vector>
 
@@ -66,10 +64,8 @@ auto ExpressionString::build(std::vector<Token>& equation) -> INode*
         token.line = str.line;
         token.column = str.column;
 
-        auto* nodeLiteral = _context.getBuilderTreeEquation()->allocate<NodeLiteral>(
-            _context.getNodeComponentRegistry()->getNextId()
-        );
-        _context.getNodeComponentRegistry()->emplace<NodeLiteralComponents>(nodeLiteral->getNodeId(), token);
+        auto* nodeLiteral = _context.getBuilderTreeEquation()->allocate<NodeLiteral>(_context.getIdGenerator()->next());
+        _context.getNodeDataRegistry()->construct(nodeLiteral, token);
 
         stringElements.push_back(nodeLiteral); 
     }
@@ -80,19 +76,13 @@ auto ExpressionString::build(std::vector<Token>& equation) -> INode*
     tokenZero.line = str.line;
     tokenZero.column = str.column;
 
-    auto* nodeLiteral = _context.getBuilderTreeEquation()->allocate<NodeLiteral>(
-        _context.getNodeComponentRegistry()->getNextId()
-    );
-    _context.getNodeComponentRegistry()->emplace<NodeLiteralComponents>(nodeLiteral->getNodeId(), tokenZero);
+    auto* nodeLiteral = _context.getBuilderTreeEquation()->allocate<NodeLiteral>(_context.getIdGenerator()->next());
+    _context.getNodeDataRegistry()->construct(nodeLiteral, tokenZero);
+
     stringElements.push_back(nodeLiteral); 
 
-    auto* nodeArrayInit = _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(
-        _context.getNodeComponentRegistry()->getNextId()
-    );
-    _context.getNodeComponentRegistry()->emplace<NodeArrayInitializationComponents>(
-        nodeArrayInit->getNodeId(),
-        _context.getBuilderTreeEquation()->allocateArray<INode*>(stringElements)
-    );
+    auto* nodeArrayInit = _context.getBuilderTreeEquation()->allocate<NodeArrayInitialization>(_context.getIdGenerator()->next());
+    _context.getNodeDataRegistry()->construct(nodeArrayInit, _context.getBuilderTreeEquation()->allocateArray<INode*>(stringElements));
 
     return nodeArrayInit;
 }

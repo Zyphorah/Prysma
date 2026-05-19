@@ -15,7 +15,7 @@
 
 void GeneralVisitorGenCode::visiter(NodeRefVariable* nodeRefVariable) 
 {
-    auto& nodeData = _contextGenCode->getNodeComponentRegistry()->get<NodeRefVariableComponents>(nodeRefVariable->getNodeId());
+    auto& nodeData = _contextGenCode->getNodeDataRegistry()->get(nodeRefVariable);
     const auto& nodeToken = nodeData.getName();
 
     Symbol symbol = _contextGenCode->getRegistryVariable()->getVariable(nodeToken);

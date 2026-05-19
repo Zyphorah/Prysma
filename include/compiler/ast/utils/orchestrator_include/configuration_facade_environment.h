@@ -9,6 +9,8 @@
 #ifndef D8FAA486_F5BA_43FB_BFFC_AB9990B46458
 #define D8FAA486_F5BA_43FB_BFFC_AB9990B46458
 
+#include "compiler/ast/registry/data/id_generator.hpp"
+#include "compiler/ast/registry/data/node_data_registry.hpp"
 #include "compiler/macros/prysma_nodiscard.h"
 #include "compiler/macros/prysma_maybe_unused.h"
 #include "compiler/ast/registry/context_gen_code.h"
@@ -40,7 +42,8 @@ private:
 
     llvm::BumpPtrAllocator _arena;
 
-    std::unique_ptr<NodeComponentRegistry> _nodeComponentRegistry;
+    std::unique_ptr<NodeDataRegistry> _nodeDataRegistry;
+    std::unique_ptr<IdGenerator> _idGenerator;
 
     std::unique_ptr<LlvmBackend> _backend;
     std::unique_ptr<RegistryInstruction> _registryInstruction;
@@ -60,6 +63,7 @@ private:
     ContextExpression* _contextExpression;
 
     void createRegistries();
+    void createGenerators();
     void createContext(const std::string& filePath);
     void createContextParser();
     void registerExternalFunctions();

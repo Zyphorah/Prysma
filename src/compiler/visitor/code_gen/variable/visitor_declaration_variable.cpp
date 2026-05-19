@@ -8,7 +8,6 @@
 
 #include "compiler/ast/ast_genere.h"
 #include "compiler/ast/nodes/interfaces/i_node.h"
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/ast/registry/stack/registry_variable.h"
 #include "compiler/ast/registry/types/i_type.h"
 #include "compiler/lexer/lexer.h"
@@ -30,9 +29,7 @@ void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVari
 {
     VariableAllocator allocator(_contextGenCode);
 
-    auto& nodeDeclarationData = _contextGenCode->getNodeComponentRegistry()->get<NodeDeclarationVariableComponents>(
-        nodeDeclarationVariable->getNodeId()
-    );
+    auto& nodeDeclarationData = _contextGenCode->getNodeDataRegistry()->get(nodeDeclarationVariable);
 
     INode* expression = nodeDeclarationData.getExpression();
 
@@ -42,7 +39,7 @@ void GeneralVisitorGenCode::visiter(NodeDeclarationVariable* nodeDeclarationVari
     // Check if the expression is an array initialization
     auto* arrayInit = prysma::dyn_cast<NodeArrayInitialization>(expression);
 
-    auto& nodeArrData = _contextGenCode->getNodeComponentRegistry()->get<NodeArrayInitializationComponents>(arrayInit->getNodeId());
+    auto& nodeArrData = _contextGenCode->getNodeDataRegistry()->get(arrayInit);
     auto nodeElements = nodeArrData.getElements();
     
     llvm::AllocaInst* createdAlloca = nullptr; 

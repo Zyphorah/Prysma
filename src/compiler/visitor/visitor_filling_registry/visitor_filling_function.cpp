@@ -6,7 +6,6 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "compiler/ast/registry/node_component_registry.h"
 #include "compiler/visitor/visitor_filling_registry/visitor_filling_registry.h"
 #include "compiler/ast/registry/registry_class.h"
 #include "compiler/ast/registry/registry_function.h"
@@ -18,8 +17,7 @@
 
 void FillingVisitorRegistry::visiter(NodeDeclarationFunction* nodeDeclarationFunction)
 {
-    auto& nodeDeclFuncData = _contextGenCode->getNodeComponentRegistry()
-        ->get<NodeDeclarationFunctionComponents>(nodeDeclarationFunction->getNodeId());
+    auto& nodeDeclFuncData = _contextGenCode->getNodeDataRegistry()->get(nodeDeclarationFunction);
 
     IType* returnType = nodeDeclFuncData.getReturnType();
     llvm::StringRef functionName = nodeDeclFuncData.getName().value;
