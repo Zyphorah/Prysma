@@ -179,6 +179,6 @@ public:
 private:
     std::array<bool, N> is_constructed_;
 
-    RawBufferType raw_buffer_;
+    alignas(T) RawBufferType raw_buffer_;
     std::byte* buffer_ptr_;
 };
